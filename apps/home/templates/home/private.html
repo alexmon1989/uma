@@ -1,0 +1,33 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+    <div class="starter-template">
+        {% load bootstrap4 %}
+        {% bootstrap_messages %}
+
+        <h1>Закрита сторінка</h1>
+        <p class="lead">Цю інформацію бачать лише авторизовані користувачі.</p>
+    </div>
+
+    {% if cert %}
+        <p>Дані сертифіката:</p>
+        <ul class="list-unstyled">
+            <li><strong>Ім’я ЦСК, що видав сертифікат:</strong> {{ cert.pszIssuer }}</li>
+            <li><strong>Реквізити ЦСК, що видав сертифікат:</strong> {{ cert.pszIssuerCN }}</li>
+            <li><strong>Реєстраційний номер сертифіката:</strong> {{ cert.pszSerial }}</li>
+            <li><strong>Ім’я власника сертифіката:</strong> {{ cert.pszSubject }}</li>
+            <li><strong>Реквізити власника сертифіката:</strong> {{ cert.pszSubjCN }}</li>
+            <li><strong>Організація до якої належить власник сертифіката:</strong> {{ cert.pszSubjOrg }}</li>
+            <li><strong>Підрозділ організації до якої належить власник сертифіката:</strong> {{ cert.pszSubjOrgUnit }}</li>
+            <li><strong>Посада власника сертифіката:</strong> {{ cert.pszSubjTitle }}</li>
+            <li><strong>Назва області до якої належить власник сертифіката:</strong> {{ cert.pszSubjState }}</li>
+            <li><strong>Повне ім’я власника сертифіката:</strong> {{ cert.pszSubjFullName }}</li>
+            <li><strong>Адреса власника сертифіката:</strong> {{ cert.pszSubjAddress }}</li>
+            <li><strong>Номер телефону власника сертифіката:</strong> {{ cert.pszSubjPhone }}</li>
+            <li><strong>Адреса електронної пошти власника сертифіката:</strong> {{ cert.pszSubjEMail }}</li>
+            <li><strong>Код ЄДРПОУ власника сертифіката:</strong> {{ cert.pszSubjEDRPOUCode }}</li>
+            <li><strong>Код ДРФО власника сертифіката:</strong> {{ cert.pszSubjDRFOCode }}</li>
+            <li><strong>Locality власника сертифіката:</strong> {{ cert.pszSubjLocality }}</li>
+        </ul>
+    {% endif %}
+{% endblock %}

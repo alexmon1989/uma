@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Простий пошук{% endblock %}
+
+{% block content %}
+
+    {% include 'search/simple/_partials/breadcrumbs.html' %}
+
+    <div class="container g-min-height-200">
+        <div class="g-py-50">
+            <p class="g-mb-15 g-font-size-15">Система дозволяє здійснювати пошук в 72 млн. патентних документів. Детальну інформацію про
+                сферу охоплення бази даних
+                можна отримати <a href="#">тут</a>.</p>
+
+            <simple-search-form/>
+        </div>
+    </div>
+
+{% endblock %}

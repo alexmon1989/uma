@@ -1,0 +1,11 @@
+.form-auth > .alert {
+    display: none;
+}
+
+.form-auth .is-invalid .bootstrap4-multi-input {
+    color: #dc3545;
+}
+
+.form-auth .invalid-feedback {
+    display: block !important;
+}

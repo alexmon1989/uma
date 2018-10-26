@@ -1,0 +1,79 @@
+<div id="sideNav" class="col-auto u-sidebar-navigation-v1 u-sidebar-navigation--dark">
+    <ul id="sideNavMenu" class="u-sidebar-navigation-v1-menu u-side-nav--top-level-menu g-min-height-100vh mb-0">
+        <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
+            <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12 {% if request.resolver_match.app_name == 'home' %}active{% endif %}"
+               href="/">
+                <span class="d-flex align-self-center g-font-size-18 g-mr-18">
+                    <i class="hs-admin-home"></i>
+                </span>
+                <span class="media-body align-self-center">Головна</span>
+            </a>
+        </li>
+
+        <!-- Пошук -->
+        <li class="u-sidebar-navigation-v1-menu-item u-side-nav--has-sub-menu u-side-nav--top-level-menu-item {% if request.resolver_match.app_name == 'search' %}u-side-nav-opened has-active{% endif %}">
+            <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12" href="#!"
+               data-hssm-target="#subMenu1">
+                <span class="d-flex align-self-center g-pos-rel g-font-size-18 g-mr-18">
+                    <i class="hs-admin-search"></i>
+                </span>
+                <span class="media-body align-self-center">Пошук</span>
+                <span class="d-flex align-self-center u-side-nav--control-icon">
+                    <i class="hs-admin-angle-right"></i>
+                </span>
+                <span class="u-side-nav--has-sub-menu__indicator"></span>
+            </a>
+
+            <!-- Пошук: Submenu-1 -->
+            <ul id="subMenu1" class="u-sidebar-navigation-v1-menu u-side-nav--second-level-menu mb-0" {% if request.resolver_match.app_name == 'search' %}style="display: block"{% endif %}>
+                <!-- Простий пошук -->
+                <li class="u-sidebar-navigation-v1-menu-item u-side-nav--second-level-menu-item">
+                    <a class="media u-side-nav--second-level-menu-link g-px-15 g-py-12 {% if request.resolver_match.app_name == 'search' and request.resolver_match.url_name == 'simple' %}active{% endif %}"
+                       href="{% url 'search:simple' %}">
+                        <span class="d-flex align-self-center g-mr-15 g-mt-minus-1">
+                            <i class="hs-admin-wand"></i>
+                        </span>
+                        <span class="media-body align-self-center">Простий пошук</span>
+                    </a>
+                </li>
+                <!-- End Простий пошук -->
+
+                <!-- Детальний пошук -->
+                <li class="u-sidebar-navigation-v1-menu-item u-side-nav--second-level-menu-item">
+                    <a class="media u-side-nav--second-level-menu-link g-px-15 g-py-12 {% if request.resolver_match.app_name == 'search' and request.resolver_match.url_name == 'advanced' %}active{% endif %}"
+                       href="{% url 'search:advanced' %}">
+                        <span class="d-flex align-self-center g-mr-15 g-mt-minus-1">
+                            <i class="hs-admin-view-list"></i>
+                        </span>
+                        <span class="media-body align-self-center">Розширений пошук</span>
+                    </a>
+                </li>
+                <!-- Детальний пошук v2 -->
+            </ul>
+            <!-- End Пошук: Submenu-1 -->
+        </li>
+        <!-- End Пошук -->
+
+        <!-- Допомога -->
+        <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
+            <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12" href="#">
+                <span class="d-flex align-self-center g-pos-rel g-font-size-18 g-mr-18">
+                    <i class="hs-admin-help"></i>
+                </span>
+                <span class="media-body align-self-center">Допомога</span>
+            </a>
+        </li>
+        <!-- End Допомога -->
+
+        <!-- Контакти -->
+        <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
+            <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12" href="#">
+                <span class="d-flex align-self-center g-pos-rel g-font-size-18 g-mr-18">
+                    <i class="hs-admin-envelope"></i>
+                </span>
+                <span class="media-body align-self-center">Контакти</span>
+            </a>
+        </li>
+        <!-- End Контакти -->
+    </ul>
+</div>
