@@ -3,9 +3,10 @@
         <div class="row">
             <div class="col-md-6">
                 <!-- Об'єкт промислової власності -->
-                <div class="form-group g-mb-20">
+                <div class="form-group g-mb-20 g-mb-10--md">
                     <label class="g-mb-10" for="obj_type">Об'єкт промислової власності</label>
-                    <chosen-select class="js-custom-select w-100 h-100 u-select-v1 g-min-width-150 g-brd-gray-light-v3 g-color-black g-color-primary--hover g-pt-7 g-pb-7"
+                    <chosen-select
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-py-7"
                             multiple="multiple"
                             data-placeholder="Об'єкт промислової власності"
                             data-open-icon="fa fa-angle-down"
@@ -18,17 +19,23 @@
                                 v-for="objType in objTypes"
                                 :value="objType.id"
                                 :key="objType.id"
-                        >{{ objType.value }}</option>
+                        >{{ objType.value }}
+                        </option>
                     </chosen-select>
+                    <div class="d-flex justify-content-between small">
+                        <a href="#" @click.prevent="selectAllTypes()">Вибрати все</a><br>
+                        <a href="#" @click.prevent="deselectAllTypes()">Скинути</a>
+                    </div>
                 </div>
                 <!-- End Об'єкт промислової власності -->
             </div>
 
             <div class="col-md-6">
                 <!-- Об'єкт промислової власності -->
-                <div class="form-group g-mb-20">
+                <div class="form-group g-mb-20 g-mb-10--md">
                     <label class="g-mb-10" for="obj_status">Стан об'єкта</label>
-                    <chosen-select class="js-custom-select w-100 h-100 u-select-v1 g-min-width-150 g-brd-gray-light-v3 g-color-black g-color-primary--hover g-pt-7 g-pb-7"
+                    <chosen-select
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-py-7"
                             multiple
                             data-placeholder="Стан об'єкта"
                             data-open-icon="fa fa-angle-down"
@@ -41,8 +48,14 @@
                                 v-for="objState in objStates"
                                 v-bind:value="objState.id"
                                 :key="objState.id"
-                        >{{ objState.value }}</option>
+                        >{{ objState.value }}
+                        </option>
                     </chosen-select>
+
+                    <div class="d-flex justify-content-between small">
+                        <a href="#" @click.prevent="selectAllStates()">Вибрати все</a><br>
+                        <a href="#" @click.prevent="deselectAllStates()">Скинути</a>
+                    </div>
                 </div>
                 <!-- End Об'єкт промислової власності -->
             </div>
@@ -54,7 +67,7 @@
             Коди ІНІД</h3>
 
         <!-- Коди ІНІД -->
-        <div class="form-group g-mb-15"
+        <div class="form-group g-mb-10"
              v-for="(ipcGroup, index) in ipcGroups"
              :key="ipcGroup.id"
         >
@@ -67,21 +80,24 @@
         </div>
         <!-- End Коди ІНІД -->
 
-        <div class="g-mb-10">
-            <button @click="addIpcGroup"
-                    type="button"
-                    class="btn btn-md u-btn-primary"
-                    :disabled="selectedObjTypes.length === 0 || selectedObjStates.length === 0"
-            ><i class="hs-admin-plus g-mr-5"></i>Додати
-            </button>
+         <!-- Дії -->
+        <div class="row">
+            <div class="col-md-6 text-center text-md-left g-mb-20 g-mb-0--md">
+                <button @click="addIpcGroup"
+                        type="button"
+                        class="btn btn-md u-btn-indigo"
+                        :disabled="selectedObjTypes.length === 0 || selectedObjStates.length === 0"
+                ><i class="fa fa-plus g-mr-5"></i>Додати параметр
+                </button>
+            </div>
+            <div class="col-md-6 text-center text-md-right g-mb-20 g-mb-0--md">
+                <button type="submit"
+                        class="btn btn-md u-btn-blue"
+                ><i class="fa fa-search g-mr-5"></i>Показати результати
+                </button>
+            </div>
         </div>
-
-        <div class="text-center">
-            <button type="submit"
-                    class="btn btn-xl u-btn-blue g-mr-10"
-            ><i class="hs-admin-search g-mr-5"></i>Пошук
-            </button>
-        </div>
+        <!-- End Дії -->
     </form>
 </template>
 
@@ -115,31 +131,25 @@
                 // Фильтрация ИНИД-кодов
                 const ipcCodesFiltered = this.ipcCodes.filter(function (item) {
                     return item.schedule_types.some(x => self.selectedScheduleTypes.includes(x))
-                        && self.selectedObjTypes.some(x => x === item.obj_type_id);
+                        && self.selectedObjTypes.some(x => x === item.obj_type_id.toString());
                 });
 
                 // Группировка ИНИД-кодов по объектам пром. собственности
                 return this.selectedObjTypes.map(function (item) {
                     return {
                         'title': self.objTypes.find(x => x.id === parseInt(item)).value,
-                        'ipc_codes': ipcCodesFiltered.filter(x => x.obj_type_id === item)
+                        'ipc_codes': ipcCodesFiltered.filter(x => x.obj_type_id === parseInt(item))
                     }
                 });
             }
         },
         watch: {
-            ipcCodesGrouped: function (val) {
-                this.$nextTick(function () {
-                    //$('.selectpicker').selectpicker('refresh');
-                });
-            },
-
             // Получение scheduleTypes для выбранных состояний объекта ОПС
             selectedObjStates: function (val) {
                 const self = this;
                 let scheduleTypes = [];
                 this.objStates.filter(function (item) {
-                    return self.selectedObjStates.includes(item.id)
+                    return self.selectedObjStates.includes(item.id.toString())
                 }).forEach(function (item) {
                     scheduleTypes = scheduleTypes.concat(item.schedule_types);
                 });
@@ -150,15 +160,32 @@
             // Добавляет группу полей для выбора кода ИНИД и его значения
             addIpcGroup: function () {
                 this.ipcGroups.push({'id': (this.ipcGroups.length + 1)});
-                this.$nextTick(function () {
-                    $('.selectpicker').selectpicker();
-                });
             },
 
             // Удаляет группу полей ИНИД
             removeIpcGroup: function (index) {
                 this.ipcGroups.splice(index, 1);
             },
+
+            // Выбор всех состояний объекта
+            selectAllStates: function() {
+                this.selectedObjStates = this.objStates.map(x => x.id.toString());
+            },
+
+            // Снять выбор всех состояний объекта
+            deselectAllStates: function() {
+                this.selectedObjStates = [];
+            },
+
+            // Выбор всех типов объекта
+            selectAllTypes: function() {
+                this.selectedObjTypes = this.objTypes.map(x => x.id.toString());
+            },
+
+            // Снять выбор всех типов объекта
+            deselectAllTypes: function() {
+                this.selectedObjTypes = [];
+            }
         },
         components: {
             IpcCode

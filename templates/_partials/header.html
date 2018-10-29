@@ -30,18 +30,17 @@
                      id="navBar">
                     <ul class="navbar-nav text-uppercase g-font-weight-600 mx-auto">
 
-                        <li class="nav-item active hs-has-sub-menu g-mx-20--lg">
+                        <li class="nav-item hs-has-sub-menu g-mx-20--lg {% if 'search' in request.path %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
                                aria-expanded="false" aria-controls="nav-submenu-1">Пошук
-
                             </a>
                             <!-- Submenu -->
                             <ul class="hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-20 g-mt-10--lg--scrolling"
                                 id="nav-submenu-1" aria-labelledby="nav-link-1">
-                                <li class="dropdown-item active">
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'search:simple'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'search:simple' %}">Простий пошук</a>
                                 </li>
-                                <li class="dropdown-item">
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'search:advanced'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'search:advanced' %}">Розширений пошук</a>
                                 </li>
                             </ul>
