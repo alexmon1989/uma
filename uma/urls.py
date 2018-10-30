@@ -26,6 +26,7 @@ urlpatterns = [
     path('search/', include('apps.search.urls')),
     path('contacts/', include('apps.contacts.urls')),
     path('about/', include('apps.about.urls')),
+    path('help/', include('apps.help.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
