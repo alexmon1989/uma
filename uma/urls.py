@@ -25,6 +25,7 @@ urlpatterns = [
     path('auth/', include('apps.my_auth.urls')),
     path('search/', include('apps.search.urls')),
     path('contacts/', include('apps.contacts.urls')),
+    path('about/', include('apps.about.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
