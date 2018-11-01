@@ -16,27 +16,3 @@
   background: linear-gradient(0deg, rgba(7, 21, 59, 0.95) 0%, rgba(86, 218, 249, 0.75) 100%); /* w3c */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8ac3f3', endColorstr='#07153b', GradientType=0); /* ie6-9 */
 }
-
-.chosen-container-single {
-  .chosen-search {
-    input[type="text"] {
-      padding: inherit;
-    }
-  }
-}
-
-.chosen-container .chosen-results li.group-result {
-  font-size: 16px;
-  color: #0a0a0a;
-  padding-top: 20px;
-}
-
-.chosen-container-single .chosen-default {
-    color: #999 !important;
-}
-
-.chosen-disabled {
-    opacity: 1 !important;
-    cursor: default;
-    background-color: #e9ecef;
-}

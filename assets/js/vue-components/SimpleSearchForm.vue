@@ -8,9 +8,7 @@
                 <div class="form-group g-mb-20">
                     <chosen-select
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            data-placeholder="Оберіть параметр пошуку"
-                            data-open-icon="fa fa-angle-down"
-                            data-close-icon="fa fa-angle-up">
+                            data-placeholder="Оберіть параметр пошуку">
                         <option></option>
                         <option class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
                                 value="">Номер заявки
@@ -29,12 +27,13 @@
             <!-- Значення параметра пошуку -->
             <div class="col-md-7 d-flex">
                 <div class="form-group g-mb-20 g-pos-rel" style="flex-grow: 1">
-                    <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11" type="text"
+                    <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11"
+                           type="text"
                            placeholder="Значення">
                 </div>
                 <!-- Кнопка скрытия -->
                 <button class="btn btn-md u-btn-pink g-pt-10 g-pb-11 g-ml-10 align-self-start"
-                    type="button"
+                        type="button"
                 ><i class="fa fa-minus"></i></button>
                 <!-- End Кнопка скрытия -->
             </div>
@@ -61,8 +60,11 @@
 </template>
 
 <script>
+    import ChosenSelect from "./ChosenSelect.vue";
+
     export default {
-        name: "SimpleSearchForm"
+        name: "SimpleSearchForm",
+        components: {ChosenSelect}
     }
 </script>
 

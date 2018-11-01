@@ -1,78 +1,135 @@
 <template>
     <div class="row">
-        <div class="col-12 col-md-6">
-            <div class="form-group g-mb-10">
-                <chosen-select
-                        ref="ipc_code"
-                        class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                        data-placeholder="Оберіть код ІНІД"
-                        data-open-icon="fa fa-angle-down"
-                        data-close-icon="fa fa-angle-up"
-                        id="obj_status"
-                        :name="'form-' + index + '-ipc_code'"
-                        v-model="ipcCode"
-                        :disabled="selectedObjTypes.length === 0 || selectedObjStates.length === 0"
-                >
-                    <option value=""></option>
-                    <optgroup v-for="group in ipcCodesGrouped" :label="group.title">
-                        <option v-for="ipcCode in group.ipc_codes"
-                            class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
-                            :value="ipcCode.id"
-                            :key="ipcCode.id"
-                        >{{ ipcCode.value }} <small class=text-muted>({{ ipcCode.obj_type }})</small></option>
-                    </optgroup>
-                </chosen-select>
+        <div class="col-md-11">
+            <div class="row d-flex align-items-start">
+                <!-- Об'єкт промислової власності -->
+                <div class="col-md-3 g-mb-15 g-pr-7--md">
+                    <chosen-select
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
+                            data-placeholder="Об'єкт промислової власності"
+                            :name="'form-' + index + '-obj_type'"
+                            v-model="objType"
+                    >
+                        <option value=""></option>
+                        <option v-for="objType in objTypes"
+                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
+                                :value="objType.id"
+                                :key="objType.id"
+                        >{{ objType.value }}
+                        </option>
+                    </chosen-select>
+                </div>
+                <!-- END Об'єкт промислової власності -->
+
+                <!-- Стан об'єкта -->
+                <div class="col-md-3 g-mb-15 g-px-8--md">
+                    <chosen-select
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
+                            data-placeholder="Стан об'єкта"
+                            multiple
+                            :name="'form-' + index + '-obj_state'"
+                            v-model="objState"
+                    >
+                        <option v-for="objState in objStates"
+                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
+                                :value="objState.id"
+                                :key="objState.id"
+                        >{{ objState.value }}
+                        </option>
+                    </chosen-select>
+                </div>
+                <!-- END Стан об'єкта -->
+
+                <!-- Код ІНІД -->
+                <div class="col-md-3 g-mb-15 g-px-8--md">
+                    <chosen-select
+                            ref="ipc_code"
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
+                            data-placeholder="Код ІНІД"
+                            id="obj_status"
+                            :name="'form-' + index + '-ipc_code'"
+                            v-model="ipcCode"
+                            :disabled="objType === '' || objState.length === 0"
+                    >
+                        <option value=""></option>
+                        <option v-for="ipcCode in ipcCodesFiltered"
+                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
+                                :value="ipcCode.id"
+                                :key="ipcCode.id"
+                        >{{ ipcCode.value }}
+                        </option>
+                    </chosen-select>
+                </div>
+                <!-- END Код ІНІД -->
+
+                <!-- Значення -->
+                <div class="col-md-3 g-px-8--md">
+                    <input type="text"
+                           class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
+                           :name="'form-' + index + '-value'"
+                           v-model="value"
+                           ref="value"
+                           @focus="valueFocused = true"
+                           @blur="onValueBlur"
+                           :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
+                           autocomplete="off"
+                           placeholder="Значення">
+
+                    <div class="d-flex justify-content-around g-pt-5"
+                         @focus="valueFocused = true">
+                        <button type="button"
+                                v-for="(operator, index) in logicalOperators"
+                                v-show="valueFocused && operator.dataTypes.includes(dataType)"
+                                ref="logical_operator"
+                                class="btn btn-xs btn-secondary"
+                                @click="onLogicalOperatorBtnClick(operator.value)"
+                        >{{ operator.value }}
+                        </button>
+                    </div>
+                </div>
+                <!-- END Значення -->
             </div>
         </div>
 
-        <div class="col-12 col-md-6 d-flex">
-            <div class="g-pos-rel form-group g-mb-10" style="flex-grow: 1">
-                <input class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
-                       :name="'form-' + index + '-value'"
-                       placeholder="Значення"
-                       v-model="value"
-                       :disabled="selectedObjTypes.length === 0 || selectedObjStates.length === 0 || !ipcCode"
-                       ref="value"
-                       @focus="valueFocused = true"
-                       @blur="onValueBlur"
-                       type="text">
-
-                    <ul class="u-list-inline g-pt-5"
-                        v-show="valueFocused"
-                        @focus="valueFocused = true"
-                    >
-                        <li class="list-inline-item g-mr-5"
-                            v-for="(operator, index) in logicalOperators"
-                            v-show="operator.dataTypes.includes(dataType)"
-                            :key="index"
-                        >
-                            <button type="button"
-                                    ref="logical_operator"
-                                    class="btn btn-xs btn-secondary"
-                                    :disabled="selectedObjTypes.length === 0 || selectedObjStates.length === 0"
-                                    @click="onLogicalOperatorBtnClick(operator.value)"
-                            >{{ operator.value }}</button>
-                        </li>
-                    </ul>
-            </div>
-            <button class="btn btn-md u-btn-pink g-pt-10 g-pb-11 g-ml-10 align-self-start"
-                    type="button"
+        <div class="col-md-1 g-mb-30 g-mb-15--md g-pl-8--md">
+            <button type="button"
+                    class="btn btn-block btn-md u-btn-pink g-pt-10 g-pb-11 rounded-0"
                     @click="$emit('remove-ipc-group', index)"
+                    :disabled="ipcGroupsCount === 1"
             ><i class="fa fa-minus"></i></button>
         </div>
     </div>
 </template>
 
 <script>
+    import ChosenSelect from "../ChosenSelect.vue";
+
     export default {
         name: "ipcCode",
-        props: ["ipcCodesGrouped", "selectedObjTypes", "selectedObjStates", "index"],
+        components: {ChosenSelect},
+        props: {
+            objTypes: Array,
+            objStates: Array,
+            ipcCodes: Array,
+            index: Number,
+            ipcGroupsCount: Number,
+        },
         methods: {
             // Обработчик события нажатия на кнопку "Логический оператор".
-            onLogicalOperatorBtnClick: function (value) {
-                this.value = this.value + value;
+            // Добавляет в позицию курсора значение логического оператора.
+            onLogicalOperatorBtnClick: function (text) {
+                const $value = $(this.$refs.value);
+                const cursorPos = $value.prop('selectionStart');
+                const v = $value.val();
+                const textBefore = v.substring(0,  cursorPos);
+                const textAfter  = v.substring(cursorPos, v.length);
+
+                $value.val(textBefore + text + textAfter);
+
                 this.$nextTick(function () {
                     this.$refs.value.focus();
+                    let newCursorPos = cursorPos + text.length;
+                    this.$refs.value.setSelectionRange(newCursorPos, newCursorPos);
                 });
             },
 
@@ -87,6 +144,8 @@
         },
         data: function () {
             return {
+                objType: '', // выбранный объект пром. собств.
+                objState: [], // выбранные состояния объектов пром. собств.
                 ipcCode: '', // выбранный код ИНИД
                 value: '', // введенное значение для поиска
                 valueFocused: false,
@@ -138,24 +197,35 @@
         computed: {
             // Тип данных выбранного поля ИНИД
             dataType: function () {
-                const self = this;
-                let data_type = '';
-                this.ipcCodesGrouped.forEach(function (item) {
-                    let ipcCode = item.ipc_codes.find(x => x.id === parseInt(self.ipcCode));
-                    if (ipcCode) {
-                        data_type = ipcCode.data_type;
-                    }
+                if (this.ipcCode) {
+                    return this.ipcCodes.find(x => x.id === parseInt(this.ipcCode)).data_type;
+                }
+                return '';
+            },
+
+            ipcCodesFiltered: function () {
+                // Фильтр по объекту пром. собств.
+                let ipcCodes = this.ipcCodes.filter(item => item.obj_type_id === parseInt(this.objType));
+
+                // Получение реестров (заявки, охр. документы)
+                let selectedScheduleTypes = [];
+                this.objState.forEach(item => {
+                    let schedule_types = this.objStates.find(x => x.id === parseInt(item)).schedule_types;
+                    selectedScheduleTypes.push(...schedule_types);
                 });
-                return data_type;
+
+                // Фильтр по реестрам
+                ipcCodes = ipcCodes.filter(item => item.schedule_types.some(x => selectedScheduleTypes.includes(x)));
+                return ipcCodes;
             }
         },
         watch: {
-            ipcCodesGrouped: function (val) {
+            ipcCodesFiltered: function (val) {
                 this.$nextTick(function () {
                     $(this.$refs.ipc_code.$el).trigger('chosen:updated');
                 });
             }
-        },
+        }
     }
 </script>
 
