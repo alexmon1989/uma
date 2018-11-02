@@ -1,7 +1,9 @@
+{% load i18n %}
+
 <form>
     <div class="row">
         <div class="col-md-6 form-group g-mb-20">
-            <label class="g-color-gray-dark-v2 g-font-size-13">ПІБ:</label>
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "ПІБ" %}:</label>
             <input class="form-control g-color-gray-dark-v5 g-bg-white g-bg-white--focus g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
                    type="text">
         </div>
@@ -13,18 +15,18 @@
         </div>
 
         <div class="col-md-12 form-group g-mb-20">
-            <label class="g-color-gray-dark-v2 g-font-size-13">Тема повідомлення:</label>
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Тема повідомлення" %}:</label>
             <input class="form-control g-color-gray-dark-v5 g-bg-white g-bg-white--focus g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
                    type="text">
         </div>
 
         <div class="col-md-12 form-group g-mb-40">
-            <label class="g-color-gray-dark-v2 g-font-size-13">Повідомлення:</label>
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Повідомлення" %}:</label>
             <textarea
                     class="form-control g-color-gray-dark-v5 g-bg-white g-bg-white--focus g-brd-gray-light-v4 g-brd-primary--focus g-resize-none rounded-3 g-py-13 g-px-15"
                     rows="7"></textarea>
         </div>
     </div>
 
-    <button class="btn u-btn-primary rounded-3 g-py-12 g-px-20" type="submit" role="button">Відправити повідомлення</button>
+    <button class="btn u-btn-primary rounded-3 g-py-12 g-px-20" type="submit" role="button">{% trans "Відправити повідомлення" %}</button>
 </form>

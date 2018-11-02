@@ -1,4 +1,6 @@
 {% load staticfiles %}
+{% load i18n %}
+{% load uma_extras %}
 
 <header id="js-header" class="u-header u-header--static u-header--show-hide u-header--change-appearance"
         data-header-fix-moment="500" data-header-fix-effect="slide">
@@ -20,7 +22,7 @@
                 <!-- End Responsive Toggle Button -->
 
                 <!-- Logo -->
-                <a href="/" class="navbar-brand d-flex">
+                <a href="{% url 'home:index' %}" class="navbar-brand d-flex">
                     <img src="{% static 'img/logo/logo.png' %}" alt="">
                 </a>
                 <!-- End Logo -->
@@ -32,37 +34,39 @@
 
                         <li class="nav-item hs-has-sub-menu g-mx-20--lg {% if 'search' in request.path %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
-                               aria-expanded="false" aria-controls="nav-submenu-1">Пошук
+                               aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Пошук" %}
                             </a>
                             <!-- Submenu -->
                             <ul class="hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-20 g-mt-10--lg--scrolling"
                                 id="nav-submenu-1" aria-labelledby="nav-link-1">
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'search:simple'%}active{% endif %}">
-                                    <a class="nav-link g-px-0" href="{% url 'search:simple' %}">Простий пошук</a>
+                                    <a class="nav-link g-px-0" href="{% url 'search:simple' %}">{% trans "Простий пошук" %}</a>
                                 </li>
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'search:advanced'%}active{% endif %}">
-                                    <a class="nav-link g-px-0" href="{% url 'search:advanced' %}">Розширений пошук</a>
+                                    <a class="nav-link g-px-0" href="{% url 'search:advanced' %}">{% trans "Розширений пошук" %}</a>
                                 </li>
                             </ul>
                             <!-- End Submenu -->
                         </li>
 
                         <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'about' in request.path %}active{% endif %}">
-                            <a href="{% url 'about:about' %}" class="nav-link g-py-7 g-px-0">Про сервіс</a>
+                            <a href="{% url 'about:about' %}" class="nav-link g-py-7 g-px-0">{% trans "Про сервіс" %}</a>
                         </li>
 
                         <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'help' in request.path %}active{% endif %}">
-                            <a href="{% url 'help:help' %}" class="nav-link g-py-7 g-px-0">Допомога</a>
+                            <a href="{% url 'help:help' %}" class="nav-link g-py-7 g-px-0">{% trans "Допомога" %}</a>
                         </li>
 
                         <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'contacts' in request.path %}active{% endif %}">
-                            <a href="{% url 'contacts:contacts' %}" class="nav-link g-py-7 g-px-0">Контакти</a>
+                            <a href="{% url 'contacts:contacts' %}" class="nav-link g-py-7 g-px-0">{% trans "Контакти" %}</a>
                         </li>
                     </ul>
                 </div>
                 <!-- End Navigation -->
 
-                <!-- Search -->
+                <!-- Смена языков -->
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_language_info for LANGUAGE_CODE as lang %}
                 <div class="g-pos-rel g-width-50 g-pt-3--lg g-ml-30 g-ml-0--lg">
                     <a href="#!" id="languages-dropdown-invoker-2"
                        class="g-color-gray-dark-v2 g-color-primary--hover g-text-underline--none--hover"
@@ -71,22 +75,23 @@
                        data-dropdown-type="css-animation" data-dropdown-duration="500"
                        data-dropdown-hide-on-scroll="false" data-dropdown-animation-in="fadeIn"
                        data-dropdown-animation-out="fadeOut">
-                        УКР&nbsp;<i class="fa fa-angle-down g-ml-3"></i>
+                        {{ lang.name_local|slice:":3" }}&nbsp;<i class="fa fa-angle-down g-ml-3"></i>
                     </a>
+
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as langs %}
                     <ul id="languages-dropdown-2"
                         class="list-unstyled text-left u-shadow-v23 g-pos-abs g-left-0 g-bg-white g-width-160 g-z-index-2 g-py-20 g-pb-15 g-mt-25--lg g-mt-20--lg--scrolling"
                         aria-labelledby="languages-dropdown-invoker-2">
-                        <li>
-                            <a class="d-block g-color-main g-color-primary--hover g-text-underline--none--hover g-py-8 g-px-20"
-                               href="#!">Українська</a>
-                        </li>
-                        <li>
-                            <a class="d-block g-color-main g-color-primary--hover g-text-underline--none--hover g-py-8 g-px-20"
-                               href="#!">English</a>
-                        </li>
+                        {% for language in langs %}
+                            <li>
+                                <a class="d-block g-color-main g-color-primary--hover g-text-underline--none--hover g-py-8 g-px-20"
+                                   href="{% change_language language.code %}">{{ language.name_local }}</a>
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
-                <!-- End Search -->
+                <!-- End Смена языков -->
             </div>
         </nav>
     </div>

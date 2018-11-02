@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load i18n %}
 
 <!-- Footer -->
 <div class="gradient g-bg-cover g-bg-pos-center g-bg-img-hero g-bg-black-opacity-0_1--after g-py-50"
@@ -10,47 +11,45 @@
                 <a class="d-block g-mb-20" href="/">
                     <img class="img-fluid" src="{% static 'img/logo/logo-footer.png' %}" alt="Logo">
                 </a>
-                <p>Сервіс створено для пошуку відомостей про об'єкти промислової власності.</p>
-                <p class="mb-0">Duis eleifend fermentum ante ut aliquam. Cras mi risus, dignissim sed adipiscing ut,
-                    placerat non arcu.</p>
+                <p>{% trans "Сервіс створено для пошуку відомостей про об'єкти промислової власності." %}</p>
             </div>
             <!-- End Footer Content -->
 
             <!-- Footer Content -->
             <div class="col-lg-3 col-md-6 g-mb-40 g-mb-0--lg">
                 <div class="u-heading-v3-1 g-brd-white-opacity-0_3 g-mb-25">
-                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">Меню</h2>
+                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">{% trans "Меню" %}</h2>
                 </div>
 
                 <nav class="text-uppercase1">
                     <ul class="list-unstyled g-mt-minus-10 mb-0">
                         <li class="g-pos-rel g-brd-bottom g-brd-white-opacity-0_1 g-py-10">
                             <h4 class="h6 g-pr-20 mb-0">
-                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'search:simple' %}">Простий пошук</a>
+                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'search:simple' %}">{% trans "Простий пошук" %}</a>
                                 <i class="fa fa-angle-right g-absolute-centered--y g-right-0"></i>
                             </h4>
                         </li>
                         <li class="g-pos-rel g-brd-bottom g-brd-white-opacity-0_1 g-py-10">
                             <h4 class="h6 g-pr-20 mb-0">
-                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'search:advanced' %}">Розширений пошук</a>
+                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'search:advanced' %}">{% trans "Розширений пошук" %}</a>
                                 <i class="fa fa-angle-right g-absolute-centered--y g-right-0"></i>
                             </h4>
                         </li>
                         <li class="g-pos-rel g-brd-bottom g-brd-white-opacity-0_1 g-py-10">
                             <h4 class="h6 g-pr-20 mb-0">
-                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'about:about' %}">Про сервіс</a>
+                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'about:about' %}">{% trans "Про сервіс" %}</a>
                                 <i class="fa fa-angle-right g-absolute-centered--y g-right-0"></i>
                             </h4>
                         </li>
                         <li class="g-pos-rel g-brd-bottom g-brd-white-opacity-0_1 g-py-10">
                             <h4 class="h6 g-pr-20 mb-0">
-                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'help:help' %}">Допомога</a>
+                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'help:help' %}">{% trans "Допомога" %}</a>
                                 <i class="fa fa-angle-right g-absolute-centered--y g-right-0"></i>
                             </h4>
                         </li>
                         <li class="g-pos-rel g-py-10">
                             <h4 class="h6 g-pr-20 mb-0">
-                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'contacts:contacts' %}">Контакти</a>
+                                <a class="g-color-white-opacity-0_8 g-color-white--hover" href="{% url 'contacts:contacts' %}">{% trans "Контакти" %}</a>
                                 <i class="fa fa-angle-right g-absolute-centered--y g-right-0"></i>
                             </h4>
                         </li>
@@ -62,11 +61,11 @@
             <!-- Footer Content -->
             <div class="col-lg-3 col-md-6 g-mb-40 g-mb-0--lg">
                 <div class="u-heading-v3-1 g-brd-white-opacity-0_3 g-mb-25">
-                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">Статистика</h2>
+                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">{% trans "Статистика" %}</h2>
                 </div>
 
                 <div class="g-color-white-opacity-0_8 g-line-height-2 g-mt-minus-4">
-                    Дата актуалізації: <strong>25.10.2018 11:31</strong>
+                    {% trans "Дата актуалізації" %}: <strong>25.10.2018 11:31</strong>
                 </div>
             </div>
             <!-- End Footer Content -->
@@ -74,14 +73,14 @@
             <!-- Footer Content -->
             <div class="col-lg-3 col-md-6">
                 <div class="u-heading-v3-1 g-brd-white-opacity-0_3 g-mb-25">
-                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">Зв'язок з нами</h2>
+                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">{% trans "Зв'язок з нами" %}</h2>
                 </div>
 
                 <address class="g-bg-no-repeat g-line-height-2 g-mt-minus-4 g-color-white-opacity-0_8">
-                    <div class="g-mb-10"><strong>Адміністратор баз даних</strong></div>
-                    Телефон: <a href="tel:+380 (44) 494-05-54" class="g-color-white">+380 (44) 494-05-54</a><br>
-                    Режим роботи: з 8.30 до 17.15<br>
-                    Перерва з 12.00 до 12.30<br>
+                    <div class="g-mb-10"><strong>{% trans "Адміністратор баз даних" %}</strong></div>
+                    {% trans "Телефон" %}: <a href="tel:+380 (44) 494-05-54" class="g-color-white">+380 (44) 494-05-54</a><br>
+                    {% trans "Режим роботи" %}: з 8.30 до 17.15<br>
+                    {% trans "Перерва" %} {% trans "з" %} 12.00 {% trans "по" %} 12.30<br>
                     <a href="mailto:IBase@ukrpatent.org" class="g-color-white">IBase@ukrpatent.org</a>
                 </address>
             </div>
@@ -97,8 +96,8 @@
         <div class="row">
             <div class="col-md-8 text-center text-md-left g-mb-15 g-mb-0--md">
                 <div class="d-lg-flex">
-                    <small class="d-block g-font-size-default g-mr-10 g-mb-10 g-mb-0--md">&copy; Державне підприємство
-                        "Український інститут інтелектуальної власності", 2018
+                    <small class="d-block g-font-size-default g-mr-10 g-mb-10 g-mb-0--md">&copy;
+                        {% trans "Державне підприємство &laquo;Український інститут інтелектуальної власності&raquo;" %}, {% now 'Y' %}
                     </small>
                 </div>
             </div>

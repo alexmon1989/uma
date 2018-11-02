@@ -1,0 +1,161 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-02 12:03+0000\n"
+"PO-Revision-Date: 2018-11-02 14:04+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2\n"
+
+#: apps/about/templates/about/_partials/breadcrumbs.html:16
+#: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
+#: apps/help/templates/help/_partials/breadcrumbs.html:16
+#: apps/search/templates/search/advanced/_partials/breadcrumbs.html:16
+#: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
+msgid "Головна"
+msgstr "Home"
+
+#: apps/contacts/templates/contacts/_partials/details.html:3
+msgid "Адміністратор бази даних"
+msgstr "Database administrator"
+
+#: apps/contacts/templates/contacts/_partials/details.html:12
+#: apps/contacts/templates/contacts/_partials/details.html:13
+#: templates/_partials/footer.html:81
+msgid "Телефон"
+msgstr "Phone"
+
+#: apps/contacts/templates/contacts/_partials/details.html:18
+#: templates/_partials/footer.html:82
+msgid "Режим роботи"
+msgstr "Operating mode"
+
+#: apps/contacts/templates/contacts/_partials/details.html:19
+#: apps/contacts/templates/contacts/_partials/details.html:20
+#: templates/_partials/footer.html:83
+msgid "з"
+msgstr "from"
+
+#: apps/contacts/templates/contacts/_partials/details.html:19
+#: apps/contacts/templates/contacts/_partials/details.html:21
+#: templates/_partials/footer.html:83
+msgid "по"
+msgstr "to"
+
+#: apps/contacts/templates/contacts/_partials/details.html:20
+#: templates/_partials/footer.html:83
+msgid "Перерва"
+msgstr "Break"
+
+#: apps/contacts/templates/contacts/_partials/form.html:6
+msgid "ПІБ"
+msgstr "Name"
+
+#: apps/contacts/templates/contacts/_partials/form.html:18
+msgid "Тема повідомлення"
+msgstr "Subject"
+
+#: apps/contacts/templates/contacts/_partials/form.html:24
+msgid "Повідомлення"
+msgstr "Message"
+
+#: apps/contacts/templates/contacts/_partials/form.html:31
+msgid "Відправити повідомлення"
+msgstr "Send"
+
+#: apps/search/templates/search/advanced/_partials/breadcrumbs.html:10
+#: apps/search/templates/search/advanced/_partials/breadcrumbs.html:24
+#: apps/search/templates/search/advanced/advanced.html:4
+#: templates/_partials/footer.html:34 templates/_partials/header.html:46
+msgid "Розширений пошук"
+msgstr "Advanced search"
+
+#: apps/search/templates/search/advanced/_partials/breadcrumbs.html:20
+#: apps/search/templates/search/simple/_partials/breadcrumbs.html:20
+#: templates/_partials/header.html:37
+msgid "Пошук"
+msgstr "Search"
+
+#: apps/search/templates/search/advanced/advanced.html:11
+msgid "Система дозволяє здійснювати пошук в 72 млн. патентних документів."
+msgstr "The system allows searching for 72 million patent documents."
+
+#: apps/search/templates/search/advanced/advanced.html:11
+msgid "Детальну інформацію про сферу охоплення бази даних можна ывавыа"
+msgstr "Detailed information on the scope of the database can be obtained"
+
+#: apps/search/templates/search/advanced/advanced.html:11
+#: apps/search/templates/search/simple/simple.html:11
+msgid "тут"
+msgstr "here"
+
+#: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
+#: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
+#: apps/search/templates/search/simple/simple.html:4
+#: templates/_partials/footer.html:28 templates/_partials/header.html:43
+msgid "Простий пошук"
+msgstr "Simple search"
+
+#: apps/search/templates/search/simple/simple.html:11
+msgid ""
+"Система дозволяє здійснювати пошук в 72 млн. патентних документів. Детальну "
+"інформацію про сферу охоплення бази даних можна отримати"
+msgstr ""
+"The system allows searching for 72 million patent documents. Detailed "
+"information on the scope of the database can be obtained"
+
+#: templates/_partials/footer.html:14
+msgid ""
+"Сервіс створено для пошуку відомостей про об'єкти промислової власності."
+msgstr ""
+"The service was created to search for information about industrial property "
+"objects."
+
+#: templates/_partials/footer.html:21
+msgid "Меню"
+msgstr "Menu"
+
+#: templates/_partials/footer.html:40 templates/_partials/header.html:53
+msgid "Про сервіс"
+msgstr "About"
+
+#: templates/_partials/footer.html:46 templates/_partials/header.html:57
+msgid "Допомога"
+msgstr "Help"
+
+#: templates/_partials/footer.html:52 templates/_partials/header.html:61
+msgid "Контакти"
+msgstr "Contacts"
+
+#: templates/_partials/footer.html:64
+msgid "Статистика"
+msgstr "Staticstics"
+
+#: templates/_partials/footer.html:68
+msgid "Дата актуалізації"
+msgstr "Actualization date"
+
+#: templates/_partials/footer.html:76
+msgid "Зв'язок з нами"
+msgstr "Contact us"
+
+#: templates/_partials/footer.html:80
+msgid "Адміністратор баз даних"
+msgstr "Database administrator"
+
+#: templates/_partials/footer.html:100
+msgid ""
+"Державне підприємство &laquo;Український інститут інтелектуальної "
+"власності&raquo;"
+msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "

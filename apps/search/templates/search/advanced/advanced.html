@@ -1,15 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Розширений пошук{% endblock %}
+{% block title %}{% trans "Розширений пошук" %}{% endblock %}
 
 {% block content %}
 
     {% include 'search/advanced/_partials/breadcrumbs.html' %}
 
     <div class="container g-min-height-200 g-py-70">
-            <p class="g-mb-15 g-font-size-15">Система дозволяє здійснювати пошук в 72 млн. патентних документів. Детальну інформацію про
-                сферу охоплення бази даних
-                можна отримати <a href="#">тут</a>.</p>
+            <p class="g-mb-15 g-font-size-15">{% trans "Система дозволяє здійснювати пошук в 72 млн. патентних документів." %} {% trans "Детальну інформацію про сферу охоплення бази даних можна отримати" %} <a href="#">{% trans "тут" %}</a>.</p>
 
             <advanced-search-form v-bind:obj-types="{{ obj_types }}"
                                   v-bind:ipc-codes="{{ ipc_codes }}" />

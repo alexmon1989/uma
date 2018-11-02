@@ -1,4 +1,6 @@
-<h3 class="h4 mb-4">Адміністратор бази даних</h3>
+{% load i18n %}
+
+<h3 class="h4 mb-4">{% trans "Адміністратор бази даних" %}</h3>
 
 <div class="mb-4">
     <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">E-Mail:</h2>
@@ -7,13 +9,16 @@
 </div>
 
 <div class="mb-3">
-    <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">Телефон:</h2>
-    <p class="g-color-gray-dark-v4">Телефон: <span class="g-color-gray-dark-v2">+380 (44) 494-05-54</span>
+    <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">{% trans "Телефон" %}:</h2>
+    <p class="g-color-gray-dark-v4">{% trans "Телефон" %}: <span class="g-color-gray-dark-v2">+380 (44) 494-05-54</span>
     </p>
 </div>
 
 <div class="g-mb-30">
-    <p class="g-color-gray-dark-v5 g-font-weight-600 g-font-size-16"><em>Режим роботи: з 8.30 до 17.15 <br>Перерва з 12.00 до 12.30</em>
+    <p class="g-color-gray-dark-v5 g-font-weight-600 g-font-size-16"><em>{% trans "Режим роботи" %}:
+        {% trans "з" %} 8.30 {% trans "по" %} 17.15
+        <br>{% trans "Перерва" %} {% trans "з" %}
+        12.00 {% trans "по" %} 12.30</em>
     </p>
 </div>
 

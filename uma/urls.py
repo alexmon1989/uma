@@ -18,16 +18,24 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import JavaScriptCatalog, JSONCatalog
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+]
+
+urlpatterns += i18n_patterns(
     path('', include('apps.home.urls')),
     path('auth/', include('apps.my_auth.urls')),
     path('search/', include('apps.search.urls')),
     path('contacts/', include('apps.contacts.urls')),
     path('about/', include('apps.about.urls')),
     path('help/', include('apps.help.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('jsi18n/', JavaScriptCatalog.as_view(domain='django'), name='javascript-catalog'),
+)
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar
