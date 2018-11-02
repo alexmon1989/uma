@@ -22,7 +22,7 @@
                 <button @click="addIpcGroup"
                         type="button"
                         class="btn btn-md u-btn-indigo"
-                ><i class="fa fa-plus g-mr-5"></i>Додати параметр
+                ><i class="fa fa-plus g-mr-5"></i> Додати параметр
                 </button>
             </div>
             <div class="col-md-6 text-center text-md-right g-mb-20 g-mb-0--md">
@@ -38,9 +38,11 @@
 
 <script>
     import IpcCode from './IpcCode.vue';
+    import translationMixin from '../../vue-mixins.js';
 
     export default {
         name: "AdvancedSearchForm",
+        mixins: [translationMixin],
         props: {
             objTypes: Array,
             ipcCodes: Array,
