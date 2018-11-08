@@ -109,3 +109,4 @@ venv.bak/
 /uma/settings.py
 /node_modules/
 /webpack-stats.json
+/assets/bundles/

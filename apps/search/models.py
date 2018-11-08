@@ -68,6 +68,32 @@ class InidCodeSchedule(models.Model):
         managed = False
         db_table = 'cl_LinkShedule_INID_Codes'
 
+    @staticmethod
+    def get_ipc_codes_with_schedules(lang_code):
+        """Возвращает ИНИД коды с реестрами, в оторый они входят"""
+        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_view=True).values(
+            'ipc_code__id',
+            f"ipc_code__code_value_{lang_code}",
+            'ipc_code__obj_type__id',
+            'schedule_type__id',
+            'ipc_code__code_data_type',
+            f"ipc_code__obj_type__obj_type_{lang_code}"
+        )
+        ipc_codes_result = {}
+        for ipc_code in ipc_codes:
+            if not ipc_codes_result.get(ipc_code['ipc_code__id']):
+                ipc_codes_result[ipc_code['ipc_code__id']] = {
+                    'id': ipc_code['ipc_code__id'],
+                    'value': ipc_code[f"ipc_code__code_value_{lang_code}"],
+                    'obj_type_id': ipc_code['ipc_code__obj_type__id'],
+                    'obj_type': ipc_code[f"ipc_code__obj_type__obj_type_{lang_code}"],
+                    'schedule_types': [ipc_code['schedule_type__id']],
+                    'data_type': ipc_code['ipc_code__code_data_type'],
+                }
+            else:
+                ipc_codes_result[ipc_code['ipc_code__id']]['schedule_types'].append(ipc_code['schedule_type__id'])
+        return list(ipc_codes_result.values())
+
 
 FIELD_TYPE_CHOICES = (
     ('integer', 'Integer'),

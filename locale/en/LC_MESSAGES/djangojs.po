@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-08 11:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:51
+msgid "Заявка"
+msgstr "Claim"
+
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:52
+msgid "Охоронний документ"
+msgstr "Protective document"
+
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:76
+msgid "Показати результати"
+msgstr "Show results"
+
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:77
+msgid "Додати параметр"
+msgstr "Add parameter"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:155
+msgid "ТА"
+msgstr "AND"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:159
+msgid "АБО"
+msgstr "OR"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:163
+msgid "НЕ"
+msgstr "NOT"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:224
+msgid "Об'єкт промислової власності"
+msgstr "Object of industrial property"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:225
+msgid "Стан об'єкта"
+msgstr "Object state"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:226
+msgid "Код ІНІД"
+msgstr "IPC code"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:227
+msgid "Значення"
+msgstr "Value"

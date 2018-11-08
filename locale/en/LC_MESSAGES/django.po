@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-02 12:03+0000\n"
-"PO-Revision-Date: 2018-11-02 14:04+0200\n"
+"POT-Creation-Date: 2018-11-07 09:17+0000\n"
+"PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -88,11 +88,13 @@ msgid "Пошук"
 msgstr "Search"
 
 #: apps/search/templates/search/advanced/advanced.html:11
+#: apps/search/templates/search/simple/simple.html:11
 msgid "Система дозволяє здійснювати пошук в 72 млн. патентних документів."
 msgstr "The system allows searching for 72 million patent documents."
 
 #: apps/search/templates/search/advanced/advanced.html:11
-msgid "Детальну інформацію про сферу охоплення бази даних можна ывавыа"
+#: apps/search/templates/search/simple/simple.html:11
+msgid "Детальну інформацію про сферу охоплення бази даних можна отримати"
 msgstr "Detailed information on the scope of the database can be obtained"
 
 #: apps/search/templates/search/advanced/advanced.html:11
@@ -106,14 +108,6 @@ msgstr "here"
 #: templates/_partials/footer.html:28 templates/_partials/header.html:43
 msgid "Простий пошук"
 msgstr "Simple search"
-
-#: apps/search/templates/search/simple/simple.html:11
-msgid ""
-"Система дозволяє здійснювати пошук в 72 млн. патентних документів. Детальну "
-"інформацію про сферу охоплення бази даних можна отримати"
-msgstr ""
-"The system allows searching for 72 million patent documents. Detailed "
-"information on the scope of the database can be obtained"
 
 #: templates/_partials/footer.html:14
 msgid ""
@@ -140,7 +134,7 @@ msgstr "Contacts"
 
 #: templates/_partials/footer.html:64
 msgid "Статистика"
-msgstr "Staticstics"
+msgstr "Statistics"
 
 #: templates/_partials/footer.html:68
 msgid "Дата актуалізації"
@@ -159,3 +153,10 @@ msgid ""
 "Державне підприємство &laquo;Український інститут інтелектуальної "
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
+
+#~ msgid ""
+#~ "Система дозволяє здійснювати пошук в 72 млн. патентних документів. "
+#~ "Детальну інформацію про сферу охоплення бази даних можна отримати"
+#~ msgstr ""
+#~ "The system allows searching for 72 million patent documents. Detailed "
+#~ "information on the scope of the database can be obtained"

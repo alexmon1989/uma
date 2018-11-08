@@ -16,19 +16,19 @@
         </div>
         <!-- End Коди ІНІД -->
 
-         <!-- Дії -->
+        <!-- Дії -->
         <div class="row">
             <div class="col-md-6 text-center text-md-left g-mb-20 g-mb-0--md">
                 <button @click="addIpcGroup"
                         type="button"
                         class="btn btn-md u-btn-indigo"
-                ><i class="fa fa-plus g-mr-5"></i> Додати параметр
+                ><i class="fa fa-plus g-mr-5"></i>{{ translations.addBtnText }}
                 </button>
             </div>
             <div class="col-md-6 text-center text-md-right g-mb-20 g-mb-0--md">
                 <button type="submit"
                         class="btn btn-md u-btn-blue"
-                ><i class="fa fa-search g-mr-5"></i>Показати результати
+                ><i class="fa fa-search g-mr-5"></i>{{ translations.searchBtnText }}
                 </button>
             </div>
         </div>
@@ -38,11 +38,9 @@
 
 <script>
     import IpcCode from './IpcCode.vue';
-    import translationMixin from '../../vue-mixins.js';
 
     export default {
         name: "AdvancedSearchForm",
-        mixins: [translationMixin],
         props: {
             objTypes: Array,
             ipcCodes: Array,
@@ -50,8 +48,8 @@
         data: function () {
             return {
                 objStates: [
-                    {'id': 1, 'value': 'Заявка', 'schedule_types': [9, 10, 11, 12, 13, 14, 15]},
-                    {'id': 2, 'value': 'Охоронний документ', 'schedule_types': [3, 4, 5, 6, 7, 8]},
+                    {'id': 1, 'value': gettext('Заявка'), 'schedule_types': [9, 10, 11, 12, 13, 14, 15]},
+                    {'id': 2, 'value': gettext('Охоронний документ'), 'schedule_types': [3, 4, 5, 6, 7, 8]},
                 ],
                 ipcGroups: [
                     {'id': 1},
@@ -71,6 +69,14 @@
         },
         components: {
             IpcCode
+        },
+        computed: {
+            translations: function () {
+                return {
+                    searchBtnText: gettext('Показати результати'),
+                    addBtnText: gettext('Додати параметр')
+                }
+            }
         }
     }
 </script>

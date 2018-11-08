@@ -6,7 +6,7 @@
                 <div class="col-md-3 g-mb-15 g-pr-7--md">
                     <chosen-select
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            data-placeholder="Об'єкт промислової власності"
+                            :data-placeholder="translations.objType"
                             :name="'form-' + index + '-obj_type'"
                             v-model="objType"
                     >
@@ -25,7 +25,7 @@
                 <div class="col-md-3 g-mb-15 g-px-8--md">
                     <chosen-select
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            data-placeholder="Стан об'єкта"
+                            :data-placeholder="translations.objState"
                             multiple
                             :name="'form-' + index + '-obj_state'"
                             v-model="objState"
@@ -45,7 +45,7 @@
                     <chosen-select
                             ref="ipc_code"
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            data-placeholder="Код ІНІД"
+                            :data-placeholder="translations.ipcCode"
                             id="obj_status"
                             :name="'form-' + index + '-ipc_code'"
                             v-model="ipcCode"
@@ -73,7 +73,7 @@
                            @blur="onValueBlur"
                            :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
                            autocomplete="off"
-                           placeholder="Значення">
+                           :placeholder="translations.value">
 
                     <div class="d-flex justify-content-around g-pt-5"
                          @focus="valueFocused = true">
@@ -152,15 +152,15 @@
                 // Логические операторы. dataTypes определяет какие доступны для каких типов кодов ИНИД
                 logicalOperators: [
                     {
-                        'value': ' ТА ',
+                        'value': ' ' + gettext('ТА') + ' ',
                         'dataTypes': ['date', 'integer', 'geography', 'varchar']
                     },
                     {
-                        'value': ' АБО ',
+                        'value': ' ' + gettext('АБО') + ' ',
                         'dataTypes': ['date', 'integer', 'geography', 'varchar']
                     },
                     {
-                        'value': ' НЕ ',
+                        'value': ' ' + gettext('НЕ') + ' ',
                         'dataTypes': ['date', 'integer', 'geography', 'varchar']
                     },
                     {
@@ -217,7 +217,17 @@
                 // Фильтр по реестрам
                 ipcCodes = ipcCodes.filter(item => item.schedule_types.some(x => selectedScheduleTypes.includes(x)));
                 return ipcCodes;
+            },
+
+            translations: function () {
+                return {
+                    objType: gettext('Об\'єкт промислової власності'),
+                    objState: gettext('Стан об\'єкта'),
+                    ipcCode: gettext('Код ІНІД'),
+                    value: gettext('Значення'),
+                }
             }
+
         },
         watch: {
             ipcCodesFiltered: function (val) {

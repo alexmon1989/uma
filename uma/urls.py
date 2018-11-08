@@ -32,7 +32,7 @@ urlpatterns += i18n_patterns(
     path('contacts/', include('apps.contacts.urls')),
     path('about/', include('apps.about.urls')),
     path('help/', include('apps.help.urls')),
-    path('jsi18n/', JavaScriptCatalog.as_view(domain='django'), name='javascript-catalog'),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

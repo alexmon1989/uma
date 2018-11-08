@@ -16,32 +16,16 @@ class AdvancedListView(TemplateView):
     def get_context_data(self, **kwargs):
         """Передаёт доп. переменные в шаблон."""
         context = super().get_context_data(**kwargs)
+
+        # Текущий язык приложения
+        lang_code = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').annotate(value=F('obj_type_ua')).values('id', 'value'))
-        # ИНИД-коды
-        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_view=True).values(
-            'ipc_code__id',
-            'ipc_code__code_value_ua',
-            'ipc_code__obj_type__id',
-            'schedule_type__id',
-            'ipc_code__code_data_type',
-            'ipc_code__obj_type__obj_type_ua'
-        )
-        ipc_codes_result = {}
-        for ipc_code in ipc_codes:
-            if not ipc_codes_result.get(ipc_code['ipc_code__id']):
-                ipc_codes_result[ipc_code['ipc_code__id']] = {
-                    'id': ipc_code['ipc_code__id'],
-                    'value': ipc_code['ipc_code__code_value_ua'],
-                    'obj_type_id': ipc_code['ipc_code__obj_type__id'],
-                    'obj_type': ipc_code['ipc_code__obj_type__obj_type_ua'],
-                    'schedule_types': [ipc_code['schedule_type__id']],
-                    'data_type': ipc_code['ipc_code__code_data_type'],
-                }
-            else:
-                ipc_codes_result[ipc_code['ipc_code__id']]['schedule_types'].append(ipc_code['schedule_type__id'])
-        context['ipc_codes'] = list(ipc_codes_result.values())
+            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value'))
+
+        # ИНИД-коды вместе с их реестрами
+        context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(lang_code)
 
         # Тестовый поиск по Elastic
 
