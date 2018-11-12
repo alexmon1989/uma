@@ -16,3 +16,55 @@
   background: linear-gradient(0deg, rgba(7, 21, 59, 0.95) 0%, rgba(86, 218, 249, 0.75) 100%); /* w3c */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8ac3f3', endColorstr='#07153b', GradientType=0); /* ie6-9 */
 }
+
+@media all and (max-width: 1199px) {
+  .navbar-expand-xl > .container,
+  .navbar-expand-xl > .container-fluid {
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+  .navbar-expand-xl .navbar-collapse {
+    width: 100%;
+    -ms-flex-order: 10;
+    order: 10;
+  }
+}
+
+@media all and (max-width: 991px) {
+  .navbar-expand-lg > .container,
+  .navbar-expand-lg > .container-fluid {
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+  .navbar-expand-lg .navbar-collapse {
+    width: 100%;
+    -ms-flex-order: 10;
+    order: 10;
+  }
+}
+
+@media all and (max-width: 767px) {
+  .navbar-expand-md > .container,
+  .navbar-expand-md > .container-fluid {
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+  .navbar-expand-md .navbar-collapse {
+    width: 100%;
+    -ms-flex-order: 10;
+    order: 10;
+  }
+}
+
+@media all and (max-width: 575px) {
+  .navbar-expand-sm > .container,
+  .navbar-expand-sm > .container-fluid {
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+  .navbar-expand-sm .navbar-collapse {
+    width: 100%;
+    -ms-flex-order: 10;
+    order: 10;
+  }
+}
