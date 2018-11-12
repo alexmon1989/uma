@@ -1,12 +1,29 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.db.models import F
-from .models import ObjType, InidCodeSchedule
+from .models import ObjType, InidCodeSchedule, SimpleSearchField
 
 
-def simple(request):
-    """Отображает страницу с простым одностроковым поиском."""
-    return render(request, 'search/simple/simple.html')
+class SimpleListView(TemplateView):
+    """Отображает страницу с возможностью простого поиска."""
+    template_name = 'search/simple/simple.html'
+
+    def get_context_data(self, **kwargs):
+        """Передаёт доп. переменные в шаблон."""
+        context = super().get_context_data(**kwargs)
+
+        # Текущий язык приложения
+        lang_code = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
+        # Параметры поиска
+        context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
+            field_label=F(f"field_label_{lang_code}")
+        ).values(
+            'id',
+            'field_label',
+            'field_name'
+        ).filter(is_visible=True))
+
+        return context
 
 
 class AdvancedListView(TemplateView):
