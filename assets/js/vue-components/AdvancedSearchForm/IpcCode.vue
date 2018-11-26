@@ -113,6 +113,7 @@
             ipcCodes: Array,
             index: Number,
             ipcGroupsCount: Number,
+            initialData: Object,
         },
         methods: {
             // Обработчик события нажатия на кнопку "Логический оператор".
@@ -140,6 +141,22 @@
                 if (!this.valueFocused && e.relatedTarget) {
                     e.relatedTarget.click();
                 }
+            }
+        },
+        mounted() {
+            if (this.initialData['form-' + this.index + '-obj_type']) {
+                this.objType = this.initialData['form-' + this.index + '-obj_type'];
+            }
+            if (this.initialData['form-' + this.index + '-obj_state']) {
+                this.objState = this.initialData['form-' + this.index + '-obj_state'];
+            }
+            this.$nextTick(function () {
+                if (this.initialData['form-' + this.index + '-ipc_code']) {
+                    this.ipcCode = this.initialData['form-' + this.index + '-ipc_code'];
+                }
+            });
+            if (this.initialData['form-' + this.index + '-value']) {
+                this.value = this.initialData['form-' + this.index + '-value'];
             }
         },
         data: function () {

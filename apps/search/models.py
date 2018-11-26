@@ -1,6 +1,27 @@
 from django.db import models
 
 
+class IpcAppList(models.Model):
+    id = models.AutoField(db_column='idAPPNumber', primary_key=True)
+    app_number = models.CharField(db_column='APP_Number', max_length=100, blank=True, null=True)
+    registration_number = models.IntegerField(db_column='RegistrationNumber', blank=True, null=True)
+    registration_date = models.DateField(db_column='RegistrationDate', blank=True, null=True)
+    id_shedule_type = models.IntegerField(db_column='idSheduleType')
+    files_path = models.CharField(db_column='FilesPath', max_length=500, blank=True, null=True)
+    id_parent = models.IntegerField(db_column='idParent', blank=True, null=True)
+    id_claim = models.IntegerField(db_column='idClaim', blank=True, null=True)
+    obj_type = models.ForeignKey('ObjType', db_column='idObjType', blank=True, null=True, on_delete=models.CASCADE)
+    changescount = models.IntegerField(db_column='ChangesCount')
+    lastupdate = models.DateField(db_column='LastUpdate', blank=True, null=True)
+    idstatus = models.IntegerField(db_column='idStatus', blank=True, null=True)
+    app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
+    elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'IPC_AppList'
+
+
 class ObjType(models.Model):
     """Модель типа объекта ИС."""
     id = models.AutoField(db_column='idObjType', primary_key=True)
@@ -51,27 +72,43 @@ class ScheduleType(models.Model):
     is_scheduled = models.IntegerField(db_column='isSheduled', blank=True, null=True)
     mask_task_name = models.CharField(db_column='MaskTaskName', max_length=100, blank=True, null=True)
 
+    def __str__(self):
+        return self.schedule_type
+
     class Meta:
         managed = False
         db_table = 'cl_SheduleTypes'
+        verbose_name = 'Реєстр'
+        verbose_name_plural = 'Реєстри'
 
 
 class InidCodeSchedule(models.Model):
     """Промежуточная модель, описывающая свзяь многие-ко-многим между моделями ScheduleType и IpcCode."""
     id = models.AutoField(db_column='idLink', primary_key=True)
-    schedule_type = models.ForeignKey(ScheduleType, models.DO_NOTHING, db_column='idSheduleType', blank=True, null=True)
-    ipc_code = models.ForeignKey(IpcCode, models.DO_NOTHING, db_column='idIPCCode', blank=True, null=True)
-    enable_search = models.IntegerField(db_column='EnableSearch', blank=True, null=True)
-    enable_view = models.IntegerField(db_column='EnableView', blank=True, null=True)
+    schedule_type = models.ForeignKey(ScheduleType, models.DO_NOTHING, db_column='idSheduleType', blank=True, null=True,
+                                      verbose_name='Реєстр')
+    ipc_code = models.ForeignKey(IpcCode, models.DO_NOTHING, db_column='idIPCCode', blank=True, null=True,
+                                 verbose_name='Код ІНІД')
+    elastic_index_field = models.ForeignKey('ElasticIndexField', db_column='ElasticIndexField',
+                                            on_delete=models.SET_NULL, blank=True, null=True,
+                                            verbose_name='Поле індексу ElasticSearch')
+    enable_search = models.BooleanField(db_column='EnableSearch', blank=True, null=True,
+                                        verbose_name='Дозволяти пошук')
+    enable_view = models.BooleanField(db_column='EnableView', blank=True, null=True,
+                                      verbose_name='Відображати параметр на формі')
 
     class Meta:
         managed = False
         db_table = 'cl_LinkShedule_INID_Codes'
+        verbose_name = 'Пошуковий параметр'
+        verbose_name_plural = 'Пошукові параметри'
 
     @staticmethod
     def get_ipc_codes_with_schedules(lang_code):
         """Возвращает ИНИД коды с реестрами, в оторый они входят"""
-        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_view=True).values(
+        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_view=True).order_by(
+            f"ipc_code__code_value_{lang_code}"
+        ).values(
             'ipc_code__id',
             f"ipc_code__code_value_{lang_code}",
             'ipc_code__obj_type__id',
@@ -110,7 +147,6 @@ class ElasticIndexField(models.Model):
     field_type = models.CharField('Тип поля ElasticSearch', max_length=255, choices=sorted(FIELD_TYPE_CHOICES))
     parent = models.ForeignKey('self', verbose_name='Батьківське поле (nested)', on_delete=models.SET_NULL, null=True,
                                blank=True, limit_choices_to={'field_type': 'nested'})
-    ipc_codes = models.ManyToManyField(IpcCode, verbose_name='ІНІД-коди', blank=True)
 
     def __str__(self):
         return self.field_name

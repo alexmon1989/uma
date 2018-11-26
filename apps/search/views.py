@@ -1,6 +1,10 @@
 from django.views.generic import TemplateView
 from django.db.models import F
-from .models import ObjType, InidCodeSchedule, SimpleSearchField
+from django.forms import formset_factory
+from .models import ObjType, InidCodeSchedule, SimpleSearchField, IpcCode, ElasticIndexField
+from .forms import AdvancedSearchForm
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
 
 
 class SimpleListView(TemplateView):
@@ -44,28 +48,63 @@ class AdvancedListView(TemplateView):
         # ИНИД-коды вместе с их реестрами
         context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(lang_code)
 
-        # Тестовый поиск по Elastic
+        context['initial_data'] = {'form-TOTAL_FORMS': 1}
+        AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
+        if self.request.GET:
+            formset = AdvancedSearchFormSet(self.request.GET)
+            print(formset.errors)
+            context['initial_data'] = dict(formset.data.lists())
 
-        from elasticsearch import Elasticsearch
-        from elasticsearch_dsl import Search, Q
+            # Поиск в ElasticSearch
+            client = Elasticsearch()
+            qs = None
+            for elastic_field in ElasticIndexField.objects.filter(parent__isnull=True):
+                # Список связанных ИНИД-кодов
+                ipc_codes = elastic_field.inidcodeschedule_set.all()
 
-        i_11 = 111160
-        i_51 = "A61B5/103"
-        i_31 = "2010-140155 OR qw"
-        i_32 = "2010-06-21"
-        i_33 = "JP OR UA"
+                # Проверка есть ли в данных поисковой форме запрос на поиск по этому ИНИД-коду
+                # for ipc_code in ipc_codes:
+                #     print(ipc_code.ipc_code)
 
-        client = Elasticsearch()
 
-        qs = Q('query_string', query='ipcCodes.I_11:{}'.format(i_11))
-        qs |= Q('nested', path='ipcCodes.IPC', query=Q('query_string', query='ipcCodes.IPC.I_51:"{}"'.format(i_51)))
-        qs |= Q('nested', path='ipcCodes.I_30', query=Q('query_string', query='ipcCodes.I_30.I_31:{}'.format(i_31)))
-        qs |= Q('nested', path='ipcCodes.I_30', query=Q('query_string', query='ipcCodes.I_30.I_32:{}'.format(i_32)))
-        qs |= Q('nested', path='ipcCodes.I_30', query=Q('query_string', query='ipcCodes.I_30.I_33:{}'.format(i_33)))
+            # Тестовый поиск по Elastic
+            I_11 = 78139
+            IPC = "C21B13/00"
+            I_54 = "РЕГУЛИРОВАНИЕ"
+            I_72_N_U = "Метіус Гарі Е."
+            I_72_C_U = "US OR UA"
+            I_71_N = "МІД?ЕКС* OR aqdasd"
+            I_71_C = "CH"
 
-        s = Search(using=client, index="uma").query(qs)
+            qs = Q('query_string', query='Patent.I_11:{}'.format(I_11))
+            qs &= Q('query_string', query='Patent.IPC:"{}"'.format(IPC))
+            qs &= Q('query_string', query='Patent.I_54//*:{}'.format(I_54))
 
-        response = s.execute()
-        context['elastic_results'] = response
+            qs &= Q(
+                'nested',
+                path='Patent.I_72',
+                query=Q('query_string', query='Patent.I_72.I_72.N.U:"{}"'.format(I_72_N_U)) & Q('query_string', query='Patent.I_72.I_72.C.U:{}'.format(I_72_C_U))
+            )
+
+            # qs &= Q(
+            #     'nested',
+            #     path='Patent.I_71',
+            #     query=Q('query_string', query='Patent.I_71.I_71.N//*:({})'.format(I_71_N))
+            # )
+
+            qs &= Q(
+                'nested',
+                path='Patent.I_71',
+                query=Q('query_string', default_field='Patent.I_71.I_71.N*', analyze_wildcard=True, query=I_71_N)
+                      & Q('query_string', default_field='Patent.I_71.I_71.C*', analyze_wildcard=True, query=I_71_C)
+            )
+
+            # print(qs)
+
+            s = Search(using=client, index="uma").query(qs)
+
+            response = s.execute()
+            context['elastic_results'] = response
+            # print(context['elastic_results'])
 
         return context

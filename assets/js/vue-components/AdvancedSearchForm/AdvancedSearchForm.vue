@@ -1,5 +1,8 @@
 <template>
     <form class="g-brd-around g-brd-gray-light-v4 g-px-30 g-py-20">
+        <input type="hidden" name="form-TOTAL_FORMS" :value="totalForms"/>
+        <input type="hidden" name="form-INITIAL_FORMS" :value="initialData['form-INITIAL_FORMS'] || 1"/>
+        <input type="hidden" name="form-MAX_NUM_FORMS" :value="initialData['form-MAX_NUM_FORMS']"/>
 
         <!-- Коди ІНІД -->
         <div class="form-group g-mb-10"
@@ -11,6 +14,7 @@
                       :ipc-codes="ipcCodes"
                       :index="index"
                       :ipc-groups-count="ipcGroups.length"
+                      :initial-data="initialData"
                       v-on:remove-ipc-group="removeIpcGroup"
             ></ipc-code>
         </div>
@@ -44,6 +48,7 @@
         props: {
             objTypes: Array,
             ipcCodes: Array,
+            initialData: Object
         },
         data: function () {
             return {
@@ -51,20 +56,30 @@
                     {'id': 1, 'value': gettext('Заявка'), 'schedule_types': [9, 10, 11, 12, 13, 14, 15]},
                     {'id': 2, 'value': gettext('Охоронний документ'), 'schedule_types': [3, 4, 5, 6, 7, 8]},
                 ],
-                ipcGroups: [
-                    {'id': 1},
-                ]
+                ipcGroups: [],
+                totalForms: 1
             }
+        },
+        mounted() {
+            // Группы ИНИД-кодов (поисковые)
+            for (let i = 0; i < parseInt(this.initialData['form-TOTAL_FORMS']); i++) {
+                this.ipcGroups.push({'id': i});
+            }
+
+            // Количество форм
+            this.totalForms = this.initialData['form-TOTAL_FORMS']
         },
         methods: {
             // Добавляет группу полей для выбора кода ИНИД и его значения
             addIpcGroup: function () {
                 this.ipcGroups.push({'id': (this.ipcGroups.length + 1)});
+                this.totalForms++;
             },
 
             // Удаляет группу полей ИНИД
             removeIpcGroup: function (index) {
                 this.ipcGroups.splice(index, 1);
+                this.totalForms--;
             }
         },
         components: {

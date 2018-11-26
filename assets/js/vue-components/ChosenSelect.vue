@@ -27,6 +27,7 @@
                 rtl: setRtl ? setRtl : false
             }).on("change", e => this.$emit('input', $(this.$el).val()));
 
+
             if (setControlClasses) {
                 $this.next().find('.chosen-single div').addClass(setControlClasses);
             }
