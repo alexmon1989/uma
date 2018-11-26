@@ -3,12 +3,14 @@
         <div class="col-md-11">
             <div class="row d-flex align-items-start">
                 <!-- Об'єкт промислової власності -->
-                <div class="col-md-3 g-mb-15 g-pr-7--md">
+                <div class="col-md-3 g-mb-15 g-pr-7--md"
+                     :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_type') }">
                     <chosen-select
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
                             :data-placeholder="translations.objType"
                             :name="'form-' + index + '-obj_type'"
                             v-model="objType"
+                            v-validate="'required'"
                     >
                         <option value=""></option>
                         <option v-for="objType in objTypes"
@@ -18,17 +20,20 @@
                         >{{ objType.value }}
                         </option>
                     </chosen-select>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_type')">{{ translations.required_error }}</small>
                 </div>
                 <!-- END Об'єкт промислової власності -->
 
                 <!-- Стан об'єкта -->
-                <div class="col-md-3 g-mb-15 g-px-8--md">
+                <div class="col-md-3 g-mb-15 g-px-8--md"
+                     :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_state') }">
                     <chosen-select
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
                             :data-placeholder="translations.objState"
                             multiple
                             :name="'form-' + index + '-obj_state'"
                             v-model="objState"
+                            v-validate="'required'"
                     >
                         <option v-for="objState in objStates"
                                 class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
@@ -37,11 +42,13 @@
                         >{{ objState.value }}
                         </option>
                     </chosen-select>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_state')">{{ translations.required_error }}</small>
                 </div>
                 <!-- END Стан об'єкта -->
 
                 <!-- Код ІНІД -->
-                <div class="col-md-3 g-mb-15 g-px-8--md">
+                <div class="col-md-3 g-mb-15 g-px-8--md"
+                     :class="{ 'u-has-error-v1': errors.has('form-' + index + '-ipc_code') }">
                     <chosen-select
                             ref="ipc_code"
                             class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
@@ -50,6 +57,7 @@
                             :name="'form-' + index + '-ipc_code'"
                             v-model="ipcCode"
                             :disabled="objType === '' || objState.length === 0"
+                            v-validate="'required'"
                     >
                         <option value=""></option>
                         <option v-for="ipcCode in ipcCodesFiltered"
@@ -59,11 +67,13 @@
                         >{{ ipcCode.value }}
                         </option>
                     </chosen-select>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-ipc_code')">{{ translations.required_error }}</small>
                 </div>
                 <!-- END Код ІНІД -->
 
                 <!-- Значення -->
-                <div class="col-md-3 g-px-8--md">
+                <div class="col-md-3 g-px-8--md"
+                     :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
                     <input type="text"
                            class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
                            :name="'form-' + index + '-value'"
@@ -73,7 +83,9 @@
                            @blur="onValueBlur"
                            :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
                            autocomplete="off"
-                           :placeholder="translations.value">
+                           :placeholder="translations.value"
+                           v-validate="'required'">
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.required_error }}</small>
 
                     <div class="d-flex justify-content-around g-pt-5"
                          @focus="valueFocused = true">
@@ -107,6 +119,7 @@
     export default {
         name: "ipcCode",
         components: {ChosenSelect},
+        inject: ['$validator'],
         props: {
             objTypes: Array,
             objStates: Array,
@@ -125,7 +138,7 @@
                 const textBefore = v.substring(0,  cursorPos);
                 const textAfter  = v.substring(cursorPos, v.length);
 
-                $value.val(textBefore + text + textAfter);
+                this.value = textBefore + text + textAfter;
 
                 this.$nextTick(function () {
                     this.$refs.value.focus();
@@ -242,6 +255,7 @@
                     objState: gettext('Стан об\'єкта'),
                     ipcCode: gettext('Код ІНІД'),
                     value: gettext('Значення'),
+                    required_error: gettext('Обов\'язкове поле для заповнення'),
                 }
             }
 
@@ -272,6 +286,12 @@
     .dropdown-item {
         span.text-muted {
             display: none !important;
+        }
+    }
+
+    .u-has-error-v1 {
+        .chosen-choices {
+            background-color: #fff0f0;
         }
     }
 </style>

@@ -1,5 +1,6 @@
 <template>
-    <form class="g-brd-around g-brd-gray-light-v4 g-px-30 g-py-20">
+    <form @submit.prevent="handleSubmit"
+          class="g-brd-around g-brd-gray-light-v4 g-px-30 g-py-20">
         <input type="hidden" name="form-TOTAL_FORMS" :value="totalForms"/>
         <input type="hidden" name="form-INITIAL_FORMS" :value="initialData['form-INITIAL_FORMS'] || 1"/>
         <input type="hidden" name="form-MAX_NUM_FORMS" :value="initialData['form-MAX_NUM_FORMS']"/>
@@ -80,6 +81,15 @@
             removeIpcGroup: function (index) {
                 this.ipcGroups.splice(index, 1);
                 this.totalForms--;
+            },
+
+            // Обработчик отправки формы
+            handleSubmit: function () {
+                this.$validator.validate().then(valid => {
+                    if (valid) {
+                        document.forms[0].submit();
+                    }
+                });
             }
         },
         components: {

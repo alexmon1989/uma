@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 12:01+0000\n"
+"POT-Creation-Date: 2018-11-26 13:29+0000\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,57 +18,61 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:51
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:57
 msgid "Заявка"
 msgstr "Claim"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:52
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:58
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:76
-#: assets/js/vue-components/SimpleSearchForm.vue:74
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:102
+#: assets/js/vue-components/SimpleSearchForm.vue:88
 msgid "Показати результати"
 msgstr "Show results"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:77
-#: assets/js/vue-components/SimpleSearchForm.vue:73
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:103
+#: assets/js/vue-components/SimpleSearchForm.vue:87
 msgid "Додати параметр"
 msgstr "Add parameter"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:155
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:185
 msgid "ТА"
 msgstr "AND"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:159
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:189
 msgid "АБО"
 msgstr "OR"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:163
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:193
 msgid "НЕ"
 msgstr "NOT"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:224
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:254
 msgid "Об'єкт промислової власності"
 msgstr "Object of industrial property"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:225
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:255
 msgid "Стан об'єкта"
 msgstr "Object state"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:226
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:256
 msgid "Код ІНІД"
 msgstr "IPC code"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:227
-#: assets/js/vue-components/SimpleSearchForm.vue:72
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:257
+#: assets/js/vue-components/SimpleSearchForm.vue:86
 msgid "Значення"
 msgstr "Value"
 
-#: assets/js/vue-components/SimpleSearchForm.vue:70
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:258
+msgid "Обов'язкове поле для заповнення"
+msgstr "Required field"
+
+#: assets/js/vue-components/SimpleSearchForm.vue:84
 msgid "Для початку роботи заповніть форму пошуку"
 msgstr "Fill out the search form to get started"
 
-#: assets/js/vue-components/SimpleSearchForm.vue:71
+#: assets/js/vue-components/SimpleSearchForm.vue:85
 msgid "Оберіть параметр пошуку"
 msgstr "Select search parameter"

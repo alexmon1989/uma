@@ -5,6 +5,9 @@ import Vue from 'vue';
 import SimpleSearchForm from "./vue-components/SimpleSearchForm.vue";
 import AdvancedSearchForm from "./vue-components/AdvancedSearchForm/AdvancedSearchForm.vue";
 
+import VeeValidate from 'vee-validate';
+Vue.use(VeeValidate);
+
 window.$ = window.jQuery = require('jquery');
 
 const app = new Vue({
