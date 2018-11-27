@@ -2,7 +2,7 @@
 import './template.js';
 import Vue from 'vue';
 
-import SimpleSearchForm from "./vue-components/SimpleSearchForm.vue";
+import SimpleSearchForm from "./vue-components/SimpleSearchForm/SimpleSearchForm.vue";
 import AdvancedSearchForm from "./vue-components/AdvancedSearchForm/AdvancedSearchForm.vue";
 
 import VeeValidate from 'vee-validate';

@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, IpcCode, ElasticIndexField
-from .forms import AdvancedSearchForm
+from .forms import AdvancedSearchForm, SimpleSearchForm
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
@@ -26,6 +26,13 @@ class SimpleListView(TemplateView):
             'field_label',
             'field_name'
         ).filter(is_visible=True))
+
+        context['initial_data'] = {'form-TOTAL_FORMS': 1}
+        SimpleSearchFormSet = formset_factory(SimpleSearchForm)
+        if self.request.GET:
+            formset = SimpleSearchFormSet(self.request.GET)
+            print(formset.errors)
+            context['initial_data'] = dict(formset.data.lists())
 
         return context
 

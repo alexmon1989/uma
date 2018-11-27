@@ -11,7 +11,8 @@
         <p class="g-mb-15 g-font-size-15">{% trans "Система дозволяє здійснювати пошук в 72 млн. патентних документів." %} {% trans "Детальну інформацію про сферу охоплення бази даних можна отримати" %}
             <a href="#">{% trans "тут" %}</a>.</p>
 
-        <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"/>
+        <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
+                            v-bind:initial-data="{{ initial_data }}"/>
     </div>
 
 {% endblock %}
