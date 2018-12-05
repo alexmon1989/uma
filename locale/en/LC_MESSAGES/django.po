@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-07 09:17+0000\n"
+"POT-Creation-Date: 2018-11-29 11:55+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -87,18 +87,34 @@ msgstr "Advanced search"
 msgid "Пошук"
 msgstr "Search"
 
-#: apps/search/templates/search/advanced/advanced.html:11
+#: apps/search/templates/search/advanced/_partials/sidebar.html:4
+msgid "Тип об'єкта"
+msgstr "Object type"
+
+#: apps/search/templates/search/advanced/_partials/sidebar.html:23
+msgid "Стан об'єкта"
+msgstr "Object state"
+
+#: apps/search/templates/search/advanced/_partials/sidebar.html:34
+msgid "Заявка"
+msgstr "Claim"
+
+#: apps/search/templates/search/advanced/_partials/sidebar.html:34
+msgid "Охоронний документ"
+msgstr "Protective document"
+
+#: apps/search/templates/search/advanced/advanced.html:12
 #: apps/search/templates/search/simple/simple.html:11
 msgid "Система дозволяє здійснювати пошук в 72 млн. патентних документів."
 msgstr "The system allows searching for 72 million patent documents."
 
-#: apps/search/templates/search/advanced/advanced.html:11
+#: apps/search/templates/search/advanced/advanced.html:12
 #: apps/search/templates/search/simple/simple.html:11
 msgid "Детальну інформацію про сферу охоплення бази даних можна отримати"
 msgstr "Detailed information on the scope of the database can be obtained"
 
-#: apps/search/templates/search/advanced/advanced.html:11
-#: apps/search/templates/search/simple/simple.html:11
+#: apps/search/templates/search/advanced/advanced.html:13
+#: apps/search/templates/search/simple/simple.html:12
 msgid "тут"
 msgstr "here"
 

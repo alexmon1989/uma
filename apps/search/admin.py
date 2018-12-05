@@ -35,6 +35,10 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
         'ipc_code__obj_type',
         'schedule_type',
     )
+    list_editable = (
+        'enable_search',
+        'enable_view'
+    )
     ordering = ('ipc_code',)
 
     def ipc_code_title(self, obj):

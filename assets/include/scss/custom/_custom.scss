@@ -68,3 +68,23 @@
     order: 10;
   }
 }
+
+.g-bg-bluegray {
+  background-color: $g-color-bluegray !important;
+
+  &-opacity {
+    &-0_35,
+    &-0_35--after::after {
+      background-color: rgba($g-color-bluegray, .35) !important;
+    }
+  }
+}
+
+/* Color Brown */
+.g-color-burgundy {
+  color: #be0f05 !important;
+
+  &--hover:hover {
+    color: #be0f05 !important;
+  }
+}

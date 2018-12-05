@@ -31,6 +31,9 @@ $(document).on('ready', function () {
 
     // initialization of custom select
     $.HSCore.components.HSSelect.init('.js-custom-select');
+
+    // initialization of popovers
+    $('[data-toggle="popover"]').popover();
 });
 
 $(window).on('load', function () {

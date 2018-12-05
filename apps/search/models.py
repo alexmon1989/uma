@@ -95,7 +95,7 @@ class InidCodeSchedule(models.Model):
     enable_search = models.BooleanField(db_column='EnableSearch', blank=True, null=True,
                                         verbose_name='Дозволяти пошук')
     enable_view = models.BooleanField(db_column='EnableView', blank=True, null=True,
-                                      verbose_name='Відображати параметр на формі')
+                                      verbose_name='Відображати параметр на сторінці об\'єкта')
 
     class Meta:
         managed = False
@@ -106,7 +106,7 @@ class InidCodeSchedule(models.Model):
     @staticmethod
     def get_ipc_codes_with_schedules(lang_code):
         """Возвращает ИНИД коды с реестрами, в оторый они входят"""
-        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_view=True).order_by(
+        ipc_codes = InidCodeSchedule.objects.exclude(ipc_code__isnull=True).filter(enable_search=True).order_by(
             f"ipc_code__code_value_{lang_code}"
         ).values(
             'ipc_code__id',

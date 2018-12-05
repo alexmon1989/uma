@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -25,8 +24,7 @@ SECRET_KEY = '67e@9#2za%$fle7v3c0dr_^=bxqo%070_x@(*=5czgqv&fd7a('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -43,6 +41,9 @@ INSTALLED_APPS = [
     'apps.home.apps.HomeConfig',
     'apps.my_auth.apps.MyAuthConfig',
     'apps.search.apps.SearchConfig',
+    'apps.contacts.apps.ContactsConfig',
+    'apps.about.apps.AboutConfig',
+    'apps.help.apps.HelpConfig',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -71,12 +73,14 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'uma_extras': 'templatetags.uma_extras',
+            }
         },
     },
 ]
 
 WSGI_APPLICATION = 'uma.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -92,7 +96,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
         'NAME': 'UMA',
-        'USER': '',
+        'USER': 'sa',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '1433',
@@ -102,7 +106,6 @@ DATABASES = {
         },
     },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -122,11 +125,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'uk'
+
+# список доступных языков
+LANGUAGES = (
+    ('uk', 'Ukrainian'),
+    ('en', 'English'),
+)
 
 TIME_ZONE = 'UTC'
 
@@ -136,6 +144,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -145,7 +156,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
-
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -159,6 +169,7 @@ EUSIGN_FILESTORE_PATH = os.path.join(BASE_DIR, "certs")
 # Пути к библиотекам библиотек ЭЦП
 import os
 import sys
+
 os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
 sys.path.append('lib/EUSignCP/Interface/64')
 
@@ -169,3 +180,7 @@ WEBPACK_LOADER = {
     }
 }
 INTERNAL_IPS = ('10.0.2.2',)
+
+ELASTIC_INDEX_NAME = 'uma'
+
+DOCUMENTS_MOUNT_FOLDER = '/mount/bear/'

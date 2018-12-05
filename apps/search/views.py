@@ -1,10 +1,13 @@
 from django.views.generic import TemplateView
 from django.db.models import F
-from django.forms import formset_factory
+from django.forms import formset_factory, ValidationError
+from django.core.paginator import Paginator
+from django.http import Http404
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, IpcCode, ElasticIndexField
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
+from operator import attrgetter
 
 
 class SimpleListView(TemplateView):
@@ -31,7 +34,6 @@ class SimpleListView(TemplateView):
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)
         if self.request.GET:
             formset = SimpleSearchFormSet(self.request.GET)
-            print(formset.errors)
             context['initial_data'] = dict(formset.data.lists())
 
         return context
@@ -46,72 +48,129 @@ class AdvancedListView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Текущий язык приложения
-        lang_code = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+        context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value'))
+            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{context['lang_code']}")).values('id', 'value'))
 
         # ИНИД-коды вместе с их реестрами
-        context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(lang_code)
+        context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(context['lang_code'])
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
         if self.request.GET:
             formset = AdvancedSearchFormSet(self.request.GET)
-            print(formset.errors)
+
+            # Иниц. данные для формы
             context['initial_data'] = dict(formset.data.lists())
 
+            # Валидация поисковой формы
+            try:
+                is_valid = formset.is_valid()
+
+                # Признак того что производится поиск
+                context['is_search'] = True
+            except ValidationError:
+                raise Http404("Некоректний пошуковий запит.")
+
             # Поиск в ElasticSearch
-            client = Elasticsearch()
-            qs = None
-            for elastic_field in ElasticIndexField.objects.filter(parent__isnull=True):
-                # Список связанных ИНИД-кодов
-                ipc_codes = elastic_field.inidcodeschedule_set.all()
+            if is_valid:
+                # Разбивка поисковых данных на поисковые группы
+                search_groups = []
+                for obj_type in ObjType.objects.all():
+                    # Поисковые запросы на заявки
+                    search_groups.append({
+                        'obj_type': obj_type,
+                        'obj_state': 1,
+                        'search_params': list(filter(
+                            lambda x: x['obj_type'] == obj_type.pk and '1' in x['obj_state'],
+                            formset.cleaned_data
+                        ))
+                    })
+                    # Поисковые запросы на охранные документы
+                    search_groups.append({
+                        'obj_type': obj_type,
+                        'obj_state': 2,
+                        'search_params': list(filter(
+                            lambda x: x['obj_type'] == obj_type.pk and '2' in x['obj_state'],
+                            formset.cleaned_data
+                        ))
+                    })
 
-                # Проверка есть ли в данных поисковой форме запрос на поиск по этому ИНИД-коду
-                # for ipc_code in ipc_codes:
-                #     print(ipc_code.ipc_code)
+                # Поиск по каждой группе
+                client = Elasticsearch()
+                all_hits = []
+                for group in search_groups:
+                    if group['search_params']:
+                        qs = Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
+                        qs &= Q('query_string', query=f"{group['obj_state']}", default_field='Document.Status')
 
+                        for search_param in group['search_params']:
+                            # Поле поиска ElasticSearch
+                            inid_schedule = InidCodeSchedule.objects.filter(
+                                ipc_code__id=search_param['ipc_code'],
+                                schedule_type__obj_type=group['obj_type']
+                            ).first()
 
-            # Тестовый поиск по Elastic
-            I_11 = 78139
-            IPC = "C21B13/00"
-            I_54 = "РЕГУЛИРОВАНИЕ"
-            I_72_N_U = "Метіус Гарі Е."
-            I_72_C_U = "US OR UA"
-            I_71_N = "МІД?ЕКС* OR aqdasd"
-            I_71_C = "CH"
+                            # Проверка доступно ли поле для поиска
+                            if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
+                                qs &= Q(
+                                    'query_string',
+                                    query=f"{search_param['value']}",
+                                    default_field=inid_schedule.elastic_index_field.field_name
+                                )
 
-            qs = Q('query_string', query='Patent.I_11:{}'.format(I_11))
-            qs &= Q('query_string', query='Patent.IPC:"{}"'.format(IPC))
-            qs &= Q('query_string', query='Patent.I_54//*:{}'.format(I_54))
+                        s = Search(using=client, index="uma").query(qs)
+                        group['response'] = s.execute()
+                        # Объединение результатов поиска
+                        for hit in group['response']:
+                            all_hits.append(hit)
 
-            qs &= Q(
-                'nested',
-                path='Patent.I_72',
-                query=Q('query_string', query='Patent.I_72.I_72.N.U:"{}"'.format(I_72_N_U)) & Q('query_string', query='Patent.I_72.I_72.C.U:{}'.format(I_72_C_U))
-            )
+                # Сортировка результатов поиска (обратная сортировка по релевантности)
+                all_hits = sorted(all_hits, key=attrgetter('meta.score'), reverse=True)
 
-            # qs &= Q(
-            #     'nested',
-            #     path='Patent.I_71',
-            #     query=Q('query_string', query='Patent.I_71.I_71.N//*:({})'.format(I_71_N))
-            # )
+                # Типы объектов в найденных результатах
+                context['res_obj_types'] = []
+                for obj_type in ObjType.objects.annotate(
+                        title=F(f"obj_type_{context['lang_code']}")
+                ).values('id', 'title'):
+                    count = len(list(filter(
+                        lambda x: x['Document']['idObjType'] == obj_type['id'],
+                        all_hits
+                    )))
+                    if count:
+                        context['res_obj_types'].append({'obj_type': obj_type})
 
-            qs &= Q(
-                'nested',
-                path='Patent.I_71',
-                query=Q('query_string', default_field='Patent.I_71.I_71.N*', analyze_wildcard=True, query=I_71_N)
-                      & Q('query_string', default_field='Patent.I_71.I_71.C*', analyze_wildcard=True, query=I_71_C)
-            )
+                # Статусы в найденных результатах
+                context['res_obj_states'] = []
+                for i in range(1, 3):
+                    count = len(list(filter(
+                        lambda x: x['Document']['Status'] == i,
+                        all_hits
+                    )))
+                    if count:
+                        context['res_obj_states'].append({'obj_state': i})
 
-            # print(qs)
+                # TODO: Фильтрация согласно фильтрам в сайдбаре
 
-            s = Search(using=client, index="uma").query(qs)
+                # Пагинатор
+                paginator = Paginator(all_hits, 10)
+                page = self.request.GET.get('page')
+                context['results'] = paginator.get_page(page)
 
-            response = s.execute()
-            context['elastic_results'] = response
-            # print(context['elastic_results'])
+                # Количество объектов определённых типов в отфильтрованных результатах
+                for obj_type in context['res_obj_types']:
+                    obj_type['count'] = len(list(filter(
+                        lambda x: x['Document']['idObjType'] == obj_type['obj_type']['id'],
+                        all_hits
+                    )))
+
+                # Количество объектов определённых статусов в отфильтрованных результатах
+                for obj_state in context['res_obj_states']:
+                    obj_state['count'] = len(list(filter(
+                        lambda x: x['Document']['Status'] == obj_state['obj_state'],
+                        all_hits
+                    )))
 
         return context
