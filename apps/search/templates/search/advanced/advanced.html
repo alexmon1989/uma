@@ -40,13 +40,10 @@
                         {% for hit in results %}
                             {# Изобретения, полезные модели #}
                             {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
-                                {% if hit.Document.Status == 1 %}
-                                    {# Заявка #}
-                                    {% inv_um_claim_item hit forloop.counter0|add:results.start_index %}
-                                {% else %}
-                                    {# Патент #}
-                                    {% inv_um_protective_item hit forloop.counter0|add:results.start_index %}
-                                {% endif %}
+                                {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                            {# Топографии #}
+                            {% elif hit.Document.idObjType == 3 %}
+                                {% ld_item hit forloop.counter0|add:results.start_index %}
                             {% endif %}
                         {% endfor %}
 
@@ -65,9 +62,5 @@
                 </div>
             {% endif %}
         {% endif %}
-
     </div>
-
-
-
 {% endblock %}

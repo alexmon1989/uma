@@ -1,0 +1,136 @@
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+    <h3 class="card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        {{ item_num }}. <a href="#" class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover">{{ hit.Patent.I_54.0|get:"I_54.U" }}</a>
+    </h3>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% if hit.Document.Status == 1 %}
+                {% if hit.Document.idObjType == 1 %}
+                    Заявка на винахід
+                {% else %}
+                    Заявка на корисну модель
+                {% endif %}
+            {% else %}
+                {% if hit.Document.idObjType == 1 %}
+                    Патент України на винахід
+                {% else %}
+                    Патент України на корисну модель
+                {% endif %}
+            {% endif %}
+        </div>
+        {% if hit.Document.Status == 2 %}
+            <div class="g-font-weight-600"><i class="fa fa-circle g-color-green g-mr-5"></i>Патент діє</div>
+        {% endif %}
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Винахідник(и):</h4>
+            {% for I_72 in hit.Patent.I_72 %}
+                {% if forloop.counter <= 2 %}
+                    {{ I_72|get_person_name }} [{{ I_72|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
+                {% elif forloop.counter == 3 %}
+                    <a href="#!"
+                       data-toggle="popover"
+                       data-title="Повний список винахідників"
+                       data-html="true"
+                       data-trigger="focus"
+                       data-content="
+                               {% for I_72_ in hit.Patent.I_72 %}{{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]<br>{% endfor %}"
+                    >(+{{ hit.Patent.I_72|length|add:"-2" }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
+            {% for I_71 in hit.Patent.I_71 %}
+                {% if forloop.counter <= 2 %}
+                    {{ I_71|get_person_name }} [{{ I_71|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
+                {% elif forloop.counter == 3 %}
+                    <a href="#!"
+                       data-toggle="popover"
+                       data-title="Повний список заявників"
+                       data-html="true"
+                       data-trigger="focus"
+                       data-content="
+                               {% for I_71_ in hit.Patent.I_71 %}{{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]<br>{% endfor %}"
+                    >(+{{ hit.Patent.I_71|length|add:"-2" }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">МПК:</h4>
+            {% for ipc in hit.Patent.IPC %}
+                {% if forloop.counter <= 2 %}
+                    {{ ipc }}{% if not forloop.last %}<br>{% endif %}
+                {% elif forloop.counter == 3 %}
+                    <a href="#!"
+                       data-toggle="popover"
+                       data-title="Повний список індексів МПК"
+                       data-html="true"
+                       data-trigger="focus"
+                       data-content="{% for ipc_ in hit.Patent.IPC %}{{ ipc_ }}<br>{% endfor %}"
+                    >(+{{ hit.Patent.IPC|length|add:"-2" }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="(21) Номер заявки"
+            >{{ hit.Patent.I_21 }}</a><br>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="(22) Дата подання заявки"
+            >{{ hit.Patent.I_22|parse_date|date:"d.m.Y" }}</a>
+        </div>
+
+        {% if hit.Document.Status == 2 %}
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Патент:</h4>
+                <a href="#!"
+                   class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                   data-toggle="tooltip"
+                   data-placement="top"
+                   title="(11) Номер патенту"
+                >{{ hit.Patent.I_11 }}</a><br>
+                {% for I_45 in hit.Patent|get:"I_45.D" %}
+                    <a href="#!"
+                       class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                       data-toggle="tooltip"
+                       data-placement="bottom"
+                       title="(45) Дата публікації про видачу патенту"
+                    >{{ I_45|parse_date|date:"d.m.Y" }}</a>
+                {% endfor %}
+            </div>
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
+                {% for I_73 in hit.Patent.I_73 %}
+                    {% if forloop.counter <= 2 %}
+                        {{ I_73|get_person_name }} [{{ I_73|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
+                    {% elif forloop.counter == 3 %}
+                        <a href="#!"
+                           data-toggle="popover"
+                           data-title="Повний список власників"
+                           data-html="true"
+                           data-trigger="focus"
+                           data-content="{% for I_73_ in hit.Patent.I_73 %}{{ I_73|get_person_name }} [{{ I_73|get_person_country }}]<br>{% endfor %}"
+                        >(+{{ hit.Patent.I_73|length|add:"-2" }})</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
