@@ -24,6 +24,7 @@ import '../js/components/hs.header.js';
 import '../js/components/hs.dropdown.js';
 import '../js/components/hs.select.js';
 import '../js/helpers/hs.hamburgers.js';
+import './custom.js';
 
 $(document).on('ready', function () {
     // initialization of HSDropdown component

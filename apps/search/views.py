@@ -3,10 +3,14 @@ from django.db.models import F
 from django.forms import formset_factory, ValidationError
 from django.core.paginator import Paginator
 from django.http import Http404
+from django.utils.http import urlencode
+from django.shortcuts import redirect, reverse
+from django.views.decorators.http import require_POST
 from .models import ObjType, InidCodeSchedule, SimpleSearchField
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import get_search_groups, elastic_search_groups
+from .utils import get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered
 from operator import attrgetter
+from urllib.parse import parse_qs
 
 
 class SimpleListView(TemplateView):
@@ -89,33 +93,62 @@ class AdvancedListView(TemplateView):
                 obj_types = [{'id': x['obj_type'].id,
                               'title': getattr(x['obj_type'], f"obj_type_{context['lang_code']}")}
                              for x in search_groups]
-                context['res_obj_types'] = list({v['id']: v for v in obj_types}.values())
+                res_obj_types = list({v['id']: v for v in obj_types}.values())
 
                 # Статусы в найденных результатах
-                context['res_obj_states'] = []
+                res_obj_states = []
                 for i in range(1, 3):
                     count = len(list(filter(lambda x: x['Document']['Status'] == i, all_hits)))
                     if count:
-                        context['res_obj_states'].append({'obj_state': i})
+                        res_obj_states.append({'obj_state': i})
 
-                # TODO: Фильтрация согласно фильтрам в сайдбаре
-
-                # Пагинатор
-                paginator = Paginator(all_hits, 10)
-                context['results'] = paginator.get_page(self.request.GET.get('page'))
+                # Фильтрация согласно фильтрам в сайдбаре
+                context['results'] = all_hits
+                if self.request.GET.get('filter_obj_type'):
+                    context['results'] = list(
+                        filter(lambda x: str(x['Document']['idObjType']) in self.request.GET.getlist('filter_obj_type'),
+                               context['results']))
+                if self.request.GET.get('filter_obj_state'):
+                    context['results'] = list(
+                        filter(lambda x: str(x['Document']['Status']) in self.request.GET.getlist('filter_obj_state'),
+                               context['results']))
 
                 # Количество объектов определённых типов в отфильтрованных результатах
-                for obj_type in context['res_obj_types']:
-                    obj_type['count'] = len(list(filter(
-                        lambda x: x['Document']['idObjType'] == obj_type['id'],
-                        all_hits
-                    )))
+                context['res_obj_types'] = count_obj_types_filtered(
+                    all_hits,
+                    res_obj_types,
+                    self.request.GET.getlist('filter_obj_state')
+                )
 
                 # Количество объектов определённых статусов в отфильтрованных результатах
-                for obj_state in context['res_obj_states']:
-                    obj_state['count'] = len(list(filter(
-                        lambda x: x['Document']['Status'] == obj_state['obj_state'],
-                        all_hits
-                    )))
+                context['res_obj_states'] = count_obj_states_filtered(
+                    all_hits,
+                    res_obj_states,
+                    self.request.GET.getlist('filter_obj_type')
+                )
+
+                # Пагинатор
+                paginator = Paginator(context['results'], 10)
+                context['results'] = paginator.get_page(self.request.GET.get('page'))
 
         return context
+
+
+@require_POST
+def add_filter_params(request):
+    """Формирует строку параметров фильтра и делает переадресацию обратно на страницу поиска."""
+    get_params = parse_qs(request.POST.get('get_params'))
+    get_params['filter_obj_type'] = request.POST.getlist('filter_obj_type')
+    get_params['filter_obj_state'] = request.POST.getlist('filter_obj_state')
+
+    if not get_params['filter_obj_type']:
+        del get_params['filter_obj_type']
+
+    if not get_params['filter_obj_state']:
+        del get_params['filter_obj_state']
+
+    if get_params.get('page'):
+        del get_params['page']  # Для переадресации на 1 страницу
+
+    get_params = urlencode(get_params, True)
+    return redirect(f"{reverse('search:advanced')}?{get_params}")

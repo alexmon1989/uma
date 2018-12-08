@@ -29,11 +29,11 @@
 
                     <div class="col-lg-9">
                         <div class="d-md-flex justify-content-between g-mb-30">
-                            <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">Всього результатів:<span
+                            <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">{% trans "Всього результатів" %}:<span
                                     class="g-color-gray-dark-v1">&nbsp;{{ results|length }}</span></h3>
 
                             <div class="d-flex justify-content-between">
-                                <div class="g-mr-10">Сортувати за:</div>
+                                <div class="g-mr-10">{% trans "Сортувати за" %}:</div>
                             </div>
                         </div>
 
@@ -56,9 +56,9 @@
                     <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
                             data-target="#collapseForm"
                             aria-expanded="false" aria-controls="collapseExample">
-                        <i class="fa fa-angle-down"></i> Показати умови пошуку
+                        <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
                     </button>
-                    <p class="lead">За вашими умовами пошуку не знайдено жодного об'єкта.</p>
+                    <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
                 </div>
             {% endif %}
         {% endif %}

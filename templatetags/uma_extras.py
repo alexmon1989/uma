@@ -29,3 +29,8 @@ def get(mapping, key):
 @register.filter
 def parse_date(value):
     return datetime.strptime(value, '%Y-%m-%d')
+
+
+@register.filter
+def get_list(dictionary, key):
+    return dictionary.getlist(key)

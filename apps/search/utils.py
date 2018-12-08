@@ -59,3 +59,32 @@ def elastic_search_groups(search_groups):
             for hit in group['response']:
                 all_hits.append(hit)
     return all_hits
+
+
+def count_obj_types_filtered(all_hits, res_obj_types, filter_obj_state):
+    """Количество объектов определённых типов в отфильтрованных результатах."""
+    if filter_obj_state:
+        filtered_hits = list(
+            filter(lambda x: str(x['Document']['Status']) in filter_obj_state, all_hits))
+    else:
+        filtered_hits = all_hits
+    for obj_type in res_obj_types:
+        obj_type['count'] = len(list(filter(
+            lambda x: x['Document']['idObjType'] == obj_type['id'],
+            filtered_hits
+        )))
+    return res_obj_types
+
+
+def count_obj_states_filtered(all_hits, res_obj_states, filter_obj_type):
+    """Количество объектов определённых статусов в отфильтрованных результатах."""
+    if filter_obj_type:
+        filtered_hits = list(filter(lambda x: str(x['Document']['idObjType']) in filter_obj_type, all_hits))
+    else:
+        filtered_hits = all_hits
+    for obj_state in res_obj_states:
+        obj_state['count'] = len(list(filter(
+            lambda x: x['Document']['Status'] == obj_state['obj_state'],
+            filtered_hits
+        )))
+    return res_obj_states

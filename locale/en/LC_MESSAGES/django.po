@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-07 02:23+0000\n"
+"POT-Creation-Date: 2018-12-08 18:46+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -81,12 +81,12 @@ msgid "Статус об'єкта"
 msgstr "Object state"
 
 #: apps/search/admin.py:32 apps/search/admin.py:88
-#: apps/search/templates/search/advanced/_partials/sidebar.html:40
+#: apps/search/templates/search/advanced/_partials/sidebar.html:58
 msgid "Заявка"
 msgstr "Claim"
 
 #: apps/search/admin.py:33 apps/search/admin.py:87
-#: apps/search/templates/search/advanced/_partials/sidebar.html:40
+#: apps/search/templates/search/advanced/_partials/sidebar.html:58
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -95,7 +95,7 @@ msgid "ІНІД-код"
 msgstr "INID code"
 
 #: apps/search/admin.py:81
-#: apps/search/templates/search/advanced/_partials/sidebar.html:10
+#: apps/search/templates/search/advanced/_partials/sidebar.html:15
 msgid "Тип об'єкта"
 msgstr "Object type"
 
@@ -112,7 +112,14 @@ msgstr "Advanced search"
 msgid "Пошук"
 msgstr "Search"
 
-#: apps/search/templates/search/advanced/_partials/sidebar.html:29
+#: apps/search/templates/search/advanced/_partials/sidebar.html:8
+#: apps/search/templates/search/advanced/advanced.html:59
+#, fuzzy
+#| msgid "Розширений пошук"
+msgid "Показати умови пошуку"
+msgstr "Advanced search"
+
+#: apps/search/templates/search/advanced/_partials/sidebar.html:43
 msgid "Стан об'єкта"
 msgstr "Object state"
 
@@ -130,6 +137,18 @@ msgstr "Detailed information on the scope of the database can be obtained"
 #: apps/search/templates/search/simple/simple.html:12
 msgid "тут"
 msgstr "here"
+
+#: apps/search/templates/search/advanced/advanced.html:32
+msgid "Всього результатів"
+msgstr "Results"
+
+#: apps/search/templates/search/advanced/advanced.html:36
+msgid "Сортувати за"
+msgstr "Sort by"
+
+#: apps/search/templates/search/advanced/advanced.html:61
+msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
+msgstr "No results"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
