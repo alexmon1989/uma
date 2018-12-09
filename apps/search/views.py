@@ -11,6 +11,9 @@ from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered
 from operator import attrgetter
 from urllib.parse import parse_qs
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
+
 
 
 class SimpleListView(TemplateView):
@@ -152,3 +155,23 @@ def add_filter_params(request):
 
     get_params = urlencode(get_params, True)
     return redirect(f"{reverse('search:advanced')}?{get_params}")
+
+
+class ObjectDetailView(TemplateView):
+    """Отображает страницу с детальной информацией по объекту"""
+    template_name = 'search/detail/detail.html'
+
+    def get_context_data(self, **kwargs):
+        """Передаёт доп. переменные в шаблон."""
+        context = super().get_context_data(**kwargs)
+
+        # Поиск в ElasticSearch по номеру заявки, который является _id документа
+        app_number = kwargs['app_number']
+        client = Elasticsearch()
+        s = Search().using(client).query("match", _id=app_number).execute()
+        if not s:
+            raise Http404("Об'єкт не знайдено")
+
+        context['hit'] = s
+
+        return context
