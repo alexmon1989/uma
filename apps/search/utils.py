@@ -30,6 +30,11 @@ def get_search_groups(search_data):
     return list(search_groups)
 
 
+def process_query(query):
+    """Обрабатывает строку запроса пользователя."""
+    return query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
+
+
 def elastic_search_groups(search_groups):
     """Поиск в ElasticSearch по группам."""
     all_hits = []
@@ -50,7 +55,7 @@ def elastic_search_groups(search_groups):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     qs &= Q(
                         'query_string',
-                        query=f"{search_param['value']}",
+                        query=f"{process_query(search_param['value'])}",
                         default_field=inid_schedule.elastic_index_field.field_name
                     )
             s = Search(using=client, index="uma").query(qs)
