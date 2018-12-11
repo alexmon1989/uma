@@ -165,13 +165,15 @@ class ObjectDetailView(TemplateView):
         """Передаёт доп. переменные в шаблон."""
         context = super().get_context_data(**kwargs)
 
+        # Текущий язык приложения
+        context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
         # Поиск в ElasticSearch по номеру заявки, который является _id документа
         app_number = kwargs['app_number']
         client = Elasticsearch()
         s = Search().using(client).query("match", _id=app_number).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")
-
-        context['hit'] = s
+        context['hit'] = s[0]
 
         return context

@@ -88,3 +88,23 @@
     color: #be0f05 !important;
   }
 }
+
+.table-biblio {
+  th {
+    width: 10%;
+    white-space: nowrap;
+  }
+  td {
+    padding-left: 10px;
+  }
+}
+
+.g-text-underline--hover {
+    &:hover {
+      text-decoration: underline;
+    }
+}
+
+.hidden {
+  display: none;
+}

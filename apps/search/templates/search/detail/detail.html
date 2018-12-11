@@ -8,102 +8,149 @@
 
     {% include 'search/detail/_partials/breadcrumbs.html' %}
 
-    <div class="container g-min-height-200 g-py-70">
-        <!-- Nav tabs -->
-        <ul class="nav nav-justified u-nav-v4-1 u-nav-primary" role="tablist"
-            data-target="nav-4-1-primary-hor-justified" data-tabs-mobile-type="slide-up-down"
-            data-btn-classes="btn btn-md btn-block u-btn-outline-primary">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#nav-4-1-primary-hor-justified--1" role="tab">Бібліографічні дані</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#nav-4-1-primary-hor-justified--2" role="tab">Опис</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#nav-4-1-primary-hor-justified--3" role="tab">Реферат (UA)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#nav-4-1-primary-hor-justified--4" role="tab">Реферат (EN)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#nav-4-1-primary-hor-justified--5" role="tab">Стан діловодства</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#nav-4-1-primary-hor-justified--6" role="tab">Документи</a>
-            </li>
-        </ul>
-        <!-- End Nav tabs -->
-
-        <!-- Tab panes -->
-        <div id="nav-4-1-primary-hor-justified" class="tab-content g-pt-20">
-            <div class="tab-pane fade show active" id="nav-4-1-primary-hor-justified--1" role="tabpanel">
-                <p>{{ hit }}</p>
+    <div class="container g-min-height-200 g-py-20 g-py-70--lg">
+        <div class="row">
+            <div class="col-md-3 g-mb-20">
+                <!-- Nav tabs -->
+                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5" role="tablist" data-target="nav-1-1-primary-ver"
+                    data-tabs-mobile-type="slide-up-down"
+                    data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover active"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--1"
+                           role="tab"
+                        >{% trans "Бібліографічні дані" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--2"
+                           role="tab"
+                        >{% trans "Опис" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--3"
+                           role="tab"
+                        >{% trans "Реферат" %} (UA)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--4"
+                           role="tab"
+                        >{% trans "Реферат" %} (RU)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--5"
+                           role="tab"
+                        >{% trans "Реферат" %} (EN)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--6"
+                           role="tab"
+                        >{% trans "Стан діловодства" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--7"
+                           role="tab"
+                        >{% trans "Документи" %}</a>
+                    </li>
+                </ul>
+                <!-- End Nav tabs -->
             </div>
-            <div class="tab-pane fade" id="nav-4-1-primary-hor-justified--2" role="tabpanel">
-                <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex quas
-                    saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud neglegentur
-                    accommodare eam ad. Quo cu primis
-                    delenit.</p>
 
-                <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an. Facer
-                    doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro no porro
-                    cetero, mea probo apeirian torquatos ut.
-                    Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique inciderint
-                    reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
-            </div>
-            <div class="tab-pane fade" id="nav-4-1-primary-hor-justified--3" role="tabpanel">
-                <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex quas
-                    saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud neglegentur
-                    accommodare eam ad. Quo cu primis
-                    delenit.</p>
+            <div class="col-md-9">
+                <!-- Tab panes -->
+                <div id="nav-1-1-primary-ver" class="tab-content">
+                    <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                       {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                           {% include 'search/detail/_partials/blblio_data/inv_um_item.html' %}
+                       {% endif %}
+                    </div>
 
-                <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an. Facer
-                    doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro no porro
-                    cetero, mea probo apeirian torquatos ut.
-                    Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique inciderint
-                    reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
-            </div>
-            <div class="tab-pane fade" id="nav-4-1-primary-hor-justified--4" role="tabpanel">
-                <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex quas
-                    saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud neglegentur
-                    accommodare eam ad. Quo cu primis
-                    delenit.</p>
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--2" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
 
-                <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an. Facer
-                    doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro no porro
-                    cetero, mea probo apeirian torquatos ut.
-                    Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique inciderint
-                    reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
-            </div>
-            <div class="tab-pane fade" id="nav-4-1-primary-hor-justified--5" role="tabpanel">
-                <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex quas
-                    saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud neglegentur
-                    accommodare eam ad. Quo cu primis
-                    delenit.</p>
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--3" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
 
-                <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an. Facer
-                    doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro no porro
-                    cetero, mea probo apeirian torquatos ut.
-                    Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique inciderint
-                    reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
-            </div>
-            <div class="tab-pane fade" id="nav-4-1-primary-hor-justified--6" role="tabpanel">
-                <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex quas
-                    saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud neglegentur
-                    accommodare eam ad. Quo cu primis
-                    delenit.</p>
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--4" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
 
-                <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an. Facer
-                    doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro no porro
-                    cetero, mea probo apeirian torquatos ut.
-                    Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique inciderint
-                    reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--5" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--6" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
+                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
+                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
+                            neglegentur accommodare eam ad. Quo cu
+                            primis delenit.</p>
+                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
+                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
+                            no porro cetero, mea probo apeirian torquatos
+                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
+                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                    </div>
+                </div>
+                <!-- End Tab panes -->
             </div>
         </div>
-        <!-- End Tab panes -->
-
-
-
-
     </div>
 {% endblock %}
