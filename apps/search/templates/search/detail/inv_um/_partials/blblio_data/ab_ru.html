@@ -1,0 +1,6 @@
+{% load search_extras %}
+{% load i18n %}
+
+{% document_pdf path=documents.ab_ru.file_name|document_path height=500 %}
+
+<p><a href="{{ documents.ab_ru.file_name|document_path }}" target="_blank"><i class="fa fa-external-link"></i>&nbsp;{% trans "Відкрити у новому вікні" %}</a></p>

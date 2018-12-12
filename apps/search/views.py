@@ -6,14 +6,13 @@ from django.http import Http404
 from django.utils.http import urlencode
 from django.shortcuts import redirect, reverse
 from django.views.decorators.http import require_POST
-from .models import ObjType, InidCodeSchedule, SimpleSearchField
+from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered
 from operator import attrgetter
 from urllib.parse import parse_qs
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-
 
 
 class SimpleListView(TemplateView):
@@ -159,7 +158,11 @@ def add_filter_params(request):
 
 class ObjectDetailView(TemplateView):
     """Отображает страницу с детальной информацией по объекту"""
-    template_name = 'search/detail/detail.html'
+    hit = None
+
+    def get_template_names(self):
+        if self.hit['Document']['idObjType'] in (1, 2):
+            return ['search/detail/inv_um/detail.html']
 
     def get_context_data(self, **kwargs):
         """Передаёт доп. переменные в шаблон."""
@@ -174,6 +177,9 @@ class ObjectDetailView(TemplateView):
         s = Search().using(client).query("match", _id=app_number).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")
-        context['hit'] = s[0]
+        context['hit'], self.hit = s[0], s[0]
+
+        # Документы заявки
+        context['documents'] = AppDocuments.get_app_documents(app_number)
 
         return context

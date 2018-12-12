@@ -53,7 +53,8 @@
                     <tr>
                         <th>(31) Номер попередньої заявки</th>
                         <td>{{ hit.Patent.I_30.I_31|parse_date|date:"d.m.Y" }}
-                            {% if hit.Patent.I_30.I_32 %}<span title="(33) Двобуквений код держави">hit.Patent.I_30.I_32</span>{% endif %}
+                            {% if hit.Patent.I_30.I_32 %}
+                                <span title="(33) Двобуквений код держави">hit.Patent.I_30.I_32</span>{% endif %}
                         </td>
                     </tr>
                 {% endif %}
@@ -97,9 +98,9 @@
                         {{ IPC }}
                         {% if forloop.counter == 3 and not forloop.last %}
                             &nbsp;<a href="#"
-                               class="show-all g-font-size-12"
-                               title="{% trans "Показати всі" %}"
-                            ><i class="fa fa-plus"></i></a>
+                                     class="show-all g-font-size-12"
+                                     title="{% trans "Показати всі" %}"
+                        ><i class="fa fa-plus"></i></a>
                         {% endif %}
                         {% if not forloop.last %}<br>{% endif %}
                     </span>
@@ -137,9 +138,9 @@
                                 {{ I_56|get:"I_56.A" }}
                                 {% if forloop.counter == 3 and not forloop.last %}
                                     &nbsp;<a href="#"
-                                       class="show-all g-font-size-12"
-                                       title="{% trans "Показати всі" %}"
-                                    ><i class="fa fa-plus"></i></a>
+                                             class="show-all g-font-size-12"
+                                             title="{% trans "Показати всі" %}"
+                                ><i class="fa fa-plus"></i></a>
                                 {% endif %}
                             </li>
                         {% endfor %}
@@ -174,9 +175,9 @@
                             {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
                             {% if forloop.counter == 3 and not forloop.last %}
                                 &nbsp;<a href="#"
-                                   class="show-all g-font-size-12"
-                                   title="{% trans "Показати всі" %}"
-                                ><i class="fa fa-plus"></i></a>
+                                         class="show-all g-font-size-12"
+                                         title="{% trans "Показати всі" %}"
+                            ><i class="fa fa-plus"></i></a>
                             {% endif %}
                             {% if not forloop.last %}<br>{% endif %}
                         </span>
@@ -194,9 +195,9 @@
                             {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
                             {% if forloop.counter == 3 and not forloop.last %}
                                 &nbsp;<a href="#"
-                                   class="show-all g-font-size-12"
-                                   title="{% trans "Показати всі" %}"
-                                ><i class="fa fa-plus"></i></a>
+                                         class="show-all g-font-size-12"
+                                         title="{% trans "Показати всі" %}"
+                            ><i class="fa fa-plus"></i></a>
                             {% endif %}
                             {% if not forloop.last %}<br>{% endif %}
                         </span>
@@ -215,9 +216,9 @@
                             {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
                             {% if forloop.counter == 3 and not forloop.last %}
                                 &nbsp;<a href="#"
-                                   class="show-all g-font-size-12"
-                                   title="{% trans "Показати всі" %}"
-                                ><i class="fa fa-plus"></i></a>
+                                         class="show-all g-font-size-12"
+                                         title="{% trans "Показати всі" %}"
+                            ><i class="fa fa-plus"></i></a>
                             {% endif %}
                             {% if not forloop.last %}<br>{% endif %}
                         </span>

@@ -173,3 +173,47 @@ class SimpleSearchField(models.Model):
         verbose_name = 'Поле форми пошуку'
         verbose_name_plural = 'Проста форма пошуку'
         ordering = ('field_name',)
+
+
+class AppDocuments(models.Model):
+    """Модель документов заявки."""
+    id = models.AutoField(db_column='idDocument', primary_key=True)
+    enter_num = models.IntegerField(db_column='enterNum')
+    app = models.ForeignKey('IpcAppList', models.DO_NOTHING, db_column='idAPPNumber')
+    add_date = models.DateTimeField(db_column='AddDate')
+    file_name = models.CharField(db_column='FileName', max_length=500, blank=True, null=True)
+    file_type = models.CharField(db_column='FileType', max_length=10, blank=True, null=True)
+    barcode = models.CharField(db_column='BarCODE', max_length=50, blank=True, null=True)
+    cead_id_doc = models.IntegerField(db_column='CEADIdDoc', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'APP_Documents'
+
+    @staticmethod
+    def get_app_documents(app_number):
+        """Возвращает словарь документов по номеру заявки."""
+        objects = AppDocuments.objects.filter(
+            app__app_number=app_number,
+            enter_num__in=(98, 99, 100),
+            file_type='pdf'
+        )
+        documents = {}
+        for document in objects:
+            # Формула
+            if document.enter_num == 98:
+                documents['cl'] = document
+            # Описание
+            elif document.enter_num == 99:
+                documents['de'] = document
+            else:
+                if 'A_UA' in document.file_name:
+                    # Реферат укр.
+                    documents['ab_ua'] = document
+                if 'A_RU' in document.file_name:
+                    # Реферат рос.
+                    documents['ab_ru'] = document
+                if 'A_EN' in document.file_name:
+                    # Реферат англ.
+                    documents['ab_en'] = document
+        return documents

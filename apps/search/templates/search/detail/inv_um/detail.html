@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load search_extras %}
 
 {% block title %}{% trans "Детальна інформація по об'єкту" %}{% endblock %}
 
 {% block content %}
 
-    {% include 'search/detail/_partials/breadcrumbs.html' %}
+    {% include 'search/detail/inv_um/_partials/breadcrumbs.html' %}
 
     <div class="container g-min-height-200 g-py-20 g-py-70--lg">
         <div class="row">
             <div class="col-md-3 g-mb-20">
                 <!-- Nav tabs -->
-                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5" role="tablist" data-target="nav-1-1-primary-ver"
+                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav" role="tablist"
+                    data-target="nav-1-1-primary-ver"
                     data-tabs-mobile-type="slide-up-down"
                     data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
                     <li class="nav-item">
@@ -23,44 +23,51 @@
                         >{% trans "Бібліографічні дані" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover"
+                        <a class="nav-link g-text-underline--hover {% if not documents.cl %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--2"
+                           role="tab"
+                        >{% trans "Формула" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover {% if not documents.de %}disabled{% endif %}"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--3"
                            role="tab"
                         >{% trans "Опис" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover"
+                        <a class="nav-link g-text-underline--hover {% if not documents.ab_ua %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--3"
+                           href="#nav-1-1-primary-ver--4"
                            role="tab"
                         >{% trans "Реферат" %} (UA)</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover"
+                        <a class="nav-link g-text-underline--hover {% if not documents.ab_ru %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--4"
+                           href="#nav-1-1-primary-ver--5"
                            role="tab"
                         >{% trans "Реферат" %} (RU)</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover"
+                        <a class="nav-link g-text-underline--hover {% if not documents.ab_en %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--5"
+                           href="#nav-1-1-primary-ver--6"
                            role="tab"
                         >{% trans "Реферат" %} (EN)</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--6"
+                           href="#nav-1-1-primary-ver--7"
                            role="tab"
                         >{% trans "Стан діловодства" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--7"
+                           href="#nav-1-1-primary-ver--8"
                            role="tab"
                         >{% trans "Документи" %}</a>
                     </li>
@@ -72,60 +79,43 @@
                 <!-- Tab panes -->
                 <div id="nav-1-1-primary-ver" class="tab-content">
                     <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
-                       {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
-                           {% include 'search/detail/_partials/blblio_data/inv_um_item.html' %}
-                       {% endif %}
+                        {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/inv_um_biblio.html' %}
+                        {% endif %}
                     </div>
 
+
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--2" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                        {% if documents.cl %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/cl.html' %}
+                        {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--3" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                        {% if documents.de %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/de.html' %}
+                        {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--4" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                        {% if documents.ab_ua %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ua.html' %}
+                        {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--5" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                        {% if documents.ab_ru %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ru.html' %}
+                        {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--6" role="tabpanel">
+                        {% if documents.ab_en %}
+                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_en.html' %}
+                        {% endif %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
                         <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
                             quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
                             neglegentur accommodare eam ad. Quo cu
@@ -137,7 +127,7 @@
                             inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
                         <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
                             quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
                             neglegentur accommodare eam ad. Quo cu
