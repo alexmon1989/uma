@@ -100,7 +100,7 @@ class AdvancedListView(TemplateView):
                 # Статусы в найденных результатах
                 res_obj_states = []
                 for i in range(1, 3):
-                    count = len(list(filter(lambda x: x['Document']['Status'] == i, all_hits)))
+                    count = len(list(filter(lambda x: x['search_data']['obj_state'] == i, all_hits)))
                     if count:
                         res_obj_states.append({'obj_state': i})
 
@@ -112,7 +112,7 @@ class AdvancedListView(TemplateView):
                                context['results']))
                 if self.request.GET.get('filter_obj_state'):
                     context['results'] = list(
-                        filter(lambda x: str(x['Document']['Status']) in self.request.GET.getlist('filter_obj_state'),
+                        filter(lambda x: str(x['search_data']['obj_state']) in self.request.GET.getlist('filter_obj_state'),
                                context['results']))
 
                 # Количество объектов определённых типов в отфильтрованных результатах

@@ -42,7 +42,9 @@ def elastic_search_groups(search_groups):
     for group in search_groups:
         if group['search_params']:
             qs = Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
-            qs &= Q('query_string', query=f"{group['obj_state']}", default_field='Document.Status')
+            qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
+            # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
+            qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
             for search_param in group['search_params']:
                 # Поле поиска ElasticSearch
@@ -70,7 +72,7 @@ def count_obj_types_filtered(all_hits, res_obj_types, filter_obj_state):
     """Количество объектов определённых типов в отфильтрованных результатах."""
     if filter_obj_state:
         filtered_hits = list(
-            filter(lambda x: str(x['Document']['Status']) in filter_obj_state, all_hits))
+            filter(lambda x: str(x['search_data']['obj_state']) in filter_obj_state, all_hits))
     else:
         filtered_hits = all_hits
     for obj_type in res_obj_types:
@@ -89,7 +91,7 @@ def count_obj_states_filtered(all_hits, res_obj_states, filter_obj_type):
         filtered_hits = all_hits
     for obj_state in res_obj_states:
         obj_state['count'] = len(list(filter(
-            lambda x: x['Document']['Status'] == obj_state['obj_state'],
+            lambda x: x['search_data']['obj_state'] == obj_state['obj_state'],
             filtered_hits
         )))
     return res_obj_states
