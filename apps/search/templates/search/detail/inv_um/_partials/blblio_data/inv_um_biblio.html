@@ -94,9 +94,9 @@
             <th>(51) Iндекс МПК</th>
             <td class="i_51">
                 {% for IPC in hit.Patent.IPC %}
-                    <span class="{% if forloop.counter > 3 %}more hidden{% endif %}">
+                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                         {{ IPC }}
-                        {% if forloop.counter == 3 and not forloop.last %}
+                        {% if forloop.counter == 2 and not forloop.last %}
                             &nbsp;<a href="#"
                                      class="show-all g-font-size-12"
                                      title="{% trans "Показати всі" %}"
@@ -134,9 +134,9 @@
                 <td>
                     <ul class="g-pl-15 g-mb-0 i_56">
                         {% for I_56 in hit.Patent.I_56 %}
-                            <li class="{% if forloop.counter > 3 %}more hidden{% endif %}">
+                            <li class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                                 {{ I_56|get:"I_56.A" }}
-                                {% if forloop.counter == 3 and not forloop.last %}
+                                {% if forloop.counter == 2 and not forloop.last %}
                                     &nbsp;<a href="#"
                                              class="show-all g-font-size-12"
                                              title="{% trans "Показати всі" %}"
@@ -171,9 +171,9 @@
                 <th>(71) Заявник</th>
                 <td class="i_71">
                     {% for I_71_ in hit.Patent.I_71 %}
-                        <span class="{% if forloop.counter > 3 %}more hidden{% endif %}">
+                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
-                            {% if forloop.counter == 3 and not forloop.last %}
+                            {% if forloop.counter == 2 and not forloop.last %}
                                 &nbsp;<a href="#"
                                          class="show-all g-font-size-12"
                                          title="{% trans "Показати всі" %}"
@@ -191,9 +191,9 @@
                 <th>(72) Винахідник</th>
                 <td class="i_72">
                     {% for I_72_ in hit.Patent.I_72 %}
-                        <span class="{% if forloop.counter > 3 %}more hidden{% endif %}">
+                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
-                            {% if forloop.counter == 3 and not forloop.last %}
+                            {% if forloop.counter == 2 and not forloop.last %}
                                 &nbsp;<a href="#"
                                          class="show-all g-font-size-12"
                                          title="{% trans "Показати всі" %}"
@@ -212,9 +212,9 @@
                 <th>(73) Власник</th>
                 <td class="i_73">
                     {% for I_73_ in hit.Patent.I_73 %}
-                        <span class="{% if forloop.counter > 3 %}more hidden{% endif %}">
+                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
-                            {% if forloop.counter == 3 and not forloop.last %}
+                            {% if forloop.counter == 2 and not forloop.last %}
                                 &nbsp;<a href="#"
                                          class="show-all g-font-size-12"
                                          title="{% trans "Показати всі" %}"
