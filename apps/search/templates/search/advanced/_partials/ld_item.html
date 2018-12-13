@@ -11,13 +11,13 @@
 
     <div class="g-py-5 d-flex justify-content-between">
         <div class="g-text-underline text-info">
-            {% if hit.search_data_obj_status == 1 %}
+            {% if hit.search_data.obj_state == 1 %}
                 Заявка на топографію (компонування) ІМС
             {% else %}
                 Свідоцтво України на топографію (компонування) ІМС
             {% endif %}
         </div>
-        {% if hit.search_data_obj_status == 2 %}
+        {% if hit.search_data.obj_state == 2 %}
             <div class="g-font-weight-600"><i class="fa fa-circle g-color-green g-mr-5"></i>Свідоцтво діє</div>
         {% endif %}
     </div>
@@ -75,7 +75,7 @@
             >{{ hit.Patent.I_22|parse_date|date:"d.m.Y" }}</a>
         </div>
 
-        {% if hit.search_data_obj_status == 2 %}
+        {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Свідоцтво:</h4>
                 <a href="#!"
