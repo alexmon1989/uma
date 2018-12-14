@@ -172,14 +172,15 @@ class ObjectDetailView(TemplateView):
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Поиск в ElasticSearch по номеру заявки, который является _id документа
-        app_number = kwargs['app_number']
+        id_app_number = kwargs['id_app_number']
         client = Elasticsearch()
-        s = Search().using(client).query("match", _id=app_number).execute()
+        s = Search().using(client).query("match", _id=id_app_number).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")
         context['hit'], self.hit = s[0], s[0]
+        context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
 
         # Документы заявки
-        context['documents'] = AppDocuments.get_app_documents(app_number)
+        context['documents'] = AppDocuments.get_app_documents(id_app_number)
 
         return context

@@ -5,85 +5,86 @@
 <div class="table-responsive">
     <table class="table table-sm table-biblio g-font-size-13">
         <tbody>
-        {% if hit.Patent.I_11 %}
+        {% if biblio_data.I_11 %}
             <tr>
                 <th>(11) Номер патенту</th>
-                <td>{{ hit.Patent.I_11 }}</td>
+                <td>{{ biblio_data.I_11 }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_13 %}
+        {% if biblio_data.I_13 %}
             <tr>
                 <th>(13) Код виду документа (ВОІВ ST.16)</th>
-                <td>{{ hit.Patent.I_13 }}</td>
+                <td>{{ biblio_data.I_13 }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_19 %}
+        {% if biblio_data.I_19 %}
             <tr>
                 <th>(19) Код відомства (ВОІВ SТ.3)</th>
-                <td>{{ hit.Patent.I_19 }}</td>
+                <td>{{ biblio_data.I_19 }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_21 %}
+        {% if biblio_data.I_21 %}
             <tr>
                 <th>(21) Номер заявки</th>
-                <td>{{ hit.Patent.I_21 }}</td>
+                <td>{{ biblio_data.I_21 }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_22 %}
+        {% if biblio_data.I_22 %}
             <tr>
                 <th>(22) Дата заявки</th>
-                <td>{{ hit.Patent.I_22|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ biblio_data.I_22|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_24 %}
+        {% if biblio_data.I_24 %}
             <tr>
                 <th>(24) Дата, з якої є чинними права</th>
-                <td>{{ hit.Patent.I_24|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ biblio_data.I_24|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_30 %}
-            {% for I_30 in hit.Patent.I_30 %}
-                {% if hit.Patent.I_30.I_31 %}
+        {% if biblio_data.I_30 %}
+            {% for I_30 in biblio_data.I_30 %}
+                {% if biblio_data.I_30.I_31 %}
                     <tr>
                         <th>(31) Номер попередньої заявки</th>
-                        <td>{{ hit.Patent.I_30.I_31|parse_date|date:"d.m.Y" }}
-                            {% if hit.Patent.I_30.I_32 %}
-                                <span title="(33) Двобуквений код держави">hit.Patent.I_30.I_32</span>{% endif %}
+                        <td>{{ biblio_data.I_30.I_31 }}
+                            {% if biblio_data.I_30.I_33 %}
+                                <span title="(33) Двобуквений код держави">biblio_data.I_30.I_33</span>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endif %}
 
-                {% if hit.Patent.I_30.I_32 %}
+                {% if biblio_data.I_30.I_32 %}
                     <tr>
                         <th>(32) Дата подання попередньої заявки</th>
-                        <td>{{ hit.Patent.I_30.I_31|parse_date|date:"d.m.Y" }}</td>
+                        <td>{{ biblio_data.I_30.I_32|parse_date|date:"d.m.Y" }}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
         {% endif %}
 
-        {% if hit.Patent|get:'I_43.D' %}
+        {% if biblio_data|get:'I_43.D' %}
             <tr>
                 <th>(43) Дата публікації заявки</th>
                 <td>
-                    {% for I_43 in hit.Patent|get:'I_43.D' %}
+                    {% for I_43 in biblio_data|get:'I_43.D' %}
                         {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 </td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent|get:'I_45.D' %}
+        {% if biblio_data|get:'I_45.D' %}
             <tr>
                 <th>(45) Дата публікації про видачу патенту</th>
                 <td>
-                    {% for I_43 in hit.Patent|get:'I_45.D' %}
+                    {% for I_43 in biblio_data|get:'I_45.D' %}
                         {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 </td>
@@ -93,7 +94,7 @@
         <tr>
             <th>(51) Iндекс МПК</th>
             <td class="i_51">
-                {% for IPC in hit.Patent.IPC %}
+                {% for IPC in biblio_data.IPC %}
                     <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                         {{ IPC }}
                         {% if forloop.counter == 2 and not forloop.last %}
@@ -108,11 +109,11 @@
             </td>
         </tr>
 
-        {% if hit.Patent.I_54 %}
+        {% if biblio_data.I_54 %}
             <tr>
                 <th>(54) Назва</th>
                 <td>
-                    {% for I_54 in hit.Patent.I_54 %}
+                    {% for I_54 in biblio_data.I_54 %}
                         {% if I_54|get:'I_54.U' %}
                             {{ I_54|get:'I_54.U' }} [UA]
                         {% endif %}
@@ -128,12 +129,12 @@
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_56 %}
+        {% if biblio_data.I_56 %}
             <tr>
                 <th>(56) Аналоги винаходу</th>
                 <td>
                     <ul class="g-pl-15 g-mb-0 i_56">
-                        {% for I_56 in hit.Patent.I_56 %}
+                        {% for I_56 in biblio_data.I_56 %}
                             <li class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                                 {{ I_56|get:"I_56.A" }}
                                 {% if forloop.counter == 2 and not forloop.last %}
@@ -149,28 +150,28 @@
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_62 %}
-            {% for I_62 in hit.Patent.I_62 %}
-                {% if I_62|get:"I_62.N" %}
+        {% if biblio_data.i_62 %}
+            {% for i_62 in biblio_data.i_62 %}
+                {% if i_62|get:"I_62.N" %}
                     <tr>
                         <th>(62) Номер більш ранньої заявки</th>
-                        <td>{{ I_62|get:"I_62.N" }}</td>
+                        <td>{{ i_62|get:"I_62.N" }}</td>
                     </tr>
                 {% endif %}
-                {% if I_62|get:"I_62.D" %}
+                {% if i_62|get:"I_62.D" %}
                     <tr>
                         <th>(62) Дата більш ранньої заявки</th>
-                        <td>{{ I_62|get:"I_62.D" }}</td>
+                        <td>{{ i_62|get:"I_62.D" }}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
         {% endif %}
 
-        {% if hit.Patent.I_71 %}
+        {% if biblio_data.I_71 %}
             <tr>
                 <th>(71) Заявник</th>
                 <td class="i_71">
-                    {% for I_71_ in hit.Patent.I_71 %}
+                    {% for I_71_ in biblio_data.I_71 %}
                         <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
                             {% if forloop.counter == 2 and not forloop.last %}
@@ -186,11 +187,11 @@
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_72 %}
+        {% if biblio_data.I_72 %}
             <tr>
                 <th>(72) Винахідник</th>
                 <td class="i_72">
-                    {% for I_72_ in hit.Patent.I_72 %}
+                    {% for I_72_ in biblio_data.I_72 %}
                         <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
                             {% if forloop.counter == 2 and not forloop.last %}
@@ -207,11 +208,11 @@
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_73 %}
+        {% if biblio_data.I_73 %}
             <tr>
                 <th>(73) Власник</th>
                 <td class="i_73">
-                    {% for I_73_ in hit.Patent.I_73 %}
+                    {% for I_73_ in biblio_data.I_73 %}
                         <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
                             {% if forloop.counter == 2 and not forloop.last %}
@@ -227,17 +228,17 @@
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_74 %}
+        {% if biblio_data.I_74 %}
             <tr>
                 <th>(74) Представник</th>
-                <td>{{ hit.Patent.I_74 }}</td>
+                <td>{{ biblio_data.I_74 }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Patent.I_98 %}
+        {% if biblio_data.I_98 %}
             <tr>
                 <th>(98) Адреса для листування</th>
-                <td>{{ hit.Patent.I_98 }}</td>
+                <td>{{ biblio_data.I_98 }}</td>
             </tr>
         {% endif %}
         </tbody>

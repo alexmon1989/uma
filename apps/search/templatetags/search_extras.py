@@ -18,12 +18,14 @@ def get_person_country(value):
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html')
 def inv_um_item(hit, item_num):
-    return {'hit': hit, 'item_num': item_num}
+    biblio_data = hit.Claim if hit.search_data.obj_state == 1 else hit.Patent
+    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
 @register.inclusion_tag('search/advanced/_partials/ld_item.html')
 def ld_item(hit, item_num):
-    return {'hit': hit, 'item_num': item_num}
+    biblio_data = hit.Claim if hit.search_data.obj_state == 1 else hit.Patent
+    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
 @register.filter

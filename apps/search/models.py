@@ -92,9 +92,9 @@ class InidCodeSchedule(models.Model):
     elastic_index_field = models.ForeignKey('ElasticIndexField', db_column='ElasticIndexField',
                                             on_delete=models.SET_NULL, blank=True, null=True,
                                             verbose_name='Поле індексу ElasticSearch')
-    enable_search = models.BooleanField(db_column='EnableSearch', blank=True, null=True,
-                                        verbose_name='Дозволяти пошук')
-    enable_view = models.BooleanField(db_column='EnableView', blank=True, null=True,
+    enable_search = models.BooleanField(db_column='EnableSearch', blank=False, null=False,
+                                        verbose_name='Дозволяти пошук', default=False)
+    enable_view = models.BooleanField(db_column='EnableView', blank=False, null=False,
                                       verbose_name='Відображати параметр на сторінці об\'єкта')
 
     class Meta:
@@ -191,10 +191,10 @@ class AppDocuments(models.Model):
         db_table = 'APP_Documents'
 
     @staticmethod
-    def get_app_documents(app_number):
+    def get_app_documents(id_app_number):
         """Возвращает словарь документов по номеру заявки."""
         objects = AppDocuments.objects.filter(
-            app__app_number=app_number,
+            app__id=id_app_number,
             enter_num__in=(98, 99, 100),
             file_type='pdf'
         )

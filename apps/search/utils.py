@@ -41,16 +41,20 @@ def elastic_search_groups(search_groups):
     client = Elasticsearch()
     for group in search_groups:
         if group['search_params']:
+            # Идентификаторы schedule_type для заявок или охранных документов
+            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8)
+
             qs = Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
             qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
             # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
-            qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+            #qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
             for search_param in group['search_params']:
                 # Поле поиска ElasticSearch
                 inid_schedule = InidCodeSchedule.objects.filter(
                     ipc_code__id=search_param['ipc_code'],
-                    schedule_type__obj_type=group['obj_type']
+                    schedule_type__obj_type=group['obj_type'],
+                    schedule_type__id__in=schedule_type_ids
                 ).first()
 
                 # Проверка доступно ли поле для поиска
