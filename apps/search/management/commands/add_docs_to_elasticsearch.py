@@ -59,7 +59,7 @@ class Command(BaseCommand):
                             res['Claim'] = biblio_data
 
                         # Обработка I_72 для избежания ошибки добавления в индекс ElasticSearch
-                        for I_72 in biblio_data['I_72']:
+                        for I_72 in biblio_data.get('I_72', []):
                             if I_72.get('I_72.N'):
                                 I_72['I_72.N.E'] = I_72.pop('I_72.N')
                             if I_72.get('I_72.C'):
