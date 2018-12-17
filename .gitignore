@@ -110,3 +110,4 @@ venv.bak/
 /node_modules/
 /webpack-stats.json
 /assets/bundles/
+/log_indexation.txt
