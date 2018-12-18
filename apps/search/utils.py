@@ -72,8 +72,8 @@ def elastic_search_groups(search_groups):
                         analyze_wildcard=True
                     )
             s = Search(using=client, index="uma").query(qs)
-            total = s.count()
-            s = s[0:total]
+            # total = s.count()
+            s = s[0:500]
             group['response'] = s.execute()
             # Объединение результатов поиска
             for hit in group['response']:
