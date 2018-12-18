@@ -62,7 +62,8 @@ def elastic_search_groups(search_groups):
                     qs &= Q(
                         'query_string',
                         query=f"{process_query(search_param['value'])}",
-                        default_field=inid_schedule.elastic_index_field.field_name
+                        default_field=inid_schedule.elastic_index_field.field_name,
+                        analyze_wildcard=True
                     )
             s = Search(using=client, index="uma").query(qs)
             total = s.count()
