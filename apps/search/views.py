@@ -130,6 +130,7 @@ class AdvancedListView(TemplateView):
                 )
 
                 # Пагинатор
+                context['results_count'] = len(context['results'])
                 paginator = Paginator(context['results'], 10)
                 context['results'] = paginator.get_page(self.request.GET.get('page'))
 
