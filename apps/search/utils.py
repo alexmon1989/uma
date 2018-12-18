@@ -1,6 +1,7 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from .models import ObjType, InidCodeSchedule
+from datetime import datetime
 
 
 def get_search_groups(search_data):
@@ -30,9 +31,14 @@ def get_search_groups(search_data):
     return list(search_groups)
 
 
-def process_query(query):
+def process_query(query, field_type):
     """Обрабатывает строку запроса пользователя."""
-    return query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
+    # TODO: сделать чтоб работали и операторы (OR, AND и т.д.)
+    if field_type == 'date':
+        value = datetime.strptime(query, '%d.%m.%Y')
+        query = value.strftime("%Y-%m-%d")
+    query = query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
+    return query
 
 
 def elastic_search_groups(search_groups):
@@ -61,7 +67,7 @@ def elastic_search_groups(search_groups):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     qs &= Q(
                         'query_string',
-                        query=f"{process_query(search_param['value'])}",
+                        query=f"{process_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
                         default_field=inid_schedule.elastic_index_field.field_name,
                         analyze_wildcard=True
                     )
