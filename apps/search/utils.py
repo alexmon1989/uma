@@ -65,6 +65,8 @@ def elastic_search_groups(search_groups):
                         default_field=inid_schedule.elastic_index_field.field_name
                     )
             s = Search(using=client, index="uma").query(qs)
+            total = s.count()
+            s = s[0:total]
             group['response'] = s.execute()
             # Объединение результатов поиска
             for hit in group['response']:
