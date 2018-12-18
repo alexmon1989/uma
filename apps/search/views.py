@@ -2,17 +2,20 @@ from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory, ValidationError
 from django.core.paginator import Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.utils.http import urlencode
 from django.shortcuts import redirect, reverse
 from django.views.decorators.http import require_POST
-from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments
+from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered
+from .utils import (get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered,
+                    get_client_ip)
 from operator import attrgetter
 from urllib.parse import parse_qs
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl import Search
+from io import BytesIO
+from zipfile import ZipFile
 
 
 class SimpleListView(TemplateView):
@@ -112,7 +115,8 @@ class AdvancedListView(TemplateView):
                                context['results']))
                 if self.request.GET.get('filter_obj_state'):
                     context['results'] = list(
-                        filter(lambda x: str(x['search_data']['obj_state']) in self.request.GET.getlist('filter_obj_state'),
+                        filter(lambda x: str(x['search_data']['obj_state']) in self.request.GET.getlist(
+                            'filter_obj_state'),
                                context['results']))
 
                 # Количество объектов определённых типов в отфильтрованных результатах
@@ -185,3 +189,49 @@ class ObjectDetailView(TemplateView):
         context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 
         return context
+
+
+@require_POST
+def download_docs(request):
+    if request.POST['cead_id']:
+        # Создание заказа
+        order = OrderService(
+            # user=request.user,
+            user_id=3,
+            ip_user=get_client_ip(request),
+            app_id=request.POST['id_app_number']
+        )
+        order.save()
+        for id_cead_doc in request.POST.getlist('cead_id'):
+            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
+
+        # Проверка обработан ли заказ
+        order_id = order.id
+        completed = False
+        while completed is False:
+            order = OrderService.objects.get(id=order_id)
+            if order.order_completed:
+                completed = True
+
+        # Создание архива
+        in_memory = BytesIO()
+        zip_ = ZipFile(in_memory, "a")
+        for document in order.orderdocument_set.all():
+            zip_.write(
+                f"/mount/bear/OrderService/{order.user_id}/{order.id}/{document.id_cead_doc}.{document.file_type}",
+                f"{document.id_cead_doc}.{document.file_type}"
+            )
+
+        # fix for Linux zip files read in Windows
+        for file in zip_.filelist:
+            file.create_system = 0
+
+        zip_.close()
+        in_memory.seek(0)
+
+        response = HttpResponse(in_memory.read(), content_type='application/force-download')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % 'documents.zip'
+
+        return response
+    else:
+        return Http404('Файли не було обрано!')

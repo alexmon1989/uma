@@ -11,61 +11,66 @@
             </h3>
 
             <div class="table-responsive">
-                <table class="table table-striped table-bordered u-table--v1 mb-0">
-                    <thead>
-                    <tr>
-                        <th><input type="checkbox"></th>
-                        <th>#</th>
-                        <th class="text-nowrap text-center">{% trans "Дата реєстрації" %}</th>
-                        <th class="text-nowrap text-center">{% trans "Дата відправки" %}</th>
-                        <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
-                        <th class="text-nowrap text-center">{% trans "Реєстраційний номер" %}</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for doc in hit.DOCFLOW.DOCUMENTS %}
+                <form action="{% url "search:download_docs" %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
+                    <table class="table table-striped table-bordered u-table--v1 mb-0">
+                        <thead>
                         <tr>
-                            <td>
-                                {% if doc.DOCRECORD.DOCIDDOCCEAD %}
-                                    <input type="checkbox">
-                                {% endif %}
-                            </td>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCREGDATE %}
-                                    {{ doc.DOCRECORD.DOCREGDATE|parse_date|date:"d.m.Y" }}
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCSENDINGDATE %}
-                                    {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if doc.DOCRECORD.DOCTYPE %}
-                                    {{ doc.DOCRECORD.DOCTYPE }}
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCREGNUMBER %}
-                                    {{ doc.DOCRECORD.DOCREGNUMBER }}
+                            <th><input type="checkbox"></th>
+                            <th>#</th>
+                            <th class="text-nowrap text-center">{% trans "Дата реєстрації" %}</th>
+                            <th class="text-nowrap text-center">{% trans "Дата відправки" %}</th>
+                            <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
+                            <th class="text-nowrap text-center">{% trans "Реєстраційний номер" %}</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for doc in hit.DOCFLOW.DOCUMENTS %}
+                            <tr>
+                                <td>
+                                    {% if doc.DOCRECORD.DOCIDDOCCEAD %}
+                                        <input type="checkbox" name="cead_id" value="{{ doc.DOCRECORD.DOCIDDOCCEAD }}">
+                                    {% endif %}
+                                </td>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCREGDATE %}
+                                        {{ doc.DOCRECORD.DOCREGDATE|parse_date|date:"d.m.Y" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCSENDINGDATE %}
+                                        {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if doc.DOCRECORD.DOCTYPE %}
+                                        {{ doc.DOCRECORD.DOCTYPE }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCREGNUMBER %}
+                                        {{ doc.DOCRECORD.DOCREGNUMBER }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="6" class="g-bg-white">
+                                {% if hit.DOCFLOW.DOCUMENTS|length > 0 %}
+                                    <button class="btn btn-primary"
+                                            type="submit"><i
+                                            class="fa fa-download"></i>&nbsp;{% trans "Завантажити обрані" %}</button>
+                                {% else %}
+                                    {% trans "Документи відсутні" %}
                                 {% endif %}
                             </td>
                         </tr>
-                    {% endfor %}
-                    <tr>
-                        <td colspan="6" class="g-bg-white">
-                            {% if hit.DOCFLOW.DOCUMENTS|length > 0 %}
-                                <button class="btn btn-primary"><i
-                                        class="fa fa-download"></i>&nbsp;{% trans "Завантажити обрані" %}</button>
-                            {% else %}
-                                {% trans "Документи відсутні" %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
         <!-- End Striped Rows -->
