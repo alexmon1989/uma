@@ -23,35 +23,35 @@
                         >{% trans "Бібліографічні дані" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if not documents.cl %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.cl %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--2"
                            role="tab"
                         >{% trans "Формула" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if not documents.de %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.de %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--3"
                            role="tab"
                         >{% trans "Опис" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if not documents.ab_ua %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ua %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--4"
                            role="tab"
                         >{% trans "Реферат" %} (UA)</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if not documents.ab_ru %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ru %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--5"
                            role="tab"
                         >{% trans "Реферат" %} (RU)</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if not documents.ab_en %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_en %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--6"
                            role="tab"
@@ -63,13 +63,6 @@
                            href="#nav-1-1-primary-ver--7"
                            role="tab"
                         >{% trans "Стан діловодства" %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover"
-                           data-toggle="tab"
-                           href="#nav-1-1-primary-ver--8"
-                           role="tab"
-                        >{% trans "Документи" %}</a>
                     </li>
                 </ul>
                 <!-- End Nav tabs -->
@@ -86,57 +79,39 @@
 
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--2" role="tabpanel">
-                        {% if documents.cl %}
+                        {% if biblio_documents.cl %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/cl.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--3" role="tabpanel">
-                        {% if documents.de %}
+                        {% if biblio_documents.de %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/de.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--4" role="tabpanel">
-                        {% if documents.ab_ua %}
+                        {% if biblio_documents.ab_ua %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/ab_ua.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--5" role="tabpanel">
-                        {% if documents.ab_ru %}
+                        {% if biblio_documents.ab_ru %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/ab_ru.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--6" role="tabpanel">
-                        {% if documents.ab_en %}
+                        {% if biblio_documents.ab_en %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/ab_en.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
-                        <p>Equidem recteque sea et. Per detracto iracundia ea, duo nusquam denique omittantur in. Nam ex
-                            quas saperet, solum convenire vel in, dicant atomorum his ne. Putant bonorum in nam, nostrud
-                            neglegentur accommodare eam ad. Quo cu
-                            primis delenit.</p>
-                        <p>Nam ut viris disputando dissentiunt, sumo vocent ad mea. Vel justo debitis neglegentur an.
-                            Facer doctus inimicus et est, sed ea sint dicant. Per soleat pertinax complectitur et, pro
-                            no porro cetero, mea probo apeirian torquatos
-                            ut. Habeo dicat errem quo et, ut democritum sententiae eloquentiam cum. Sit ad oblique
-                            inciderint reformidans, homero albucius voluptatum pro te, saepe laoreet in est.</p>
+                        {% include 'search/detail/inv_um/_partials/state_of_affair/documents.html' %}
+                        {% include 'search/detail/inv_um/_partials/state_of_affair/collections.html' %}
+                        {% include 'search/detail/inv_um/_partials/state_of_affair/payments.html' %}
                     </div>
                 </div>
                 <!-- End Tab panes -->

@@ -180,7 +180,7 @@ class ObjectDetailView(TemplateView):
         context['hit'], self.hit = s[0], s[0]
         context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
 
-        # Документы заявки
-        context['documents'] = AppDocuments.get_app_documents(id_app_number)
+        # Документы заявки (библиографические)
+        context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 
         return context
