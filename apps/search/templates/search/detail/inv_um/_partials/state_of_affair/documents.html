@@ -11,7 +11,7 @@
             </h3>
 
             <div class="table-responsive">
-                <form action="{% url "search:download_docs" %}" method="post">
+                <form action="{% url "search:download_docs_zipped" %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
                     <table class="table table-striped table-bordered u-table--v1 mb-0">

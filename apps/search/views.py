@@ -195,7 +195,8 @@ class ObjectDetailView(TemplateView):
 
 
 @require_POST
-def download_docs(request):
+def download_docs_zipped(request):
+    """Инициирует загрузку архива с документами."""
     if request.POST['cead_id']:
         # Создание заказа
         order = OrderService(
@@ -237,13 +238,9 @@ def download_docs(request):
 
         zip_.close()
         in_memory.seek(0)
-
-        response = HttpResponse(in_memory.read(), content_type='application/force-download')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % 'documents.zip'
-
-        return response
+        return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
     else:
-        return Http404('Файли не було обрано!')
+        raise Http404('Файли не було обрано!')
 
 
 def download_doc(request, id_app_number, id_cead_doc):
