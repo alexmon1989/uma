@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory, ValidationError
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.http import urlencode
 from django.shortcuts import redirect, reverse
 from django.views.decorators.http import require_POST
@@ -16,6 +16,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from io import BytesIO
 from zipfile import ZipFile
+import time
 
 
 class SimpleListView(TemplateView):
@@ -208,10 +209,16 @@ def download_docs(request):
         # Проверка обработан ли заказ
         order_id = order.id
         completed = False
+        counter = 0
         while completed is False:
             order = OrderService.objects.get(id=order_id)
             if order.order_completed:
                 completed = True
+            else:
+                if counter == 5:
+                    return HttpResponseServerError('Помилка сервісу видачі документів.')
+                counter += 1
+                time.sleep(3)
 
         # Создание архива
         in_memory = BytesIO()
