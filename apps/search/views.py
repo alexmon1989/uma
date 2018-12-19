@@ -2,10 +2,11 @@ from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory, ValidationError
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponse, HttpResponseServerError
+from django.http import Http404, HttpResponse, HttpResponseServerError, FileResponse
 from django.utils.http import urlencode
 from django.shortcuts import redirect, reverse
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered,
@@ -17,6 +18,7 @@ from elasticsearch_dsl import Search
 from io import BytesIO
 from zipfile import ZipFile
 import time
+import os
 
 
 class SimpleListView(TemplateView):
@@ -242,3 +244,49 @@ def download_docs(request):
         return response
     else:
         return Http404('Файли не було обрано!')
+
+
+def download_doc(request, id_app_number, id_cead_doc):
+    """Инициирует у пользование скачивание документа."""
+    # Создание заказа
+    order = OrderService(
+        # user=request.user,
+        user_id=3,
+        ip_user=get_client_ip(request),
+        app_id=id_app_number
+    )
+    order.save()
+    OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
+
+    # Проверка обработан ли заказ
+    order_id = order.id
+    completed = False
+    counter = 0
+    while completed is False:
+        order = OrderService.objects.get(id=order_id)
+        if order.order_completed:
+            completed = True
+        else:
+            if counter == 10:
+                return HttpResponseServerError('Помилка сервісу видачі документів.')
+            counter += 1
+            time.sleep(2)
+
+    # Получение документа из БД
+    doc = order.orderdocument_set.first()
+    if doc is None:
+        raise Http404()
+
+    # Путь к файлу
+    file_path = os.path.join(
+        settings.ORDERS_ROOT,
+        str(order.user_id),
+        str(order.id),
+        f"{doc.id_cead_doc}.{doc.file_type}"
+    )
+
+    # Инициирование загрузки
+    try:
+        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+    except FileNotFoundError:
+        raise Http404()
