@@ -38,4 +38,14 @@ $(function () {
         $(".i_51 span.more").toggleClass('hidden');
         $(this).find('i').toggleClass('fa-minus').toggleClass('fa-plus');
     });
+
+    // Выделитть (снять выделение) все документы
+    $("#documents-form #select-all-documents").click(function () {
+        var $this = $(this);
+        if ($this.is(':checked')) {
+            $("#documents-form input[name=cead_id]").prop('checked', true);
+        } else {
+            $("#documents-form input[name=cead_id]").prop('checked', false);
+        }
+    });
 });
