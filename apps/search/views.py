@@ -197,7 +197,7 @@ class ObjectDetailView(TemplateView):
 @require_POST
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
-    if request.POST['cead_id']:
+    if request.POST.getlist('cead_id'):
         # Создание заказа
         order = OrderService(
             # user=request.user,
