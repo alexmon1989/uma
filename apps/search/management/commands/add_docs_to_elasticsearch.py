@@ -73,6 +73,10 @@ class Command(BaseCommand):
                             if data.get('DOCFLOW'):
                                 res['DOCFLOW'] = data['DOCFLOW']
 
+                            # Оповещения
+                            if data.get('TRANSACTIONS'):
+                                res['TRANSACTIONS'] = data['TRANSACTIONS']
+
                             # Поисковые данные (для сортировки и т.д.)
                             res['search_data'] = {
                                 'obj_state': 2 if doc['registration_number'] else 1,
