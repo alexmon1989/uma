@@ -58,39 +58,43 @@ class Command(BaseCommand):
                             biblio_data = data['Claim']
                             res['Claim'] = biblio_data
 
-                        # Обработка I_72 для избежания ошибки добавления в индекс ElasticSearch
-                        for I_72 in biblio_data.get('I_72', []):
-                            if I_72.get('I_72.N'):
-                                I_72['I_72.N.E'] = I_72.pop('I_72.N')
-                            if I_72.get('I_72.C'):
-                                I_72['I_72.C.E'] = I_72.pop('I_72.C')
-
-                        # Состояние делопроизводства
-                        if data.get('DOCFLOW'):
-                            res['DOCFLOW'] = data['DOCFLOW']
-
-                        # Поисковые данные (для сортировки и т.д.)
-                        res['search_data'] = {
-                            'obj_state': 2 if doc['registration_number'] else 1,
-                            'app_number': biblio_data.get('I_21'),
-                            'app_date':  biblio_data.get('I_22'),
-                            'protective_doc_number': biblio_data.get('I_11'),
-                            'rights_date': biblio_data.get('I_24'),
-                            'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
-                            'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
-                            'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],
-                            'agent': biblio_data.get('I_74'),
-                            'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])],
-                        }
-
-                        # Запись в индекс
-                        try:
-                            es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
-                        except elasticsearch_exceptions.RequestError:
-                            self.stdout.write(self.style.ERROR(f"Can't add to ElasticSearch index: {json_path}"))
+                        if biblio_data is None:
+                            self.stdout.write(
+                                self.style.ERROR(f"Error: biblio data missed in file: {json_path}"))
                         else:
-                            # Пометка в БД что этот документ проиндексирован
-                            IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+                            # Обработка I_72 для избежания ошибки добавления в индекс ElasticSearch
+                            for I_72 in biblio_data.get('I_72', []):
+                                if I_72.get('I_72.N'):
+                                    I_72['I_72.N.E'] = I_72.pop('I_72.N')
+                                if I_72.get('I_72.C'):
+                                    I_72['I_72.C.E'] = I_72.pop('I_72.C')
+
+                            # Состояние делопроизводства
+                            if data.get('DOCFLOW'):
+                                res['DOCFLOW'] = data['DOCFLOW']
+
+                            # Поисковые данные (для сортировки и т.д.)
+                            res['search_data'] = {
+                                'obj_state': 2 if doc['registration_number'] else 1,
+                                'app_number': biblio_data.get('I_21'),
+                                'app_date':  biblio_data.get('I_22'),
+                                'protective_doc_number': biblio_data.get('I_11'),
+                                'rights_date': biblio_data.get('I_24'),
+                                'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
+                                'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
+                                'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],
+                                'agent': biblio_data.get('I_74'),
+                                'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])],
+                            }
+
+                            # Запись в индекс
+                            try:
+                                es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
+                            except elasticsearch_exceptions.RequestError:
+                                self.stdout.write(self.style.ERROR(f"Can't add to ElasticSearch index: {json_path}"))
+                            else:
+                                # Пометка в БД что этот документ проиндексирован
+                                IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
                     except json.decoder.JSONDecodeError:
                         self.stdout.write(
