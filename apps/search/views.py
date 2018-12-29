@@ -312,7 +312,7 @@ def download_docs_zipped(request):
         zip_ = ZipFile(in_memory, "a")
         for document in order.orderdocument_set.all():
             zip_.write(
-                f"/mount/bear/OrderService/{order.user_id}/{order.id}/{document.id_cead_doc}.{document.file_type}",
+                f"{settings.DOCUMENTS_MOUNT_FOLDER}/{order.user_id}/{order.id}/{document.id_cead_doc}.{document.file_type}",
                 f"{document.id_cead_doc}.{document.file_type}"
             )
 
