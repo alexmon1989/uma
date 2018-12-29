@@ -53,6 +53,9 @@ class SimpleListView(TemplateView):
             except ValidationError:
                 raise Http404("Некоректний пошуковий запит.")
 
+            # Признак того что производится поиск
+            context['is_search'] = True
+
             if is_valid:
                 # Формирование поискового запроса ElasticSearch
                 client = Elasticsearch()

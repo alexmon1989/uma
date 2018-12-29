@@ -9,47 +9,52 @@
     {% include 'search/simple/_partials/breadcrumbs.html' %}
 
     <div class="container g-py-70">
-        <p class="g-mb-15 g-font-size-15">{% trans "Система дозволяє здійснювати пошук в 72 млн. патентних документів." %} {% trans "Детальну інформацію про сферу охоплення бази даних можна отримати" %}
-            <a href="#">{% trans "тут" %}</a>.</p>
-
-        <div>
+        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
             <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
                                 v-bind:initial-data="{{ initial_data }}"/>
         </div>
 
+        {% if is_search %}
+            {% if results %}
+                <div class="row g-pt-20 g-pb-9">
 
-        {% if results %}
-            <div class="row g-pt-20 g-pb-9">
-
-                <div class="col-md-3">
-                    {% include 'search/simple/_partials/sidebar.html' %}
-                </div>
-
-                <div class="col-md-9">
-                    <div class="d-md-flex justify-content-between g-mb-30">
-                        <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">{% trans "Всього результатів" %}:<span
-                                class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></h3>
-
-                        <div class="d-flex justify-content-between">
-                            <div class="g-mr-10">{% trans "Сортувати за" %}:</div>
-                        </div>
+                    <div class="col-md-3">
+                        {% include 'search/simple/_partials/sidebar.html' %}
                     </div>
 
-                    {% for hit in results %}
-                        {# Изобретения, полезные модели #}
-                        {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
-                            {% inv_um_item hit forloop.counter0|add:results.start_index %}
-                        {# Топографии #}
-                        {% elif hit.Document.idObjType == 3 %}
-                            {% ld_item hit forloop.counter0|add:results.start_index %}
-                        {% endif %}
-                    {% endfor %}
+                    <div class="col-md-9">
+                        <div class="d-md-flex justify-content-between g-mb-30">
+                            <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">{% trans "Всього результатів" %}:<span
+                                    class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></h3>
 
-                    {% include 'search/simple/_partials/pagination.html' %}
+                            <div class="d-flex justify-content-between">
+                                <div class="g-mr-10">{% trans "Сортувати за" %}:</div>
+                            </div>
+                        </div>
+
+                        {% for hit in results %}
+                            {# Изобретения, полезные модели #}
+                            {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                                {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                            {# Топографии #}
+                            {% elif hit.Document.idObjType == 3 %}
+                                {% ld_item hit forloop.counter0|add:results.start_index %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% include 'search/simple/_partials/pagination.html' %}
+                    </div>
                 </div>
-            </div>
-        {% else %}
-            <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
+            {% else %}
+                <div class="g-mt-10">
+                    <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
+                            data-target="#collapseForm"
+                            aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+                    </button>
+                    <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 

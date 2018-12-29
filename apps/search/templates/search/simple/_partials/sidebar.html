@@ -4,6 +4,12 @@
 
 <div class="g-pr-40--lg g-mb-50 g-mb-0--lg">
 
+    <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
+            data-target="#collapseForm"
+            aria-expanded="false" aria-controls="collapseExample">
+        <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+    </button>
+
     <form action="{% url 'search:add_filter_params' %}" method="post" id="filter-form">
         {% csrf_token %}
         <input type="hidden" name="get_params" value="{{ request.GET.urlencode }}">
