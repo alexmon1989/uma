@@ -31,7 +31,7 @@ def get_search_groups(search_data):
     return list(search_groups)
 
 
-def process_query(query, field_type):
+def prepare_query(query, field_type):
     """Обрабатывает строку запроса пользователя."""
     # TODO: сделать чтоб работали и операторы (OR, AND и т.д.)
     if field_type == 'date':
@@ -67,7 +67,7 @@ def elastic_search_groups(search_groups):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     qs &= Q(
                         'query_string',
-                        query=f"{process_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
+                        query=f"{prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
                         default_field=inid_schedule.elastic_index_field.field_name,
                         analyze_wildcard=True
                     )
@@ -118,3 +118,18 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+class ResultsProxy(object):
+    """
+    A proxy object for returning Elasticsearch results that is able to be
+    passed to a Paginator.
+    """
+    def __init__(self, s):
+        self.s = s
+
+    def __len__(self):
+        return self.s.count()
+
+    def __getitem__(self, item):
+        return self.s[item.start:item.stop].execute()

@@ -1,0 +1,65 @@
+{% load i18n %}
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="g-pr-40--lg g-mb-50 g-mb-0--lg">
+
+    <form action="{% url 'search:add_filter_params' %}" method="post" id="filter-form">
+        {% csrf_token %}
+        <input type="hidden" name="get_params" value="{{ request.GET.urlencode }}">
+
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Тип об'єкта" %}</h2>
+
+        <hr class="g-brd-gray-light-v4 g-my-15">
+
+        <div class="g-mb-40">
+            {% for obj_type in aggregations.idObjType_terms.buckets %}
+                <div class="form-group g-mb-5">
+                    <label class="u-check g-pl-30 {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in request.GET|get_list:'filter_obj_type' %}g-color-gray-dark-v5{% endif %}">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                               type="checkbox"
+                               name="filter_obj_type"
+                               value="{{ obj_type.key }}"
+                               {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in request.GET|get_list:'filter_obj_type' %}disabled="disabled"{% endif %}
+                               {% if obj_type.key|stringformat:"i" in request.GET|get_list:'filter_obj_type' %}checked{% endif %}>
+                        <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon=""></i>
+                        </div>
+                        {% obj_type_title id=obj_type.key lang=lang_code %}
+                        {% if obj_type.key|stringformat:"i" not in request.GET|get_list:'filter_obj_type' %}
+                            <span class="g-color-gray-dark-v5">
+                                ({% if request.GET.filter_obj_type %}+{% endif %}{{ obj_type.doc_count }})
+                            </span>
+                        {% endif %}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Стан об'єкта" %}</h2>
+        <hr class="g-brd-gray-light-v4 g-my-15">
+        <div class="g-mb-20">
+            {% for obj_state in aggregations.obj_state_terms.buckets %}
+                <div class="form-group g-mb-5">
+                    <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 and obj_state.key|stringformat:"i" not in request.GET|get_list:'filter_obj_state' %}g-color-gray-dark-v5{% endif %}">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                               type="checkbox"
+                               name="filter_obj_state"
+                               value="{{ obj_state.key }}"
+                               {% if obj_state.doc_count == 0 and obj_state.key|stringformat:"i" not in request.GET|get_list:'filter_obj_state' %}disabled="disabled"{% endif %}
+                               {% if obj_state.key|stringformat:"i" in request.GET|get_list:'filter_obj_state' %}checked{% endif %}>
+                        <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon=""></i>
+                        </div>
+                        {% if obj_state.key == 1 %}{% trans "Заявка" %}{% elif obj_state.key == 2 %}{% trans "Охоронний документ" %}{% endif %}
+                        {% if obj_state.key|stringformat:"i" not in request.GET|get_list:'filter_obj_state' %}
+                            <span class="g-color-gray-dark-v5">
+                                ({% if request.GET.filter_obj_state %}+{% endif %}{{ obj_state.doc_count }})
+                            </span>
+                        {% endif %}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+    </form>
+</div>

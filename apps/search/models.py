@@ -162,18 +162,18 @@ class SimpleSearchField(models.Model):
     """Модель для описания формы простого поиска."""
     field_label_ua = models.CharField('Label поля (укр.)', max_length=255, default='')
     field_label_en = models.CharField('Label поля (англ.)', max_length=255, default='')
-    field_name = models.CharField('Name поля', max_length=255)
     is_visible = models.BooleanField('Відображати', default=True)
-    elastic_index_fields = models.ManyToManyField(ElasticIndexField, verbose_name='Поля ElasticSearch', blank=True,
-                                                  limit_choices_to={'field_type__in': ('integer', 'keyword', 'text', 'date')})
+    elastic_index_field = models.ForeignKey('ElasticIndexField', db_column='ElasticIndexField',
+                                            on_delete=models.SET_NULL, blank=True, null=True,
+                                            verbose_name='Поле індексу ElasticSearch')
 
     def __str__(self):
-        return self.field_name
+        return self.field_label_ua
 
     class Meta:
         verbose_name = 'Поле форми пошуку'
         verbose_name_plural = 'Проста форма пошуку'
-        ordering = ('field_name',)
+        ordering = ('id',)
 
 
 class AppDocuments(models.Model):

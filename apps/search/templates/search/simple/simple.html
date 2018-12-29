@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load search_extras %}
 
 {% block title %}{% trans "Простий пошук" %}{% endblock %}
 
@@ -11,8 +12,45 @@
         <p class="g-mb-15 g-font-size-15">{% trans "Система дозволяє здійснювати пошук в 72 млн. патентних документів." %} {% trans "Детальну інформацію про сферу охоплення бази даних можна отримати" %}
             <a href="#">{% trans "тут" %}</a>.</p>
 
-        <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
-                            v-bind:initial-data="{{ initial_data }}"/>
+        <div>
+            <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
+                                v-bind:initial-data="{{ initial_data }}"/>
+        </div>
+
+
+        {% if results %}
+            <div class="row g-pt-20 g-pb-9">
+
+                <div class="col-md-3">
+                    {% include 'search/simple/_partials/sidebar.html' %}
+                </div>
+
+                <div class="col-md-9">
+                    <div class="d-md-flex justify-content-between g-mb-30">
+                        <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">{% trans "Всього результатів" %}:<span
+                                class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></h3>
+
+                        <div class="d-flex justify-content-between">
+                            <div class="g-mr-10">{% trans "Сортувати за" %}:</div>
+                        </div>
+                    </div>
+
+                    {% for hit in results %}
+                        {# Изобретения, полезные модели #}
+                        {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                            {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                        {# Топографии #}
+                        {% elif hit.Document.idObjType == 3 %}
+                            {% ld_item hit forloop.counter0|add:results.start_index %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% include 'search/simple/_partials/pagination.html' %}
+                </div>
+            </div>
+        {% else %}
+            <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
+        {% endif %}
     </div>
 
 {% endblock %}

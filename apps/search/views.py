@@ -1,8 +1,8 @@
 from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory, ValidationError
-from django.core.paginator import Paginator
-from django.http import Http404, HttpResponse, HttpResponseServerError, FileResponse
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import Http404, HttpResponseServerError, FileResponse
 from django.utils.http import urlencode
 from django.shortcuts import redirect, reverse
 from django.views.decorators.http import require_POST
@@ -10,11 +10,11 @@ from django.conf import settings
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered,
-                    get_client_ip)
+                    get_client_ip, prepare_query, ResultsProxy)
 from operator import attrgetter
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, Q, A
 from io import BytesIO
 from zipfile import ZipFile
 import time
@@ -31,6 +31,7 @@ class SimpleListView(TemplateView):
 
         # Текущий язык приложения
         lang_code = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+        context['lang_code'] = lang_code
 
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
@@ -38,7 +39,6 @@ class SimpleListView(TemplateView):
         ).values(
             'id',
             'field_label',
-            'field_name'
         ).filter(is_visible=True))
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
@@ -47,6 +47,86 @@ class SimpleListView(TemplateView):
             formset = SimpleSearchFormSet(self.request.GET)
             context['initial_data'] = dict(formset.data.lists())
 
+            # Валидация поисковой формы
+            try:
+                is_valid = formset.is_valid()
+            except ValidationError:
+                raise Http404("Некоректний пошуковий запит.")
+
+            if is_valid:
+                # Формирование поискового запроса ElasticSearch
+                client = Elasticsearch()
+                qs = None
+                for s in formset.cleaned_data:
+                    elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
+                    if elastic_field:
+                        q = Q(
+                            'query_string',
+                            query=prepare_query(s['value'], elastic_field.field_type),
+                            default_field=elastic_field.field_name,
+                            default_operator='AND'
+                        )
+                        if qs is not None:
+                            qs &= q
+                        else:
+                            qs = q
+                s = Search(using=client, index='uma').query(qs).sort('_score')
+
+                # Агрегация для определения всех типов объектов и состояний
+                s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
+                s.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+                aggregations = s.execute().aggregations.to_dict()
+                s_ = s
+
+                # Фильтрация
+                if self.request.GET.get('filter_obj_type'):
+                    # Фильтрация в основном запросе
+                    s = s.filter('terms', Document__idObjType=self.request.GET.getlist('filter_obj_type'))
+                    # Агрегация для определения количества объектов определённых типов после применения одного фильтра
+                    s_filter_obj_type = s_.filter(
+                        'terms',
+                        Document__idObjType=self.request.GET.getlist('filter_obj_type')
+                    )
+                    s_filter_obj_type.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+                    aggregations_obj_state = s_filter_obj_type.execute().aggregations.to_dict()
+                    for bucket in aggregations['obj_state_terms']['buckets']:
+                        if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_obj_state['obj_state_terms']['buckets'])):
+                            aggregations_obj_state['obj_state_terms']['buckets'].append(
+                                {'key': bucket['key'], 'doc_count': 0}
+                            )
+                    aggregations['obj_state_terms']['buckets'] = aggregations_obj_state['obj_state_terms']['buckets']
+
+                if self.request.GET.get('filter_obj_state'):
+                    # Фильтрация в основном запросе
+                    s = s.filter('terms', search_data__obj_state=self.request.GET.getlist('filter_obj_state'))
+                    # Агрегация для определения количества объектов определённых состояний
+                    # после применения одного фильтра
+                    s_filter_obj_state = s_.filter(
+                        'terms',
+                        search_data__obj_state=self.request.GET.getlist('filter_obj_state')
+                    )
+                    s_filter_obj_state.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
+                    aggregations_id_obj_type = s_filter_obj_state.execute().aggregations.to_dict()
+                    for bucket in aggregations['idObjType_terms']['buckets']:
+                        if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_id_obj_type['idObjType_terms']['buckets'])):
+                            aggregations_id_obj_type['idObjType_terms']['buckets'].append(
+                                {'key': bucket['key'], 'doc_count': 0}
+                            )
+                    aggregations['idObjType_terms']['buckets'] = aggregations_id_obj_type['idObjType_terms']['buckets']
+
+                # Пагинация
+                paginate_by = 10
+                paginator = Paginator(ResultsProxy(s), paginate_by)
+                page_number = self.request.GET.get('page')
+                try:
+                    page = paginator.page(page_number)
+                except PageNotAnInteger:
+                    page = paginator.page(1)
+                except EmptyPage:
+                    page = paginator.page(paginator.num_pages)
+
+                context['results'] = page
+                context['aggregations'] = aggregations
         return context
 
 
@@ -161,7 +241,11 @@ def add_filter_params(request):
         del get_params['page']  # Для переадресации на 1 страницу
 
     get_params = urlencode(get_params, True)
-    return redirect(f"{reverse('search:advanced')}?{get_params}")
+
+    referer = request.META.get('HTTP_REFERER')
+    path = urlparse(referer).path
+
+    return redirect(f"{path}?{get_params}")
 
 
 class ObjectDetailView(TemplateView):

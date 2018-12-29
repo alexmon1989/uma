@@ -1,5 +1,6 @@
 from django import template
 from django.conf import settings
+from ..models import ObjType
 
 register = template.Library()
 
@@ -36,3 +37,12 @@ def document_path(file_name):
 @register.inclusion_tag('search/detail/document_pdf.html')
 def document_pdf(path, height=500):
     return {'document_path': path, 'height': height}
+
+
+@register.simple_tag
+def obj_type_title(id, lang):
+    obj_type = ObjType.objects.get(id=id)
+    if lang == 'ua':
+        return obj_type.obj_type_ua
+    else:
+        return obj_type.obj_type_en

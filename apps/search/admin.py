@@ -111,7 +111,7 @@ class SimpleSearchFields(admin.ModelAdmin):
     list_display = (
         'field_label_ua',
         'field_label_en',
-        'field_name',
+        'elastic_index_field',
         'is_visible',
     )
     list_filter = (
@@ -120,8 +120,10 @@ class SimpleSearchFields(admin.ModelAdmin):
     search_fields = (
         'field_label_ua',
         'field_label_en',
+        'elastic_index_field',
         'field_name',
     )
     list_editable = (
         'is_visible',
+        'elastic_index_field',
     )
