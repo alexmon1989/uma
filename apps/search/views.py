@@ -39,7 +39,7 @@ class SimpleListView(TemplateView):
         ).values(
             'id',
             'field_label',
-        ).filter(is_visible=True))
+        ).filter(is_visible=True).order_by('-weight'))
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)

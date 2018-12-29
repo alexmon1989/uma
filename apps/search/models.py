@@ -166,6 +166,11 @@ class SimpleSearchField(models.Model):
     elastic_index_field = models.ForeignKey('ElasticIndexField', db_column='ElasticIndexField',
                                             on_delete=models.SET_NULL, blank=True, null=True,
                                             verbose_name='Поле індексу ElasticSearch')
+    weight = models.PositiveIntegerField(
+        'Вага',
+        default=1000,
+        help_text='Чим більша вага, тим вище параметр пошуку у списку'
+    )
 
     def __str__(self):
         return self.field_label_ua
