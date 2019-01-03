@@ -10,7 +10,7 @@ from django.conf import settings
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered,
-                    get_client_ip, prepare_query, ResultsProxy)
+                    get_client_ip, prepare_advanced_query, prepare_simple_query, ResultsProxy)
 from operator import attrgetter
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
@@ -65,7 +65,7 @@ class SimpleListView(TemplateView):
                     if elastic_field:
                         q = Q(
                             'query_string',
-                            query=prepare_query(s['value'], elastic_field.field_type),
+                            query=prepare_simple_query(s['value'], elastic_field.field_type),
                             default_field=elastic_field.field_name,
                             default_operator='AND'
                         )

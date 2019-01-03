@@ -31,8 +31,8 @@ def get_search_groups(search_data):
     return list(search_groups)
 
 
-def prepare_query(query, field_type):
-    """Обрабатывает строку запроса пользователя."""
+def prepare_advanced_query(query, field_type):
+    """Обрабатывает строку расширенного запроса пользователя."""
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'>(\d{1,2})\.(\d{1,2})\.(\d{4})', '{\\3-\\2-\\1 TO *}', query)
@@ -41,6 +41,18 @@ def prepare_query(query, field_type):
         query = re.sub(r'<=(\d{1,2})\.(\d{1,2})\.(\d{4})', '[* TO \\3-\\2-\\1]', query)
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
     query = query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
+    return query
+
+
+def prepare_simple_query(query, field_type):
+    """Обрабатывает строку простого запроса пользователя."""
+    if field_type == 'date':
+        # Форматирование дат
+        query = re.sub(r'>(\d{1,2})\.(\d{1,2})\.(\d{4})', '{\\3-\\2-\\1 TO *}', query)
+        query = re.sub(r'<(\d{1,2})\.(\d{1,2})\.(\d{4})', '{* TO \\3-\\2-\\1}', query)
+        query = re.sub(r'>=(\d{1,2})\.(\d{1,2})\.(\d{4})', '[\\3-\\2-\\1 TO *]', query)
+        query = re.sub(r'<=(\d{1,2})\.(\d{1,2})\.(\d{4})', '[* TO \\3-\\2-\\1]', query)
+        query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
     return query
 
 
@@ -70,7 +82,7 @@ def elastic_search_groups(search_groups):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     qs &= Q(
                         'query_string',
-                        query=f"{prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
+                        query=f"{prepare_advanced_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
                         default_field=inid_schedule.elastic_index_field.field_name,
                         analyze_wildcard=True
                     )
