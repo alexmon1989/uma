@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from .models import ObjType, InidCodeSchedule
-from datetime import datetime
+import re
 
 
 def get_search_groups(search_data):
@@ -33,10 +33,13 @@ def get_search_groups(search_data):
 
 def prepare_query(query, field_type):
     """Обрабатывает строку запроса пользователя."""
-    # TODO: сделать чтоб работали и операторы (OR, AND и т.д.)
     if field_type == 'date':
-        value = datetime.strptime(query, '%d.%m.%Y')
-        query = value.strftime("%Y-%m-%d")
+        # Форматирование дат
+        query = re.sub(r'>(\d{1,2})\.(\d{1,2})\.(\d{4})', '{\\3-\\2-\\1 TO *}', query)
+        query = re.sub(r'<(\d{1,2})\.(\d{1,2})\.(\d{4})', '{* TO \\3-\\2-\\1}', query)
+        query = re.sub(r'>=(\d{1,2})\.(\d{1,2})\.(\d{4})', '[\\3-\\2-\\1 TO *]', query)
+        query = re.sub(r'<=(\d{1,2})\.(\d{1,2})\.(\d{4})', '[* TO \\3-\\2-\\1]', query)
+        query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
     query = query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
     return query
 
