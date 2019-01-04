@@ -48,10 +48,9 @@ def prepare_simple_query(query, field_type):
     return query
 
 
-def elastic_search_groups(search_groups):
+def get_elastic_results(search_groups):
     """Поиск в ElasticSearch по группам."""
-    all_hits = []
-    client = Elasticsearch()
+    qs_list = []
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
@@ -78,43 +77,20 @@ def elastic_search_groups(search_groups):
                         default_field=inid_schedule.elastic_index_field.field_name,
                         analyze_wildcard=True
                     )
-            s = Search(using=client, index="uma").query(qs)
-            # total = s.count()
-            s = s[0:500]
-            group['response'] = s.execute()
-            # Объединение результатов поиска
-            for hit in group['response']:
-                all_hits.append(hit)
-    return all_hits
+            qs_list.append(qs)
 
+    # Формирование результирующего запроса
+    qs_result = None
+    for qs in qs_list:
+        if qs_result is None:
+            qs_result = qs
+        else:
+            qs_result |= qs
 
-def count_obj_types_filtered(all_hits, res_obj_types, filter_obj_state):
-    """Количество объектов определённых типов в отфильтрованных результатах."""
-    if filter_obj_state:
-        filtered_hits = list(
-            filter(lambda x: str(x['search_data']['obj_state']) in filter_obj_state, all_hits))
-    else:
-        filtered_hits = all_hits
-    for obj_type in res_obj_types:
-        obj_type['count'] = len(list(filter(
-            lambda x: x['Document']['idObjType'] == obj_type['id'],
-            filtered_hits
-        )))
-    return res_obj_types
+    client = Elasticsearch()
+    s = Search(using=client, index="uma").query(qs_result).sort('_score')
 
-
-def count_obj_states_filtered(all_hits, res_obj_states, filter_obj_type):
-    """Количество объектов определённых статусов в отфильтрованных результатах."""
-    if filter_obj_type:
-        filtered_hits = list(filter(lambda x: str(x['Document']['idObjType']) in filter_obj_type, all_hits))
-    else:
-        filtered_hits = all_hits
-    for obj_state in res_obj_states:
-        obj_state['count'] = len(list(filter(
-            lambda x: x['search_data']['obj_state'] == obj_state['obj_state'],
-            filtered_hits
-        )))
-    return res_obj_states
+    return s
 
 
 def get_client_ip(request):

@@ -4,14 +4,12 @@ from django.forms import formset_factory, ValidationError
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import Http404, HttpResponseServerError, FileResponse
 from django.utils.http import urlencode
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import (get_search_groups, elastic_search_groups, count_obj_types_filtered, count_obj_states_filtered,
-                    get_client_ip, prepare_advanced_query, prepare_simple_query, ResultsProxy)
-from operator import attrgetter
+from .utils import get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, ResultsProxy
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
@@ -174,55 +172,66 @@ class AdvancedListView(TemplateView):
                 # Разбивка поисковых данных на поисковые группы
                 search_groups = get_search_groups(formset.cleaned_data)
 
-                # Поиск по каждой группе
-                all_hits = elastic_search_groups(search_groups)
+                # Поиск в LEasticSearch по каждой группе
+                s = get_elastic_results(search_groups)
 
-                # Сортировка результатов поиска (обратная сортировка по релевантности)
-                all_hits = sorted(all_hits, key=attrgetter('meta.score'), reverse=True)
+                # Агрегация для определения всех типов объектов и состояний
+                s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
+                s.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+                aggregations = s.execute().aggregations.to_dict()
+                s_ = s
 
-                # Типы объектов в найденных результатах
-                obj_types = [{'id': x['obj_type'].id,
-                              'title': getattr(x['obj_type'], f"obj_type_{context['lang_code']}")}
-                             for x in search_groups]
-                res_obj_types = list({v['id']: v for v in obj_types}.values())
-
-                # Статусы в найденных результатах
-                res_obj_states = []
-                for i in range(1, 3):
-                    count = len(list(filter(lambda x: x['search_data']['obj_state'] == i, all_hits)))
-                    if count:
-                        res_obj_states.append({'obj_state': i})
-
-                # Фильтрация согласно фильтрам в сайдбаре
-                context['results'] = all_hits
+                # Фильтрация
                 if self.request.GET.get('filter_obj_type'):
-                    context['results'] = list(
-                        filter(lambda x: str(x['Document']['idObjType']) in self.request.GET.getlist('filter_obj_type'),
-                               context['results']))
+                    # Фильтрация в основном запросе
+                    s = s.filter('terms', Document__idObjType=self.request.GET.getlist('filter_obj_type'))
+                    # Агрегация для определения количества объектов определённых типов после применения одного фильтра
+                    s_filter_obj_type = s_.filter(
+                        'terms',
+                        Document__idObjType=self.request.GET.getlist('filter_obj_type')
+                    )
+                    s_filter_obj_type.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+                    aggregations_obj_state = s_filter_obj_type.execute().aggregations.to_dict()
+                    for bucket in aggregations['obj_state_terms']['buckets']:
+                        if not list(filter(lambda x: x['key'] == bucket['key'],
+                                           aggregations_obj_state['obj_state_terms']['buckets'])):
+                            aggregations_obj_state['obj_state_terms']['buckets'].append(
+                                {'key': bucket['key'], 'doc_count': 0}
+                            )
+                    aggregations['obj_state_terms']['buckets'] = aggregations_obj_state['obj_state_terms']['buckets']
+
                 if self.request.GET.get('filter_obj_state'):
-                    context['results'] = list(
-                        filter(lambda x: str(x['search_data']['obj_state']) in self.request.GET.getlist(
-                            'filter_obj_state'),
-                               context['results']))
+                    # Фильтрация в основном запросе
+                    s = s.filter('terms', search_data__obj_state=self.request.GET.getlist('filter_obj_state'))
+                    # Агрегация для определения количества объектов определённых состояний
+                    # после применения одного фильтра
+                    s_filter_obj_state = s_.filter(
+                        'terms',
+                        search_data__obj_state=self.request.GET.getlist('filter_obj_state')
+                    )
+                    s_filter_obj_state.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
+                    aggregations_id_obj_type = s_filter_obj_state.execute().aggregations.to_dict()
+                    for bucket in aggregations['idObjType_terms']['buckets']:
+                        if not list(filter(lambda x: x['key'] == bucket['key'],
+                                           aggregations_id_obj_type['idObjType_terms']['buckets'])):
+                            aggregations_id_obj_type['idObjType_terms']['buckets'].append(
+                                {'key': bucket['key'], 'doc_count': 0}
+                            )
+                    aggregations['idObjType_terms']['buckets'] = aggregations_id_obj_type['idObjType_terms']['buckets']
 
-                # Количество объектов определённых типов в отфильтрованных результатах
-                context['res_obj_types'] = count_obj_types_filtered(
-                    all_hits,
-                    res_obj_types,
-                    self.request.GET.getlist('filter_obj_state')
-                )
+                # Пагинация
+                paginate_by = 10
+                paginator = Paginator(ResultsProxy(s), paginate_by)
+                page_number = self.request.GET.get('page')
+                try:
+                    page = paginator.page(page_number)
+                except PageNotAnInteger:
+                    page = paginator.page(1)
+                except EmptyPage:
+                    page = paginator.page(paginator.num_pages)
 
-                # Количество объектов определённых статусов в отфильтрованных результатах
-                context['res_obj_states'] = count_obj_states_filtered(
-                    all_hits,
-                    res_obj_states,
-                    self.request.GET.getlist('filter_obj_type')
-                )
-
-                # Пагинатор
-                context['results_count'] = len(context['results'])
-                paginator = Paginator(context['results'], 10)
-                context['results'] = paginator.get_page(self.request.GET.get('page'))
+                context['results'] = page
+                context['aggregations'] = aggregations
 
         return context
 
