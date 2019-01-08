@@ -71,6 +71,11 @@ class SimpleListView(TemplateView):
                             qs &= q
                         else:
                             qs = q
+
+                # Не показывать заявки, по которым выдан охранный документ
+                if qs is not None:
+                    qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+
                 s = Search(using=client, index='uma').query(qs).sort('_score')
 
                 # Фильтрация, агрегация
@@ -177,7 +182,13 @@ class ObjectDetailView(TemplateView):
         # Поиск в ElasticSearch по номеру заявки, который является _id документа
         id_app_number = kwargs['id_app_number']
         client = Elasticsearch()
-        s = Search().using(client).query("match", _id=id_app_number).execute()
+        q = Q(
+            'bool',
+            must=[Q('match', _id=id_app_number)],
+            # Не показывать заявки, по которым выдан охранный документ
+            must_not=[Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")]
+        )
+        s = Search().using(client).query(q).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")
         context['hit'], self.hit = s[0], s[0]
