@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap4',
     'debug_toolbar',
-    'webpack_loader',
     'apps.home.apps.HomeConfig',
     'apps.my_auth.apps.MyAuthConfig',
     'apps.search.apps.SearchConfig',
@@ -156,6 +155,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -173,12 +173,6 @@ import sys
 os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
 sys.path.append('lib/EUSignCP/Interface/64')
 
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-    }
-}
 INTERNAL_IPS = ('10.0.2.2',)
 
 ELASTIC_INDEX_NAME = 'uma'
