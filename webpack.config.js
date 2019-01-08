@@ -5,8 +5,9 @@ const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
-module.exports = {
-    mode: 'development',
+const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+module.exports  = {
+    mode: mode,
     context: __dirname,
     entry: ['./assets/js/index'],
     output: {
@@ -85,6 +86,6 @@ module.exports = {
     },
     resolve: {
         modules: ['node_modules'],
-        alias: {vue: 'vue/dist/vue.js'}
+        alias: {vue: mode === 'production' ? 'vue/dist/vue.min.js' : 'vue/dist/vue.js'}
     },
 };
