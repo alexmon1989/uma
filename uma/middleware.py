@@ -73,3 +73,5 @@ class MyLocaleMiddleware(LocaleMiddleware):
             language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
+        # Запомнить язык для текущей сессии
+        request.session[translation.LANGUAGE_SESSION_KEY] = request.LANGUAGE_CODE
