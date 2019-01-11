@@ -79,10 +79,10 @@
                            :name="'form-' + index + '-value'"
                            v-model="value"
                            ref="value"
-                           @focus="valueFocused = true"
+                           @focus="onValueFocus"
                            @blur="onValueBlur"
                            :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
-                           autocomplete="off"
+                           :autocomplete="autocomplete"
                            :placeholder="translations.value"
                            v-validate="'required'">
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.required_error }}</small>
@@ -154,6 +154,14 @@
                 if (!this.valueFocused && e.relatedTarget) {
                     e.relatedTarget.click();
                 }
+
+                this.autocomplete = 'on';
+            },
+
+            // Обработчик приобретения фокуса полем "Значение".
+            onValueFocus: function (e) {
+                this.valueFocused = true;
+                this.autocomplete = 'off';
             }
         },
         mounted() {
