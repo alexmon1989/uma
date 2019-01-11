@@ -28,7 +28,9 @@
                  :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
                 <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11"
                        type="text"
-                       autocomplete="off"
+                       :autocomplete="autocomplete"
+                       @focus="autocomplete = 'off'"
+                       @blur="autocomplete = 'on'"
                        :name="'form-' + index + '-value'"
                        v-validate="'required'"
                        v-model="value"
@@ -71,6 +73,7 @@
                 },
                 paramType: '',
                 value: '',
+                autocomplete: 'on'
             }
         },
         mounted() {
