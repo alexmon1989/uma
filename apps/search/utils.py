@@ -56,14 +56,7 @@ def get_elastic_results(search_groups):
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
             schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8)
-
-            qs = Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
-            qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
-            # Не показывать заявки, по которым выдан охранный документ
-            qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
-
-            # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
-            #qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+            qs = None
 
             for search_param in group['search_params']:
                 # Поле поиска ElasticSearch
@@ -75,13 +68,27 @@ def get_elastic_results(search_groups):
 
                 # Проверка доступно ли поле для поиска
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
-                    qs &= Q(
+                    q = Q(
                         'query_string',
                         query=f"{prepare_advanced_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
                         default_field=inid_schedule.elastic_index_field.field_name,
                         analyze_wildcard=True
                     )
-            qs_list.append(qs)
+                    if not qs:
+                        qs = q
+                    else:
+                        qs &= q
+
+            if qs is not None:
+                qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
+                qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
+                # Не показывать заявки, по которым выдан охранный документ
+                qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+
+                # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
+                # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+
+                qs_list.append(qs)
 
     # Формирование результирующего запроса
     qs_result = None
