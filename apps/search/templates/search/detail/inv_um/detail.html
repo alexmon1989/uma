@@ -64,6 +64,13 @@
                            role="tab"
                         >{% trans "Стан діловодства" %}</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover {% if transactions|length == 0 %}disabled{% endif %}"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--8"
+                           role="tab"
+                        >{% trans "Сповіщення" %}</a>
+                    </li>
                 </ul>
                 <!-- End Nav tabs -->
             </div>
@@ -112,6 +119,10 @@
                         {% include 'search/detail/inv_um/_partials/state_of_affair/documents.html' %}
                         {% include 'search/detail/inv_um/_partials/state_of_affair/collections.html' %}
                         {% include 'search/detail/inv_um/_partials/state_of_affair/payments.html' %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
+                        {% include 'search/detail/inv_um/_partials/transactions.html' %}
                     </div>
                 </div>
                 <!-- End Tab panes -->

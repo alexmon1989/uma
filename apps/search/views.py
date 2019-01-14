@@ -56,7 +56,7 @@ class SimpleListView(TemplateView):
 
             if is_valid:
                 # Формирование поискового запроса ElasticSearch
-                client = Elasticsearch()
+                client = Elasticsearch(settings.ELASTIC_HOST)
                 qs = None
                 for s in formset.cleaned_data:
                     elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
@@ -181,7 +181,7 @@ class ObjectDetailView(TemplateView):
 
         # Поиск в ElasticSearch по номеру заявки, который является _id документа
         id_app_number = kwargs['id_app_number']
-        client = Elasticsearch()
+        client = Elasticsearch(settings.ELASTIC_HOST)
         q = Q(
             'bool',
             must=[Q('match', _id=id_app_number)],
@@ -194,6 +194,10 @@ class ObjectDetailView(TemplateView):
         context['hit'], self.hit = s[0], s[0]
         context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
 
+        # Оповещения
+        context['transactions'] = self.hit.to_dict().get('TRANSACTIONS', {}).get('TRANSACTION', [])
+        if type(context['transactions']) is dict:
+            context['transactions'] = [context['transactions']]
         # Документы заявки (библиографические)
         context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 

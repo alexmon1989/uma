@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
@@ -98,7 +99,7 @@ def get_elastic_results(search_groups):
         else:
             qs_result |= qs
 
-    client = Elasticsearch()
+    client = Elasticsearch(settings.ELASTIC_HOST)
     s = Search(using=client, index="uma").query(qs_result).sort('_score')
 
     return s
