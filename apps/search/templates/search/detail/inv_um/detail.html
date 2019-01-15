@@ -82,9 +82,11 @@
                     <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
 
-                        <div class="g-pb-10 d-flex justify-content-end">
-                            {% registration_status status=hit.Document.RegistrationStatus %}
-                        </div>
+                        {% if hit.search_data.obj_state == 2 %}
+                            <div class="g-pb-10 d-flex justify-content-end">
+                                {% registration_status status=hit.Document.RegistrationStatus %}
+                            </div>
+                        {% endif %}
 
                         {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
                             {% include 'search/detail/inv_um/_partials/blblio_data/biblio.html' %}
