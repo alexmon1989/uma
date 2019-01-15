@@ -46,3 +46,8 @@ def obj_type_title(id, lang):
         return obj_type.obj_type_ua
     else:
         return obj_type.obj_type_en
+
+
+@register.inclusion_tag('search/templatetags/registration_status.html')
+def registration_status(status):
+    return {'status': status}

@@ -17,9 +17,8 @@
                 Свідоцтво України на топографію (компонування) ІМС
             {% endif %}
         </div>
-        {% if hit.search_data.obj_state == 2 %}
-            <div class="g-font-weight-600"><i class="fa fa-circle g-color-green g-mr-5"></i>Свідоцтво діє</div>
-        {% endif %}
+
+        {% registration_status status=hit.Document.RegistrationStatus %}
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">

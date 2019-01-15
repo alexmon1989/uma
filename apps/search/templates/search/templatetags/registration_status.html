@@ -1,0 +1,13 @@
+{% load i18n %}
+
+{% if hit.Document.RegistrationStatus == 'A' %}
+    <div class="g-font-weight-600"><i class="fa fa-circle g-color-green g-mr-5"></i>{% trans "Патент діє" %}</div>
+{% elif hit.Document.RegistrationStatus == 'N' %}
+    <div class="g-font-weight-600"><i class="fa fa-circle g-color-red g-mr-5"></i>{% trans "Патент не діє" %}</div>
+{% elif hit.Document.RegistrationStatus == 'T' %}
+    <div class="g-font-weight-600"
+         title="{% trans "Дію патента припинено але може бути поновлено" %}"
+    ><i class="fa fa-circle g-color-yellow g-mr-5"></i>{% trans "Дію припинено" %}</div>
+{% else %}
+    <div class="g-font-weight-600"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i>{% trans "Статус невідомий" %}</div>
+{% endif %}
