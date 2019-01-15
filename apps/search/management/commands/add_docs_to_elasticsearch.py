@@ -81,7 +81,7 @@ class Command(BaseCommand):
                             res['search_data'] = {
                                 'obj_state': 2 if doc['registration_number'] else 1,
                                 'app_number': biblio_data.get('I_21'),
-                                'app_date':  biblio_data.get('I_22'),
+                                'app_date': biblio_data.get('I_22'),
                                 'protective_doc_number': biblio_data.get('I_11'),
                                 'rights_date': biblio_data.get('I_24'),
                                 'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
@@ -108,5 +108,7 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR(f"File not found: {json_path}"))
                 except UnicodeDecodeError:
                     self.stdout.write(self.style.ERROR(f"Decode Error: {json_path}"))
+                except UnicodeError as e:
+                    self.stdout.write(self.style.ERROR(f"{e}: {json_path}"))
 
         self.stdout.write(self.style.SUCCESS('Finished'))
