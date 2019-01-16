@@ -1,10 +1,10 @@
 {% load i18n %}
 
-{% if hit.Document.RegistrationStatus == 'A' %}
+{% if status == 'A' %}
     <div class="g-font-weight-600"><i class="fa fa-circle g-color-green g-mr-5"></i>{% trans "Патент діє" %}</div>
-{% elif hit.Document.RegistrationStatus == 'N' %}
+{% elif status == 'N' %}
     <div class="g-font-weight-600"><i class="fa fa-circle g-color-red g-mr-5"></i>{% trans "Патент не діє" %}</div>
-{% elif hit.Document.RegistrationStatus == 'T' %}
+{% elif status == 'T' %}
     <div class="g-font-weight-600"
          title="{% trans "Дію патента припинено але може бути поновлено" %}"
     ><i class="fa fa-circle g-color-yellow g-mr-5"></i>{% trans "Дію припинено" %}</div>

@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from apps.search.models import IpcAppList
-import os
 import json
+import apps.search.chardet_open as chardet_open
+import os.path
 
 
 class Command(BaseCommand):
@@ -41,7 +42,7 @@ class Command(BaseCommand):
 
                 res = {}
                 try:
-                    f = open(json_path, 'r', encoding='utf16')
+                    f = chardet_open.open(json_path, 'r')
                     try:
                         # Чтение содержимого JSON
                         data = json.loads(f.read())
@@ -69,6 +70,21 @@ class Command(BaseCommand):
                                 if I_72.get('I_72.C'):
                                     I_72['I_72.C.E'] = I_72.pop('I_72.C')
 
+                            # Обработка I_73 для избежания ошибки добавления в индекс ElasticSearch
+                            for I_72 in biblio_data.get('I_73', []):
+                                if I_72.get('I_73.N.U'):
+                                    I_72['I_73.N'] = I_72.pop('I_73.N.U')
+                                if I_72.get('I_73.N.R'):
+                                    I_72['I_73.N'] = I_72.pop('I_73.N.R')
+                                if I_72.get('I_73.N.E'):
+                                    I_72['I_73.N'] = I_72.pop('I_73.N.E')
+                                if I_72.get('I_73.C.U'):
+                                    I_72['I_73.C'] = I_72.pop('I_73.C.U')
+                                if I_72.get('I_73.C.R'):
+                                    I_72['I_73.C'] = I_72.pop('I_73.C.R')
+                                if I_72.get('I_73.C.E'):
+                                    I_72['I_73.C'] = I_72.pop('I_73.C.E')
+
                             # Состояние делопроизводства
                             if data.get('DOCFLOW'):
                                 res['DOCFLOW'] = data['DOCFLOW']
@@ -94,21 +110,20 @@ class Command(BaseCommand):
                             # Запись в индекс
                             try:
                                 es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
-                            except elasticsearch_exceptions.RequestError:
-                                self.stdout.write(self.style.ERROR(f"Can't add to ElasticSearch index: {json_path}"))
+                            except elasticsearch_exceptions.RequestError as e:
+                                self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
                             else:
                                 # Пометка в БД что этот документ проиндексирован
                                 IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
-                    except json.decoder.JSONDecodeError:
-                        self.stdout.write(
-                            self.style.ERROR(f"Error: can't parse JSON in file: {json_path}"))
+                    except json.decoder.JSONDecodeError as e:
+                        self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
 
-                except FileNotFoundError:
-                    self.stdout.write(self.style.ERROR(f"File not found: {json_path}"))
-                except UnicodeDecodeError:
-                    self.stdout.write(self.style.ERROR(f"Decode Error: {json_path}"))
+                except FileNotFoundError as e:
+                    self.stdout.write(self.style.ERROR(f"FileNotFoundError: {e}"))
+                except UnicodeDecodeError as e:
+                    self.stdout.write(self.style.ERROR(f"UnicodeDecodeError: {e}: {json_path}"))
                 except UnicodeError as e:
-                    self.stdout.write(self.style.ERROR(f"{e}: {json_path}"))
+                    self.stdout.write(self.style.ERROR(f"UnicodeError: {e}: {json_path}"))
 
         self.stdout.write(self.style.SUCCESS('Finished'))
