@@ -112,3 +112,4 @@ venv.bak/
 /assets/bundles/
 /log_indexation.txt
 /static/
+/nohup.out

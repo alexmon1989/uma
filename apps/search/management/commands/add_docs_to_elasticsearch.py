@@ -3,7 +3,7 @@ from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from apps.search.models import IpcAppList
 import json
-import apps.search.chardet_open as chardet_open
+from uma.utils import chardet_open
 import os.path
 
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
                 res = {}
                 try:
-                    f = chardet_open.open(json_path, 'r')
+                    f = chardet_open(json_path, 'r')
                     try:
                         # Чтение содержимого JSON
                         data = json.loads(f.read())
