@@ -37,6 +37,7 @@ class Command(BaseCommand):
                 file_name = doc['registration_number'] \
                     if (doc['registration_number'] and doc['registration_number'] != '0') \
                     else doc['app_number']
+                file_name = file_name.replace('/', '_')
                 json_path = os.path.join(doc_files_path, f"{file_name}.json")
                 if not os.path.exists(json_path):
                     json_path = os.path.join(doc_files_path, f"{file_name}-К.json")
