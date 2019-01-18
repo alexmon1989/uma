@@ -35,7 +35,7 @@ class Command(BaseCommand):
             if doc['obj_type_id'] in (1, 2, 3):
                 # Путь к файлу JSON с данными объекта:
                 file_name = doc['registration_number'] \
-                    if (doc['registration_number'] and doc['registration_number'] != 0) \
+                    if (doc['registration_number'] and doc['registration_number'] != '0') \
                     else doc['app_number']
                 json_path = os.path.join(doc_files_path, f"{file_name}.json")
                 if not os.path.exists(json_path):
