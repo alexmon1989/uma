@@ -88,7 +88,7 @@
                             </div>
                         {% endif %}
 
-                        {% include 'search/detail/inv_um/_partials/blblio_data/biblio.html' %}
+                        {% include 'search/detail/ld/_partials/blblio_data/biblio.html' %}
                     </div>
 
 
@@ -96,7 +96,7 @@
                         <h3 class="g-pb-15">{% trans "Формула" %}</h3>
 
                         {% if biblio_documents.cl %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/cl.html' %}
+                            {% include 'search/detail/ld/_partials/blblio_data/cl.html' %}
                         {% endif %}
                     </div>
 
@@ -104,7 +104,7 @@
                         <h3 class="g-pb-15">{% trans "Опис" %}</h3>
 
                         {% if biblio_documents.de %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/de.html' %}
+                            {% include 'search/detail/ld/_partials/blblio_data/de.html' %}
                         {% endif %}
                     </div>
 
@@ -112,7 +112,7 @@
                         <h3 class="g-pb-15">{% trans "Реферат (UA)" %}</h3>
 
                         {% if biblio_documents.ab_ua %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ua.html' %}
+                            {% include 'search/detail/ld/_partials/blblio_data/ab_ua.html' %}
                         {% endif %}
                     </div>
 
@@ -120,7 +120,7 @@
                         <h3 class="g-pb-15">{% trans "Реферат (RU)" %}</h3>
 
                         {% if biblio_documents.ab_ru %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ru.html' %}
+                            {% include 'search/detail/ld/_partials/blblio_data/ab_ru.html' %}
                         {% endif %}
                     </div>
 
@@ -128,22 +128,22 @@
                         <h3 class="g-pb-15">{% trans "Реферат (EN)" %}</h3>
 
                         {% if biblio_documents.ab_en %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_en.html' %}
+                            {% include 'search/detail/ld/_partials/blblio_data/ab_en.html' %}
                         {% endif %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
 
-                        {% include 'search/detail/inv_um/_partials/state_of_affair/documents.html' %}
-                        {% include 'search/detail/inv_um/_partials/state_of_affair/collections.html' %}
-                        {% include 'search/detail/inv_um/_partials/state_of_affair/payments.html' %}
+                        {% include 'search/detail/ld/_partials/state_of_affair/documents.html' %}
+                        {% include 'search/detail/ld/_partials/state_of_affair/collections.html' %}
+                        {% include 'search/detail/ld/_partials/state_of_affair/payments.html' %}
                     </div>
 
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
                         <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
 
-                        {% include 'search/detail/inv_um/_partials/transactions.html' %}
+                        {% include 'search/detail/ld/_partials/transactions.html' %}
                     </div>
                 </div>
                 <!-- End Tab panes -->

@@ -171,6 +171,8 @@ class ObjectDetailView(TemplateView):
     def get_template_names(self):
         if self.hit['Document']['idObjType'] in (1, 2):
             return ['search/detail/inv_um/detail.html']
+        elif self.hit['Document']['idObjType'] == 3:
+            return ['search/detail/ld/detail.html']
 
     def get_context_data(self, **kwargs):
         """Передаёт доп. переменные в шаблон."""
