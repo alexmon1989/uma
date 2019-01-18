@@ -121,7 +121,7 @@ class Command(BaseCommand):
 
                         # Поисковые данные (для сортировки и т.д.)
                         res['search_data'] = {
-                            'obj_state': 2 if doc['registration_number'] else 1,
+                            'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
                             'app_number': biblio_data.get('I_21'),
                             'app_date': biblio_data.get('I_22'),
                             'protective_doc_number': biblio_data.get('I_11'),
