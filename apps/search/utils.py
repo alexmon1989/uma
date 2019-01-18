@@ -207,17 +207,34 @@ def extend_doc_flow(hit):
     if application:
         application = application[0]
 
-        # Объединение документов
-        documents = application.DOCFLOW.DOCUMENTS
-        documents.extend(hit.DOCFLOW.DOCUMENTS)
-        hit.DOCFLOW.DOCUMENTS = documents
+        try:
+            # Объединение стадий
+            stages = application.DOCFLOW.STAGES
+            stages.extend(hit.DOCFLOW.STAGES)
+            hit.DOCFLOW.STAGES = stages
+        except AttributeError:
+            pass
 
-        # Объединение платежей
-        payments = application.DOCFLOW.PAYMENTS
-        payments.extend(hit.DOCFLOW.PAYMENTS)
-        hit.DOCFLOW.PAYMENTS = payments
+        try:
+            # Объединение документов
+            documents = application.DOCFLOW.DOCUMENTS
+            documents.extend(hit.DOCFLOW.DOCUMENTS)
+            hit.DOCFLOW.DOCUMENTS = documents
+        except AttributeError:
+            pass
 
-        # Объединение сборов
-        collections = application.DOCFLOW.COLLECTIONS
-        documents.extend(hit.DOCFLOW.COLLECTIONS)
-        hit.DOCFLOW.COLLECTIONS = collections
+        try:
+            # Объединение платежей
+            payments = application.DOCFLOW.PAYMENTS
+            payments.extend(hit.DOCFLOW.PAYMENTS)
+            hit.DOCFLOW.PAYMENTS = payments
+        except AttributeError:
+            pass
+
+        try:
+            # Объединение сборов
+            collections = application.DOCFLOW.COLLECTIONS
+            collections.extend(hit.DOCFLOW.COLLECTIONS)
+            hit.DOCFLOW.COLLECTIONS = collections
+        except AttributeError:
+            pass
