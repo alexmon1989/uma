@@ -9,7 +9,7 @@ from django.conf import settings
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results)
+                    filter_results, extend_doc_flow)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -200,6 +200,10 @@ class ObjectDetailView(TemplateView):
             context['transactions'] = [context['transactions']]
         # Документы заявки (библиографические)
         context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
+
+        # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
+        if self.hit.search_data.obj_state == 2:
+            extend_doc_flow(context['hit'])
 
         return context
 

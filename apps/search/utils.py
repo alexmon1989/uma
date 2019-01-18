@@ -190,3 +190,34 @@ def filter_results(s, request):
         aggregations['idObjType_terms']['buckets'] = aggregations_id_obj_type['idObjType_terms']['buckets']
 
     return s, aggregations
+
+
+def extend_doc_flow(hit):
+    """Расширяет секцию DOCFLOW патента документами заявки"""
+    # Получение заявки охранного документа
+    q = Q(
+        'bool',
+        must=[
+            Q('match', search_data__app_number=hit.search_data.app_number),
+            Q('match', search_data__obj_state=1)
+        ]
+    )
+    client = Elasticsearch(settings.ELASTIC_HOST)
+    application = Search().using(client).query(q).execute()
+    if application:
+        application = application[0]
+
+        # Объединение документов
+        documents = application.DOCFLOW.DOCUMENTS
+        documents.extend(hit.DOCFLOW.DOCUMENTS)
+        hit.DOCFLOW.DOCUMENTS = documents
+
+        # Объединение платежей
+        payments = application.DOCFLOW.PAYMENTS
+        payments.extend(hit.DOCFLOW.PAYMENTS)
+        hit.DOCFLOW.PAYMENTS = payments
+
+        # Объединение сборов
+        collections = application.DOCFLOW.COLLECTIONS
+        documents.extend(hit.DOCFLOW.COLLECTIONS)
+        hit.DOCFLOW.COLLECTIONS = collections
