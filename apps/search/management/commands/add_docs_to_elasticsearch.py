@@ -94,7 +94,13 @@ class Command(BaseCommand):
 
                     if biblio_data is None:
                         self.stdout.write(
-                            self.style.ERROR(f"Error: biblio data missed in file: {json_path}"))
+                            self.style.ERROR(f"Error: no biblio data in JSON: {json_path}"))
+                        IndexationError.objects.create(
+                            app_id=doc['id'],
+                            type='Other',
+                            text='No biblio data in JSON',
+                            json_path=json_path
+                        )
                     else:
                         # Обработка I_71 для избежания ошибки добавления в индекс ElasticSearch
                         i_71 = biblio_data.get('I_71', [])
