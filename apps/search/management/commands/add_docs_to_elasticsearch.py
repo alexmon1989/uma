@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
-from apps.search.models import IpcAppList
+from apps.search.models import IpcAppList, IndexationError
 import json
 import os.path
 
@@ -52,14 +52,32 @@ class Command(BaseCommand):
                         data = json.loads(f.read())
                     except json.decoder.JSONDecodeError as e:
                         self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
+                        IndexationError.objects.create(
+                            app_id=doc['id'],
+                            type='JSONDecodeError',
+                            text=e,
+                            json_path=json_path
+                        )
                 except (UnicodeDecodeError, UnicodeError):
                     f = open(json_path, 'r', encoding='utf-8')
                     try:
                         data = json.loads(f.read())
                     except json.decoder.JSONDecodeError as e:
                         self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
+                        IndexationError.objects.create(
+                            app_id=doc['id'],
+                            type='JSONDecodeError',
+                            text=e,
+                            json_path=json_path
+                        )
                 except FileNotFoundError as e:
                     self.stdout.write(self.style.ERROR(f"FileNotFoundError: {e}"))
+                    IndexationError.objects.create(
+                        app_id=doc['id'],
+                        type='FileNotFoundError',
+                        text=e,
+                        json_path=json_path
+                    )
 
                 if data is not None:
                     # Секция Document
@@ -138,6 +156,12 @@ class Command(BaseCommand):
                             es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
                         except elasticsearch_exceptions.RequestError as e:
                             self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
+                            IndexationError.objects.create(
+                                app_id=doc['id'],
+                                type='ElasticSearch RequestError',
+                                text=e,
+                                json_path=json_path
+                            )
                         else:
                             # Пометка в БД что этот документ проиндексирован
                             IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)

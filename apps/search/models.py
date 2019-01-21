@@ -251,3 +251,12 @@ class OrderDocument(models.Model):
     class Meta:
         managed = False
         db_table = 'ls_OrderDocuments'
+
+
+class IndexationError(models.Model):
+    """Модель ошибки индексации."""
+    app = models.ForeignKey('IpcAppList', models.CASCADE, db_column='idAPPNumber')
+    type = models.CharField(blank=True, null=True, max_length=255)
+    json_path = models.CharField(blank=True, null=True, max_length=255)
+    text = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
