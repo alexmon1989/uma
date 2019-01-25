@@ -173,6 +173,17 @@ class Command(BaseCommand):
                     # Пометка в БД что этот документ проиндексирован
                     IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
+    def process_tm(self, doc):
+        """Добавляет документ типа "знак для товаров и услуг" ElasticSearch."""
+        # Получает данные для загрузки из файла JSON
+        data = self.get_data_from_json(doc)
+
+        res = {}
+        if data is not None:
+            # Секция Document
+            res['Document'] = data.get('Document')
+
+
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
         self.es = Elasticsearch()
@@ -191,5 +202,8 @@ class Command(BaseCommand):
             # Изобретения, полезные модели, топографии интегральных микросхем
             if doc['obj_type_id'] in (1, 2, 3):
                 self.process_inv_um_ld(doc)
+            # Знаки для товаров и услуг
+            elif doc['obj_type_id'] == 4:
+                self.process_tm(doc)
 
         self.stdout.write(self.style.SUCCESS('Finished'))

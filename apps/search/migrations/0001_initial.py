@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import sys
 
 
 class Migration(migrations.Migration):
@@ -21,7 +22,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'cl_LinkShedule_INID_Codes',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -36,7 +37,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'cl_IPCCodes',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -51,7 +52,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'cl_IP_ObjTypes',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -66,7 +67,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'cl_SheduleTypes',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(

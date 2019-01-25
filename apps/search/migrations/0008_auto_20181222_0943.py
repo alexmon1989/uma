@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import sys
 
 
 class Migration(migrations.Migration):
@@ -24,7 +25,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'APP_Documents',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -37,7 +38,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ls_OrderDocuments',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -51,16 +52,16 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ls_OrderService',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.AlterModelOptions(
             name='inidcodeschedule',
-            options={'managed': False, 'verbose_name': 'Пошуковий параметр', 'verbose_name_plural': 'Пошукові параметри'},
+            options={'managed': 'test' in sys.argv, 'verbose_name': 'Пошуковий параметр', 'verbose_name_plural': 'Пошукові параметри'},
         ),
         migrations.AlterModelOptions(
             name='scheduletype',
-            options={'managed': False, 'verbose_name': 'Реєстр', 'verbose_name_plural': 'Реєстри'},
+            options={'managed': 'test' in sys.argv, 'verbose_name': 'Реєстр', 'verbose_name_plural': 'Реєстри'},
         ),
         migrations.RemoveField(
             model_name='simplesearchfield',

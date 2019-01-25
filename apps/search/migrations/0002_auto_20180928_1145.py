@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import sys
 
 
 class Migration(migrations.Migration):
@@ -17,7 +18,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='ipccode',
-            options={'managed': False, 'ordering': ('code_inid',), 'verbose_name': 'Код ІНІД', 'verbose_name_plural': 'Коди ІНІД'},
+            options={'managed': 'test' in sys.argv, 'ordering': ('code_inid',), 'verbose_name': 'Код ІНІД', 'verbose_name_plural': 'Коди ІНІД'},
         ),
         migrations.AlterField(
             model_name='elasticindex',
