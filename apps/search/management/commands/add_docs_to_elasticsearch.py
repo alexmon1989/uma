@@ -4,6 +4,7 @@ from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from apps.search.models import IpcAppList, IndexationError
 import json
 import os.path
+import datetime
 
 
 class Command(BaseCommand):
@@ -183,6 +184,63 @@ class Command(BaseCommand):
             # Секция Document
             res['Document'] = data.get('Document')
 
+            # Секция TradeMark
+            res['TradeMark'] = data.get('TradeMark')
+
+            # Форматирование даты
+            if res['TradeMark'].get('PublicationDetails', {}).get('PublicationDate'):
+                try:
+                    d = datetime.datetime.today().strptime(
+                        res['TradeMark']['PublicationDetails']['PublicationDate'],
+                        '%d.%m.%Y'
+                    )
+                except ValueError:
+                    pass
+                else:
+                    res['TradeMark']['PublicationDetails']['PublicationDate'] = d.strftime('%Y-%m-%d')
+
+            # Поисковые данные (для сортировки и т.д.)
+            res['search_data'] = {
+                'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
+                'app_number': res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
+                'app_date': res['TradeMark']['TrademarkDetails'].get('ApplicationDate'),
+                'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
+                'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
+
+                'applicant': [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                  'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']],
+
+                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']]
+                if res['TradeMark']['TrademarkDetails'].get('HolderDetails') else None,
+
+                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['TradeMark']['TrademarkDetails']['RepresentativeDetails']['Representative']]
+                if res['TradeMark']['TrademarkDetails'].get('RepresentativeDetails') else None,
+
+                'title': ', '.join([x['#text'] for x in res['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
+                    'MarkSignificantVerbalElement']])
+                if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
+            }
+
+            # Запись в индекс
+            try:
+                self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
+            except elasticsearch_exceptions.RequestError as e:
+                json_path = self.get_json_path(doc)
+                self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
+                IndexationError.objects.create(
+                    app_id=doc['id'],
+                    type='ElasticSearch RequestError',
+                    text=e,
+                    json_path=json_path
+                )
+            else:
+                # Пометка в БД что этот документ проиндексирован
+                IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
