@@ -173,6 +173,8 @@ class ObjectDetailView(TemplateView):
             return ['search/detail/inv_um/detail.html']
         elif self.hit['Document']['idObjType'] == 3:
             return ['search/detail/ld/detail.html']
+        elif self.hit['Document']['idObjType'] == 4:
+            return ['search/detail/tm/detail.html']
 
     def get_context_data(self, **kwargs):
         """Передаёт доп. переменные в шаблон."""
@@ -194,18 +196,20 @@ class ObjectDetailView(TemplateView):
         if not s:
             raise Http404("Об'єкт не знайдено")
         context['hit'], self.hit = s[0], s[0]
-        context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
 
-        # Оповещения
-        context['transactions'] = self.hit.to_dict().get('TRANSACTIONS', {}).get('TRANSACTION', [])
-        if type(context['transactions']) is dict:
-            context['transactions'] = [context['transactions']]
-        # Документы заявки (библиографические)
-        context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
+        if self.hit['Document']['idObjType'] in (1, 2, 3):
+            context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
 
-        # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
-        if self.hit.search_data.obj_state == 2:
-            extend_doc_flow(context['hit'])
+            # Оповещения
+            context['transactions'] = self.hit.to_dict().get('TRANSACTIONS', {}).get('TRANSACTION', [])
+            if type(context['transactions']) is dict:
+                context['transactions'] = [context['transactions']]
+            # Документы заявки (библиографические)
+            context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
+
+            # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
+            if self.hit.search_data.obj_state == 2:
+                extend_doc_flow(context['hit'])
 
         return context
 

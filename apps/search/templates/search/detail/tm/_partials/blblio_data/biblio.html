@@ -1,0 +1,81 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-sm table-trade-mark g-font-size-13">
+        <tbody>
+        {% if hit.TradeMark.TrademarkDetails.ApplicationNumber %}
+            <tr>
+                <th>(210) Номер заявки</th>
+                <td>{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</td>
+            </tr>
+        {% endif %}
+
+        {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
+            <tr>
+                <th>(220) Дата подання заявки</th>
+                <td>{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
+            </tr>
+        {% endif %}
+
+        {% if hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
+            <tr>
+                <th>(531) Індекс (індекси) Міжнародної класифікації зображальних елементів знака</th>
+                <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
+            </tr>
+        {% endif %}
+
+        {% if hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+            <tr>
+                <th>(731) Ім'я або повне найменування та адреса заявника (заявників)</th>
+                <td class="text-justify">
+                    {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+                        {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                        {% if not forloop.last %};<br>{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+
+        {% if hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
+            <tr>
+                <th>(540) Зображення знака</th>
+                <td>
+                    <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                       href="javascript:;"
+                       data-src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
+                        <img class="img-fluid img-thumbnail"
+                             src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                             alt="">
+
+                        <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                            <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                        </span>
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+
+        {% if hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+            <tr>
+                <th>(511) Індекс (індекси) Міжнародної класифікації товарів і послуг для реєстрації знаків та перелік товарів і послуг</th>
+                <td>
+                    {% for cls in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                        <div class="d-flex justify-content-start">
+                            <div class="g-pr-6 text-nowrap">Кл. {{ cls.ClassNumber }}:</div>
+                            <div class="text-justify">
+                                {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
+                                    {{ term.ClassificationTermText }}{% if not forloop.last %}; {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+
+        </tbody>
+    </table>
+</div>
+<!-- End Basic Table -->
