@@ -29,9 +29,25 @@ def ld_item(hit, item_num):
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
+@register.inclusion_tag('search/advanced/_partials/tm_item.html')
+def tm_item(hit, item_num):
+    return {'hit': hit, 'item_num': item_num}
+
+
 @register.filter
 def document_path(file_name):
     return file_name.replace("\\\\bear\share\\", settings.MEDIA_URL).replace("\\", "/")
+
+
+@register.filter
+def get_image_url(file_path, image_name):
+    splitted_path = file_path.replace("\\", "/").split('/')
+    splitted_path_len = len(splitted_path)
+
+    return f"{settings.MEDIA_URL}/" \
+           f"{splitted_path[splitted_path_len-4]}" \
+           f"/{splitted_path[splitted_path_len-3]}/" \
+           f"{splitted_path[splitted_path_len-2]}/{image_name}"
 
 
 @register.inclusion_tag('search/detail/document_pdf.html')

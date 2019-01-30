@@ -1,0 +1,83 @@
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+    <h3 class="card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        {{ item_num }}.
+        <a href="{% url 'search:detail' id_app_number=hit.meta.id %}"
+           class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
+        >{{ hit.search_data.title }}</a>
+    </h3>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% if hit.search_data.obj_state == 1 %}
+                Заявка на знак для товарів та послуг
+            {% else %}
+                Свідоцтво України на знак для товарів та послуг
+            {% endif %}
+        </div>
+
+        {% if hit.search_data.obj_state == 2 %}
+            <div class="g-font-weight-600"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i> {{ hit.Document.RegistrationStatus }}</div>
+        {% endif %}
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
+            {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+                {% if forloop.counter <= 2 %}
+                    {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                {% elif forloop.counter == 3 %}
+                    <a href="#!"
+                       data-toggle="popover"
+                       data-title="Повний список заявників"
+                       data-html="true"
+                       data-trigger="focus"
+                       data-content="
+                               {% for applicant_ in hit.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                    >(+{{ hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="(210) Номер заявки"
+            >{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</a><br>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="(220) Дата подання заявки"
+            >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Індекси <abbr title="Міжнародної класифікації товарів і послуг для реєстрації знаків та перелік товарів і послуг">МКТП</abbr>:</h4>
+            {% for index in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                {{ index.ClassNumber }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md-3">
+            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+               href="javascript:;"
+               data-src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
+                <img class="img-fluid img-thumbnail"
+                     src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                     alt="">
+
+                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                    <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                </span>
+            </a>
+        </div>
+
+    </div>
+</div>
