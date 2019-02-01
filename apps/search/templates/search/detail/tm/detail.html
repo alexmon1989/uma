@@ -47,7 +47,18 @@
                     <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
 
+                        {% if hit.search_data.obj_state == 2 %}
+                            <div class="g-pb-20 d-flex justify-content-between">
+                                {% if hit.TradeMark.TrademarkDetails.PublicationDetails %}
+                                    <div>
+                                        {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationDate }}</span>,
+                                        {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier }}</span>
+                                    </div>
+                                {% endif %}
 
+                                <div class="g-font-weight-600 ml-auto"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i>{{ hit.Document.RegistrationStatus }}</div>
+                            </div>
+                        {% endif %}
 
                         {% include 'search/detail/tm/_partials/blblio_data/biblio.html' %}
                     </div>
@@ -56,7 +67,6 @@
                         <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
 
                         {% include 'search/detail/tm/_partials/state_of_affair/documents.html' %}
-                        {% include 'search/detail/tm/_partials/state_of_affair/collections.html' %}
                         {% include 'search/detail/tm/_partials/state_of_affair/payments.html' %}
                     </div>
 

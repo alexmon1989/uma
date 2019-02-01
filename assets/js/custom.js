@@ -39,6 +39,14 @@ $(function () {
         $(this).find('i').toggleClass('fa-minus').toggleClass('fa-plus');
     });
 
+    // Показать/скрыть индексы МКТП
+    $(".mktp-indexes .show-indexes").click(function (e) {
+        e.preventDefault();
+        let $this = $(this);
+        $this.parents().first().find('span.more').toggleClass('hidden');
+        $this.find('i').toggleClass('fa-minus').toggleClass('fa-plus');
+    });
+
     // Выделитть (снять выделение) все документы
     $("#documents-form #select-all-documents").click(function () {
         var $this = $(this);
