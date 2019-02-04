@@ -136,6 +136,10 @@ class Command(BaseCommand):
                         item_i_73['I_73.C'] = item_i_73.pop('I_73.C.E')
                 biblio_data['I_73'] = i_73
 
+                # Обработка I_98.Index
+                if biblio_data.get('I_98.Index'):
+                    biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
+
                 # Состояние делопроизводства
                 if data.get('DOCFLOW'):
                     res['DOCFLOW'] = data['DOCFLOW']
