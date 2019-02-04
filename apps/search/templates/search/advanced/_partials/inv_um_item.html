@@ -1,4 +1,5 @@
 {% load uma_extras %}
+{% load i18n %}
 {% load search_extras %}
 
 <div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
@@ -17,8 +18,16 @@
                 {% else %}
                     Заявка на корисну модель
                 {% endif %}
-            {% elif hit.Document.idObjType == 2 %}
-                {{ biblio_data.I_12 }}
+            {% elif hit.search_data.obj_state == 2 %}
+                {% if biblo_data.I_12 %}
+                    {{ biblio_data.I_12 }}
+                {% else %}
+                    {% if hit.Document.idObjType == 1 %}
+                        {% trans "Патент на винахід" %}
+                    {% elif hit.Document.idObjType == 2 %}
+                        {% trans "Патент на корисну модель" %}
+                    {% endif %}
+                {% endif %}
             {% endif %}
         </div>
 
