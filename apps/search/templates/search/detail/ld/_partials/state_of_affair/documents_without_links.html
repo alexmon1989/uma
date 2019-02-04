@@ -38,13 +38,7 @@
                             </td>
                             <td>
                                 {% if doc.DOCRECORD.DOCTYPE %}
-                                    {% if doc.DOCRECORD.DOCIDDOCCEAD %}
-                                        <a href="{% url 'search:download_doc' id_app_number=hit.meta.id id_cead_doc=doc.DOCRECORD.DOCIDDOCCEAD %}"
-                                           target="_blank"
-                                           class="g-color-blue-dark-v1">{{ doc.DOCRECORD.DOCTYPE }}</a>
-                                    {% else %}
-                                        {{ doc.DOCRECORD.DOCTYPE }}
-                                    {% endif %}
+                                    {{ doc.DOCRECORD.DOCTYPE }}
                                 {% endif %}
                             </td>
                             <td class="text-center">
