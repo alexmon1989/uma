@@ -87,7 +87,7 @@ def get_elastic_results(search_groups):
                 qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
 
                 # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
-                qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+                # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
                 qs_list.append(qs)
 
