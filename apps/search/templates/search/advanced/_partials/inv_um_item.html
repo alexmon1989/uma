@@ -17,12 +17,8 @@
                 {% else %}
                     Заявка на корисну модель
                 {% endif %}
-            {% else %}
-                {% if hit.Document.idObjType == 1 %}
-                    Патент України на винахід
-                {% else %}
-                    Патент України на корисну модель
-                {% endif %}
+            {% elif hit.Document.idObjType == 2 %}
+                {{ biblio_data.I_12 }}
             {% endif %}
         </div>
 
