@@ -72,9 +72,12 @@ class SimpleListView(TemplateView):
                         else:
                             qs = q
 
-                # Не показывать заявки, по которым выдан охранный документ
                 if qs is not None:
+                    # Не показывать заявки, по которым выдан охранный документ
                     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+
+                    # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
+                    qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
                 s = Search(using=client, index='uma').query(qs).sort('_score')
 
@@ -188,7 +191,7 @@ class ObjectDetailView(TemplateView):
         client = Elasticsearch(settings.ELASTIC_HOST)
         q = Q(
             'bool',
-            must=[Q('match', _id=id_app_number)],
+            must=[Q('match', _id=id_app_number), Q('query_string', query="3 OR 4", default_field='Document.Status')],
             # Не показывать заявки, по которым выдан охранный документ
             must_not=[Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")]
         )
