@@ -40,7 +40,7 @@
             </tr>
         {% endif %}
 
-        {% if biblio_data.I_24 %}
+        {% if hit.search_data.obj_state == 2 and biblio_data.I_24 %}
             <tr>
                 <th>(24) Дата, з якої є чинними права</th>
                 <td>{{ biblio_data.I_24|parse_date|date:"d.m.Y" }}</td>
