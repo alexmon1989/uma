@@ -15,24 +15,10 @@
                 </h1>
 
                 <div class="g-mt-5 g-color-white-opacity-0_9 g-font-size-13">
-                    {% if hit.Document.idObjType == 1 %}
-                        {% if hit.Document.Status == 1 %}
-                            {% trans "Заявка на винахід" %}
-                        {% else %}
-                            {% trans "Патент України на винахід" %}
-                        {% endif %}
-                    {% elif hit.Document.idObjType == 2 %}
-                        {% if hit.Document.Status == 1 %}
-                            {% trans "Заявка на корисну модель" %}
-                        {% else %}
-                            {% trans "Патент України на корисну модель" %}
-                        {% endif %}
-                    {% elif hit.Document.idObjType == 3 %}
-                        {% if hit.Document.Status == 1 %}
-                            {% trans "Заявка на топографію (компонування) ІМС" %}
-                        {% else %}
-                            {% trans "Свідоцтво України на топографію (компонування) ІМС" %}
-                        {% endif %}
+                    {% if hit.Document.Status == 1 %}
+                        {% trans "Заявка на топографію (компонування) ІМС" %}
+                    {% else %}
+                        {% trans "Свідоцтво України на топографію (компонування) ІМС" %}
                     {% endif %}
                 </div>
             </div>
