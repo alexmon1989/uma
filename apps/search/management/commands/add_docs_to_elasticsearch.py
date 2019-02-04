@@ -137,7 +137,7 @@ class Command(BaseCommand):
                 biblio_data['I_73'] = i_73
 
                 # Обработка I_98.Index
-                if biblio_data.get('I_98.Index'):
+                if biblio_data.get('I_98.Index') is not None:
                     biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
 
                 # Состояние делопроизводства
