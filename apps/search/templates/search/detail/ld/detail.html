@@ -135,7 +135,12 @@
                     <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
 
-                        {% include 'search/detail/ld/_partials/state_of_affair/documents.html' %}
+                        {% if request.user.is_superuser %}
+                            {% include 'search/detail/ld/_partials/state_of_affair/documents.html' %}
+                        {% else %}
+                            {% include 'search/detail/ld/_partials/state_of_affair/documents_without_links.html' %}
+                        {% endif %}
+
                         {% include 'search/detail/ld/_partials/state_of_affair/collections.html' %}
                         {% include 'search/detail/ld/_partials/state_of_affair/payments.html' %}
                     </div>
