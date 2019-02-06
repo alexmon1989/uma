@@ -253,8 +253,8 @@ def download_docs_zipped(request):
         zip_ = ZipFile(in_memory, "a")
         for document in order.orderdocument_set.all():
             zip_.write(
-                f"{settings.DOCUMENTS_MOUNT_FOLDER}/OrderService/{order.user_id}/{order.id}/{document.file_name}.{document.file_type}",
-                f"{document.file_name}.{document.file_type}"
+                f"{settings.DOCUMENTS_MOUNT_FOLDER}/OrderService/{order.user_id}/{order.id}/{document.file_name}",
+                f"{document.file_name}"
             )
 
         # fix for Linux zip files read in Windows
@@ -305,7 +305,7 @@ def download_doc(request, id_app_number, id_cead_doc):
         settings.ORDERS_ROOT,
         str(order.user_id),
         str(order.id),
-        f"{doc.file_name}.{doc.file_type}"
+        doc.file_name
     )
 
     # Инициирование загрузки
