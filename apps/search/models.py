@@ -247,6 +247,7 @@ class OrderDocument(models.Model):
     id_cead_doc = models.IntegerField(db_column='idCEADDoc', blank=True, null=True)
     file_type = models.CharField(db_column='FileType', max_length=20, blank=True, null=True)
     file_size = models.IntegerField(db_column='FileSize', blank=True, null=True)
+    file_name = models.CharField(db_column='FileName', blank=True, null=True, max_length=600)
 
     class Meta:
         managed = False

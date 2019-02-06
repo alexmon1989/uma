@@ -1,0 +1,3341 @@
+{% load uma_extras %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm g-font-size-13">
+        {% for transaction in hit.TradeMark.Transactions.Transaction %}
+            <tr>
+                <th class="g-px-10" width="20%">{{ transaction|get:"@name" }}</th>
+                <td>
+                    {% if transaction|get:"@type" == 'ChangeOwner' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction.PATENTNUMBER %}
+                                <li><span class="g-font-weight-600">(11) Номер свідоцтва:</span> {{ transaction.PATENTNUMBER }}</li>
+                            {% endif %}
+
+                            {% if transaction.INPUTNUMBER %}
+                                <li><span class="g-font-weight-600">(21) Номер заявки:</span> {{ transaction.INPUTNUMBER }}</li>
+                            {% endif %}
+
+                            {% if transaction.DATE %}
+                                <li><span class="g-font-weight-600">Дата сповіщення:</span> {{ transaction.DATE|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+                        </ul>
+                        {
+                            "@type":"ChangeOwner",
+                            "@name":"Зміна імені або повного найменування і/або адреси власника свідоцтва на знак для товарів і послуг, чи зміна особи власника свідоцтва на знак для товарів і послуг",
+                            "@bulletinNumber":"12",
+                            "@bulletinDate":"2016-06-24",
+                            "@applicationNumber":"m201413173",
+                            "@registrationNumber":"204261",
+                            "TransactionBody":{
+                              "HolderDetails":{
+                                "Holder":[
+                                  {
+                                    "ApplicantSequenceNumber":1,
+                                    "ApplicantAddressBook":{
+                                    "FormattedNameAddress":{
+                                        "Name":{
+                                          "FreeFormatName":{
+                                            "NameKind":"Legal Entity",
+                                              "FreeFormatNameDetails":{"FreeFormatNameLine":"Товариство з обмеженою відповідальністю \"АЙГАМА\""}
+                                            }
+                                          },
+                                        "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"проспект Оболонський, 35, м. Київ, 04205"}
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                              }
+                            }
+                    {% elif transaction|get:"@type" == 'Renewal' %}
+                        {
+                                "@type":"Renewal",
+                                "@name":"Продовження дії свідоцтва на знак для товарів і послуг",
+                                "@bulletinNumber":"2",
+                                "@bulletinDate":"2009-01-26",
+                                "@applicationNumber":"98124955",
+                                "@registrationNumber":"22702",
+                                "TransactionBody":{
+                                  "ProlongationExpiryDate":"2018-12-24"
+                                  }
+                                },
+                    {% elif transaction|get:"@type" == 'InternationalReplacement' %}
+
+                    {% elif transaction|get:"@type" == 'TotalTerminationByOwner' %}
+
+                        {
+        "@type":"TotalTerminationByOwner",
+        "@name":"Припинення дії свідоцтва на підставі заяви власника повністю",
+        "@bulletinNumber":"15",
+        "@bulletinDate":"2009-08-10",
+        "@applicationNumber":"m200617942",
+        "@registrationNumber":"92069",
+        "TransactionBody":{
+            "TerminationDate":"2009-08-10"
+          }
+        }
+
+                    {% elif transaction|get:"@type" == 'PartialTerminationByOwner' %}
+{
+        "@type":"PartialTerminationByOwner",
+        "@name":"Припинення дії свідоцтва на підставі заяви власника частково",
+        "@bulletinNumber":"23",
+        "@bulletinDate":"2018-12-10",
+        "@applicationNumber":"m200807331",
+        "@registrationNumber":"114948",
+        "TransactionBody":{
+            "TerminationDate":"2018-12-10",
+          "GoodsServicesDetails":{
+            "GoodsServices":{
+              "ClassDescriptionDetails":{
+                "ClassDescription":[
+                  {
+                   "ClassNumber":5,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"Фармацевтичні та ветеринарні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дієтичні речовини на лікарські (медичні) потреби, дитяче харчування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пластирі, перев'язувальні матеріали"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"матеріали для пломбування зубів і виготовляння зубних виліпків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дезінфікувальні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення паразитів і шкідників"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фунгіциди, гербіциди"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"абразивні матеріали зубничі (стоматологічні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"акарициди"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"аконітин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"алкалоїди на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ацетат алюмінію на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"альгіциди"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"альдегіди на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"амальгами зубні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"амінокислоти на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"амінокислоти на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"анальгетики (знеболювачі, знеболювальні засоби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кора ангустури на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"анестетики (знечулювачі, знечулівні засоби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"антибіотики"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"апетитостримувачі на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"аптечки першої допомоги"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ацетати на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бавовняна тканина на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бадьорівники (тонізівники) (бадьорівні, тонізівні лікарські препарати)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бактерицидні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бактерійні отрути"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бактерійні препарати на лікарські (медичні) та ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поживні середовища для бактеріологічних культур"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бактеріологічні препарати на лікарські (медичні) та ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бальзами лікувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бальзамічні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бандажі (пов'язки, бинти) гігієнічні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бандажі менструальні (місячкові)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"безмікробна (асептична) вата"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"безтютюнові сигарети лікарські (медичні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бинти перев'язувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"білкове молоко"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"білкові препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"білкові харчові продукти на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"біологічні препарати ветеринарні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"біологічні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"біоциди"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати на фармацевтичні потреби з бісмуту"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бісмут азотнокислий основний на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"олівці від бородавок"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"борошно на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"браслети на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бром на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бронхорозширювальні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вагінальні промивальні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати для діагностування вагітності"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вазелін на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вакцини"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"терапевтичні препарати до ванн"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі до лікувальних ванн з мінеральних вод"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ванни кисневі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ванни лікувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі для лікувальних ванн"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати з вапна на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вата лікарська (медична)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вбиральна вата (гігроскопічна)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вивари лікарські (медичні) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"винний камінь на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати для обробляння винограду, ураженого хворобою"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вітамінні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вода морська до лікувальних ванн"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"води мінеральні на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"водний розчин хлоралю на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"волокна їстівних рослин нехарчові"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні препарати для росту волосся"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вугілля деревне на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гази на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"галова кислота на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гваякол на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"олії від ґедзів, мух"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гематоген"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гемоглобін"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати від геморою"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні панталони"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні прокладки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні рушники"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні серветки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні труси"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гідрастин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гідрастинін"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гілки локриці на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гірчиця на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гірчична олія на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гірчичники"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"глистогінні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гліцерин на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гліцерофосфати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"глюкоза на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"подушечки для годування груддю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засоби від головного болю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"олівці від головного болю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гормони на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення гнилісних грибів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для стерилізування ґрунту"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"грязі до ванн"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"грязі лікувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"губки цілющі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гума на зубничі (стоматологічні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гумігут на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гур'юновий бальзам на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дезінфікувальні засоби на гігієнічні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дезінфікувальні хімічні засоби для туалетів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дезодоранти для одягу та тканин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дезодоранти, крім особистих"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"детергенти на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дигіталін"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"молочні порошки на дитяче харчування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хліб для діабетиків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"діагностичні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"діастаза на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дієтичні напої лікарські (медичні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дієтичні харчові продукти лікарські (медичні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жири для доїння"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"домішки до кормів лікарські (медичні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дріжджі на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"евкаліпт на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"евкаліптол на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні провідники для електрокардіографічних електродів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"еліксири (фармацевтичні препарати)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"естери (складні ефіри) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"етери (прості ефіри) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"желатина на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жир риб'ячий"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жири на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жири на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жожоба (ююба) лікувальна"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жуйки (жуйні гумки) на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарські (медичні) засоби від закрепів (запорів)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сперма для штучного запліднювання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"заспокійливі препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"заспокоївники (заспокійливі, седативні засоби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімікати для обробляння злаків, уражених сажкою"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зубні амальгами, що містять золото"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати, що полегшують прорізування зубів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зубні мастики"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"клеї для зубних протезів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зубні цементувальні речовини"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ізотопи на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"імуностимулятори на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"інсектициди (комахотруйники, хімікати для нищення комах)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ірландський мох на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"їдкі (каустичні) олівці"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"їдкі речовини (каустики) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"йод на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"йодиди лужних металів на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"йодиди на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"йодоформ"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі калію на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"каломель"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"камеді-смоли на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"камфора на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"камфорна олія"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"капсули (облатки) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"капсули на ліки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"карболінеум (засоби від паразитів)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"касторова олія на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кашу на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"квасія на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"квебрахо на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кедрове дерево для відлякування комах"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кисень на медичні (лікарські) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кислоти на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кільця протиревматичні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кістковий цемент на хірургічні та ортопедичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"клейкі (липкі) речовини від мух"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кокаїн"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"колодій на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"репеленти (відлякувальники комах)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"компреси"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кондурангова кора на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розчини для контактних лінз"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"чистильні препарати для контактних лінз"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кора на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кора хінного дерева на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коріння лікувальне (цілюще)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коріння ревеню на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"корпія на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"крем з винного каменю на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"креозот на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"плазма крові"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кров на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кровоочищальні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кровоспиняльні (кровотамівні) олівці"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кровоспиняльні (кровотамівні) препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кропова олія на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кротонова кора"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"крохмаль на дієтичні або фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"культури мікроорганізмів на лікарські (медичні) та ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кураре"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трави для куріння на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лаки для зубів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лактоза"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лейкопластирі (пластирі)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лецитин на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"липкі смуги (стрічки) на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення личинок комах"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарський (медичний) спирт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарські (медичні) аптечки переносні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ліки ветеринарні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ліки для людини"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ліки зубні (стоматологічні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальний чай"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні (цілющі) трави"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні засоби від пітніння ніг"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні напої (мікстури)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні настої"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікувальні олії"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лініменти (рідкі мазі)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"локриця на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лосьйони на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лосьйони на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фармацевтичні препарати від лупи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лупулін на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"льодяники (смоктунці) лікувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"борошно з насіння льону на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"льонове насіння на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"магнезія на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мазі на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кора мангрового дерева на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"марля для перев'язування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"маткове молочко (бджолине) на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мелісова вода на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"менструальні (місячкові) прокладки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"менструальні (місячкові) тампони"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"менструальні (місячкові) труси"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ментол"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мигдалеве молочко на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"миробаланова кора на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення мишей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати з мікроелементами для людей або тварин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поживні речовини для мікроорганізмів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати проти мілдью"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"папір проти молі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для захисту від молі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі мінеральних вод"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мінеральні харчові домішки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати від мозолів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для видаляння мозолів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мозольні подушечки (м'які підкладки)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"молескін на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"молочні ферменти на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"липкий папір від мух"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення мух"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"порошок із шпанських мушок"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"м'ята на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наплічні пов'язки (перев'язі) на хірургічні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наривальні засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наркотики"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наркотики на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"настоянки йоду"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"настоянки на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі натрію на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"таблетки нашатирю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"нашийники для тварин протипаразитні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі для нюхання від зомління"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обкурювальні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обкурювальні свічки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обкурювальні таблетки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мазі проти обмороження на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати від обмороження"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"олія скипидарна (терпентинна) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"опій"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати опію"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для обробляння опіків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оподельдок"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для органотерапії"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"отрути"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарські (медичні) пов'язки на очі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"примочки для очей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"палички сірчані (дезінфікувальні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"панталони вбиральні (абсорбувальні) для хворих на нетримання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"папір на гірчичники"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"паразитоциди (засоби для нищення паразитів)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пахощі для віднаджування комах"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пектин на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пелюшки для хворих на нетримання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пепсини на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пептони на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"перев'язувальні матеріали хірургічні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хірургічні пересадні органи чи тканини (живі)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пероксид водню на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пестициди (отрутохімікати) (препарати для нищення шкідливих тварин)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пігулки (пілюлі) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"піретрумовий порошок (інсектицидний)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ліки від пітніння"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"освіжальні препарати для повітря"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"очищальні препарати для повітря"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поживні (харчові) домішки на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для полоскання рота на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"помади на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"порцеляна на зубні протези"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послаблювальні засоби легкі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пояси менструальні (місячкові)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"припарки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"продукти для дитячого харчування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"продукти побічні від обробляння злаків на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"проносні засоби (проносники)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протиастмовий чай"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протигарячкові (жарозменшувальні) засоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протизаплідні засоби хімічні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протимікробна (антисептична) вата"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протимікробні препарати (антисептики)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протимозольні кільця для ніг"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протипаразитні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протиревматичні браслети"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протисечогінні (антидіуретичні) препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протиспорові препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"п'явки на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"радій на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"радіоактивні речовини на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"цементувальні речовини для копит (ратиць) тварин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"реактиви хімічні на лікарські (медичні) або ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"рентгенологічні контрастні речовини на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"репеленти (відлякувальники комах) для собак"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"рибне борошно на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ріжки житні на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розчинники для змивання липких пластирів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення шкідливих рослин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ртутна мазь"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сарсапарель на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"свинцеві примочки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"свічки лікарські (медичні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"серветки, просочені лікувальними розчинами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"серотерапевтичні ліки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сикативи (прискорювачі висихання) на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сироватки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сиропи на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скипидар (терпентина) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати для нищення слимаків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"снотворні засоби (снотворники)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лосьйони для собак"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мийні засоби для собак"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сода питна (бікарбонат натрію) на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солі на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солод на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"солодові молочні напої на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мазі від сонячних опіків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"препарати від сонячних ударів на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сплави (стопи) дорогоцінних металів на зубничі (стоматологічні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стерилізувальні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стероїди"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стрихнін"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сульфаміди (ліки)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"таблетки на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"тафтові пластирі (прогумовані)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мийні засоби для тварин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"термальні води"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"тимол на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"тирлич на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"тканини хірургічні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"речовини на фармацевтичні потреби, що сприяють травленню"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трав'яні чаї на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гігієнічні вкладки для трусів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"тютюнові екстракти (інсектициди)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фенол на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фенхель на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ферменти на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ферменти на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ферменти на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ферментні препарати на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ферментні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімікати для обробляння проти філоксери"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"формальдегіди на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"формувальний віск зубничий (стоматологічний)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фосфати на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фунгіциди (протигрибкові препарати)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хіміко-фармацевтичні препарати"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати на ветеринарні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хімічні препарати на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хінін на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хінолін на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хлороформ"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"екстракти хмелю на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарський (медичний) чай для худнення"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"лікарські (медичні) препарати для худнення"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"мийні засоби для худоби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"цвіт сірковий на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"естери (складні ефіри) целюлози на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"етери (прості ефіри) целюлози на фармацевтичні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"цукерки лікувальні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"цукор на лікарські (медичні) потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фармацевтичні препарати для догляду шкіри"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"отрута для щурів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ялапа"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                   "ClassNumber":35,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"Реклама"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"керування справами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділове адміністрування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"канцелярські роботи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"агентства комерційного інформування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"адміністративне обробляння замовлень на купівлю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"аналізування собівартості"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"аукціонний продаж"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бухгалтерський облік"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вивчання ринку"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"визначання громадської думки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги телефонних відповідачів для відсутніх абонентів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"влаштовування виставок на комерційні або рекламні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"влаштовування ярмарків на комерційні або рекламні потреби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"демонстрування товарів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділове досліджування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділове інформування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділове оцінювання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділове розвідування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ділові довідки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"допомога в керуванні справами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"досліджування ринкове"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"економічне прогнозування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"експертування на ділову успішність"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"записування повідомин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"збирання інформації до комп'ютерних баз даних"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"збирання статистичних даних"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"складання звітів про стан рахунків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги щодо зв'язків з громадськістю"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"імпортно-експортні агентства"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"інвойсування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання (прокат) канцелярських машин і обладдя"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дорадча допомога в діловому керуванні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"керування комп'ютерними файлами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"консультування щодо керування справами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поради щодо налагоджування і керування справами"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"керування справами артистів-виконавців"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"керування справами в готелях"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"комерційна інформація і консультації для споживачів (центри підтримки споживачів)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"комерційне керування ліцензуванням товарів і послуг для інших"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"комплектування штату працівників"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"консультування фахове щодо підприємництва"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"консультування щодо налагоджування справ"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"консультування щодо штату працівників"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги манекенників для рекламування або сприяння продажеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"машинописні роботи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"множення документів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"написання рекламних текстів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обробляння текстів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги щодо огляду преси"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оновлювання, коригування та удосконалювання рекламних матеріалів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оформляння вітрин"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оцінювання вовни"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оцінювання лісу (дерева) на пні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"перевіряння рахунків (аудит)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"передплачування газет (посередництво)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"передплачування телекомунікаційних послуг для інших"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"перенаймання приміщень"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"готування платіжних документів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"складання податкових декларацій"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги з порівнювання цін"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги з розміщування рекламних матеріалів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги із укладання субдоговорів (комерційна допомога)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги постачання для інших (закуповування товарів та надавання постачальницьких послуг іншим фірмам)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги секретарів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"послуги стенографістів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пошук спонсорів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"служби працевлаштовування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"представляння продуктів через засоби комунікації з метою роздрібного продажу"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"допомога у комерційному або промисловому керуванні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"психологічне випробовування (тестування) для відбирання працівників"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"публікування рекламних текстів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"радіорекламування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"реклама поштою"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання (орендування) місця на рекламу"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання рекламного часу на засобах інформування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"рекламні агентства"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання (прокат) рекламних матеріалів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"готування рекламних смуг"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"рекламування через комп'ютерну мережу"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розклеювання афіш, об'яв"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розміщування об'яв поза приміщеннями"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розповсюджування зразків"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розповсюджування рекламних матеріалів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розсилання поштою рекламних матеріалів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сприяння продажеві (посередництво)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"телевізійне рекламування"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання (прокат) торговельних автоматів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"упорядковування (систематизування) інформації комп'ютерних баз даних"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"наймання (прокат) фотокопіювальної техніки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"фотокопіювання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"шукання відомостей (інформації, даних) в комп'ютерних файлах для інших"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розміщування в одному місці, на користь іншим особам, асортименту товарів, яке дає змогу покупцям зручно оглядати і купувати ці товари через магазини роздрібної та оптової торгівлі та мережу інтернет"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+          }
+        },
+
+                    {% elif transaction|get:"@type" == 'TerminationNoRenewalFee' %}
+{
+        "@type":"TerminationNoRenewalFee",
+        "@name":"Припинення дії свідоцтва у разі несплати збору за продовження строку дії",
+        "@bulletinNumber":"24",
+        "@bulletinDate":"2008-12-25",
+        "@applicationNumber":"98051810",
+        "@registrationNumber":"23380",
+        "TransactionBody":{
+            "TerminationDate":"2008-05-12"
+          }
+        }
+                    {% elif transaction|get:"@type" == 'TotalInvalidationByCourt' %}
+{
+        "@type":"TotalInvalidationByCourt",
+        "@name":"Визнання свідоцтва недійсним за рішенням суду повністю",
+        "@bulletinNumber":"22",
+        "@bulletinDate":"2017-11-27",
+        "@applicationNumber":"m201108178",
+        "@registrationNumber":"159383",
+        "TransactionBody":{
+            "TerminationDate":"2011-05-25",
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд м. Києва",
+                "Date":"2017-10-30",
+                "Number":"№ 910/3220/17"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'PartialInvalidationByCourt' %}
+
+                    {% elif transaction|get:"@type" == 'ChangeOwnerByCourt' %}
+        {
+            "@type":"ChangeOwnerByCourt",
+            "@name":"Встановлення власника свідоцтва за рішенням суду",
+            "@bulletinNumber":"7",
+            "@bulletinDate":"2002-07-15",
+            "@applicationNumber":"94072528",
+            "@registrationNumber":"10149",
+            "TransactionBody":{
+              "HolderDetails":{
+                "Holder":[
+                  {
+                    "ApplicantSequenceNumber":1,
+                    "ApplicantAddressBook":{
+                    "FormattedNameAddress":{
+                        "Name":{
+                          "FreeFormatName":{
+                            "NameKind":"Legal Entity",
+                              "FreeFormatNameDetails":{"FreeFormatNameLine":"Виробничо-комерційний комбінат \"АЛКО\""}
+                            }
+                          },
+                        "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"04053, м. Київ, вул. Кудрявська, 16"}
+                      }
+                    }
+                  }
+                ]
+              }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'ChangesByCourt' %}
+
+                    {% elif transaction|get:"@type" == 'TotalTerminationByCourt' %}
+{
+        "@type":"TotalTerminationByCourt",
+        "@name":"Припинення дії свідоцтва за рішенням суду повністю",
+        "@bulletinNumber":"23",
+        "@bulletinDate":"2018-12-10",
+        "@applicationNumber":"m200709264",
+        "@registrationNumber":"99177",
+        "TransactionBody":{
+            "TerminationDate":"2018-10-05",
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд м. Києва",
+                "Date":"2018-09-05",
+                "Number":"№ 910/9962/17"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'PartialTerminationByCourt' %}
+
+                    {% elif transaction|get:"@type" == 'TotalTransfer' %}
+{
+        "@type":"TotalTransfer",
+        "@name":"Передача права власності",
+        "@bulletinNumber":"18",
+        "@bulletinDate":"2017-09-25",
+        "@applicationNumber":"m201108178",
+        "@registrationNumber":"159383",
+        "TransactionBody":{
+          "HolderDetails":{
+            "PreviousHolder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Legal Entity",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"Общєство с огранічєнной отвєтсвєнностью «Тєхнопоіск»"}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"RU","FreeFormatAddressLine":"ул. Колі Томчака, д. 28, літ. В, г. Санкт-Пєтєрбург, 196084, Російська Федерація"}
+                  }
+                }
+              }
+            ],
+            "NewHolder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                  "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Legal Entity",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"ТрансЕнергоОіл АГ"}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"CH","FreeFormatAddressLine":"ц\/о Любомір Зец, Чурерстрассе 58, 8852 Алтендорф, Швейцарія"}
+                  }
+                }
+              }
+            ]
+          },
+            "DecisionDetails":{
+              "Decision":{
+                "Number":"22127"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'PartialTransfer' %}
+
+                    {% elif transaction|get:"@type" == 'Licence' %}
+{
+        "@type":"Licence",
+        "@name":"Видача ліцензії на використання знака для товарів і послуг",
+        "@bulletinNumber":"14",
+        "@bulletinDate":"2014-07-25",
+        "@applicationNumber":"m201108178",
+        "@registrationNumber":"159383",
+        "TransactionBody":{
+          "LicensorDetails":{
+            "Licensor":{
+              "LicensorSequenceNumber":1,
+              "LicensorAddressBook":{
+                "FormattedNameAddress":{
+                  "Name":{
+                    "FreeFormatName":{
+                      "NameKind":"Legal Entity",
+                        "FreeFormatNameDetails":{"FreeFormatNameLine":"Общєство с огранічєнной отвєтствєнностью \"Тєхнопоіск\""}
+                      }
+                    },
+                  "Address":{"AddressCountryCode":"RU","FreeFormatAddressLine":"ул. Колі Томчака, д. 28, літ. В, г. Санкт-Пєтєрбург, 196084, Російська Федерація"}
+                }
+              }
+            }
+          },
+          "LicenseeDetails":{
+            "Licensee":{
+              "LicenseeSequenceNumber":1,
+              "LicenseeAddressBook":{
+                "FormattedNameAddress":{
+                  "Name":{
+                    "FreeFormatName":{
+                      "NameKind":"Legal Entity",
+                        "FreeFormatNameDetails":{"FreeFormatNameLine":"Товариство з обмеженою відповідальністю \"РЕДМОНД-УКРАЇНА\""}
+                      }
+                    },
+                  "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"вул. Хрещатик, буд. 48 Б, м. Київ, 01601"}
+                }
+              }
+            }
+          },
+            "LicenceKind":"Nonexclusive",
+            "DecisionDetails":{
+              "Decision":{
+                "Number":"16549"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'TotalTransferInvalidationByCourt' %}
+{
+        "@type":"TotalTransferInvalidationByCourt",
+        "@name":"Визнання недійсним договору про передачу права власності за рішенням суду",
+        "@bulletinNumber":"12",
+        "@bulletinDate":"2004-12-15",
+        "@applicationNumber":"97082596",
+        "@registrationNumber":"10574",
+        "TransactionBody":{
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд м. Києва",
+                "Date":"2004-07-22",
+                "Number":"№ 12/174"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'AppealsRefusalByCourt' %}
+
+                    {% elif transaction|get:"@type" == 'Reclassification' %}
+{
+        "@type":"Reclassification",
+        "@name":"Рекласифікація переліку товарів і послуг відповідно до чинної редакції МКТП",
+        "@bulletinNumber":"1",
+        "@bulletinDate":"2019-01-10",
+        "@applicationNumber":"98124955",
+        "@registrationNumber":"22702",
+        "TransactionBody":{
+          "GoodsServicesDetails":{
+            "GoodsServices":{
+              "ClassDescriptionDetails":{
+                "ClassDescription":[
+                  {
+                   "ClassNumber":39,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"транспорт"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                   "ClassNumber":43,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"забезпечування харчами і напоями"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"забезпечування харчами і напоями"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "HolderDetails":{
+            "Holder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Other",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"Скендіневіан Еіерлайнз Сістем Денмарк-Норвей-Свіден"}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"SE","FreeFormatAddressLine":"19587 Стокгольм, Швеція"}
+                  }
+                }
+              }
+            ]
+          }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'Correction' %}
+{
+        "@type":"Correction",
+        "@name":"Виправлення очевидних помилок в публікації про видачу свідоцтва на знак для товарів і послуг",
+        "@bulletinNumber":"1",
+        "@bulletinDate":"2019-01-10",
+        "@applicationNumber":"m201622227",
+        "@registrationNumber":"248781",
+        "TransactionBody":{
+            "PublicationDetails":{
+              "Publication":{"PublicationIdentifier":"20/2018","PublicationDate":"2018-10-25"}
+            },
+          "HolderDetails":{
+            "Holder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Natural Person",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"Тимофеєв Олексій Миколайович"}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"просп. Маяковського, 4, кв. 210, м. Київ, 02217"}
+                  }
+                }
+              }
+            ]
+          }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'TotalTransferCorrection' %}
+
+                    {% elif transaction|get:"@type" == 'Duplicate' %}
+        {
+        "@type":"Duplicate",
+        "@name":"Видача дубліката свідоцтва на знак для товарів і послуг",
+        "@bulletinNumber":"1",
+        "@bulletinDate":"2019-01-10",
+        "@applicationNumber":"m201413173",
+        "@registrationNumber":"204261"
+        }
+                    {% elif transaction|get:"@type" == 'RestoreByCourt' %}
+{
+        "@type":"RestoreByCourt",
+        "@name":"Поновлення дії свідоцтва за рішенням суду",
+        "@bulletinNumber":"1",
+        "@bulletinDate":"2019-01-10",
+        "@applicationNumber":"m201108178",
+        "@registrationNumber":"159383",
+        "TransactionBody":{
+            "@operationCode":"Delete",
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд м. Києва",
+                "Date":"2018-05-16",
+                "Number":"№ 910/3220/17"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'ChangeGoodsAndServicesByCourt' %}
+{
+        "@type":"ChangeGoodsAndServicesByCourt",
+        "@name":"Встановлення переліку товарів і послуг за рішенням суду",
+        "@bulletinNumber":"24",
+        "@bulletinDate":"2011-12-26",
+        "@applicationNumber":"m200606610",
+        "@registrationNumber":"109692",
+        "TransactionBody":{
+          "GoodsServicesDetails":{
+            "GoodsServices":{
+              "ClassDescriptionDetails":{
+                "ClassDescription":[
+                  {
+                   "ClassNumber":33,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"алкогольні напої (крім пива)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"всі товари, що включені до 33 класу"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Дніпропетровський окружний адміністративний суд",
+                "Date":"2011-06-30",
+                "Number":"№ 2а-10490/08"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'CourtDecisionCancellation' %}
+
+                    {% elif transaction|get:"@type" == 'DisclaimerByAppeal' %}
+
+                    {% elif transaction|get:"@type" == 'DuplicateByCourt' %}
+{
+        "@type":"DuplicateByCourt",
+        "@name":"Видача дубліката свідоцтва на знак для товарів і послуг за рішенням суду",
+        "@bulletinNumber":"12",
+        "@bulletinDate":"2004-12-15",
+        "@applicationNumber":"97082595",
+        "@registrationNumber":"10573",
+        "TransactionBody":{
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд м. Києва",
+                "Date":"2004-07-22",
+                "Number":"№ 12/174"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'PartialInvalidationByAppeal' %}
+
+                    {% elif transaction|get:"@type" == 'PartialTransferCorrection' %}
+{
+        "@type":"PartialTransferCorrection",
+        "@name":"Виправлення очевидних помилок у публiкацiях вiдомостей про часткову передачу права власностi на підставі заяви власника",
+        "@bulletinNumber":"8",
+        "@bulletinDate":"2012-04-25",
+        "@applicationNumber":"20031010729",
+        "@registrationNumber":"57825",
+        "TransactionBody":{
+          "GoodsServicesDetails":{
+            "GoodsServices":{
+              "ClassDescriptionDetails":{
+                "ClassDescription":[
+                  {
+                   "ClassNumber":6,
+                    "ClassificationTermDetails":{
+                      "ClassificationTerm":[
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"анкери"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"анкерні плити"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"арматура будівельна металева"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"армувальні матеріали металеві будівельні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"армувальні матеріали металеві для бетону"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"армувальні матеріали металеві до труб"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"балки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"безпечні скриньки на гроші"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"блоки (обертові) до піднімних вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"блоки металеві (крім деталей машин)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"броньові плити"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"броня (покриви)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"будівельні або меблеві обладунки (фітинги) з нейзильберу"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"будівельні каркаси металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"будівельні матеріали металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"будівельні панелі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"будівельні плити металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бункери металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"бункери металеві (немеханічні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трубопроводи металеві до вентиляційного і кондиціювального устатковання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вироби металеві (дрібні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обладунки (фітинги) металеві до вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"вікна металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засувки металеві до вікон стулкових"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконниці металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні блоки (обертові)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні засувки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні зупинники (стопори) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні коліщата"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні коловороти"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні коробки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні рами металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні ролики"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"віконні шківи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"внутрішнє личковання металеве (будівельне)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"водогінні труби металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зупинники (стопори) металеві до воріт"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ворота металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"втулки (металеві вироби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гаки для кріплення шиферу, шиферної плитки (металеві вироби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"гачки (металеві вироби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ґрати металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ґратчасті конструкції металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коробки металеві на гроші"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скриньки металеві на гроші"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дахові покриви металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"відчиняльні неелектричні пристрої для дверей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зачиняльні неелектричні пристрої для дверей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"двері металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"двері обертні (турнікети) неавтоматичні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні засувки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні зупинники (стопори) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні коробки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні обладунки (фітинги) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні пружини (неелектричні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні рами металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні ручки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"дверні тахлі (фільонки) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ковпаки металеві на димарі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"димарі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"димові труби металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"драбини металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"драбини самостійні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жалюзі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"жердини металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"з'єднини металеві для труб"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"з'єднувачі ланцюгові металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"з'єднувачі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"завіси металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"закріпи (тюбінги) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"залізні вироби (дрібні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"залізні частини вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"залізні частини дверей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замки (крім електричних) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замки металеві до сумок"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замки металеві до транспортних засобів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замки навісні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замки пружинні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"замкові заскочки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"запобіжні ланцюги металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"заскочки замкові"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засуви замкові"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засуви плоскі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засувки замкові металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засувки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"засувки металеві (крім деталей машин)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"затвори металеві (крім деталей машин)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"затички металеві стінні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"затулки металеві (крім деталей машин)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"защільники металеві будівельні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"защіпки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зовнішні віконниці металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зовнішні заслони металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"карнизи металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ключі"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коліщата до піднімних вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коліщата металеві до розсувних дверей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"коловороти до піднімних вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"колони металеві для споруд і конструкцій"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трубопроводи металеві до вентиляційного кондиціювального устатковання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"консолі металеві будівельні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"конструкції металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"конструкції металеві перемісні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"контррейки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"кутники сталеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ляди металеві до колодязів оглядових"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"металокерамічні матеріали"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"муфти (металеві вироби)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"напірний трубопровід (металевий)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"насадки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"настили металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"обмежники металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"огорожі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"одвірки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"опалубки металеві на бетон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"каркаси металеві на оранжереї"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"оранжереї перемісні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"панельні стінні обшиви металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"перемички металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"затулки до печей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"протипожежний захист металевий до печей"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"піддашки металеві будівельні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"підлоги металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"підлогові плитки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"підпори металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"планки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поздовжні балки (частини сходів) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"покриви металеві для конструкцій і споруд"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"покрівельні кутники защільнювальні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"покрівлі металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поперечки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"пороги дверні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"поручні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"рами металеві будівельні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"решітки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ринви (водостічні труби) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"риштаки (водостічні жолоби) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"риштовання металеве"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"розгалужувальні патрубки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ролики до піднімних вікон"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"роликові віконниці сталеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"роликові заслони сталеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"ручки кулясті металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сейфи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"силосні башти металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"силосні ями металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скарбнички металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скоби із звичайних металів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скоби металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"скрині металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"смуги залізні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"смуги сталеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"споруди металеві перемісні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві конструкції"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві опори"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві пластини"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві плити"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві сляби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві стовпи"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві стояки"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві труби"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сталеві щогли"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стелини металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стінне личковання металеве (будівельне)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стінні гаки металеві кріпильні для труб"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стінні покриви металеві (будівельні)"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стовпи металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стовпи металеві до споруд і конструкцій"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стопори (зупинники) металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стояки металеві до споруд і конструкцій"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стрижні металеві для поручнів і огорож"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"стулкові вікна металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"східці металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"сходи металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"каркаси металеві на теплиці"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"теплиці перемісні металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трубопроводи металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"трубопроводи металеві до центрального опалювання"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"зупинники (стопори) металеві до хвірток"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хвіртки металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хвіртки обертні (турнікети) неавтоматичні"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хомути із звичайних металів"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хомути металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"хомути металеві для кріплення труб"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"частоколи металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"черепиця металева"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"шарніри металеві"
+                        },
+                        {
+                         "ClassificationTermLanguageCode":"uk",
+                         "ClassificationTermText":"шафи неспаленні"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+          }
+        },
+
+                    {% elif transaction|get:"@type" == 'TotalTerminationCorrection' %}
+{
+        "@type":"TotalTerminationCorrection",
+        "@name":"Виправлення очевидної помилки щодо припинення дії свідоцтва на підставі заяви власника повністю",
+        "@bulletinNumber":"22",
+        "@bulletinDate":"2009-11-25",
+        "@applicationNumber":"m200617942",
+        "@registrationNumber":"92069",
+        "TransactionBody":{
+            "@operationCode":"Delete",
+          "ExpiryDate":"2016-11-15"
+          }
+        }
+                    {% elif transaction|get:"@type" == 'TotalTransferByCourt' %}
+{
+        "@type":"TotalTransferByCourt",
+        "@name":"Передача права власності за рішенням суду",
+        "@bulletinNumber":"10",
+        "@bulletinDate":"2006-10-16",
+        "@applicationNumber":"2000010238",
+        "@registrationNumber":"25717",
+        "TransactionBody":{
+          "HolderDetails":{
+            "PreviousHolder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Natural Person",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"Приходько Анатолій Олексійович"}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"вул. Кірова, 46, кв. 6, м. Суми, 40022"}
+                  }
+                }
+              }
+            ],
+            "NewHolder":[
+              {
+                "ApplicantSequenceNumber":1,
+                "ApplicantAddressBook":{
+                  "FormattedNameAddress":{
+                    "Name":{
+                      "FreeFormatName":{
+                        "NameKind":"Legal Entity",
+                          "FreeFormatNameDetails":{"FreeFormatNameLine":"Товариство з обмеженою відповідальністю \"Слобожанська марка\""}
+                        }
+                      },
+                    "Address":{"AddressCountryCode":"UA","FreeFormatAddressLine":"вул. Петропавловська, 121, м. Суми"}
+                  }
+                }
+              }
+            ]
+          },
+            "DecisionDetails":{
+              "Decision":{
+                "CourtName":"Господарський суд Сумської області",
+                "Date":"2006-05-24",
+                "Number":"АС 15/211-06"
+              }
+            }
+          }
+        }
+                    {% elif transaction|get:"@type" == 'TotalInvalidationByAppeal' %}
+{
+        "@type":"TotalInvalidationByAppeal",
+        "@name":"Визнання свідоцтва недійсним за рішенням Апеляційної ради повністю",
+        "@bulletinNumber":"3",
+        "@bulletinDate":"2000-08-15",
+        "@applicationNumber":"94072013",
+        "@registrationNumber":"11436",
+        "TransactionBody":{
+            "TerminationDate":"1994-07-04"
+          }
+        }
+                    {% else %}
+                        {{ transaction }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

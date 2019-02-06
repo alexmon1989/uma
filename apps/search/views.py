@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.admin.views.decorators import user_passes_test
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
@@ -218,7 +218,7 @@ class ObjectDetailView(TemplateView):
         return context
 
 
-@staff_member_required
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
 @require_POST
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
@@ -226,7 +226,7 @@ def download_docs_zipped(request):
         # Создание заказа
         order = OrderService(
             # user=request.user,
-            user_id=3,
+            user_id=request.user.pk,
             ip_user=get_client_ip(request),
             app_id=request.POST['id_app_number']
         )
@@ -268,13 +268,13 @@ def download_docs_zipped(request):
         raise Http404('Файли не було обрано!')
 
 
-@staff_member_required
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
 def download_doc(request, id_app_number, id_cead_doc):
     """Инициирует у пользование скачивание документа."""
     # Создание заказа
     order = OrderService(
         # user=request.user,
-        user_id=3,
+        user_id=request.user.pk,
         ip_user=get_client_ip(request),
         app_id=id_app_number
     )

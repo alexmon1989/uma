@@ -67,3 +67,8 @@ def obj_type_title(id, lang):
 @register.inclusion_tag('search/templatetags/registration_status.html')
 def registration_status(status):
     return {'status': status}
+
+
+@register.simple_tag
+def user_can_watch_docs(user):
+    return user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists()
