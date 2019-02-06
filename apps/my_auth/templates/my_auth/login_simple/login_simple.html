@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Авторизація" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'my_auth/login_simple/_partials/breadcrumbs.html' %}
+
+    <div class="container g-min-height-200 g-py-70">
+
+        <div class="row justify-content-center">
+            <div class="col-sm-8 col-lg-5">
+                <div class="g-brd-around g-brd-gray-light-v4 rounded g-py-40 g-px-30">
+                    <header class="text-center mb-4">
+                        <h2 class="h2 g-color-black g-font-weight-600">{% trans "Авторизація" %}</h2>
+                    </header>
+
+                    {% if form.non_field_errors %}
+                        <!-- Red Alert -->
+                        <div class="alert alert-dismissible fade show g-bg-red-opacity-0_8 g-color-white rounded-0" role="alert">
+                            <button type="button" class="close u-alert-close--light" data-dismiss="alert"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+
+                            {% for error in form.non_field_errors %}
+                                {{ error }}{% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- End Red Alert -->
+                    {% endif %}
+
+                    <!-- Form -->
+                    <form class="g-py-15" method="post" action="{% url 'auth:login' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-4 {% if form.username.errors %}u-has-error-v1{% endif %}">
+                            <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Логін" %}:</label>
+                            <input class="form-control g-color-black g-brd-gray-light-v4 g-brd-primary--hover rounded g-py-15 g-px-15"
+                                   type="text"
+                                   name="username"
+                                   placeholder="{% trans "Логін" %}">
+                            {% for error in form.username.errors %}
+                                <small class="form-control-feedback">{{ error }}</small>{% if not forloop.last %}<br>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-0">
+                            <div class="{% if form.password.errors %}u-has-error-v1{% endif %}">
+                                <div class="row justify-content-between">
+                                    <div class="col align-self-center">
+                                        <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Пароль" %}:</label>
+                                    </div>
+                                </div>
+                                <input class="form-control g-color-black g-brd-gray-light-v4 g-brd-primary--hover rounded g-py-15 g-px-15"
+                                       type="password"
+                                       name="password"
+                                       placeholder="{% trans "Пароль" %}">
+                                {% for error in form.password.errors %}
+                                    <small class="form-control-feedback">{{ error }}</small>{% if not forloop.last %}
+                                    <br>{% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="row justify-content-between mt-4">
+                                <div class="col-8 align-self-center">
+                                    <label class="form-check-inline u-check g-color-gray-dark-v5 g-font-size-13 g-pl-25 mb-0">
+                                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                               type="checkbox"
+                                               name="remember_me"
+                                               value="1">
+                                        <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                                            <i class="fa" data-check-icon=""></i>
+                                        </div>
+                                        {% trans "Запам'ятати" %}
+                                    </label>
+                                </div>
+                                <div class="col-4 align-self-center text-right">
+                                    <button class="btn btn-md u-btn-primary rounded g-py-13 g-px-25" type="submit">
+                                        {% trans "Вхід" %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- End Form -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,11 +1,11 @@
 import os
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
-from apps.my_auth.forms import AuthForm
+from apps.my_auth.forms import AuthForm, AuthFormSimple
 from apps.my_auth.utils import get_certificate_data, save_file_to_temp, save_file_to_eu_file_store
 from apps.my_auth.models import CertificateOwner, KeyCenter
 
@@ -66,6 +66,31 @@ def login_view(request):
         form = AuthForm()
 
     return render(request, 'my_auth/login.html', {'form': form})
+
+
+def login_simple_view(request):
+    """Логин пользователей."""
+    if request.method == 'POST':
+        form = AuthFormSimple(request.POST, request)
+
+        if form.is_valid():
+            user = authenticate(
+                request,
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password']
+            )
+            if user is not None:
+                login(request, user)
+                if not form.cleaned_data.get('remember_me'):
+                    request.session.set_expiry(0)
+                    request.session.modified = True
+                return redirect('/')
+            else:
+                return redirect(reverse('auth:login'))
+    else:
+        form = AuthFormSimple()
+
+    return render(request, 'my_auth/login_simple/login_simple.html', {'form': form})
 
 
 def logout_view(request):
