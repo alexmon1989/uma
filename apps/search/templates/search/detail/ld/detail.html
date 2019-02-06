@@ -137,9 +137,9 @@
 
                         {% user_can_watch_docs request.user as user_can_watch_docs %}
                         {% if user_can_watch_docs %}
-                            {% include 'search/detail/tm/_partials/state_of_affair/documents.html' %}
+                            {% include 'search/detail/ld/_partials/state_of_affair/documents.html' %}
                         {% else %}
-                            {% include 'search/detail/tm/_partials/state_of_affair/documents_without_links.html' %}
+                            {% include 'search/detail/ld/_partials/state_of_affair/documents_without_links.html' %}
                         {% endif %}
 
                         {% include 'search/detail/ld/_partials/state_of_affair/collections.html' %}
