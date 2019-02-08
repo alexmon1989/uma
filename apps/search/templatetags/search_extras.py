@@ -1,5 +1,7 @@
 from django import template
 from django.conf import settings
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
 from ..models import ObjType
 
 register = template.Library()
@@ -72,3 +74,15 @@ def registration_status(status):
 @register.simple_tag
 def user_can_watch_docs(user):
     return user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists()
+
+
+@register.simple_tag
+def documents_count():
+    """Возвращает количество документов доступных для поиска"""
+    client = Elasticsearch(settings.ELASTIC_HOST)
+    # Только документы с существующей датой подачи заявки
+    qs = Q('query_string', query="_exists_:search_data.app_date")
+    # Только заявки, по которым не выдан патент
+    qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+    s = Search(using=client, index='uma').query(qs)
+    return s.count()

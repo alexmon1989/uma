@@ -19,8 +19,6 @@ from zipfile import ZipFile
 import time
 import os
 
-from elasticsearch_dsl.query import Query
-
 
 class SimpleListView(TemplateView):
     """Отображает страницу с возможностью простого поиска."""
@@ -85,7 +83,6 @@ class SimpleListView(TemplateView):
                     # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
                 s = Search(using=client, index='uma').query(qs).sort('_score')
-                print(qs.to_dict())
                 # Фильтрация, агрегация
                 s, context['aggregations'] = filter_results(s, self.request)
 

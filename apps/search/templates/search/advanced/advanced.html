@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load humanize %}
 {% load search_extras %}
 
 {% block title %}{% trans "Розширений пошук" %}{% endblock %}
@@ -10,10 +11,12 @@
 
     <div class="container g-min-height-200 g-py-70">
 
-        {% if not is_search %}
-            <p class="g-mb-15 g-font-size-15">{% trans "Система дозволяє здійснювати пошук в 72 млн. патентних документів." %} {% trans "Детальну інформацію про сферу охоплення бази даних можна отримати" %}
-                <a href="#">{% trans "тут" %}</a>.</p>
-        {% endif %}
+        <p class="g-mb-15 g-font-size-15">
+            {% documents_count as document_count %}
+            {% blocktrans with document_count=document_count|intword %}
+                Система дозволяє здійснювати пошук в <strong>{{ document_count }}</strong> патентних документів. Детальну інформацію про сферу охоплення бази даних можна отримати <a href="#">тут</a>.
+            {% endblocktrans %}
+        </p>
 
         <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
             <advanced-search-form v-bind:obj-types="{{ obj_types }}"

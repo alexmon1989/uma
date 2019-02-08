@@ -1,5 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
+{% load humanize %}
+{% load search_extras %}
 
 <!-- Footer -->
 <div class="gradient g-bg-cover g-bg-pos-center g-bg-img-hero g-bg-black-opacity-0_1--after g-py-50"
@@ -67,6 +69,11 @@
 
                 <div class="g-color-white-opacity-0_8 g-line-height-2 g-mt-minus-4">
                     {% trans "Дата актуалізації" %}: <strong>25.10.2018 11:31</strong>
+                </div>
+
+                <div class="g-color-white-opacity-0_8 g-line-height-2">
+                    {% documents_count as document_count %}
+                    {% trans "Кількість документів" %}: <strong>{{ document_count|intword }}</strong>
                 </div>
             </div>
             <!-- End Footer Content -->
