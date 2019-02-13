@@ -203,6 +203,12 @@ class Command(BaseCommand):
                 else:
                     res['TradeMark']['PublicationDetails']['PublicationDate'] = d.strftime('%Y-%m-%d')
 
+            applicant = None
+            if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
+                applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                 'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                             res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
+
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
@@ -210,11 +216,7 @@ class Command(BaseCommand):
                 'app_date': res['TradeMark']['TrademarkDetails'].get('ApplicationDate'),
                 'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                 'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
-
-                'applicant': [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                                  'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
-                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']],
-
+                'applicant': applicant,
                 'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                               'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
                           res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']]
