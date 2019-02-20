@@ -191,6 +191,14 @@ class Command(BaseCommand):
             # Секция TradeMark
             res['TradeMark'] = data.get('TradeMark')
 
+            # Случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию TradeMark
+            if data.get('PaymentDetails'):
+                res['TradeMark']['PaymentDetails'] = data.get('PaymentDetails')
+            if data.get('DocFlow'):
+                res['TradeMark']['DocFlow'] = data.get('DocFlow')
+            if data.get('PaymentDetails'):
+                res['TradeMark']['Transactions'] = data.get('Transactions')
+
             # Форматирование даты
             if res['TradeMark'].get('PublicationDetails', {}).get('PublicationDate'):
                 try:
