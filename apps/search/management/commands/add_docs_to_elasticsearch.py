@@ -26,8 +26,6 @@ class Command(BaseCommand):
         file_name = file_name.replace('/', '_')
 
         json_path = os.path.join(doc_files_path, f"{file_name}.json")
-        if not os.path.exists(json_path):
-            json_path = os.path.join(doc_files_path, f"{file_name}-К.json")
 
         return json_path
 
