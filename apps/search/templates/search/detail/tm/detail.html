@@ -31,7 +31,7 @@
                         >{% trans "Стан діловодства" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link g-text-underline--hover {% if hit.TradeMark.Transactions|length == 0 %}disabled{% endif %}"
+                        <a class="nav-link g-text-underline--hover {% if not hit.TradeMark.Transactions %}disabled{% endif %}"
                            data-toggle="tab"
                            href="#nav-1-1-primary-ver--8"
                            role="tab"
