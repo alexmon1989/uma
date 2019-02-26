@@ -234,6 +234,9 @@ class OrderService(models.Model):
     app = models.ForeignKey('IpcAppList', models.DO_NOTHING, db_column='idAPPNumber', blank=True, null=True)
     completion_datetime = models.DateTimeField(db_column='CompletionDateTime', blank=True, null=True)
     created_at = models.DateTimeField(db_column='CreateDateTime', auto_now_add=True)
+    create_external_documents = models.IntegerField(blank=True, null=True)
+    externaldoc_enternum = models.IntegerField(db_column='externalDoc_EnterNUM', blank=True, null=True)
+    external_doc_body = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False

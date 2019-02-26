@@ -10,7 +10,7 @@ from django.contrib.admin.views.decorators import user_passes_test
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results, extend_doc_flow)
+                    filter_results, extend_doc_flow, get_completed_order)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -216,6 +216,7 @@ class ObjectDetailView(TemplateView):
             if self.hit.search_data.obj_state == 2:
                 extend_doc_flow(context['hit'])
 
+        context['id_app_number'] = id_app_number
         return context
 
 
@@ -237,34 +238,26 @@ def download_docs_zipped(request):
 
         # Проверка обработан ли заказ
         order_id = order.id
-        completed = False
-        counter = 0
-        while completed is False:
-            order = OrderService.objects.get(id=order_id)
-            if order.order_completed:
-                completed = True
-            else:
-                if counter == 5:
-                    return HttpResponseServerError('Помилка сервісу видачі документів.')
-                counter += 1
-                time.sleep(3)
+        order = get_completed_order(order_id)
+        if order:
+            # Создание архива
+            in_memory = BytesIO()
+            zip_ = ZipFile(in_memory, "a")
+            for document in order.orderdocument_set.all():
+                zip_.write(
+                    f"{settings.DOCUMENTS_MOUNT_FOLDER}/OrderService/{order.user_id}/{order.id}/{document.file_name}",
+                    f"{document.file_name}"
+                )
 
-        # Создание архива
-        in_memory = BytesIO()
-        zip_ = ZipFile(in_memory, "a")
-        for document in order.orderdocument_set.all():
-            zip_.write(
-                f"{settings.DOCUMENTS_MOUNT_FOLDER}/OrderService/{order.user_id}/{order.id}/{document.file_name}",
-                f"{document.file_name}"
-            )
+            # fix for Linux zip files read in Windows
+            for file in zip_.filelist:
+                file.create_system = 0
 
-        # fix for Linux zip files read in Windows
-        for file in zip_.filelist:
-            file.create_system = 0
-
-        zip_.close()
-        in_memory.seek(0)
-        return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
+            zip_.close()
+            in_memory.seek(0)
+            return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
+        else:
+            return HttpResponseServerError('Помилка сервісу видачі документів.')
     else:
         raise Http404('Файли не було обрано!')
 
@@ -284,33 +277,50 @@ def download_doc(request, id_app_number, id_cead_doc):
 
     # Проверка обработан ли заказ
     order_id = order.id
-    completed = False
-    counter = 0
-    while completed is False:
-        order = OrderService.objects.get(id=order_id)
-        if order.order_completed:
-            completed = True
-        else:
-            if counter == 10:
-                return HttpResponseServerError('Помилка сервісу видачі документів.')
-            counter += 1
-            time.sleep(2)
+    order = get_completed_order(order_id)
+    if order:
+        # Получение документа из БД
+        doc = order.orderdocument_set.first()
+        if doc is None:
+            raise Http404()
 
-    # Получение документа из БД
-    doc = order.orderdocument_set.first()
-    if doc is None:
-        raise Http404()
+        # Путь к файлу
+        file_path = os.path.join(
+            settings.ORDERS_ROOT,
+            str(order.user_id),
+            str(order.id),
+            doc.file_name
+        )
 
-    # Путь к файлу
-    file_path = os.path.join(
-        settings.ORDERS_ROOT,
-        str(order.user_id),
-        str(order.id),
-        doc.file_name
+        # Инициирование загрузки
+        try:
+            return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+        except FileNotFoundError:
+            raise Http404()
+    else:
+        return HttpResponseServerError('Помилка сервісу видачі документів.')
+
+
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
+def download_selection(request, id_app_number):
+    # Создание заказа
+    order = OrderService(
+        # user=request.user,
+        user_id=request.user.pk,
+        ip_user=get_client_ip(request),
+        app_id=id_app_number,
+        create_external_documents=1,
+        externaldoc_enternum=270,
+        order_completed=False
     )
+    order.save()
 
-    # Инициирование загрузки
-    try:
-        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
-    except FileNotFoundError:
-        raise Http404()
+    # Проверка обработан ли заказ
+    order_id = order.id
+    order = get_completed_order(order_id)
+    if order:
+        import json
+        json.loads(order.external_doc_body)
+        return FileResponse(order.external_doc_body, content_type='application/json')
+    else:
+        return HttpResponseServerError('Помилка сервісу видачі документів.')

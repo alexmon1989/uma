@@ -2,7 +2,7 @@ from django import template
 from django.conf import settings
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from ..models import ObjType
+from ..models import ObjType, IpcAppList
 
 register = template.Library()
 

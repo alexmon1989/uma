@@ -2,8 +2,9 @@ from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
-from .models import ObjType, InidCodeSchedule
+from .models import ObjType, InidCodeSchedule, OrderService
 import re
+import time
 
 
 def get_search_groups(search_data):
@@ -240,3 +241,18 @@ def extend_doc_flow(hit):
             hit.DOCFLOW.COLLECTIONS = collections
         except AttributeError:
             pass
+
+
+def get_completed_order(order_id, attempts=10, timeout=2):
+    """Ждёт пока обрабатывается заказ. Возвращает False если он не обработался."""
+    completed = False
+    counter = 0
+    while completed is False:
+        order = OrderService.objects.get(id=order_id)
+        if order.order_completed:
+            return order
+        else:
+            if counter == attempts:
+                return False
+            counter += 1
+            time.sleep(timeout)

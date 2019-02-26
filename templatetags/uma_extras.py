@@ -34,3 +34,9 @@ def parse_date(value):
 @register.filter
 def get_list(dictionary, key):
     return dictionary.getlist(key)
+
+
+@register.filter(name='has_group')
+def has_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()
+
