@@ -278,6 +278,7 @@ def create_selection(data_from_json, params):
     data['publications'] = data_from_json.pop('Publications', [])
     data['signer_comment'] = data_from_json.pop('Signer_comment', None)
     data['signer'] = data_from_json.pop('Signer', None)
+    data['INID_51_HTML'] = data_from_json.pop('INID_51_HTML', None)
     data['main_info_comments'] = list(data_from_json.values())[::2]
     data['main_info_values'] = list(data_from_json.values())[1::2]
 
