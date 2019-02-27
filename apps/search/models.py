@@ -230,11 +230,11 @@ class OrderService(models.Model):
     id = models.AutoField(db_column='idOrder', primary_key=True)
     user = models.ForeignKey(User, db_column='idUser', on_delete=models.DO_NOTHING, blank=True, null=True)
     ip_user = models.GenericIPAddressField(db_column='IP_User', max_length=100, blank=True, null=True)
-    order_completed = models.BooleanField(db_column='OrderCompleted', blank=True, null=True)
+    order_completed = models.BooleanField(db_column='OrderCompleted', default=0)
     app = models.ForeignKey('IpcAppList', models.DO_NOTHING, db_column='idAPPNumber', blank=True, null=True)
     completion_datetime = models.DateTimeField(db_column='CompletionDateTime', blank=True, null=True)
     created_at = models.DateTimeField(db_column='CreateDateTime', auto_now_add=True)
-    create_external_documents = models.IntegerField(blank=True, null=True)
+    create_external_documents = models.IntegerField(default=0)
     externaldoc_enternum = models.IntegerField(db_column='externalDoc_EnterNUM', blank=True, null=True)
     external_doc_body = models.TextField(blank=True, null=True)
 
