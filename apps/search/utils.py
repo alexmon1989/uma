@@ -3,8 +3,14 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from .models import ObjType, InidCodeSchedule, OrderService
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.shared import Pt, Cm
 import re
 import time
+import datetime
+import io
 
 
 def get_search_groups(search_data):
@@ -256,3 +262,216 @@ def get_completed_order(order_id, attempts=10, timeout=2):
                 return False
             counter += 1
             time.sleep(timeout)
+
+
+def create_selection(data_from_json, params):
+    """Формирует документ ворд в BytesIO"""
+    data = dict()
+    data['category'] = data_from_json.pop('Category', None)
+    data['contracts_comment'] = data_from_json.pop('Contracts_comment', None)
+    data['contracts'] = data_from_json.pop('Contracts', [])
+    data['collections_comment'] = data_from_json.pop('Collections_comment', None)
+    data['collections'] = data_from_json.pop('Collections', [])
+    data['documents_comment'] = data_from_json.pop('Documents_comment', None)
+    data['documents'] = data_from_json.pop('Documents', [])
+    data['publications_comment'] = data_from_json.pop('Publications_comment', None)
+    data['publications'] = data_from_json.pop('Publications', [])
+    data['signer_comment'] = data_from_json.pop('Signer_comment', None)
+    data['signer'] = data_from_json.pop('Signer', None)
+    data['main_info_comments'] = list(data_from_json.values())[::2]
+    data['main_info_values'] = list(data_from_json.values())[1::2]
+
+    # Формирование выписки
+    document = Document('selection_templates/template.docx')
+
+    sections = document.sections
+    for section in sections:
+        section.top_margin = Cm(2)
+        section.bottom_margin = Cm(2.5)
+        section.left_margin = Cm(3)
+        section.right_margin = Cm(1.5)
+        header = section.header
+        paragraph = header.paragraphs[0]
+        paragraph.text = data['main_info_values'][0]
+        paragraph.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    paragraph = document.paragraphs[0]
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = 0
+    paragraph_format.space_before = 0
+    run = paragraph.add_run('ВИПИСКА')
+    run.bold = True
+    run.font.name = 'Times New Roman CYR'
+    run.font.size = Pt(18)
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = Pt(18)
+    paragraph_format.space_before = 0
+    if data['category'] in ('винаходи', 'корисні моделі'):
+        run = paragraph.add_run(f"з Державного реєстру патентів України на {data['category']}")
+    else:
+        run = paragraph.add_run(f"з Державного реєстру свідоцтв України на {data['category']}")
+    run.font.name = 'Times New Roman CYR'
+    run.font.size = Pt(14)
+
+    table = document.add_table(rows=0, cols=2)
+    for i in range(len(data['main_info_comments'])):
+        if data['main_info_values'][i] != '':
+            row_cells = table.add_row().cells
+            row_cells[0].text = data['main_info_comments'][i]
+            row_cells[0].paragraphs[0].runs[0].font.bold = True
+            row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+            row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+            row_cells[0].paragraphs[0].space_after = 0
+            row_cells[0].paragraphs[0].space_before = 0
+            row_cells[1].text = data['main_info_values'][i]
+            row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+            row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+            row_cells[1].paragraphs[0].space_after = 0
+            row_cells[1].paragraphs[0].space_before = 0
+
+    if params.get('contracts') and data['contracts_comment'] and len(data['contracts']) > 0:
+        paragraph = document.add_paragraph()
+        paragraph_format = paragraph.paragraph_format
+        paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph_format.space_after = Pt(18)
+        paragraph_format.space_before = Pt(18)
+        run = paragraph.add_run(data['contracts_comment'])
+        run.bold = True
+        run.font.name = 'Times New Roman CYR'
+        run.font.size = Pt(12)
+
+        for item in data['contracts']:
+            item_values = list(item.values())
+            comments = item_values[::2]
+            values = item_values[1::2]
+            table = document.add_table(rows=0, cols=2)
+            for i in range(len(comments)):
+                if comments[i] != '' and values[i] != '':
+                    row_cells = table.add_row().cells
+                    row_cells[0].text = comments[i]
+                    row_cells[0].paragraphs[0].runs[0].font.bold = True
+                    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[0].paragraphs[0].space_after = 0
+                    row_cells[0].paragraphs[0].space_before = 0
+                    row_cells[1].text = values[i]
+                    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[1].paragraphs[0].space_after = 0
+                    row_cells[1].paragraphs[0].space_before = 0
+            document.add_paragraph()
+
+    if params.get('collections') and data['collections_comment'] and len(data['collections']) > 0:
+        paragraph = document.add_paragraph()
+        paragraph_format = paragraph.paragraph_format
+        paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.add_run(data['collections_comment'])
+        run.bold = True
+        run.font.name = 'Times New Roman CYR'
+        run.font.size = Pt(12)
+
+    if params.get('letters') and data['documents_comment'] and len(data['documents']) > 0:
+        paragraph = document.add_paragraph()
+        paragraph_format = paragraph.paragraph_format
+        paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.add_run(data['documents_comment'])
+        run.bold = True
+        run.font.name = 'Times New Roman CYR'
+        run.font.size = Pt(12)
+
+        for item in data['documents']:
+            item_values = list(item.values())
+            comments = item_values[::2]
+            values = item_values[1::2]
+            table = document.add_table(rows=0, cols=2)
+            for i in range(len(comments)):
+                if comments[i] != '' and values[i] != '':
+                    row_cells = table.add_row().cells
+                    row_cells[0].text = comments[i]
+                    row_cells[0].paragraphs[0].runs[0].font.bold = True
+                    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[0].paragraphs[0].space_after = 0
+                    row_cells[0].paragraphs[0].space_before = 0
+                    row_cells[1].text = values[i]
+                    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[1].paragraphs[0].space_after = 0
+                    row_cells[1].paragraphs[0].space_before = 0
+            document.add_paragraph()
+
+    if params.get('another') and data['publications_comment'] and len(data['publications']) > 0:
+        paragraph = document.add_paragraph()
+        paragraph_format = paragraph.paragraph_format
+        paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.add_run(data['publications_comment'])
+        run.bold = True
+        run.font.name = 'Times New Roman CYR'
+        run.font.size = Pt(12)
+
+        for item in data['publications']:
+            item_values = list(item.values())
+            comments = item_values[::2]
+            values = item_values[1::2]
+            table = document.add_table(rows=0, cols=2)
+            for i in range(len(comments)):
+                if comments[i] != '' and values[i] != '':
+                    row_cells = table.add_row().cells
+                    row_cells[0].text = comments[i]
+                    row_cells[0].paragraphs[0].runs[0].font.bold = True
+                    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[0].paragraphs[0].space_after = 0
+                    row_cells[0].paragraphs[0].space_before = 0
+                    row_cells[1].text = values[i]
+                    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[1].paragraphs[0].space_after = 0
+                    row_cells[1].paragraphs[0].space_before = 0
+            document.add_paragraph()
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_after = Pt(18)
+    paragraph_format.space_before = Pt(40)
+    now = datetime.datetime.now()
+    now = now.strftime("%d.%m.%Y")
+    run = paragraph.add_run(f"Виписка видана станом на {now} р.")
+    run.font.name = 'Times New Roman CYR'
+    run.bold = True
+    run.font.size = Pt(12)
+
+    table = document.add_table(rows=0, cols=2)
+    row_cells = table.add_row().cells
+    row_cells[0].text = data['signer']['SignerPost']
+    row_cells[0].paragraphs[0].runs[0].font.bold = True
+    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+    row_cells[0].paragraphs[0].space_after = 0
+    row_cells[0].paragraphs[0].space_before = 0
+    row_cells[1].text = data['signer']['SignerName']
+    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+    row_cells[1].paragraphs[0].runs[0].font.bold = True
+    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+    row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    row_cells[1].vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
+    row_cells[1].paragraphs[0].space_after = 0
+    row_cells[1].paragraphs[0].space_before = 0
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_before = Pt(18)
+    run = paragraph.add_run('М.П.')
+    run.font.name = 'Times New Roman CYR'
+    run.bold = True
+    run.font.size = Pt(12)
+
+    file_stream = io.BytesIO()
+    document.save(file_stream)
+    file_stream.seek(0)
+
+    return file_stream

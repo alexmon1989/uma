@@ -1,0 +1,121 @@
+{% load i18n %}
+
+<div id="accordion-11" class="u-accordion u-accordion-bg-primary u-accordion-color-white g-mb-20"
+     role="tablist" aria-multiselectable="true">
+    <!-- Card -->
+    <div class="card g-brd-none rounded-0 g-mb-15">
+        <div id="accordion-11-heading-02" class="u-accordion__header g-pa-0" role="tab">
+            <h5 class="mb-0">
+                <a class="collapsed d-flex g-color-white g-text-underline--none--hover g-brd-around g-brd-gray-light-v4 g-rounded-5 g-pa-10-15 g-bg-indigo"
+                   href="#accordion-11-body-02" aria-expanded="false"
+                   aria-controls="accordion-11-body-02" data-toggle="collapse"
+                   data-parent="#accordion-11">
+                      <span class="u-accordion__control-icon g-mr-10">
+                        <i class="fa fa-angle-down"></i>
+                        <i class="fa fa-angle-up"></i>
+                      </span>
+                    {% trans "Сформувати виписку" %}
+                </a>
+            </h5>
+        </div>
+        <div id="accordion-11-body-02" class="collapse" role="tabpanel"
+             aria-labelledby="accordion-11-heading-02" data-parent="#accordion-11">
+            <div class="u-accordion__body g-color-gray-dark-v5">
+                <form action="{% url 'search:download_selection' id_app_number=id_app_number %}">
+                    <h4 class="h6 g-font-weight-700 g-mb-10">Включити у виписку:</h4>
+
+                    <!-- Toggles Checkbox -->
+                    <div class="form-group u-has-success-v1-1">
+                        <label class="d-flex align-items-center justify-content-between">
+                            <span>Основна інформація</span>
+                            <div class="u-check g-opacity-0_5">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                       type="checkbox"
+                                       checked=""
+                                       disabled="">
+                                <div class="u-check-icon-radio-v8">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- End Toggles Checkbox -->
+
+                    <!-- Toggles Checkbox -->
+                    <div class="form-group">
+                        <label class="d-flex align-items-center justify-content-between">
+                            <span>Договори</span>
+                            <div class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                       name="contracts"
+                                       type="checkbox"
+                                       checked="">
+                                <div class="u-check-icon-radio-v8">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- End Toggles Checkbox -->
+
+                    <!-- Toggles Checkbox -->
+                    <div class="form-group">
+                        <label class="d-flex align-items-center justify-content-between">
+                            <span>Збори</span>
+                            <div class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                       name="collections"
+                                       type="checkbox"
+                                       checked="">
+                                <div class="u-check-icon-radio-v8">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- End Toggles Checkbox -->
+
+                    <!-- Toggles Checkbox -->
+                    <div class="form-group">
+                        <label class="d-flex align-items-center justify-content-between">
+                            <span>Листи</span>
+                            <div class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                       name="letters"
+                                       type="checkbox"
+                                       checked="">
+                                <div class="u-check-icon-radio-v8">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- End Toggles Checkbox -->
+
+                    <!-- Toggles Checkbox -->
+                    <div class="form-group">
+                        <label class="d-flex align-items-center justify-content-between">
+                            <span>Інші відомості</span>
+                            <div class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                       name="another"
+                                       type="checkbox"
+                                       checked="">
+                                <div class="u-check-icon-radio-v8">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- End Toggles Checkbox -->
+
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-md u-btn-indigo"><i class="fa fa-download"></i> {% trans "Завантажити" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Card -->
+</div>

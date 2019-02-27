@@ -3,21 +3,21 @@ from django.db.models import F
 from django.forms import formset_factory, ValidationError
 from django.http import Http404, HttpResponseServerError, FileResponse
 from django.utils.http import urlencode
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
-from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument
+from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results, extend_doc_flow, get_completed_order)
+                    filter_results, extend_doc_flow, get_completed_order, create_selection)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from io import BytesIO
 from zipfile import ZipFile
-import time
 import os
+import io
+import json
 
 
 class SimpleListView(TemplateView):
@@ -241,7 +241,7 @@ def download_docs_zipped(request):
         order = get_completed_order(order_id)
         if order:
             # Создание архива
-            in_memory = BytesIO()
+            in_memory = io.BytesIO()
             zip_ = ZipFile(in_memory, "a")
             for document in order.orderdocument_set.all():
                 zip_.write(
@@ -303,6 +303,9 @@ def download_doc(request, id_app_number, id_cead_doc):
 
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
 def download_selection(request, id_app_number):
+    """Инициирует загрузку выписки по охранному документу."""
+    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0)
+
     # Создание заказа
     order = OrderService(
         # user=request.user,
@@ -319,8 +322,14 @@ def download_selection(request, id_app_number):
     order_id = order.id
     order = get_completed_order(order_id)
     if order:
-        import json
-        json.loads(order.external_doc_body)
-        return FileResponse(order.external_doc_body, content_type='application/json')
+        # Формирование выписки
+        file_stream = create_selection(json.loads(order.external_doc_body), request.GET)
+
+        return FileResponse(
+            file_stream,
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            as_attachment=True,
+            filename=f"{app.registration_number}.docx"
+        )
     else:
         return HttpResponseServerError('Помилка сервісу видачі документів.')

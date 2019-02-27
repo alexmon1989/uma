@@ -6,8 +6,10 @@ django-pyodbc-azure==2.1.0.0
 elasticsearch==6.3.1
 elasticsearch-dsl==6.2.1
 ipaddress==1.0.22
+lxml==4.3.1
 pyodbc==4.0.24
 python-dateutil==2.7.5
+python-docx==0.8.10
 pytz==2018.7
 six==1.11.0
 sqlparse==0.2.4

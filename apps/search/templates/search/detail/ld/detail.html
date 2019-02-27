@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-md-3 g-mb-20">
                 <!-- Nav tabs -->
-                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav g-mb-20"
+                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav g-mb-40"
                     role="tablist"
                     data-target="nav-1-1-primary-ver"
                     data-tabs-mobile-type="slide-up-down"
@@ -79,7 +79,7 @@
 
                 {% if hit.search_data.obj_state == 2 %}
                     {% if request.user.is_superuser or request.user|has_group:"Посадовці (чиновники)" %}
-                        {% include 'search/detail/ld/_partials/selection.html' %}
+                        {% include 'search/detail/ld/_partials/selection_form.html' %}
                     {% endif %}
                 {% endif %}
             </div>
