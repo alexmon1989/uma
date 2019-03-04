@@ -4,6 +4,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from .models import ObjType, InidCodeSchedule, OrderService
 from docx import Document
+from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
@@ -364,6 +365,15 @@ def create_selection(data_from_json, params):
                     row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
                     row_cells[1].paragraphs[0].space_after = 0
                     row_cells[1].paragraphs[0].space_before = 0
+                    if i == len(comments) - 1:
+                        set_cell_border(
+                            row_cells[1],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
+                        set_cell_border(
+                            row_cells[0],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
             document.add_paragraph()
 
     if params.get('collections') and data['collections_comment'] and len(data['collections']) > 0:
@@ -374,6 +384,53 @@ def create_selection(data_from_json, params):
         run.bold = True
         run.font.name = 'Times New Roman CYR'
         run.font.size = Pt(12)
+
+        for collection in data['collections']:
+            res = dict()
+            for key, value in collection.items():
+                if key != 'Summs':
+                    res[key] = value
+                else:
+                    res_summs = dict()
+                    summs = value[0]
+                    for key_summs, value_summs in summs.items():
+                        if key_summs != 'Payments':
+                            res_summs[key_summs] = value_summs
+                        else:
+                            payments = value_summs[0]
+                            payments.pop('nope', None)
+                            res_summs.update(payments)
+                    res.update(res_summs)
+
+            item_values = list(res.values())
+            comments = item_values[::2]
+            values = item_values[1::2]
+            table = document.add_table(rows=0, cols=2)
+            for i in range(len(comments)):
+                if comments[i] != '' and values[i] != '':
+                    row = table.add_row()
+                    row_cells = row.cells
+                    row_cells[0].text = comments[i]
+                    row_cells[0].paragraphs[0].runs[0].font.bold = True
+                    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[0].paragraphs[0].space_after = 0
+                    row_cells[0].paragraphs[0].space_before = 0
+                    row_cells[1].text = values[i]
+                    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman CYR'
+                    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+                    row_cells[1].paragraphs[0].space_after = 0
+                    row_cells[1].paragraphs[0].space_before = 0
+                    if i == len(comments) - 1:
+                        set_cell_border(
+                            row_cells[1],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
+                        set_cell_border(
+                            row_cells[0],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
+            document.add_paragraph()
 
     if params.get('letters') and data['documents_comment'] and len(data['documents']) > 0:
         paragraph = document.add_paragraph()
@@ -403,6 +460,15 @@ def create_selection(data_from_json, params):
                     row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
                     row_cells[1].paragraphs[0].space_after = 0
                     row_cells[1].paragraphs[0].space_before = 0
+                    if i == len(comments) - 1:
+                        set_cell_border(
+                            row_cells[1],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
+                        set_cell_border(
+                            row_cells[0],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
             document.add_paragraph()
 
     if params.get('another') and data['publications_comment'] and len(data['publications']) > 0:
@@ -433,6 +499,15 @@ def create_selection(data_from_json, params):
                     row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
                     row_cells[1].paragraphs[0].space_after = 0
                     row_cells[1].paragraphs[0].space_before = 0
+                    if i == len(comments) - 1:
+                        set_cell_border(
+                            row_cells[1],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
+                        set_cell_border(
+                            row_cells[0],
+                            bottom={"sz": 12, "color": "#000000", "val": "single"},
+                        )
             document.add_paragraph()
 
     paragraph = document.add_paragraph()
@@ -476,3 +551,43 @@ def create_selection(data_from_json, params):
     file_stream.seek(0)
 
     return file_stream
+
+
+def set_cell_border(cell, **kwargs):
+    """
+    Set cell`s border
+    Usage:
+
+    set_cell_border(
+        cell,
+        top={"sz": 12, "val": "single", "color": "#FF0000", "space": "0"},
+        bottom={"sz": 12, "color": "#00FF00", "val": "single"},
+        start={"sz": 24, "val": "dashed", "shadow": "true"},
+        end={"sz": 12, "val": "dashed"},
+    )
+    """
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+
+    # check for tag existnace, if none found, then create one
+    tcBorders = tcPr.first_child_found_in("w:tcBorders")
+    if tcBorders is None:
+        tcBorders = OxmlElement('w:tcBorders')
+        tcPr.append(tcBorders)
+
+    # list over all available tags
+    for edge in ('start', 'top', 'end', 'bottom', 'insideH', 'insideV'):
+        edge_data = kwargs.get(edge)
+        if edge_data:
+            tag = 'w:{}'.format(edge)
+
+            # check for tag existnace, if none found, then create one
+            element = tcBorders.find(qn(tag))
+            if element is None:
+                element = OxmlElement(tag)
+                tcBorders.append(element)
+
+            # looks like order of attributes is important
+            for key in ["sz", "val", "color", "space", "shadow"]:
+                if key in edge_data:
+                    element.set(qn('w:{}'.format(key)), str(edge_data[key]))
