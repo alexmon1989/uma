@@ -265,7 +265,7 @@ def get_completed_order(order_id, attempts=10, timeout=2):
             time.sleep(timeout)
 
 
-def create_selection(data_from_json, params):
+def create_selection_inv_um_ld(data_from_json, params):
     """Формирует документ ворд в BytesIO"""
     data = dict()
     data['category'] = data_from_json.pop('Category', None)
@@ -591,3 +591,444 @@ def set_cell_border(cell, **kwargs):
             for key in ["sz", "val", "color", "space", "shadow"]:
                 if key in edge_data:
                     element.set(qn('w:{}'.format(key)), str(edge_data[key]))
+
+
+def get_data_for_selection_tm(hit):
+    """Возвращает данные для выписки по знаку для товаров и услуг"""
+    data = dict()
+    data['biblio'] = dict()
+    # (111) Номер реєстрації знака, який є номером свідоцтва
+    data['biblio']['i_111'] = {
+        'key': '111',
+        'value': hit.search_data.protective_doc_number,
+    }
+    # (151) Дата реєстрації знака
+    data['biblio']['i_151'] = {
+        'key': '151',
+        'value': datetime.datetime.strptime(hit.search_data.rights_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+    }
+    # (181) Очікувана дата закінчення строку дії свідоцтва
+    data['biblio']['i_181'] = {
+        'key': '181',
+        'value': datetime.datetime.strptime(hit.TradeMark.TrademarkDetails.ExpiryDate, '%Y-%m-%d').strftime('%d.%m.%Y')
+    }
+    # (210) Номер заявки
+    data['biblio']['i_210'] = {
+        'key': '210',
+        'value': hit.search_data.app_number
+    }
+    # (220) Дата подання заявки
+    data['biblio']['i_220'] = {
+        'key': '220',
+        'value': datetime.datetime.strptime(hit.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+    }
+    # (450) Бюлетень
+    data['biblio']['i_450'] = {
+        'key': '450',
+        'value': f"{hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationDate}. "
+                 f"Бюл. {hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier}"
+    }
+    # (591) зазначення кольору чи поєднання кольорів, які охороняються
+    data['biblio']['i_591'] = {
+        'key': '591',
+        'value': []
+    }
+    try:
+        for color in hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText:
+            data['biblio']['i_591']['value'].append(color['#text'])
+    except AttributeError:
+        pass
+
+    # (732) Ім'я або повне найменування та адреса власника (власників) свідоцтва
+    data['biblio']['i_732'] = {
+        'key': '732',
+        'value': []
+    }
+    for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder:
+        data['biblio']['i_732']['value'].append(
+            {
+                'name': holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine,
+                'address': holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine
+            }
+        )
+    # (511) Індекс (індекси) Міжнародної класифікації товарів і послуг для реєстрації знаків та перелік товарів і послуг
+    data['biblio']['i_511'] = {
+        'key': '511',
+        'value': []
+    }
+    for cls in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
+        data['biblio']['i_511']['value'].append(
+            {
+                'cls': cls.ClassNumber,
+                'terms': '; '.join([term.ClassificationTermText for term in cls.ClassificationTermDetails.ClassificationTerm])
+            }
+        )
+    # (540) Зображення знака
+    splitted_path = hit.Document.filesPath.replace("\\", "/").split('/')
+    splitted_path_len = len(splitted_path)
+    data['biblio']['i_540'] = {
+        'key': '540',
+        'value': f"{settings.MEDIA_ROOT}"
+                 f"{splitted_path[splitted_path_len-4]}/"
+                 f"{splitted_path[splitted_path_len-3]}/"
+                 f"{splitted_path[splitted_path_len-2]}/"
+                 f"{hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename}"
+    }
+
+    data['transactions'] = []
+    try:
+        data['transactions'] = hit.TradeMark.Transactions.Transaction
+    except AttributeError:
+        pass
+
+    data['signer'] = {
+        'post': 'Державний секретар Міністерства економічного розвитку і торгівлі України',
+        'name': 'О.Ю.Перевезенцев'
+    }
+
+    return data
+
+
+def create_selection_tm(data, params):
+    """Формирует документ ворд в BytesIO"""
+    # Формирование выписки
+    document = Document('selection_templates/template.docx')
+
+    sections = document.sections
+    for section in sections:
+        section.top_margin = Cm(2)
+        section.bottom_margin = Cm(2.5)
+        section.left_margin = Cm(3)
+        section.right_margin = Cm(1.5)
+        header = section.header
+        paragraph = header.paragraphs[0]
+        paragraph.text = data['biblio']['i_111']['value']
+        paragraph.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    paragraph = document.paragraphs[0]
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = 0
+    paragraph_format.space_before = 0
+    run = paragraph.add_run('Виписка')
+    run.bold = True
+    run.font.name = 'Arial'
+    run.font.size = Pt(14)
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = 0
+    paragraph_format.space_before = 0
+    run = paragraph.add_run("з Державного реєстру свідоцтв України")
+    run.font.name = 'Arial'
+    run.font.size = Pt(12)
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = 0
+    paragraph_format.space_before = 0
+    run = paragraph.add_run("на знаки для товарів та послуг відносно свідоцтва № ")
+    run.font.name = 'Arial'
+    run.font.size = Pt(12)
+    run = paragraph.add_run(data['biblio']['i_111']['value'])
+    run.bold = True
+    run.font.name = 'Arial'
+    run.font.size = Pt(12)
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph_format.space_after = Pt(18)
+    paragraph_format.space_before = 0
+    now = datetime.datetime.now()
+    now = now.strftime("%d.%m.%Y")
+    run = paragraph.add_run(f"станом на {now} р.")
+    run.font.name = 'Arial'
+    run.font.size = Pt(12)
+
+    # Библиография
+    table = document.add_table(rows=0, cols=2)
+    row_cells = table.add_row().cells
+    table.cell(0, 0).width = Cm(20)
+    for key, value in data['biblio'].items():
+        if value['key'] not in ('540', '511') and value['value']:
+            if value['key'] == '111':
+                paragraph = row_cells[0].paragraphs[0]
+            else:
+                paragraph = row_cells[0].add_paragraph()
+            paragraph_format = paragraph.paragraph_format
+            paragraph_format.space_after = 0
+            paragraph_format.space_before = 0
+            paragraph_format = paragraph.paragraph_format
+            paragraph_format.first_line_indent = Cm(-1.5)
+            paragraph_format.left_indent = Cm(1.5)
+            run = paragraph.add_run(f"({value['key']})\t")
+            run.font.size = Pt(12)
+            run.font.name = 'Times New Roman'
+            run.bold = True
+            if value['key'] == '591':
+                run = paragraph.add_run(', '.join(value['value']))
+            elif value['key'] == '732':
+                for i in range(len(value['value'])):
+                    if i > 0:
+                        paragraph = row_cells[0].add_paragraph()
+                        paragraph_format = paragraph.paragraph_format
+                        paragraph_format.left_indent = Cm(1.5)
+                        paragraph_format.space_after = 0
+                        paragraph_format.space_before = 0
+                    run = paragraph.add_run(f"{value['value'][i]['name']};")
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(12)
+                    run.bold = True
+                    paragraph = row_cells[0].add_paragraph()
+                    paragraph_format = paragraph.paragraph_format
+                    paragraph_format.left_indent = Cm(1.5)
+                    paragraph_format.space_after = 0
+                    paragraph_format.space_before = 0
+                    run = paragraph.add_run(f"{value['value'][i]['address']}")
+                    run.font.size = Pt(12)
+                    run.font.name = 'Times New Roman'
+                    run.bold = True
+            else:
+                run = paragraph.add_run(f"{value['value']}")
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            if value['key'] in ('111', '151'):
+                run.bold = True
+
+    paragraph = row_cells[1].paragraphs[0]
+    run = paragraph.add_run('(540)')
+    run.font.size = Pt(12)
+    run.font.name = 'Times New Roman'
+    run.bold = True
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_after = Cm(1.5)
+    paragraph_format.space_before = 0
+    paragraph = row_cells[1].add_paragraph()
+    run = paragraph.add_run()
+    run.add_picture(data['biblio']['i_540']['value'], width=Cm(5))
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_after = 0
+    paragraph_format.space_before = 0
+    paragraph_format.first_line_indent = Cm(-1.5)
+    paragraph_format.left_indent = Cm(1.5)
+    run = paragraph.add_run("(511)")
+    run.font.size = Pt(12)
+    run.font.name = 'Times New Roman'
+    run.bold = True
+
+    for i_511 in data['biblio']['i_511']['value']:
+        paragraph = document.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph_format = paragraph.paragraph_format
+        paragraph_format.space_after = 0
+        paragraph_format.space_before = 0
+        paragraph_format.first_line_indent = Cm(-1.5)
+        paragraph_format.left_indent = Cm(1.5)
+        run = paragraph.add_run(f"Кл. {i_511['cls']}:\t")
+        run.font.size = Pt(10)
+        run.font.name = 'Times New Roman'
+        run = paragraph.add_run(i_511['terms'])
+        run.font.size = Pt(12)
+        run.font.name = 'Times New Roman'
+
+    # Сповіщення
+    if params.get('transactions') and len(data['transactions']) > 0:
+        for transaction in data['transactions']:
+            paragraph = document.add_paragraph()
+            paragraph_format = paragraph.paragraph_format
+            paragraph_format.space_before = Cm(0.5)
+            paragraph_format.left_indent = Cm(1.5)
+            run = paragraph.add_run(transaction['@name'])
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            run.bold = True
+            run.underline = True
+
+            # тип лицензии в заголовке оповещения
+            try:
+                license_kind = 'Невиключна' if transaction.TransactionBody.LicenceKind == 'Nonexclusive' else 'Виключна'
+                run = paragraph.add_run(f" ({license_kind} ліцензія)")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run.underline = True
+            except AttributeError:
+                pass
+
+            # "рішення №" в заголовке оповещения
+            try:
+                run = paragraph.add_run(f", рішення № {transaction.TransactionBody.DecisionDetails.Decision.Number}")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run.underline = True
+            except AttributeError:
+                pass
+
+            # 141
+            try:
+                termination_date = transaction.TransactionBody.TerminationDate
+                termination_date = datetime.datetime.strptime(termination_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                paragraph = document.add_paragraph()
+                paragraph_format = paragraph.paragraph_format
+                paragraph_format.space_before = 0
+                paragraph_format.space_after = 0
+                paragraph_format.left_indent = Cm(1.5)
+                paragraph_format.first_line_indent = Cm(-1.5)
+                run = paragraph.add_run('(141)')
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run = paragraph.add_run(f"\t{termination_date}")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+            except AttributeError:
+                pass
+
+            # 186
+            prolongation_expiry_date = None
+            try:
+                prolongation_expiry_date = transaction.TransactionBody.ProlongationExpiryDate
+                prolongation_expiry_date = datetime.datetime.strptime(prolongation_expiry_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                paragraph = document.add_paragraph()
+                paragraph_format = paragraph.paragraph_format
+                paragraph_format.space_before = 0
+                paragraph_format.space_after = 0
+                paragraph_format.left_indent = Cm(1.5)
+                paragraph_format.first_line_indent = Cm(-1.5)
+                run = paragraph.add_run('(186)')
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run = paragraph.add_run(f"\t{prolongation_expiry_date}")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+            except AttributeError:
+                pass
+
+            # 450
+            try:
+                bulletin_date = transaction['@bulletinDate']
+                bulletin_date = datetime.datetime.strptime(bulletin_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                bulletin_number = transaction['@bulletinNumber']
+                paragraph = document.add_paragraph()
+                paragraph_format = paragraph.paragraph_format
+                paragraph_format.space_before = 0
+                paragraph_format.space_after = 0
+                paragraph_format.left_indent = Cm(1.5)
+                paragraph_format.first_line_indent = Cm(-1.5)
+                run = paragraph.add_run('(450)')
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run = paragraph.add_run(f"\t{bulletin_date}. Бюл. № {bulletin_number}")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+            except AttributeError:
+                pass
+
+            # 580
+            if not prolongation_expiry_date:
+                try:
+                    bulletin_date = transaction['@bulletinDate']
+                    bulletin_date = datetime.datetime.strptime(bulletin_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                    paragraph = document.add_paragraph()
+                    paragraph_format = paragraph.paragraph_format
+                    paragraph_format.space_before = 0
+                    paragraph_format.space_after = 0
+                    paragraph_format.left_indent = Cm(1.5)
+                    paragraph_format.first_line_indent = Cm(-1.5)
+                    run = paragraph.add_run('(580)')
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(12)
+                    run.bold = True
+                    run = paragraph.add_run(f"\t{bulletin_date}")
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(12)
+                    run.bold = True
+                except AttributeError:
+                    pass
+
+            # 732
+            holder = None
+            try:
+                holder = transaction.TransactionBody.HolderDetails.NewHolder
+            except AttributeError:
+                try:
+                    holder = transaction.TransactionBody.HolderDetails.Holder
+                except AttributeError:
+                    pass
+            finally:
+                if holder:
+                    paragraph = document.add_paragraph()
+                    paragraph_format = paragraph.paragraph_format
+                    paragraph_format.space_before = 0
+                    paragraph_format.space_after = 0
+                    paragraph_format.left_indent = Cm(1.5)
+                    paragraph_format.first_line_indent = Cm(-1.5)
+                    run = paragraph.add_run('(732)\t')
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(12)
+                    run.bold = True
+                    for i in range(len(holder)):
+                        if i > 0:
+                            paragraph = document.add_paragraph()
+                            paragraph_format = paragraph.paragraph_format
+                            paragraph_format.left_indent = Cm(1.5)
+                            paragraph_format.space_after = 0
+                            paragraph_format.space_before = 0
+                        run = paragraph.add_run(f"{holder[i].ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine};")
+                        run.font.name = 'Times New Roman'
+                        run.font.size = Pt(12)
+                        run.bold = True
+                        paragraph = document.add_paragraph()
+                        paragraph_format = paragraph.paragraph_format
+                        paragraph_format.left_indent = Cm(1.5)
+                        paragraph_format.space_after = 0
+                        paragraph_format.space_before = 0
+                        run = paragraph.add_run(f"{holder[i].ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine} "
+                                                f"({holder[i].ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode})")
+                        run.font.size = Pt(12)
+                        run.font.name = 'Times New Roman'
+                        run.bold = True
+
+    # Подпись
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_before = Pt(12)
+    table = document.add_table(rows=0, cols=2)
+    row_cells = table.add_row().cells
+    row_cells[0].text = data['signer']['post']
+    row_cells[0].paragraphs[0].runs[0].font.bold = True
+    row_cells[0].paragraphs[0].runs[0].font.name = 'Times New Roman'
+    row_cells[0].paragraphs[0].runs[0].font.size = Pt(12)
+    row_cells[0].paragraphs[0].space_after = 0
+    row_cells[0].paragraphs[0].space_before = 0
+    row_cells[1].text = data['signer']['name']
+    row_cells[1].paragraphs[0].runs[0].font.name = 'Times New Roman'
+    row_cells[1].paragraphs[0].runs[0].font.bold = True
+    row_cells[1].paragraphs[0].runs[0].font.size = Pt(12)
+    row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    row_cells[1].vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
+    row_cells[1].paragraphs[0].space_after = 0
+    row_cells[1].paragraphs[0].space_before = 0
+
+    paragraph = document.add_paragraph()
+    paragraph_format = paragraph.paragraph_format
+    paragraph_format.space_before = Pt(18)
+    run = paragraph.add_run('М.П.')
+    run.font.name = 'Times New Roman'
+    run.bold = True
+    run.font.size = Pt(12)
+
+    file_stream = io.BytesIO()
+    document.save(file_stream)
+    file_stream.seek(0)
+
+    return file_stream

@@ -125,7 +125,7 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(186) Очікувана дата закінчення строку продовження дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalInvalidationByCourt' %}

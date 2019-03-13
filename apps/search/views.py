@@ -10,7 +10,8 @@ from django.contrib.admin.views.decorators import user_passes_test
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results, extend_doc_flow, get_completed_order, create_selection)
+                    filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
+                    get_data_for_selection_tm, create_selection_tm)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -302,9 +303,9 @@ def download_doc(request, id_app_number, id_cead_doc):
 
 
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
-def download_selection(request, id_app_number):
-    """Инициирует загрузку выписки по охранному документу."""
-    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0)
+def download_selection_inv_um_ld(request, id_app_number):
+    """Инициирует загрузку выписки по охранному документу для изобретений, полезных моделей, топографий."""
+    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
 
     # Создание заказа
     order = OrderService(
@@ -323,7 +324,7 @@ def download_selection(request, id_app_number):
     order = get_completed_order(order_id)
     if order:
         # Формирование выписки
-        file_stream = create_selection(json.loads(order.external_doc_body), request.GET)
+        file_stream = create_selection_inv_um_ld(json.loads(order.external_doc_body), request.GET)
 
         return FileResponse(
             file_stream,
@@ -333,3 +334,33 @@ def download_selection(request, id_app_number):
         )
     else:
         return HttpResponseServerError('Помилка сервісу видачі документів.')
+
+
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
+def download_selection_tm(request, id_app_number):
+    """Инициирует загрузку выписки по охранному документу для знаков для товаров и услуг."""
+    # Формирование поискового запроса ElasticSearch
+    client = Elasticsearch(settings.ELASTIC_HOST)
+    q = Q(
+        'bool',
+        must=[
+            Q('match', _id=id_app_number),
+            Q('match', Document__Status=3),
+            Q('match', search_data__obj_state=2),
+            Q('match', Document__idObjType=4),
+        ],
+    )
+    s = Search().using(client).query(q).execute()
+    if s:
+        hit = s[0]
+        data = get_data_for_selection_tm(hit)
+        file_stream = create_selection_tm(data, request.GET)
+
+        return FileResponse(
+            file_stream,
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            as_attachment=True,
+            filename=f"{hit.search_data.protective_doc_number}.docx"
+        )
+    else:
+        raise Http404("Об'єкт не знайдено")
