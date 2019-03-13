@@ -862,7 +862,21 @@ def create_selection_tm(data, params):
 
             # "рішення №" в заголовке оповещения
             try:
-                run = paragraph.add_run(f", рішення № {transaction.TransactionBody.DecisionDetails.Decision.Number}")
+                decision_number = transaction.TransactionBody.DecisionDetails.Decision.Number
+                decision_number = decision_number.replace('№ ', '').replace('№', '')
+                run = paragraph.add_run(f", рішення № {decision_number}")
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                run.bold = True
+                run.underline = True
+            except AttributeError:
+                pass
+
+            # "від " в заголовке оповещения
+            try:
+                decision_date = transaction.TransactionBody.DecisionDetails.Decision.Date
+                decision_date = datetime.datetime.strptime(decision_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                run = paragraph.add_run(f" від {decision_date}")
                 run.font.name = 'Times New Roman'
                 run.font.size = Pt(12)
                 run.bold = True
