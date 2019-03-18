@@ -33,6 +33,7 @@ urlpatterns += i18n_patterns(
     path('about/', include('apps.about.urls')),
     path('help/', include('apps.help.urls')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

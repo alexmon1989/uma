@@ -1,3 +1,5 @@
 from django.contrib import admin
+from singlemodeladmin import SingleModelAdmin
+from .models import About
 
-# Register your models here.
+admin.site.register(About, SingleModelAdmin)
