@@ -39,7 +39,9 @@ class Command(BaseCommand):
         try:
             f = open(json_path, 'r', encoding='utf16')
             try:
-                data = json.loads(f.read())
+                file_content = str.encode(f.read())
+                file_content = file_content.replace(b'\xef\xbb\xbf', b'')
+                data = json.loads(file_content)
             except json.decoder.JSONDecodeError as e:
                 self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
                 IndexationError.objects.create(
@@ -254,6 +256,76 @@ class Command(BaseCommand):
                 # Пометка в БД что этот документ проиндексирован
                 IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
+    def process_id(self, doc):
+        """Добавляет документ типа "пром. образец" ElasticSearch."""
+        # Получает данные для загрузки из файла JSON
+        data = self.get_data_from_json(doc)
+
+        res = {}
+        if data is not None:
+            # Секция Document
+            res['Document'] = data.get('Document')
+
+            # Секция Design
+            res['Design'] = data.get('Design')
+
+            # Случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию Design
+            if data.get('PaymentDetails'):
+                res['Design']['PaymentDetails'] = data.get('PaymentDetails')
+            if data.get('DocFlow'):
+                res['Design']['DocFlow'] = data.get('DocFlow')
+            if data.get('PaymentDetails'):
+                res['Design']['Transactions'] = data.get('Transactions')
+
+            applicant = None
+            if res['Design']['DesignDetails'].get('ApplicantDetails'):
+                applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                 'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                             res['Design']['DesignDetails']['ApplicantDetails']['Applicant']]
+
+            # Поисковые данные (для сортировки и т.д.)
+            res['search_data'] = {
+                'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
+                'app_number': res['Design']['DesignDetails'].get('ApplicationNumber'),
+                'app_date': res['Design']['DesignDetails'].get('ApplicationDate'),
+                'protective_doc_number': res['Design']['DesignDetails'].get('RegistrationNumber'),
+                'rights_date': res['Design']['DesignDetails'].get('RegistrationDate'),
+                'applicant': applicant,
+
+                'inventor': [x['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['Design']['DesignDetails']['DesignerDetails']['Designer']]
+                if res['Design']['DesignDetails'].get('DesignerDetails') else None,
+
+                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['Design']['DesignDetails']['HolderDetails']['Holder']]
+                if res['Design']['DesignDetails'].get('HolderDetails') else None,
+
+                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['Design']['DesignDetails']['RepresentativeDetails']['Representative']]
+                if res['Design']['DesignDetails'].get('RepresentativeDetails') else None,
+
+                'title': res['Design']['DesignDetails'].get('DesignTitle')
+            }
+
+            # Запись в индекс
+            try:
+                self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
+            except elasticsearch_exceptions.RequestError as e:
+                json_path = self.get_json_path(doc)
+                self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
+                IndexationError.objects.create(
+                    app_id=doc['id'],
+                    type='ElasticSearch RequestError',
+                    text=e,
+                    json_path=json_path
+                )
+            else:
+                # Пометка в БД что этот документ проиндексирован
+                IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
         self.es = Elasticsearch()
@@ -275,5 +347,8 @@ class Command(BaseCommand):
             # Знаки для товаров и услуг
             elif doc['obj_type_id'] == 4:
                 self.process_tm(doc)
+            # Пром. образцы
+            elif doc['obj_type_id'] == 6:
+                self.process_id(doc)
 
         self.stdout.write(self.style.SUCCESS('Finished'))
