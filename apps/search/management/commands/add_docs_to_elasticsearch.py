@@ -286,10 +286,10 @@ class Command(BaseCommand):
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
-                'app_number': res['Design']['DesignDetails'].get('ApplicationNumber'),
-                'app_date': res['Design']['DesignDetails'].get('ApplicationDate'),
+                'app_number': res['Design']['DesignDetails'].get('DesignApplicationNumber'),
+                'app_date': res['Design']['DesignDetails'].get('DesignApplicationDate'),
                 'protective_doc_number': res['Design']['DesignDetails'].get('RegistrationNumber'),
-                'rights_date': res['Design']['DesignDetails'].get('RegistrationDate'),
+                'rights_date': res['Design']['DesignDetails'].get('RecordEffectiveDate'),
                 'applicant': applicant,
 
                 'inventor': [x['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
@@ -304,7 +304,8 @@ class Command(BaseCommand):
 
                 'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                               'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
-                          res['Design']['DesignDetails']['RepresentativeDetails']['Representative']]
+                          res['Design']['DesignDetails']['RepresentativeDetails']['Representative']
+                          if x.get('RepresentativeAddressBook')]
                 if res['Design']['DesignDetails'].get('RepresentativeDetails') else None,
 
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
@@ -349,6 +350,7 @@ class Command(BaseCommand):
                 self.process_tm(doc)
             # Пром. образцы
             elif doc['obj_type_id'] == 6:
+                print(doc['files_path'])
                 self.process_id(doc)
 
         self.stdout.write(self.style.SUCCESS('Finished'))
