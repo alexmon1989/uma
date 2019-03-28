@@ -350,7 +350,6 @@ class Command(BaseCommand):
                 self.process_tm(doc)
             # Пром. образцы
             elif doc['obj_type_id'] == 6:
-                print(doc['files_path'])
                 self.process_id(doc)
 
         self.stdout.write(self.style.SUCCESS('Finished'))

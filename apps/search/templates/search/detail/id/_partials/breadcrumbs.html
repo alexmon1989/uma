@@ -1,0 +1,33 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load uma_extras %}
+
+<section
+        class="gradient g-bg-size-cover g-bg-pos-center g-bg-cover g-bg-black-opacity-0_1--after g-color-white g-py-50"
+        style="background-image: url({% static 'img/bg/bg-1.jpg' %});">
+    <div class="container g-bg-cover__inner">
+        <div class="d-sm-flex">
+            <div class="align-self-center">
+                <h1 class="h3 g-font-weight-300 w-100 g-mb-10 g-mb-0--md">
+                    {{ hit.search_data.title }}
+                </h1>
+
+                <div class="g-mt-5 g-color-white-opacity-0_9 g-font-size-13">
+                    {% trans "Заявка на знак для товарів та послуг" %}
+                </div>
+            </div>
+
+            <div class="align-self-center ml-auto">
+                <ul class="u-list-inline">
+                    <li class="list-inline-item g-mr-5">
+                        <a class="u-link-v5 g-color-white g-color-primary--hover" href="/">{% trans "Головна" %}</a>
+                        <i class="g-color-gray-light-v2 g-ml-5">/</i>
+                    </li>
+                    <li class="list-inline-item g-color-white-opacity-0_7">
+                        <span>{% trans "Заявка №" %} {{ hit.search_data.app_number }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

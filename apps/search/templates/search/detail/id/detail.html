@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load search_extras %}
+{% load uma_extras %}
+{% load i18n %}
+
+{% block title %}{% trans "Детальна інформація по об'єкту" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'search/detail/id/_partials/breadcrumbs.html' %}
+
+    <div class="container g-min-height-200 g-py-20 g-py-70--lg">
+        <div class="row">
+            <div class="col-md-3 g-mb-20">
+                <!-- Nav tabs -->
+                <ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav g-mb-40" role="tablist"
+                    data-target="nav-1-1-primary-ver"
+                    data-tabs-mobile-type="slide-up-down"
+                    data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover active"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--1"
+                           role="tab"
+                        >{% trans "Бібліографічні дані" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--7"
+                           role="tab"
+                        >{% trans "Стан діловодства" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover {% if not hit.Design.Transactions %}disabled{% endif %}"
+                           data-toggle="tab"
+                           href="#nav-1-1-primary-ver--8"
+                           role="tab"
+                        >{% trans "Сповіщення" %}</a>
+                    </li>
+                </ul>
+                <!-- End Nav tabs -->
+            </div>
+
+            <div class="col-md-9">
+                <!-- Tab panes -->
+                <div id="nav-1-1-primary-ver" class="tab-content">
+                    <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                        <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
+
+                        {% if hit.search_data.obj_state == 2 %}
+                            <div class="g-pb-20 d-flex justify-content-between">
+                                {% if hit.Design.DesignDetails.RecordPublicationDetails %}
+                                    <div>
+                                        {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+                                        {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationIdentifier }}</span>
+                                    </div>
+                                {% endif %}
+
+                                <div class="g-font-weight-600 ml-auto"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i>{% trans "Патент зареєстровано" %}</div>
+                            </div>
+                        {% endif %}
+
+                        {% include 'search/detail/id/_partials/blblio_data/biblio.html' %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
+                        <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
+
+                        {% user_can_watch_docs request.user as user_can_watch_docs %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
+                        <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
+
+                    </div>
+                </div>
+                <!-- End Tab panes -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
