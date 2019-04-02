@@ -7,7 +7,7 @@
         <tbody>
         {% if biblio_data.I_11 %}
             <tr>
-                <th>(11) Номер патенту</th>
+                <th>(11) Номер реєстрації, який є номером свідоцтва</th>
                 <td>{{ biblio_data.I_11 }}</td>
             </tr>
         {% endif %}
@@ -90,24 +90,6 @@
                 </td>
             </tr>
         {% endif %}
-
-        <tr>
-            <th>(51) Iндекс МПК</th>
-            <td class="i_51">
-                {% for IPC in biblio_data.IPC %}
-                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
-                        {{ IPC }}
-                        {% if forloop.counter == 2 and not forloop.last %}
-                            &nbsp;<a href="#"
-                                     class="show-all g-font-size-12"
-                                     title="{% trans "Показати всі" %}"
-                        ><i class="fa fa-plus"></i></a>
-                        {% endif %}
-                        {% if not forloop.last %}<br>{% endif %}
-                    </span>
-                {% endfor %}
-            </td>
-        </tr>
 
         {% if biblio_data.I_54 %}
             <tr>
