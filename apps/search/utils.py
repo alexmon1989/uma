@@ -93,6 +93,7 @@ def get_elastic_results(search_groups):
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
                 # Не показывать заявки, по которым выдан охранный документ
                 qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+                qs &= ~Q('query_string', query="_exists_:Claim.I_11")
                 # Показывать только заявки с датой заяки
                 qs &= Q('query_string', query="_exists_:search_data.app_date")
 

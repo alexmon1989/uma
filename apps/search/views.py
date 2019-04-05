@@ -77,13 +77,13 @@ class SimpleListView(TemplateView):
                 if qs is not None:
                     # Не показывать заявки, по которым выдан охранный документ
                     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+                    qs &= ~Q('query_string', query="_exists_:Claim.I_11")
                     # Показывать только заявки с датой заяки
                     qs &= Q('query_string', query="_exists_:search_data.app_date")
 
                     # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
                     # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
-                s = Search(using=client, index='uma').query(qs).sort('_score')
                 # Фильтрация, агрегация
                 s, context['aggregations'] = filter_results(s, self.request)
 
@@ -198,7 +198,10 @@ class ObjectDetailView(TemplateView):
             'bool',
             must=[Q('match', _id=id_app_number)],
             # Не показывать заявки, по которым выдан охранный документ
-            must_not=[Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")]
+            must_not=[
+                Q('query_string', query="Document.Status:3 AND search_data.obj_state:1"),
+                Q('query_string', query="_exists_:Claim.I_11")
+            ]
         )
         s = Search().using(client).query(q).execute()
         if not s:
