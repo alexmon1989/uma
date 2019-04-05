@@ -22,7 +22,7 @@
                     </thead>
 
                     <tbody>
-                    {% for payment in hit.TradeMark.PaymentDetails.Payment %}
+                    {% for payment in hit.Design.PaymentDetails.Payment %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td class="text-center">
@@ -38,7 +38,7 @@
                             </td>
                         </tr>
                     {% endfor %}
-                    {% if hit.TradeMark.PaymentDetails.Payment|length == 0 %}
+                    {% if hit.Design.PaymentDetails.Payment|length == 0 %}
                     <tr>
                         <td colspan="5" class="g-bg-white">
                             {% trans "Платежі відсутні" %}
