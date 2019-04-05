@@ -89,5 +89,6 @@ def documents_count():
     qs = Q('query_string', query="_exists_:search_data.app_date")
     # Только заявки, по которым не выдан патент
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+    qs &= ~Q('query_string', query="_exists_:Claim.I_11")
     s = Search(using=client, index='uma').query(qs)
     return s.count()
