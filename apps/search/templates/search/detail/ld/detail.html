@@ -21,56 +21,63 @@
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover active"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--1"
+                           href="#nav-biblio"
                            role="tab"
                         >{% trans "Бібліографічні дані" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if not biblio_documents.cl %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--2"
+                           href="#nav-cl"
                            role="tab"
                         >{% trans "Формула" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if not biblio_documents.de %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--3"
+                           href="#nav-de"
                            role="tab"
                         >{% trans "Опис" %}</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link g-text-underline--hover {% if not biblio_documents.de_pub %}disabled{% endif %}"
+                           data-toggle="tab"
+                           href="#nav-de_pub"
+                           role="tab"
+                        >{% trans "Опублікований опис" %}</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ua %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--4"
+                           href="#nav-ab_ua"
                            role="tab"
                         >{% trans "Реферат" %} (UA)</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ru %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--5"
+                           href="#nav-ab_ru"
                            role="tab"
                         >{% trans "Реферат" %} (RU)</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_en %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--6"
+                           href="#nav-ab_en"
                            role="tab"
                         >{% trans "Реферат" %} (EN)</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--7"
+                           href="#nav-docs"
                            role="tab"
                         >{% trans "Стан діловодства" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link g-text-underline--hover {% if transactions|length == 0 %}disabled{% endif %}"
                            data-toggle="tab"
-                           href="#nav-1-1-primary-ver--8"
+                           href="#nav-transactions"
                            role="tab"
                         >{% trans "Сповіщення" %}</a>
                     </li>
@@ -87,7 +94,7 @@
             <div class="col-md-9">
                 <!-- Tab panes -->
                 <div id="nav-1-1-primary-ver" class="tab-content">
-                    <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                    <div class="tab-pane fade show active" id="nav-biblio" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
 
                         {% if hit.search_data.obj_state == 2 %}
@@ -100,7 +107,7 @@
                     </div>
 
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--2" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-cl" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Формула" %}</h3>
 
                         {% if biblio_documents.cl %}
@@ -108,7 +115,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--3" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-de" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Опис" %}</h3>
 
                         {% if biblio_documents.de %}
@@ -116,7 +123,15 @@
                         {% endif %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--4" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-de_pub" role="tabpanel">
+                        <h3 class="g-pb-15">{% trans "Опублікований опис" %}</h3>
+
+                        {% if biblio_documents.de_pub %}
+                            {% include 'search/detail/ld/_partials/blblio_data/de_pub.html' %}
+                        {% endif %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-ab_ua" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Реферат (UA)" %}</h3>
 
                         {% if biblio_documents.ab_ua %}
@@ -124,7 +139,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--5" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-ab_ru" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Реферат (RU)" %}</h3>
 
                         {% if biblio_documents.ab_ru %}
@@ -132,7 +147,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--6" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-ab_en" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Реферат (EN)" %}</h3>
 
                         {% if biblio_documents.ab_en %}
@@ -140,7 +155,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-docs" role="tabpanel">
                         <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
 
                         {% user_can_watch_docs request.user as user_can_watch_docs %}
@@ -154,7 +169,7 @@
                         {% include 'search/detail/ld/_partials/state_of_affair/payments.html' %}
                     </div>
 
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-transactions" role="tabpanel">
                         <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
 
                         {% include 'search/detail/ld/_partials/transactions.html' %}

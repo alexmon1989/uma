@@ -201,7 +201,7 @@ class AppDocuments(models.Model):
         """Возвращает словарь документов по номеру заявки."""
         objects = AppDocuments.objects.filter(
             app__id=id_app_number,
-            enter_num__in=(98, 99, 100),
+            enter_num__in=(98, 99, 100, 101),
             file_type='pdf'
         )
         documents = {}
@@ -212,6 +212,9 @@ class AppDocuments(models.Model):
             # Описание
             elif document.enter_num == 99:
                 documents['de'] = document
+            # Описание
+            elif document.enter_num == 101:
+                documents['de_pub'] = document
             else:
                 if 'A_UA' in document.file_name:
                     # Реферат укр.
