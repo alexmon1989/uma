@@ -84,6 +84,9 @@ class SimpleListView(TemplateView):
                     # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
                     # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
 
+                s = Search(using=client, index='uma').query(qs).sort('_score')
+
+
                 # Фильтрация, агрегация
                 s, context['aggregations'] = filter_results(s, self.request)
 
