@@ -43,6 +43,7 @@
 
 <script>
     import IpcCode from './IpcCode.vue';
+    import axios from 'axios';
 
     export default {
         name: "AdvancedSearchForm",
@@ -102,6 +103,22 @@
                     addBtnText: gettext('Додати параметр')
                 }
             }
+        },
+        created() {
+            this.$validator.extend('validQuery', {
+                validate: (value, args) => {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            axios
+                                .get('/search/validate-query/?search_type=advanced&value='
+                                    + value + '&ipc_code=' + args[0]
+                                    + '&obj_type=' + args[1]
+                                    + '&obj_state=' + args[2].join('&obj_state='))
+                                .then(response => resolve(response.data.result));
+                        }, 200);
+                    });
+                }
+            });
         }
     }
 </script>

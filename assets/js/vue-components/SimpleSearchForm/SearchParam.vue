@@ -17,7 +17,7 @@
                             :value="type.id">{{ type.field_label }}
                     </option>
                 </chosen-select>
-                <small class="form-control-feedback" v-if="errors.has('form-' + index + '-param_type')">{{ translations.required_error }}</small>
+                <small class="form-control-feedback" v-if="errors.has('form-' + index + '-param_type')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-param_type')] }}</small>
             </div>
         </div>
         <!-- End Параметр пошуку -->
@@ -32,10 +32,13 @@
                        @focus="autocomplete = 'off'"
                        @blur="autocomplete = 'on'"
                        :name="'form-' + index + '-value'"
-                       v-validate="'required'"
+                       v-validate="{
+                            required: true,
+                            validQuery: paramType
+                       }"
                        v-model="value"
                        :placeholder="translations.value">
-                <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.required_error }}</small>
+                <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
             </div>
         </div>
         <!-- End Значення параметра пошуку -->
@@ -69,7 +72,10 @@
                     selectParameter: gettext('Оберіть параметр пошуку'),
                     value: gettext('Значення'),
                     addBtnText: gettext('Додати параметр'),
-                    required_error: gettext('Обов\'язкове поле для заповнення'),
+                    validationErrors: {
+                        required: gettext('Обов\'язкове поле для заповнення'),
+                        validQuery: gettext('Поле містить невірне значення'),
+                    },
                 },
                 paramType: '',
                 value: '',

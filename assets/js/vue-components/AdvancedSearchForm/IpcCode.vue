@@ -20,7 +20,7 @@
                         >{{ objType.value }}
                         </option>
                     </chosen-select>
-                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_type')">{{ translations.required_error }}</small>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_type')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_type')] }}</small>
                 </div>
                 <!-- END Об'єкт промислової власності -->
 
@@ -42,7 +42,7 @@
                         >{{ objState.value }}
                         </option>
                     </chosen-select>
-                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_state')">{{ translations.required_error }}</small>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_state')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_state')] }}</small>
                 </div>
                 <!-- END Стан об'єкта -->
 
@@ -67,7 +67,7 @@
                         >{{ ipcCode.value }}
                         </option>
                     </chosen-select>
-                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-ipc_code')">{{ translations.required_error }}</small>
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-ipc_code')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-ipc_code')] }}</small>
                 </div>
                 <!-- END Код ІНІД -->
 
@@ -84,8 +84,11 @@
                            :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
                            :autocomplete="autocomplete"
                            :placeholder="translations.value"
-                           v-validate="'required'">
-                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.required_error }}</small>
+                           v-validate="{
+                                required: true,
+                                validQuery: [ipcCode, objType, objState]
+                           }">
+                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
 
                     <div class="d-flex justify-content-around g-pt-5"
                          @focus="valueFocused = true">
@@ -230,6 +233,7 @@
                         'dataTypes': ['date', 'integer']
                     },
                 ],
+                autocomplete: 'on'
             }
         },
         computed: {
@@ -263,7 +267,10 @@
                     objState: gettext('Стан об\'єкта'),
                     ipcCode: gettext('Код ІНІД'),
                     value: gettext('Значення'),
-                    required_error: gettext('Обов\'язкове поле для заповнення'),
+                    validationErrors: {
+                        required: gettext('Обов\'язкове поле для заповнення'),
+                        validQuery: gettext('Поле містить невірне значення'),
+                    },
                 }
             }
 

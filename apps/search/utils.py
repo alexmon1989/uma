@@ -23,7 +23,7 @@ def get_search_groups(search_data):
             'obj_type': obj_type,
             'obj_state': 1,
             'search_params': list(filter(
-                lambda x: x['obj_type'] == obj_type.pk and '1' in x['obj_state'],
+                lambda x: int(x['obj_type']) == obj_type.pk and '1' in x['obj_state'],
                 search_data
             ))
         })
@@ -32,7 +32,7 @@ def get_search_groups(search_data):
             'obj_type': obj_type,
             'obj_state': 2,
             'search_params': list(filter(
-                lambda x: x['obj_type'] == obj_type.pk and '2' in x['obj_state'],
+                lambda x: int(x['obj_type']) == obj_type.pk and '2' in x['obj_state'],
                 search_data
             ))
         })
@@ -46,7 +46,7 @@ def prepare_advanced_query(query, field_type):
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
-    query = query.replace(" ТА ", " AND ").replace(" АБО ", " OR ").replace(" НЕ ", " NOT ")
+    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT")
     return query
 
 

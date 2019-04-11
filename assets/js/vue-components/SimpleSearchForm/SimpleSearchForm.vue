@@ -39,7 +39,8 @@
 </template>
 
 <script>
-    import SearchParam from "./SearchParam.vue"
+    import SearchParam from "./SearchParam.vue";
+    import axios from 'axios';
 
     export default {
         name: "SimpleSearchForm",
@@ -58,7 +59,6 @@
                     value: gettext('Значення'),
                     addBtnText: gettext('Додати параметр'),
                     searchBtnText: gettext('Показати результати'),
-                    required_error: gettext('Обов\'язкове поле для заповнення'),
                 },
 
                 ipcModel: {},
@@ -99,6 +99,20 @@
                 });
             }
         },
+        created() {
+            this.$validator.extend('validQuery', {
+                validate: (value, args) => {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            axios
+                                .get('/search/validate-query/?search_type=simple&value='
+                                    + value + '&param_type=' + args[0])
+                                .then(response => resolve(response.data.result));
+                        }, 200);
+                    });
+                }
+            });
+        }
     }
 </script>
 

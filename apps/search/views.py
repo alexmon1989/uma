@@ -1,14 +1,15 @@
 from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory, ValidationError
-from django.http import Http404, HttpResponseServerError, FileResponse
+from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
+from django.core.exceptions import SuspiciousOperation
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
-from .forms import AdvancedSearchForm, SimpleSearchForm
+from .forms import AdvancedSearchForm, SimpleSearchForm, QueryForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
                     get_data_for_selection_tm, create_selection_tm)
@@ -48,10 +49,9 @@ class SimpleListView(TemplateView):
             context['initial_data'] = dict(formset.data.lists())
 
             # Валидация поисковой формы
-            try:
-                is_valid = formset.is_valid()
-            except ValidationError:
-                raise Http404("Некоректний пошуковий запит.")
+            is_valid = formset.is_valid()
+            if not is_valid:
+                context['formset_errors'] = formset.errors
 
             # Признак того что производится поиск
             context['is_search'] = True
@@ -124,10 +124,9 @@ class AdvancedListView(TemplateView):
             context['initial_data'] = dict(formset.data.lists())
 
             # Валидация поисковой формы
-            try:
-                is_valid = formset.is_valid()
-            except ValidationError:
-                raise Http404("Некоректний пошуковий запит.")
+            is_valid = formset.is_valid()
+            if not is_valid:
+                context['formset_errors'] = formset.errors
 
             # Признак того что производится поиск
             context['is_search'] = True
@@ -372,3 +371,16 @@ def download_selection_tm(request, id_app_number):
         )
     else:
         raise Http404("Об'єкт не знайдено")
+
+
+def validate_query(request):
+    """Проводит валидацию запроса, который идёт в ElasticSearch (для валидации на стороне клиента)"""
+    search_type = request.GET.get('search_type')
+    if search_type == 'simple':
+        form = SimpleSearchForm(request.GET)
+    elif search_type == 'advanced':
+        form = AdvancedSearchForm(request.GET)
+    else:
+        raise SuspiciousOperation("Невірні параметри.")
+
+    return JsonResponse({'result': int(form.is_valid())})

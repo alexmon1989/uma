@@ -17,12 +17,15 @@
             {% endblocktrans %}
         </p>
 
-        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
+        <div class="collapse g-mb-20 {% if not is_search or formset_errors %}show{% endif %}" id="collapseForm">
+            {% if formset_errors %}
+                <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
+            {% endif %}
             <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
                                 v-bind:initial-data="{{ initial_data }}"/>
         </div>
 
-        {% if is_search %}
+        {% if is_search and not formset_errors %}
             {% if results %}
                 <div class="row g-pt-20 g-pb-9">
 
