@@ -29,8 +29,14 @@
             </div>
             <div class="col-md-6 text-center text-md-right g-mb-20 g-mb-0--md">
                 <button type="submit"
+                        :disabled="isFormSubmitting"
                         class="btn btn-md u-btn-blue"
-                ><i class="fa fa-search g-mr-5"></i>{{ translations.searchBtnText }}
+                ><span v-if="isFormSubmitting">
+                    <i class="fa fa-spinner g-mr-5"></i>{{ translations.performingSearch }}
+                </span>
+                    <span v-else>
+                        <i class="fa fa-search g-mr-5"></i>{{ translations.searchBtnText }}
+                    </span>
                 </button>
             </div>
         </div>
@@ -59,11 +65,13 @@
                     value: gettext('Значення'),
                     addBtnText: gettext('Додати параметр'),
                     searchBtnText: gettext('Показати результати'),
+                    performingSearch: gettext('Виконуємо пошук...'),
                 },
 
                 ipcModel: {},
                 valueModel: {},
-                totalForms: 1
+                totalForms: 1,
+                isFormSubmitting: false
             }
         },
         mounted() {
@@ -92,9 +100,12 @@
 
             // Обработчик отправки формы
             handleSubmit: function () {
+                this.isFormSubmitting = true;
                 this.$validator.validate().then(valid => {
                     if (valid) {
                         document.forms[0].submit();
+                    } else {
+                        this.isFormSubmitting = false;
                     }
                 });
             }

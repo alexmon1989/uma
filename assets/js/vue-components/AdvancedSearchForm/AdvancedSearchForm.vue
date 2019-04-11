@@ -32,8 +32,14 @@
             </div>
             <div class="col-md-6 text-center text-md-right g-mb-20 g-mb-0--md">
                 <button type="submit"
+                        :disabled="isFormSubmitting"
                         class="btn btn-md u-btn-blue"
-                ><i class="fa fa-search g-mr-5"></i>{{ translations.searchBtnText }}
+                ><span v-if="isFormSubmitting">
+                    <i class="fa fa-spinner g-mr-5"></i>{{ translations.performingSearch }}
+                </span>
+                    <span v-else>
+                        <i class="fa fa-search g-mr-5"></i>{{ translations.searchBtnText }}
+                    </span>
                 </button>
             </div>
         </div>
@@ -59,7 +65,13 @@
                     {'id': 2, 'value': gettext('Охоронний документ'), 'schedule_types': [3, 4, 5, 6, 7, 8]},
                 ],
                 ipcGroups: [],
-                totalForms: 1
+                totalForms: 1,
+                translations: {
+                    searchBtnText: gettext('Показати результати'),
+                    addBtnText: gettext('Додати параметр'),
+                    performingSearch: gettext('Виконуємо пошук...'),
+                },
+                isFormSubmitting: false
             }
         },
         mounted() {
@@ -86,23 +98,18 @@
 
             // Обработчик отправки формы
             handleSubmit: function () {
+                this.isFormSubmitting = true;
                 this.$validator.validate().then(valid => {
                     if (valid) {
                         document.forms[0].submit();
+                    } else {
+                        this.isFormSubmitting = false;
                     }
                 });
             }
         },
         components: {
             IpcCode
-        },
-        computed: {
-            translations: function () {
-                return {
-                    searchBtnText: gettext('Показати результати'),
-                    addBtnText: gettext('Додати параметр')
-                }
-            }
         },
         created() {
             this.$validator.extend('validQuery', {
