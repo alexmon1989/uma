@@ -13,7 +13,7 @@
         {% csrf_token %}
         <input type="hidden" name="get_params" value="{{ request.GET.urlencode }}">
 
-        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Тип об'єкта" %}</h2>
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Тип" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
 
         <hr class="g-brd-gray-light-v4 g-my-15">
 
@@ -41,7 +41,7 @@
             {% endfor %}
         </div>
 
-        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Стан об'єкта" %}</h2>
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Правовий статус" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
         <hr class="g-brd-gray-light-v4 g-my-15">
         <div class="g-mb-20">
             {% for obj_state in aggregations.obj_state_terms.buckets %}

@@ -75,7 +75,7 @@
 
         {% if hit.Design.DesignDetails.ApplicantDetails.Applicant %}
             <tr>
-                <th>(71) Ім'я або повне найменування та адреса заявника (заявників)</th>
+                <th>(71) {% trans "Ім'я або повне найменування та адреса заявника (заявників)" %}</th>
                 <td class="text-justify">
                     {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
                         {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -91,7 +91,7 @@
 
         {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.DesignerDetails.Designer %}
             <tr>
-                <th>(72) Ім'я автора (авторів)</th>
+                <th>(72) {% trans "Ім'я автора (авторів)" %}</th>
                 <td class="text-justify">
                     {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
                         {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -104,8 +104,7 @@
 
         {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.HolderDetails.Holder %}
             <tr>
-                <th>(73) Ім'я або повне найменування власника (власників) патенту, його адресу та двобуквений код
-                    держави відповідно до стандарту BOIB ST.3
+                <th>(73) {% trans "Ім'я або повне найменування власника (власників) патенту, його адресу та двобуквений код держави відповідно до стандарту BOIB ST.3" %}
                 </th>
                 <td class="text-justify g-font-weight-600">
                     {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
@@ -121,8 +120,7 @@
 
         {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
             <tr>
-                <th>(74) Ім'я та реєстраційний номер представника у справах інтелектуальної власності (патентного
-                    повіреного) або ім'я (повне найменування) іншої довіреної особи
+                <th>(74) {% trans "Ім'я та реєстраційний номер представника у справах інтелектуальної власності (патентного повіреного) або ім'я (повне найменування) іншої довіреної особи" %}
                 </th>
                 <td class="text-justify">
                     {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
@@ -137,7 +135,7 @@
 
         {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.CorrespondenceAddress %}
             <tr>
-                <th>(98) Адреса для листування</th>
+                <th>(98) {% trans "Адреса для листування" %}</th>
                 <td class="text-justify">
                     {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                     <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
@@ -148,7 +146,7 @@
 
         {% if hit.Design.DesignDetails.TotalSpecimen %}
             <tr>
-                <th>(28) Кількість заявлених варіантів</th>
+                <th>(28) {% trans "Кількість заявлених варіантів" %}</th>
                 <td class="text-justify">
                     {{ hit.Design.DesignDetails.TotalSpecimen }}
                 </td>

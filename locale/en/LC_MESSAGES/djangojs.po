@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-26 13:29+0000\n"
+"POT-Creation-Date: 2019-04-11 16:56+0000\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,61 +18,81 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:57
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:64
 msgid "Заявка"
 msgstr "Claim"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:58
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:65
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:102
-#: assets/js/vue-components/SimpleSearchForm.vue:88
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:70
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:67
 msgid "Показати результати"
 msgstr "Show results"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:103
-#: assets/js/vue-components/SimpleSearchForm.vue:87
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:71
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:74
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:66
 msgid "Додати параметр"
 msgstr "Add parameter"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:185
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:72
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:68
+msgid "Виконуємо пошук..."
+msgstr ""
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:196
 msgid "ТА"
 msgstr "AND"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:189
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:200
 msgid "АБО"
 msgstr "OR"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:193
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:204
 msgid "НЕ"
 msgstr "NOT"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:254
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:266
 msgid "Об'єкт промислової власності"
 msgstr "Object of industrial property"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:255
-msgid "Стан об'єкта"
-msgstr "Object state"
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:267
+msgid "Правовий статус ОПВ"
+msgstr ""
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:256
-msgid "Код ІНІД"
-msgstr "IPC code"
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:268
+msgid "Бібліографічні елементи"
+msgstr "Bibliographic elements"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:257
-#: assets/js/vue-components/SimpleSearchForm.vue:86
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:269
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:73
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:65
 msgid "Значення"
 msgstr "Value"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:258
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:271
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:76
 msgid "Обов'язкове поле для заповнення"
 msgstr "Required field"
 
-#: assets/js/vue-components/SimpleSearchForm.vue:84
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:272
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:77
+msgid "Поле містить невірне значення"
+msgstr "The field contains wrong value"
+
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:72
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:64
+msgid "Оберіть параметр пошуку"
+msgstr "Select search parameter"
+
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:63
 msgid "Для початку роботи заповніть форму пошуку"
 msgstr "Fill out the search form to get started"
 
-#: assets/js/vue-components/SimpleSearchForm.vue:85
-msgid "Оберіть параметр пошуку"
-msgstr "Select search parameter"
+#~ msgid "Стан об'єкта"
+#~ msgstr "Object state"
+
+#~ msgid "Код ІНІД"
+#~ msgstr "IPC code"

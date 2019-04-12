@@ -264,8 +264,8 @@
             translations: function () {
                 return {
                     objType: gettext('Об\'єкт промислової власності'),
-                    objState: gettext('Стан об\'єкта'),
-                    ipcCode: gettext('Код ІНІД'),
+                    objState: gettext('Правовий статус ОПВ'),
+                    ipcCode: gettext('Бібліографічні елементи'),
                     value: gettext('Значення'),
                     validationErrors: {
                         required: gettext('Обов\'язкове поле для заповнення'),
@@ -273,7 +273,6 @@
                     },
                 }
             }
-
         },
         watch: {
             ipcCodesFiltered: function (val) {
