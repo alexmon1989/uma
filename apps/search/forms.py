@@ -41,14 +41,15 @@ class SimpleSearchForm(forms.Form):
     def clean(self):
         """Валидация поискового запроса."""
         cleaned_data = super().clean()
-        param = cleaned_data['param_type']
-        query = cleaned_data['value']
-        elastic_field = SimpleSearchField.objects.get(pk=param).elastic_index_field
+        param = cleaned_data.get('param_type')
+        query = cleaned_data.get('value')
+        if param and query:
+            elastic_field = SimpleSearchField.objects.get(pk=param).elastic_index_field
 
-        if not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'simple'):
-            raise forms.ValidationError(
-                "Невірний запит"
-            )
+            if not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'simple'):
+                raise forms.ValidationError(
+                    "Невірний запит"
+                )
 
 
 def get_obj_type_choices():
@@ -75,21 +76,22 @@ class AdvancedSearchForm(forms.Form):
     def clean(self):
         """Валидация поискового запроса."""
         cleaned_data = super().clean()
-        param = cleaned_data['ipc_code']
-        query = cleaned_data['value']
+        param = cleaned_data.get('ipc_code')
+        query = cleaned_data.get('value')
 
-        inid_code_schedule = InidCodeSchedule.objects.filter(
-            ipc_code=param,
-            enable_search=1,
-            elastic_index_field__isnull=False
-        ).first()
-        if inid_code_schedule:
-            elastic_field = inid_code_schedule.elastic_index_field
+        if param and query:
+            inid_code_schedule = InidCodeSchedule.objects.filter(
+                ipc_code=param,
+                enable_search=1,
+                elastic_index_field__isnull=False
+            ).first()
+            if inid_code_schedule:
+                elastic_field = inid_code_schedule.elastic_index_field
 
-        if not inid_code_schedule or not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'advanced'):
-            raise forms.ValidationError(
-                "Невірний запит"
-            )
+            if not inid_code_schedule or not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'advanced'):
+                raise forms.ValidationError(
+                    "Невірний запит"
+                )
 
 
 class QueryForm(forms.Form):
