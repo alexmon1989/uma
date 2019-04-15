@@ -2,7 +2,8 @@ from django import template
 from django.conf import settings
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from ..models import ObjType, IpcAppList
+from ..models import ObjType
+from ..utils import filter_bad_apps
 
 register = template.Library()
 
@@ -85,10 +86,7 @@ def user_can_watch_docs(user):
 def documents_count():
     """Возвращает количество документов доступных для поиска"""
     client = Elasticsearch(settings.ELASTIC_HOST)
-    # Только документы с существующей датой подачи заявки
-    qs = Q('query_string', query="_exists_:search_data.app_date")
-    # Только заявки, по которым не выдан патент
-    qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
-    qs &= ~Q('query_string', query="_exists_:Claim.I_11")
+    qs = Q('query_string', query='*')
+    qs = filter_bad_apps(qs)
     s = Search(using=client, index='uma').query(qs)
     return s.count()

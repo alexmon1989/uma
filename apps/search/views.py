@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from django.db.models import F
-from django.forms import formset_factory, ValidationError
+from django.forms import formset_factory
 from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
@@ -9,10 +9,10 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
 from django.core.exceptions import SuspiciousOperation
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
-from .forms import AdvancedSearchForm, SimpleSearchForm, QueryForm
+from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
-                    get_data_for_selection_tm, create_selection_tm)
+                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -76,10 +76,7 @@ class SimpleListView(TemplateView):
 
                 if qs is not None:
                     # Не показывать заявки, по которым выдан охранный документ
-                    qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
-                    qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-                    # Показывать только заявки с датой заяки
-                    qs &= Q('query_string', query="_exists_:search_data.app_date")
+                    qs = filter_bad_apps(qs)
 
                     # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
                     # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
@@ -199,12 +196,8 @@ class ObjectDetailView(TemplateView):
         q = Q(
             'bool',
             must=[Q('match', _id=id_app_number)],
-            # Не показывать заявки, по которым выдан охранный документ
-            must_not=[
-                Q('query_string', query="Document.Status:3 AND search_data.obj_state:1"),
-                Q('query_string', query="_exists_:Claim.I_11")
-            ]
         )
+        q = filter_bad_apps(q) # Исключение заявок, не пригодных к отображению
         s = Search().using(client).query(q).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")

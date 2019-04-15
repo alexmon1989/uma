@@ -91,11 +91,7 @@ def get_elastic_results(search_groups):
             if qs is not None:
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
-                # Не показывать заявки, по которым выдан охранный документ
-                qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
-                qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-                # Показывать только заявки с датой заяки
-                qs &= Q('query_string', query="_exists_:search_data.app_date")
+                qs = filter_bad_apps(qs)
 
                 # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
                 # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
@@ -152,6 +148,17 @@ def paginate_results(s, page, paginate_by=10):
     except EmptyPage:
         page = paginator.page(paginator.num_pages)
     return page
+
+
+def filter_bad_apps(qs):
+    """Исключает из результатов запроса заявки, по которым выдан патент, а также заявки без даты подачи заявки."""
+    # Не показывать заявки, по которым выдан охранный документ
+    qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
+    qs &= ~Q('query_string', query="_exists_:Claim.I_11")
+    # Показывать только заявки с датой заяки
+    qs &= Q('query_string', query="_exists_:search_data.app_date")
+
+    return qs
 
 
 def filter_results(s, request):
