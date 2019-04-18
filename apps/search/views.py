@@ -232,7 +232,6 @@ class ObjectDetailView(TemplateView):
                 schedule_type__id__gte=3,
                 schedule_type__id__lte=8,
             )
-        print(ipc_fields.query)
         context['ipc_fields'] = ipc_fields
 
         context['id_app_number'] = id_app_number
