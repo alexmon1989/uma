@@ -12,7 +12,7 @@ from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, 
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
-                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps)
+                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps, filter_unpublished_apps)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -77,12 +77,10 @@ class SimpleListView(TemplateView):
                 if qs is not None:
                     # Не показывать заявки, по которым выдан охранный документ
                     qs = filter_bad_apps(qs)
-
-                    # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
-                    # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+                    # Не показывать неопубликованные заявки
+                    # qs = filter_unpublished_apps(self.request.user, qs)
 
                 s = Search(using=client, index='uma').query(qs).sort('_score')
-
 
                 # Фильтрация, агрегация
                 s, context['aggregations'] = filter_results(s, self.request)
@@ -216,6 +214,26 @@ class ObjectDetailView(TemplateView):
             # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
             if self.hit.search_data.obj_state == 2:
                 extend_doc_flow(context['hit'])
+
+        # Видимость полей библиографических данных
+        ipc_fields = InidCodeSchedule.objects.filter(
+            ipc_code__obj_type__id=self.hit.Document.idObjType
+        ).annotate(
+            code_title=F(f"ipc_code__code_value_{context['lang_code']}"),
+            ipc_code_short=F('ipc_code__code_inid')
+        ).values('ipc_code_short', 'code_title', 'enable_view')
+        if self.hit['search_data']['obj_state'] == 1:
+            ipc_fields = ipc_fields.filter(
+                schedule_type__id__gte=9,
+                schedule_type__id__lte=15,
+            )
+        else:
+            ipc_fields = ipc_fields.filter(
+                schedule_type__id__gte=3,
+                schedule_type__id__lte=8,
+            )
+        print(ipc_fields.query)
+        context['ipc_fields'] = ipc_fields
 
         context['id_app_number'] = id_app_number
         return context

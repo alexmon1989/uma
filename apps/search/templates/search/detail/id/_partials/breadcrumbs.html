@@ -13,7 +13,11 @@
                 </h1>
 
                 <div class="g-mt-5 g-color-white-opacity-0_9 g-font-size-13">
-                    {% trans "Заявка на знак для товарів та послуг" %}
+                    {% if hit.search_data.obj_state == 1 %}
+                        {% trans "Заявка на промисловий зразок" %}
+                    {% elif hit.search_data.obj_state == 2 %}
+                        {% trans "Патент України на промисловий зразок" %}
+                    {% endif %}
                 </div>
             </div>
 

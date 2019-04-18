@@ -90,3 +90,12 @@ def documents_count():
     qs = filter_bad_apps(qs)
     s = Search(using=client, index='uma').query(qs)
     return s.count()
+
+
+@register.simple_tag
+def get_field(ipc_code, ipc_fields):
+    """Ищет поле ipc_code в ipc_fields и возвращает его."""
+    for field in ipc_fields:
+        if ipc_code == field['ipc_code_short']:
+            return field
+    return None

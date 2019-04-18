@@ -161,6 +161,12 @@ def filter_bad_apps(qs):
     return qs
 
 
+def filter_unpublished_apps(user, qs):
+    """Исключает из результатов запроса неопубликованные заявки для обычных пользователей."""
+    if user.is_anonymous or not user.is_vip():
+        qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+    return qs
+
 def filter_results(s, request):
     """Фильтрует результат запроса ElasticSearch И выполняет агрегацию для фильтров в сайдбаре."""
     # Агрегация для определения всех типов объектов и состояний

@@ -5,51 +5,59 @@
 <div class="table-responsive">
     <table class="table table-sm table-trade-mark g-font-size-13">
         <tbody>
-        {% if hit.search_data.obj_state == 2 and hit.TradeMark.TrademarkDetails.ApplicationNumber %}
+        {% get_field '111' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationNumber %}
             <tr>
-                <th>(111) Номер реєстрації знака, який є номером свідоцтва</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600 g-font-size-16">{{ hit.TradeMark.TrademarkDetails.RegistrationNumber }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and  hit.TradeMark.TrademarkDetails.RegistrationDate %}
+        {% get_field '151' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.RegistrationDate %}
             <tr>
-                <th>(151) Дата реєстрації знака</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and  hit.TradeMark.TrademarkDetails.ExpiryDate %}
+        {% get_field '181' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ExpiryDate %}
             <tr>
-                <th>(181) Очікувана дата закінчення строку дії свідоцтва</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ExpiryDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.ApplicationNumber %}
+        {% get_field '210' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationNumber %}
             <tr>
-                <th>(210) Номер заявки</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
+
+        {% get_field '220' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationDate %}
             <tr>
-                <th>(220) Дата подання заявки</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
+        {% get_field '531' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
             <tr>
-                <th>(531) Індекс (індекси) Міжнародної класифікації зображальних елементів знака</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+        {% get_field '731' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
             <tr>
-                <th>(731) Ім'я або повне найменування та адреса заявника (заявників)</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                         {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -62,9 +70,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+        {% get_field '732' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
             <tr>
-                <th>(732) Ім'я або повне найменування та адреса власника (власників) свідоцтва</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify g-font-weight-600">
                     {% for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
                         {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -75,9 +84,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
+        {% get_field '740' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
             <tr>
-                <th>(740) Ім'я (повне найменування) та реєстраційний номер представника в справах інтелектуальної власності (патентного повіреного) або іншої довіреної особи</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for representative in hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
                         {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -88,10 +98,10 @@
             </tr>
         {% endif %}
 
-
-        {% if hit.search_data.obj_state == 2 and hit.TradeMark.TrademarkDetails.CorrespondenceAddress %}
+        {% get_field '750' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.CorrespondenceAddress %}
             <tr>
-                <th>(750) Адреса для листування</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine }}
                     <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine }}
@@ -99,9 +109,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
+        {% get_field '540' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
             <tr>
-                <th>(540) Зображення знака</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td>
                     <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
                        href="javascript:;"
@@ -118,9 +129,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+        {% get_field '511.I' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
             <tr>
-                <th>(511) Індекс (індекси) Міжнародної класифікації товарів і послуг для реєстрації знаків та перелік товарів і послуг</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td>
                     {% for cls in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                         <div class="d-flex justify-content-start">
@@ -141,7 +153,6 @@
                 </td>
             </tr>
         {% endif %}
-
         </tbody>
     </table>
 </div>

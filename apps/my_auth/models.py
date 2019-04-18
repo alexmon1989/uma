@@ -68,3 +68,10 @@ class KeyCenter(TimeStampedModel):
         verbose_name = 'АЦСК'
         verbose_name_plural = 'АЦСК'
         ordering = ('title',)
+
+
+def is_vip(self):
+    """Возвращает значение (boolean) того является ли юзер суперадмином или членом группы 'Посадовці (чиновники)'"""
+    return self.is_superuser or self.groups.filter(name='Посадовці (чиновники)').exists()
+
+User.add_to_class('is_vip', is_vip)

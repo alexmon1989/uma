@@ -5,9 +5,11 @@
 <div class="table-responsive">
     <table class="table table-sm table-trade-mark g-font-size-13">
         <tbody>
-        {% if hit.Design.DesignDetails.IndicationProductDetails %}
+
+        {% get_field '51' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.IndicationProductDetails %}
             <tr>
-                <th>(51) {% trans "Індекс (індекси) Міжнародної класифікації промислових зразків" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">
                     {% for i in hit.Design.DesignDetails.IndicationProductDetails %}
                         <span class="g-font-weight-600">{{ i.Class }}{% if not forloop.last %};&nbsp;{% endif %}</span>
@@ -16,66 +18,74 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.RegistrationNumber %}
+        {% get_field '11' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.RegistrationNumber %}
             <tr>
-                <th>(11) {% trans "Номер реєстрації, який є номером патенту" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600 g-font-size-16">{{ hit.Design.DesignDetails.RegistrationNumber }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and  hit.Design.DesignDetails.RecordEffectiveDate %}
+        {% get_field '24' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.RecordEffectiveDate %}
             <tr>
-                <th>(24) {% trans "Дата, з якої є чинними права на промисловий зразок" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordEffectiveDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.DesignApplicationNumber %}
+        {% get_field '21' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationNumber %}
             <tr>
-                <th>(21) {% trans "Номер заявки" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationNumber }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.DesignApplicationDate %}
+        {% get_field '22' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationDate %}
             <tr>
-                <th>(22) {% trans "Дата подання заявки" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.PriorityDetails.PriorityNumber %}
+        {% get_field '31' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityNumber %}
             <tr>
-                <th>(31) {% trans "Номер попередньої заявки відповідно до Паризької конвенції" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityNumber }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.PriorityDetails.PriorityDate %}
+        {% get_field '32' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityDate %}
             <tr>
-                <th>(32) {% trans "Дата подання попередньої заявки відповідно до Паризької конвенції" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityDate|parse_date|date:"d.m.Y" }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode %}
+        {% get_field '33' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode %}
             <tr>
-                <th>
-                    (33) {% trans "Двобуквений код держави - учасниці Паризької конвенції чи регіональної організації, до якої подана попередня, відповідно до стандарту BOIB ST.3" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.DesignTitle %}
+        {% get_field '54' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignTitle %}
             <tr>
-                <th>(54) {% trans "Назва промислового зразка" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignTitle }}</td>
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+        {% get_field '71' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.ApplicantDetails.Applicant %}
             <tr>
-                <th>(71) {% trans "Ім'я або повне найменування та адреса заявника (заявників)" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
                         {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -89,9 +99,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.DesignerDetails.Designer %}
+        {% get_field '72' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignerDetails.Designer %}
             <tr>
-                <th>(72) {% trans "Ім'я автора (авторів)" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
                         {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -102,10 +113,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.HolderDetails.Holder %}
+        {% get_field '73' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.HolderDetails.Holder %}
             <tr>
-                <th>(73) {% trans "Ім'я або повне найменування власника (власників) патенту, його адресу та двобуквений код держави відповідно до стандарту BOIB ST.3" %}
-                </th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify g-font-weight-600">
                     {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
                         {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -118,10 +129,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
+        {% get_field '74' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
             <tr>
-                <th>(74) {% trans "Ім'я та реєстраційний номер представника у справах інтелектуальної власності (патентного повіреного) або ім'я (повне найменування) іншої довіреної особи" %}
-                </th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
                         {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -133,9 +144,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.search_data.obj_state == 2 and hit.Design.DesignDetails.CorrespondenceAddress %}
+        {% get_field '98' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.CorrespondenceAddress %}
             <tr>
-                <th>(98) {% trans "Адреса для листування" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                     <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
@@ -144,9 +156,10 @@
             </tr>
         {% endif %}
 
-        {% if hit.Design.DesignDetails.TotalSpecimen %}
+        {% get_field '28' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and hit.Design.DesignDetails.TotalSpecimen %}
             <tr>
-                <th>(28) {% trans "Кількість заявлених варіантів" %}</th>
+                <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {{ hit.Design.DesignDetails.TotalSpecimen }}
                 </td>
