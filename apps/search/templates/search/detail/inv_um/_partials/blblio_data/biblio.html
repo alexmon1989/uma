@@ -79,6 +79,18 @@
             {% endfor %}
         {% endif %}
 
+        {% get_field '41.D' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and biblio_data|get:'I_43.D' %}
+            <tr>
+                <th>{{ ipc_field.code_title }}</th>
+                <td>
+                    {% for I_43 in biblio_data|get:'I_43.D' %}
+                        {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+
         {% get_field '43.D' ipc_fields as ipc_field %}
         {% if ipc_field.enable_view and biblio_data|get:'I_43.D' %}
             <tr>
@@ -92,6 +104,18 @@
         {% endif %}
 
         {% get_field '45.D' ipc_fields as ipc_field %}
+        {% if ipc_field.enable_view and biblio_data|get:'I_45.D' %}
+            <tr>
+                <th>{{ ipc_field.code_title }}</th>
+                <td>
+                    {% for I_45 in biblio_data|get:'I_45.D' %}
+                        {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+
+        {% get_field '46.D' ipc_fields as ipc_field %}
         {% if ipc_field.enable_view and biblio_data|get:'I_45.D' %}
             <tr>
                 <th>{{ ipc_field.code_title }}</th>

@@ -14,9 +14,9 @@
         <div class="g-text-underline text-info">
             {% if hit.search_data.obj_state == 1 %}
                 {% if hit.Document.idObjType == 1 %}
-                    Заявка на винахід
+                    {% trans "Заявка на винахід" %}
                 {% else %}
-                    Заявка на корисну модель
+                    {% trans "Заявка на корисну модель" %}
                 {% endif %}
             {% elif hit.search_data.obj_state == 2 %}
                 {% if biblo_data.I_12 %}
@@ -38,14 +38,14 @@
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Винахідник(и):</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Винахідник(и)" %}:</h4>
             {% for I_72 in biblio_data.I_72 %}
                 {% if forloop.counter <= 2 %}
                     {{ I_72|get_person_name }} [{{ I_72|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список винахідників"
+                       data-title="{% trans "Повний список винахідників" %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="
@@ -56,14 +56,14 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
             {% for I_71 in biblio_data.I_71 %}
                 {% if forloop.counter <= 2 %}
                     {{ I_71|get_person_name }} [{{ I_71|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список заявників"
+                       data-title="{% trans "Повний список заявників" %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="
@@ -74,14 +74,14 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">МПК:</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "МПК" %}:</h4>
             {% for ipc in biblio_data.IPC %}
                 {% if forloop.counter <= 2 %}
                     {{ ipc }}{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список індексів МПК"
+                       data-title="{% trans "Повний список індексів МПК" %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="{% for ipc_ in biblio_data.IPC %}{{ ipc_ }}<br>{% endfor %}"
@@ -91,48 +91,48 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявка" %}:</h4>
             <a href="#!"
                class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                data-toggle="tooltip"
                data-placement="top"
-               title="(21) Номер заявки"
+               title="(21) {% trans "Номер заявки" %}"
             >{{ biblio_data.I_21 }}</a><br>
             <a href="#!"
                class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                data-toggle="tooltip"
                data-placement="bottom"
-               title="(22) Дата подання заявки"
+               title="(22) {% trans "Дата подання заявки" %}"
             >{{ biblio_data.I_22|parse_date|date:"d.m.Y" }}</a>
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Патент:</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Патент" %}:</h4>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="(11) Номер патенту"
+                   title="(11) {% trans "Номер патенту" %}"
                 >{{ biblio_data.I_11 }}</a><br>
                 {% for I_45 in biblio_data|get:"I_45.D" %}
                     <a href="#!"
                        class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                        data-toggle="tooltip"
                        data-placement="bottom"
-                       title="(45) Дата публікації про видачу патенту"
+                       title="(46) {% trans "Дата публікації про видачу патенту" %}"
                     >{{ I_45|parse_date|date:"d.m.Y" }}</a>
                 {% endfor %}
             </div>
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
                 {% for I_73 in biblio_data.I_73 %}
                     {% if forloop.counter <= 2 %}
                         {{ I_73|get_person_name }} [{{ I_73|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                     {% elif forloop.counter == 3 %}
                         <a href="#!"
                            data-toggle="popover"
-                           data-title="Повний список власників"
+                           data-title="{% trans "Повний список власників" %}"
                            data-html="true"
                            data-trigger="focus"
                            data-content="{% for I_73_ in biblio_data.I_73 %}{{ I_73|get_person_name }} [{{ I_73|get_person_country }}]<br>{% endfor %}"
