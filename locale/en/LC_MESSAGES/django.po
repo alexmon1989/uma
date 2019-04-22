@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-11 16:50+0000\n"
+"POT-Creation-Date: 2019-04-17 11:05+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -23,10 +23,10 @@ msgstr ""
 #: apps/help/templates/help/_partials/breadcrumbs.html:16
 #: apps/my_auth/templates/my_auth/login_simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:16
-#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:23
+#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:41
 #: apps/search/templates/search/detail/ld/_partials/breadcrumbs.html:29
-#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:23
+#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
 msgid "Головна"
 msgstr "Home"
@@ -112,6 +112,7 @@ msgstr "Object state"
 
 #: apps/search/admin.py:32 apps/search/admin.py:88
 #: apps/search/templates/search/advanced/_partials/id_item.html:47
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
 msgid "Заявка"
@@ -145,12 +146,14 @@ msgid "Пошук"
 msgstr "Search"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:16
+#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:17
 #, fuzzy
 #| msgid "Заявка на корисну модель"
 msgid "Заявка на промисловий зразок"
 msgstr "Utility Model Application"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:18
+#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:19
 #, fuzzy
 #| msgid "Патент України на корисну модель"
 msgid "Патент України на промисловий зразок"
@@ -164,48 +167,51 @@ msgid "Патент зареєстровано"
 msgstr "The patent is registered"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:29
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:59
 #, fuzzy
 #| msgid "Заявка"
 msgid "Заявник(и)"
 msgstr "Claim"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:36
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:66
 msgid "Повний список заявників"
 msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:35
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
 #, fuzzy
 #| msgid "Номер платежу"
 msgid "Номер заявки"
 msgstr "Payment number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:42
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
 #, fuzzy
 #| msgid "Дата відправки"
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:64
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:111
 msgid "Патент"
 msgstr "Patent"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:69
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:21
 msgid "Номер реєстрації, який є номером патенту"
 msgstr "Registration number, which is a patent number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:75
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:28
 msgid "Дата, з якої є чинними права на промисловий зразок"
 msgstr "Date from which the industrial design rights are valid"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:82
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:128
 msgid "Власник(и)"
 msgstr "Owner(s)"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:89
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:135
 msgid "Повний список власників"
 msgstr "Full list of owners"
 
@@ -221,6 +227,16 @@ msgstr "International Classification for Industrial Designs"
 msgid "МКПЗ"
 msgstr "ICID"
 
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:17
+#: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:20
+msgid "Заявка на винахід"
+msgstr "Invention Application"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:19
+#: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:22
+msgid "Заявка на корисну модель"
+msgstr " Utility Model Application"
+
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:26
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:29
 #, fuzzy
@@ -235,10 +251,44 @@ msgstr "Invention Patent"
 msgid "Патент на корисну модель"
 msgstr "Utility Model Patent"
 
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:41
+#, fuzzy
+#| msgid "Власник(и)"
+msgid "Винахідник(и)"
+msgstr "Owner(s)"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:48
+#, fuzzy
+#| msgid "Повний список власників"
+msgid "Повний список винахідників"
+msgstr "Full list of owners"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:77
+#, fuzzy
+#| msgid "МКПЗ"
+msgid "МПК"
+msgstr "ICID"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:84
+#, fuzzy
+#| msgid "Повний список заявників"
+msgid "Повний список індексів МПК"
+msgstr "Full list of applicants"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:116
+#, fuzzy
+#| msgid "Номер платежу"
+msgid "Номер патенту"
+msgstr "Payment number"
+
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:123
+msgid "Дата публікації про видачу патенту"
+msgstr ""
+
 #: apps/search/templates/search/advanced/_partials/sidebar.html:9
 #: apps/search/templates/search/advanced/advanced.html:72
 #: apps/search/templates/search/simple/_partials/sidebar.html:10
-#: apps/search/templates/search/simple/simple.html:70
+#: apps/search/templates/search/simple/simple.html:78
 #, fuzzy
 #| msgid "Розширений пошук"
 msgid "Показати умови пошуку"
@@ -301,7 +351,7 @@ msgid "Сортувати за"
 msgstr "Sort by"
 
 #: apps/search/templates/search/advanced/advanced.html:74
-#: apps/search/templates/search/simple/simple.html:72
+#: apps/search/templates/search/simple/simple.html:80
 msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
 msgstr "No results"
 
@@ -313,39 +363,10 @@ msgstr "Your browser doesn't support PDF"
 msgid "Завантажити PDF"
 msgstr "Download PDF"
 
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:10
-msgid "Індекс (індекси) Міжнародної класифікації промислових зразків"
-msgstr "Index (indexes) of the International Classification for Industrial Designs"
-
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:49
-msgid "Номер попередньої заявки відповідно до Паризької конвенції"
-msgstr "The number of the previous application in accordance with the Paris Convention"
-
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:56
-msgid "Дата подання попередньої заявки відповідно до Паризької конвенції"
-msgstr "Date of filing a previous application in accordance with the Paris Convention"
-
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:64
-msgid ""
-"Двобуквений код держави - учасниці Паризької конвенції чи регіональної "
-"організації, до якої подана попередня, відповідно до стандарту BOIB ST.3"
-msgstr ""
-
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:71
-msgid "Назва промислового зразка"
-msgstr ""
-
-#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:16
-#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:16
-#, fuzzy
-#| msgid "Заявка на корисну модель"
-msgid "Заявка на знак для товарів та послуг"
-msgstr " Utility Model Application"
-
-#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:27
+#: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:31
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:45
 #: apps/search/templates/search/detail/ld/_partials/breadcrumbs.html:33
-#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
+#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:31
 #, fuzzy
 #| msgid "Заявка"
 msgid "Заявка №"
@@ -521,27 +542,19 @@ msgstr ""
 msgid "Відкрити у новому вікні"
 msgstr "Open in new window"
 
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:103
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:143
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:180
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:200
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:221
-#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:125
-#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:162
-#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:182
-#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:203
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:141
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:184
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:225
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:246
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:268
+#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:138
+#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:179
+#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:200
+#: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:222
 #, fuzzy
 #| msgid "Розширений пошук"
 msgid "Показати всі"
 msgstr "Advanced search"
-
-#: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:20
-msgid "Заявка на винахід"
-msgstr "Invention Application"
-
-#: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:22
-msgid "Заявка на корисну модель"
-msgstr " Utility Model Application"
 
 #: apps/search/templates/search/detail/inv_um/_partials/selection.html:17
 #: apps/search/templates/search/detail/inv_um/_partials/selection_form.html:17
@@ -673,11 +686,23 @@ msgstr ""
 msgid "Свідоцтво України на топографію (компонування) ІМС"
 msgstr "Certificate of Ukraine on topography (layout) of IC"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:136
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:148
 #, fuzzy
 #| msgid "Розширений пошук"
 msgid "Показати"
 msgstr "Advanced search"
+
+#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:17
+#, fuzzy
+#| msgid "Заявка на корисну модель"
+msgid "Заявка на знак для товарів та послуг"
+msgstr " Utility Model Application"
+
+#: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:19
+#, fuzzy
+#| msgid "Заявка на корисну модель"
+msgid "Свідоцтво України на знак для товарів та послуг"
+msgstr " Utility Model Application"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
@@ -688,19 +713,21 @@ msgstr "Simple search"
 
 #: apps/search/templates/search/templatetags/registration_status.html:4
 msgid "Патент діє"
-msgstr ""
+msgstr "Valid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:6
 msgid "Патент не діє"
-msgstr ""
+msgstr "Invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:9
-msgid "Дію патента припинено але може бути поновлено"
-msgstr ""
+#, fuzzy
+#| msgid "Дію патента припинено але може бути поновлено"
+msgid "Дію патента припинено, але може бути поновлено"
+msgstr "Ceased to be effective, but is subject to renewal"
 
 #: apps/search/templates/search/templatetags/registration_status.html:10
 msgid "Дію припинено"
-msgstr ""
+msgstr "Ceased to be effective"
 
 #: apps/search/templates/search/templatetags/registration_status.html:12
 #, fuzzy
@@ -762,6 +789,20 @@ msgid ""
 "Державне підприємство &laquo;Український інститут інтелектуальної "
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
+
+#~ msgid "Індекс (індекси) Міжнародної класифікації промислових зразків"
+#~ msgstr ""
+#~ "Index (indexes) of the International Classification for Industrial Designs"
+
+#~ msgid "Номер попередньої заявки відповідно до Паризької конвенції"
+#~ msgstr ""
+#~ "The number of the previous application in accordance with the Paris "
+#~ "Convention"
+
+#~ msgid "Дата подання попередньої заявки відповідно до Паризької конвенції"
+#~ msgstr ""
+#~ "Date of filing a previous application in accordance with the Paris "
+#~ "Convention"
 
 #~ msgid "Стан об'єкта"
 #~ msgstr "Object state"
