@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div class="d-flex justify-content-between">
+    <div class="g-mr-10 align-self-center g-font-weight-600">{% trans "Сортувати за" %}:</div>
+    <div>
+        <select class="custom-select rounded-0" id="sort_by">
+            <option value="" selected="">{% trans "Релевантністю" %}</option>
+
+            {% for item in sort_params %}
+                <option value="{{ item.value }}"
+                        {% if request_get_params.sort_by == item.value %}selected=""{% endif %}
+                >{{ item.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

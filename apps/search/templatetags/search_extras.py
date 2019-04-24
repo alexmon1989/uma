@@ -1,8 +1,9 @@
 from django import template
 from django.conf import settings
+from django.db.models import F
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from ..models import ObjType
+from ..models import ObjType, SortParameter
 from ..utils import filter_bad_apps
 
 register = template.Library()
@@ -99,3 +100,21 @@ def get_field(ipc_code, ipc_fields):
         if ipc_code == field['ipc_code_short']:
             return field
     return None
+
+
+@register.inclusion_tag('search/templatetags/sort_params.html', takes_context=True)
+def sort_params(context):
+    """Отображает элемент для выбора параметра сортировки результатов поиска."""
+    return {
+        'sort_params': SortParameter.objects.filter(
+            is_enabled=True
+        ).order_by(
+            '-weight'
+        ).annotate(
+            title=F(f"title_{context['request'].LANGUAGE_CODE}")
+        ).values(
+            'title',
+            'value'
+        ),
+        'request_get_params': context['request'].GET
+    }

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule
+from .models import IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule, SortParameter
 
 
 @admin.register(IpcCode)
@@ -127,5 +127,22 @@ class SimpleSearchFields(admin.ModelAdmin):
     list_editable = (
         'is_visible',
         'elastic_index_field',
+        'weight',
+    )
+
+
+@admin.register(SortParameter)
+class SortParameterAdmin(admin.ModelAdmin):
+    list_display = (
+        'title_uk',
+        'title_en',
+        'value',
+        'search_field',
+        'ordering',
+        'weight',
+        'is_enabled',
+    )
+    list_editable = (
+        'is_enabled',
         'weight',
     )

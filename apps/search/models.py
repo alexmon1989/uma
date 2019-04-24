@@ -267,3 +267,39 @@ class IndexationError(models.Model):
     json_path = models.CharField(blank=True, null=True, max_length=255)
     text = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SortParameter(models.Model):
+    """Модель параметра сортировки результатов запроса."""
+    title_uk = models.CharField('Назва параметру (укр.)', max_length=255)
+    title_en = models.CharField('Назва параметру (en.)', max_length=255)
+    value = models.CharField('Значення поля', max_length=255, unique=True)
+    search_field = models.ForeignKey(
+        'SimpleSearchField',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Пошуковий параметр',
+        help_text='Пошуковий параметр, по якому відбувається сортування.'
+    )
+    ordering = models.CharField(
+        'Напрямок сортування',
+        choices=(
+            ('asc', 'По зростанню'),
+            ('desc', 'За спаданням')
+        ),
+        max_length=4
+    )
+    weight = models.PositiveIntegerField(
+        'Вага',
+        default=1000,
+        help_text='Чим більша вага, тим вище елемент у списку параметрів на сторінках результатів пошуку.'
+    )
+    is_enabled = models.BooleanField('Відображати', default=True)
+
+    def __str__(self):
+        return self.title_uk
+
+    class Meta:
+        verbose_name = 'Параметр сортування'
+        verbose_name_plural = 'Параметри сортування результатів пошуку'

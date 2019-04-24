@@ -154,7 +154,7 @@ class Command(BaseCommand):
                     'app_number': biblio_data.get('I_21'),
                     'app_date': biblio_data.get('I_22'),
                     'protective_doc_number': biblio_data.get('I_11'),
-                    'rights_date': biblio_data.get('I_24'),
+                    'rights_date': biblio_data.get('I_24') if biblio_data.get('I_24') != '1899-12-30' else None,
                     'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
                     'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
                     'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],

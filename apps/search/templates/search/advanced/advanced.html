@@ -36,12 +36,12 @@
 
                     <div class="col-lg-9">
                         <div class="d-md-flex justify-content-between g-mb-30">
-                            <h3 class="h6 text-uppercase g-mb-10 g-mb--lg">{% trans "Всього результатів" %}:<span
-                                    class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></h3>
-
-                            <div class="d-flex justify-content-between">
-                                <div class="g-mr-10">{% trans "Сортувати за" %}:</div>
+                            <div class="align-self-center g-mb-30 g-mb-0--md h-100">
+                                <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
+                                        class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
                             </div>
+
+                            {% sort_params %}
                         </div>
 
                         {% for hit in results %}

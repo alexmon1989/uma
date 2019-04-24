@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
-from .models import ObjType, InidCodeSchedule, OrderService
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -167,8 +167,34 @@ def filter_unpublished_apps(user, qs):
         qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
     return qs
 
+
+def sort_results(s, sort_by_value):
+    """Добавляет параметр сортировки."""
+    try:
+        sort_param = SortParameter.objects.values(
+            'ordering',
+            'search_field__elastic_index_field__field_name',
+            'search_field__elastic_index_field__field_type'
+        ).get(value=sort_by_value, is_enabled=True)
+    except SortParameter.DoesNotExist:
+        pass
+    else:
+        param = sort_param['search_field__elastic_index_field__field_name'].replace('*', '')
+        if sort_param['search_field__elastic_index_field__field_type'] == 'text':
+            param = f"{param}.raw"
+        s = s.sort(
+            {
+                param : {
+                    "order" : sort_param['ordering'],
+                    "missing" : '_last'
+                }
+            }
+        )
+
+    return s
+
 def filter_results(s, request):
-    """Фильтрует результат запроса ElasticSearch И выполняет агрегацию для фильтров в сайдбаре."""
+    """Фильтрует результат запроса ElasticSearch и выполняет агрегацию для фильтров в сайдбаре."""
     # Агрегация для определения всех типов объектов и состояний
     s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
     s.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
