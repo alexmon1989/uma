@@ -52,6 +52,11 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
         'enable_search',
         'enable_view'
     )
+    list_select_related = (
+        'ipc_code',
+        'ipc_code__obj_type',
+        'elastic_index_field',
+    )
     list_filter = (
         'ipc_code__obj_type',
         ObjStatusFilter
@@ -88,6 +93,18 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
         return _('Заявка')
     obj_status.short_description = _("Статус об'єкта")
     obj_status.admin_order_field = 'schedule_type'
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super(InidCodeScheduleAdmin, self).formfield_for_dbfield(db_field, request, **kwargs)
+
+        # Кеширование вариантов выбора поля elastic_index_field
+        if db_field.name == 'elastic_index_field':
+            choices = getattr(request, '_elastic_index_field_choices_cache', None)
+            if choices is None:
+                request._elastic_index_field_choices_cache = choices = list(formfield.choices)
+            formfield.choices = choices
+
+        return formfield
 
 
 @admin.register(ElasticIndexField)
