@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db.models import F
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from ..models import ObjType, SortParameter
+from ..models import ObjType, SortParameter, IndexationProcess
 from ..utils import filter_bad_apps
 
 register = template.Library()
@@ -91,6 +91,15 @@ def documents_count():
     qs = filter_bad_apps(qs)
     s = Search(using=client, index='uma').query(qs)
     return s.count()
+
+
+@register.simple_tag
+def last_finished_indexation_date():
+    """Возвращает дату и время последней законченной индексации."""
+    p = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
+    if p.count() > 0:
+        return p.first().finish_date
+    return '-'
 
 
 @register.simple_tag

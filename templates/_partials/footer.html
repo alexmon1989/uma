@@ -68,7 +68,8 @@
                 </div>
 
                 <div class="g-color-white-opacity-0_8 g-line-height-2 g-mt-minus-4">
-                    {% trans "Дата актуалізації" %}: <strong>28.03.2019 11:31</strong>
+                    {% last_finished_indexation_date as last_finished_indexation_date %}
+                    {% trans "Дата актуалізації" %}: <strong>{{ last_finished_indexation_date|date:"SHORT_DATETIME_FORMAT" }} </strong>
                 </div>
 
                 <div class="g-color-white-opacity-0_8 g-line-height-2">

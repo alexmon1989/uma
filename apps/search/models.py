@@ -266,6 +266,10 @@ class IndexationError(models.Model):
     type = models.CharField(blank=True, null=True, max_length=255)
     json_path = models.CharField(blank=True, null=True, max_length=255)
     text = models.TextField(blank=True, null=True)
+    indexation_process = models.ForeignKey('IndexationProcess', on_delete=models.CASCADE, blank=True, null=True)
+    error_status = models.CharField(blank=True, null=True, max_length=20, db_column='errStatus')
+    error_last_update = models.DateTimeField(blank=True, null=True, db_column='errLastUpdate')
+    correction_count = models.IntegerField(default=0, db_column='correctionCount')
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -303,3 +307,18 @@ class SortParameter(models.Model):
     class Meta:
         verbose_name = 'Параметр сортування'
         verbose_name_plural = 'Параметри сортування результатів пошуку'
+
+
+class IndexationProcess(models.Model):
+    """Модель процесса индексации."""
+    not_indexed_count = models.PositiveIntegerField("Кількість об'єктів для індексації", default=0)
+    processed_count = models.PositiveIntegerField("Опрацьовано об'єктів", default=0)
+    begin_date = models.DateTimeField("Дата та час початку індексації")
+    finish_date = models.DateTimeField("Дата та час закінчення індексації", null=True, blank=True)
+
+    def __str__(self):
+        return self.finish_date
+
+    class Meta:
+        verbose_name = 'Процес індексації'
+        verbose_name_plural = 'Процеси індексації'

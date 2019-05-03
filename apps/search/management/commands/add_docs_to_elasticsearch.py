@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
-from apps.search.models import IpcAppList, IndexationError
+from apps.search.models import IpcAppList, IndexationError, IndexationProcess
 import json
 import os.path
 import datetime
@@ -10,6 +10,7 @@ import datetime
 class Command(BaseCommand):
     help = 'Adds or updates documents in ElasticSearch index.'
     es = None
+    indexation_process = None
 
     def get_json_path(self, doc):
         """Получает путь к файлу JSON с данными объекта."""
@@ -48,7 +49,8 @@ class Command(BaseCommand):
                     app_id=doc['id'],
                     type='JSONDecodeError',
                     text=e,
-                    json_path=json_path
+                    json_path=json_path,
+                    indexation_process=self.indexation_process
                 )
         except (UnicodeDecodeError, UnicodeError):
             f = open(json_path, 'r', encoding='utf-8')
@@ -60,7 +62,8 @@ class Command(BaseCommand):
                     app_id=doc['id'],
                     type='JSONDecodeError',
                     text=e,
-                    json_path=json_path
+                    json_path=json_path,
+                    indexation_process=self.indexation_process
                 )
         except FileNotFoundError as e:
             self.stdout.write(self.style.ERROR(f"FileNotFoundError: {e}"))
@@ -68,7 +71,8 @@ class Command(BaseCommand):
                 app_id=doc['id'],
                 type='FileNotFoundError',
                 text=e,
-                json_path=json_path
+                json_path=json_path,
+                indexation_process=self.indexation_process
             )
 
         return data
@@ -100,7 +104,8 @@ class Command(BaseCommand):
                     app_id=doc['id'],
                     type='Other',
                     text='No biblio data in JSON',
-                    json_path=json_path
+                    json_path=json_path,
+                    indexation_process=self.indexation_process
                 )
             else:
                 # Обработка I_71 для избежания ошибки добавления в индекс ElasticSearch
@@ -172,7 +177,8 @@ class Command(BaseCommand):
                         app_id=doc['id'],
                         type='ElasticSearch RequestError',
                         text=e,
-                        json_path=json_path
+                        json_path=json_path,
+                        indexation_process=self.indexation_process
                     )
                 else:
                     # Пометка в БД что этот документ проиндексирован
@@ -250,7 +256,8 @@ class Command(BaseCommand):
                     app_id=doc['id'],
                     type='ElasticSearch RequestError',
                     text=e,
-                    json_path=json_path
+                    json_path=json_path,
+                    indexation_process=self.indexation_process
                 )
             else:
                 # Пометка в БД что этот документ проиндексирован
@@ -321,7 +328,8 @@ class Command(BaseCommand):
                     app_id=doc['id'],
                     type='ElasticSearch RequestError',
                     text=e,
-                    json_path=json_path
+                    json_path=json_path,
+                    indexation_process=self.indexation_process
                 )
             else:
                 # Пометка в БД что этот документ проиндексирован
@@ -339,6 +347,13 @@ class Command(BaseCommand):
             'registration_number',
             'app_number'
         ).all()
+
+        # Создание процесса индексации в БД
+        self.indexation_process = IndexationProcess.objects.create(
+            begin_date=datetime.datetime.now(),
+            not_indexed_count=documents.count()
+        )
+
         self.stdout.write(self.style.SUCCESS('The list of documents has been successfully received.'))
 
         for doc in documents:
@@ -351,5 +366,12 @@ class Command(BaseCommand):
             # Пром. образцы
             elif doc['obj_type_id'] == 6:
                 self.process_id(doc)
+            # Увеличение счётчика обработанных документов
+            self.indexation_process.processed_count += 1
+            self.indexation_process.save()
+
+        # Время окончания процесса индексации и сохранение данных процесса индексации
+        self.indexation_process.finish_date = datetime.datetime.now()
+        self.indexation_process.save()
 
         self.stdout.write(self.style.SUCCESS('Finished'))

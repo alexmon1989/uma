@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('not_indexed_count', models.PositiveIntegerField(default=0, verbose_name="Кількість об'єктів для індексації")),
                 ('processed_count', models.PositiveIntegerField(default=0, verbose_name="Опрацьовано об'єктів")),
-                ('errors_count', models.PositiveIntegerField(default=0, verbose_name='Кількість помилок')),
                 ('begin_date', models.DateTimeField(verbose_name='Дата та час початку індексації')),
                 ('finish_date', models.DateTimeField(blank=True, null=True, verbose_name='Дата та час закінчення індексації')),
             ],
