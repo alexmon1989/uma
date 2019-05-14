@@ -3,10 +3,7 @@ from django.contrib.auth.models import User
 class EUSignBackend:
 
     def authenticate(self, request, certificate=None):
-
-        if certificate.is_confirmed:
-            return certificate.user
-        return None
+        return certificate.user
 
     def get_user(self, user_id):
         try:

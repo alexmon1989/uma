@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans 'Авторизація' %}{% endblock %}
+
+{% block content %}
+
+    {% include 'my_auth/login_simple/_partials/breadcrumbs.html' %}
+
+    <div class="container g-min-height-200 g-py-70">
+
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <h3 class="h4 g-font-weight-300 g-mb-20">{% trans 'Будь-ласка, авторизуйтесь зручним для вас способом' %}:</h3>
+            </div>
+
+            <div class="col-md-12 g-mt-20">
+                {% include 'my_auth/login/_partials/nav.html' %}
+
+                <!-- Tab panes -->
+                <div id="nav-1-2-primary-hor-center" class="tab-content">
+                    <div class="tab-pane fade show active" id="nav-2-1-primary-hor-seperate--1" role="tabpanel">
+                        {% include 'my_auth/login/_partials/form_login_password.html' %}
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-2-1-primary-hor-seperate--2" role="tabpanel">
+                        {% include 'my_auth/login/_partials/form_login_ds.html' %}
+                    </div>
+                </div>
+                <!-- End Tab panes -->
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script type="text/javascript" src="{% static 'js/ds/common.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/euutils.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/euscpt.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/euscpm.js' %}"></script>
+	<script async type="text/javascript" src="{% static 'js/ds/euscp.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/euscptest.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/qr/qrcodedecode.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/qr/reedsolomon.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/fs/Blob.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/ds/fs/FileSaver.js' %}"></script>
+	<script type="text/javascript">
+        $(function () {
+			pageLoaded();
+        });
+	</script>
+{% endblock %}

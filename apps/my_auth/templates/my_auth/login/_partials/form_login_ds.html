@@ -1,0 +1,116 @@
+{% load i18n %}
+
+<div class="row justify-content-center g-mt-40">
+    <div class="col-sm-8 col-lg-5">
+        <div class="g-brd-around g-brd-gray-light-v2 rounded g-py-20 g-px-30">
+            {% csrf_token %}
+
+            <!-- Alert Danger -->
+            <div class="alert fade show g-bg-red-opacity-0_1 g-color-lightred rounded-0"
+                 id="DSLoginErrors"
+                 role="alert"
+                 style="display: none">
+                <button type="button" class="close u-alert-close--light g-ml-10 g-mt-1" data-dismiss="alert"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+
+                <div class="media">
+                    <div class="media-body">
+                        <p class="m-0 g-font-size-14" id="DSLoginErrorsText"></p>
+                    </div>
+                </div>
+            </div>
+            <!-- End Alert Danger -->
+
+            <!-- Form -->
+            <div style="display: none" id="status"></div>
+
+            <div class="g-py-15">
+
+                <div class="mb-4">
+                    <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Оберіть ЦСК" %}:</label>
+                    <select class="form-control g-color-black g-brd-gray-light-v2 g-brd-primary--hover rounded g-py-15 g-px-15"
+                            id="CAsServersSelect">
+                    </select>
+                </div>
+
+                <!-- File Input -->
+                <div class="form-group">
+                    <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Особистий ключ" %}</label>
+
+                    <div class="input-group">
+                        <input type="text"
+                               id="PKeyFileName"
+                               onclick="document.getElementById('PKeyFileInput').click();"
+                               class="form-control g-color-black g-brd-gray-light-v2 g-brd-primary--hover rounded g-py-15 g-px-15"
+                               placeholder="{% trans "Особистий ключ" %}">
+                        <div class="input-group-append">
+                            <a class="btn btn-md u-btn-brown rounded g-py-15 g-px-15 g-color-white"
+                               id="PKeySelectFileButton"
+                               onclick="document.getElementById('PKeyFileInput').click();">{% trans "Огляд" %}</a>
+                            <input id="PKeyFileInput" type="file" style="display: none">
+                        </div>
+                    </div>
+                    <small id="ChoosePKFileText" class="form-text text-muted"></small>
+                </div>
+                <!-- End File Input -->
+
+                <!-- File Input -->
+                <div class="form-group" id="PKCertsSelectZone">
+                    <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Сертифікат(и)" %}</label>
+
+                    <div class="input-group">
+                        <input type="text"
+                               id="SelectedPKCertsList"
+                               onclick="document.getElementById('ChoosePKCertsInput').click();"
+                               class="form-control g-color-black g-brd-gray-light-v2 g-brd-primary--hover rounded g-py-15 g-px-15"
+                               placeholder="{% trans "Сертифікат(и)" %}">
+                        <div class="input-group-append">
+                            <a class="btn btn-md u-btn-brown rounded g-py-15 g-px-15 g-color-white"
+                               id="ChoosePKCertsButton"
+                               onclick="document.getElementById('ChoosePKCertsInput').click();">{% trans "Огляд" %}</a>
+                            <input id="ChoosePKCertsInput" type="file" style="display: none" multiple>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">{% trans "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)" %}
+                    </small>
+                </div>
+                <!-- End File Input -->
+
+                <div class="form-group g-mb-25">
+                    <label for="PKeyPassword"
+                           class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Пароль захисту ключа" %}</label>
+                    <input type="password"
+                           class="form-control g-color-black g-brd-gray-light-v2 g-brd-primary--hover rounded g-py-15 g-px-15"
+                           id="PKeyPassword"
+                           disabled="disabled"
+                           placeholder="Пароль захисту ключа">
+                </div>
+
+                <div class="row justify-content-between mt-4">
+                    <div class="col-8 align-self-center">
+                        <label class="form-check-inline u-check g-color-gray-dark-v3 g-font-size-13 g-pl-25 mb-0">
+                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                   type="checkbox"
+                                   id="RememberMe"
+                                   value="1">
+                            <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                                <i class="fa" data-check-icon=""></i>
+                            </div>
+                            {% trans "Запам'ятати" %}
+                        </label>
+                    </div>
+                    <div class="col-4 align-self-center text-right">
+                        <button class="btn btn-md u-btn-primary rounded g-py-13 g-px-25"
+                                type="submit"
+                                onclick="euSignTest.readPrivateKeyButtonClick()"
+                                title="{% trans "Вхід" %}"
+                                id="PKeyReadButton">{% trans "Вхід" %}</button>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form -->
+        </div>
+    </div>
+</div>

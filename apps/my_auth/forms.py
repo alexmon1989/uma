@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from apps.my_auth.models import KeyCenter
 
 
-class AuthForm(forms.Form):
+class AuthFormDS(forms.Form):
     """Форма авторизации с помощью ЭЦП."""
     ca = forms.ModelChoiceField(label='АЦСК', queryset=KeyCenter.objects.all())
     key_file = forms.FileField(label='Файл ключа')
@@ -32,12 +32,13 @@ class AuthFormSimple(forms.Form):
 
     def clean(self):
         """Проверка логина и пароля"""
-        user = authenticate(
-            self.request,
-            username=self.cleaned_data['username'],
-            password=self.cleaned_data['password']
-        )
-        if not user:
-            raise forms.ValidationError(
-                "Невірні логін та/або пароль."
+        if self.cleaned_data.get('username') and self.cleaned_data.get('password'):
+            user = authenticate(
+                self.request,
+                username=self.cleaned_data['username'],
+                password=self.cleaned_data['password']
             )
+            if not user:
+                raise forms.ValidationError(
+                    "Невірні логін та/або пароль."
+                )

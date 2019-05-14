@@ -9,12 +9,12 @@ def set_key_center_settings(eu_interface, key_center):
     eu_interface.Initialize()
     ca_settings = {
         'szPath': settings.EUSIGN_FILESTORE_PATH,
-        'bCheckCRLs': False,
+        'bCheckCRLs': True,
         'bAutoRefresh': True,
         'bOwnCRLsOnly': False,
-        'bFullAndDeltaCRLs': False,
-        'bAutoDownloadCRLs': False,
-        'bSaveLoadedCerts': False,
+        'bFullAndDeltaCRLs': True,
+        'bAutoDownloadCRLs': True,
+        'bSaveLoadedCerts': True,
         'dwExpireTime': 3600,
     }
     eu_interface.SetFileStoreSettings(ca_settings)

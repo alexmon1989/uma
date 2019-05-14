@@ -19,7 +19,6 @@ class KeyCenterAdmin(admin.ModelAdmin):
 class CertificateOwnerAdmin(admin.ModelAdmin):
     list_display = (
         'pszSerial',
-        'is_confirmed',
         'user',
         'pszSubjFullName',
     )
@@ -42,4 +41,4 @@ class CertificateOwnerAdmin(admin.ModelAdmin):
         'pszSubjDRFOCode',
         'pszSubjLocality',
     )
-    search_fields = ('user__username', 'pszSerial')
+    search_fields = ('user__username', 'pszSerial', 'pszSubjFullName')

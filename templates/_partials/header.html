@@ -96,7 +96,7 @@
 
                 <div class="g-pos-rel g-pt-3--lg g-ml-30 g-ml-0--lg g-font-weight-600">
                     {% if user.is_authenticated %}
-                        <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.last_name }} {{ request.user.first_name }}">{{ request.user.username }}</span> <a href="{% url "auth:logout" %}"> (вихід)</a>
+                        <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:20 }}</span> <a href="{% url "auth:logout" %}"> (вихід)</a>
                     {% else %}
                         <a href="{% url "auth:login" %}"><i class="fa fa-sign-in" aria-hidden="true"></i> Вхід</a>
                     {% endif %}
