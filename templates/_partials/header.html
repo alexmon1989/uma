@@ -23,7 +23,8 @@
 
                 <!-- Logo -->
                 <a href="{% url 'home:index' %}" class="navbar-brand d-flex">
-                    <img src="{% static 'img/logo/logo2.png' %}" alt="">
+                    <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
+                    <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
                 </a>
                 <!-- End Logo -->
 
@@ -67,7 +68,7 @@
                 <!-- Смена языков -->
                 {% get_current_language as LANGUAGE_CODE %}
                 {% get_language_info for LANGUAGE_CODE as lang %}
-                <div class="g-pos-rel g-width-50 g-pt-3--lg g-ml-30 g-ml-0--lg">
+                <div class="g-pos-rel g-width-50 g-pt-3--lg g-ml-10 g-ml-0--lg">
                     <a href="#!" id="languages-dropdown-invoker-2"
                        class="g-color-gray-dark-v2 g-color-primary--hover g-text-underline--none--hover"
                        aria-controls="languages-dropdown-2" aria-haspopup="true" aria-expanded="false"
@@ -94,9 +95,9 @@
                 <!-- End Смена языков -->
 
 
-                <div class="g-pos-rel g-pt-3--lg g-ml-30 g-ml-0--lg g-font-weight-600">
+                <div class="g-pos-rel g-pt-3--lg ml-auto g-ml-0--lg g-font-weight-600">
                     {% if user.is_authenticated %}
-                        <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:20 }}</span> <a href="{% url "auth:logout" %}"> (вихід)</a>
+                        <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:20 }}</span> <a href="{% url "auth:logout" %}"><i class="fa fa-sign-out"></i></a>
                     {% else %}
                         <a href="{% url "auth:login" %}"><i class="fa fa-sign-in" aria-hidden="true"></i> Вхід</a>
                     {% endif %}

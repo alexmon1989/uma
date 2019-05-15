@@ -122,3 +122,16 @@
     text-decoration: none;
   }
 }
+
+.logo-mobile {
+  display: none;
+}
+
+@media (max-width: 600px) {
+    .logo-mobile {
+      display: block;
+    }
+    .logo-desktop {
+      display: none;
+    }
+  }
