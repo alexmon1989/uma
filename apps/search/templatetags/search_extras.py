@@ -4,7 +4,7 @@ from django.db.models import F
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from ..models import ObjType, SortParameter, IndexationProcess
-from ..utils import filter_bad_apps
+from ..utils import filter_bad_apps, user_has_access_to_docs as user_has_access_to_docs_
 
 register = template.Library()
 
@@ -127,3 +127,9 @@ def sort_params(context):
         ),
         'request_get_params': context['request'].GET
     }
+
+
+@register.simple_tag
+def user_has_access_to_docs(user, id_app_number):
+    """Возвращает признак доступности документа(ов)."""
+    return user_has_access_to_docs_(user, id_app_number)

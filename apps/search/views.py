@@ -12,8 +12,8 @@ from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, 
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
-                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps, filter_unpublished_apps,
-                    sort_results)
+                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps, sort_results,
+                    user_has_access_to_docs_decorator)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -252,8 +252,8 @@ class ObjectDetailView(TemplateView):
         return context
 
 
-@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
 @require_POST
+@user_has_access_to_docs_decorator
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
     if request.POST.getlist('cead_id'):
@@ -294,7 +294,7 @@ def download_docs_zipped(request):
         raise Http404('Файли не було обрано!')
 
 
-@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
+@user_has_access_to_docs_decorator
 def download_doc(request, id_app_number, id_cead_doc):
     """Инициирует у пользование скачивание документа."""
     # Создание заказа

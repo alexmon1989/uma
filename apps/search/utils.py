@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
@@ -1086,3 +1087,54 @@ def create_selection_tm(data, params):
     file_stream.seek(0)
 
     return file_stream
+
+
+def user_has_access_to_docs_decorator(f):
+    """Декоратор для проверки у пользователя наличия прав на скачивание документа(ов)."""
+    def wrapper(*args, **kw):
+        id_app_number = args[0].POST.get('id_app_number') or kw.get('id_app_number')
+        if user_has_access_to_docs(args[0].user, id_app_number):
+            return f(*args, **kw)
+        else:
+            return HttpResponse('401 Unauthorized', status=401)
+    return wrapper
+
+
+def user_has_access_to_docs(user, id_app_number):
+    """Возвращает признак доступности документа(ов)"""
+    # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
+    if user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists():
+        return True
+
+    # Поиск документа в Elastic
+    client = Elasticsearch(settings.ELASTIC_HOST)
+    q = Q(
+        'bool',
+        must=[Q('match', _id=id_app_number)],
+    )
+    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
+    s = Search().using(client).query(q).execute()
+    if not s:
+        return False
+
+    # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
+    if hasattr(user, 'certificateowner'):
+        user_fullname = user.certificateowner.pszSubjFullName.upper()
+
+        applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
+        if applicants and user_fullname in map(str.upper, applicants):
+            return True
+
+        inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
+        if inventors and user_fullname in map(str.upper, inventors):
+            return True
+
+        owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
+        if owners and user_fullname in map(str.upper, owners):
+            return True
+
+        agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
+        if agents and user_fullname in map(str.upper, agents):
+            return True
+
+    return False
