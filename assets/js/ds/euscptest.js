@@ -613,7 +613,9 @@ function() {
 					'MainPageMenuCertsAndCRLsPage');
 			}
 
-			document.getElementById('PKeyReadButton').disabled = false;
+			var PKeyReadButton = document.getElementById('PKeyReadButton');
+			PKeyReadButton.disabled = false;
+			PKeyReadButton.innerHTML = 'Вхід';
 		};
 
 		if (certificates == null) {
@@ -666,7 +668,9 @@ function() {
 					} else {
 						document.getElementById('DSLoginErrorsText').innerHTML = 'Авторизація неможлива!';
 						document.getElementById('DSLoginErrors').style.display = '';
-						document.getElementById('PKeyReadButton').disabled = false;
+						var PKeyReadButton = document.getElementById('PKeyReadButton');
+						PKeyReadButton.disabled = false;
+						PKeyReadButton.innerHTML = 'Вхід';
 					}
                 }, "json" );
             }
@@ -726,6 +730,7 @@ function() {
 	readPrivateKeyButtonClick: function() {
 		var PKeyReadButton = document.getElementById('PKeyReadButton');
 		PKeyReadButton.disabled = true;
+		PKeyReadButton.innerHTML = 'Зачекайте...';
 
 		var passwordTextField = document.getElementById('PKeyPassword');
 		var certificatesFiles = euSignTest.privateKeyCerts;
@@ -736,6 +741,7 @@ function() {
 			document.getElementById('DSLoginErrorsText').innerHTML = e;
 			document.getElementById('DSLoginErrors').style.display = '';
 			PKeyReadButton.disabled = false;
+			PKeyReadButton.innerHTML = 'Вхід';
 		};
 		
 		var _onSuccess = function(keyName, key) {
