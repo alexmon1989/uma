@@ -484,7 +484,10 @@ def download_xls_simple(request):
                 title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
                 applicant = ';\r\n'.join(h.search_data.applicant) if iterable(h.search_data.applicant) else h.search_data.applicant
                 owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(h.search_data.inventor) else h.search_data.inventor
+                if hasattr(h.search_data, 'inventor'):
+                    inventor = ';\r\n'.join(h.search_data.inventor) if iterable(h.search_data.inventor) else h.search_data.inventor
+                else:
+                    inventor = ''
                 agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
                 data.append([
