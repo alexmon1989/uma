@@ -1,8 +1,9 @@
 from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory
-from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse
+from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse, HttpResponse
 from django.utils.http import urlencode
+from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -18,9 +19,7 @@ from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
-import os
-import io
-import json
+import os, io, json, time, xlwt, datetime
 
 
 class SimpleListView(TemplateView):
@@ -408,3 +407,90 @@ def validate_query(request):
         raise SuspiciousOperation("Невірні параметри.")
 
     return JsonResponse({'result': int(form.is_valid())})
+
+
+def download_xls_simple(request):
+    """Формирует CSV-файл с результатами простого поиска и инициирует его загрузку у пользователя."""
+    SimpleSearchFormSet = formset_factory(SimpleSearchForm)
+    formset = SimpleSearchFormSet(request.GET)
+    if formset.is_valid:
+        # Формирование поискового запроса ElasticSearch
+        client = Elasticsearch(settings.ELASTIC_HOST)
+        qs = None
+        for s in formset.cleaned_data:
+            elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
+            if elastic_field:
+                q = Q(
+                    'query_string',
+                    query=prepare_simple_query(s['value'], elastic_field.field_type),
+                    default_field=elastic_field.field_name,
+                    default_operator='AND'
+                )
+                if qs is not None:
+                    qs &= q
+                else:
+                    qs = q
+
+        if qs is not None:
+            # Не показывать заявки, по которым выдан охранный документ
+            qs = filter_bad_apps(qs)
+            # Не показывать неопубликованные заявки
+            # qs = filter_unpublished_apps(self.request.user, qs)
+
+        s = Search(using=client, index='uma').query(qs)
+
+        # Фильтрация
+        if request.GET.get('filter_obj_type'):
+            # Фильтрация по типу объекта
+            s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
+
+        if request.GET.get('filter_obj_state'):
+            # Фильтрация по статусу объекта
+            s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
+
+        if s.count() <= 5000:
+            # Сортировка
+            s = s.sort('_score')
+            s = s.source(['search_data', 'Document'])
+            titles = [
+                _("Тип об'єкта промислової власності"),
+                _("Стан об'єкта промислової власності"),
+                _("Номер заявки"),
+                _("Дата подання заявки"),
+                _("Номер охоронного документа"),
+                _("Дата охоронного документа"),
+            ]
+            obj_states = [_('Заявка'), _('Охоронний документ')]
+            lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+            obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
+            data = list()
+            for h in s.params(size=1000).scan():
+                obj_type = obj_types[h.Document.idObjType - 1]
+                obj_state = obj_states[h.search_data.obj_state - 1]
+                app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime('%d.%m.%Y') if h.search_data.rights_date else ''
+
+                data.append([
+                    obj_type,
+                    obj_state,
+                    h.search_data.app_number,
+                    app_date,
+                    h.search_data.protective_doc_number,
+                    rights_date,
+                ])
+
+            workbook = xlwt.Workbook()
+            sheet = workbook.add_sheet("Sheet Name")
+            style = xlwt.easyxf('font: bold 1')
+            for i in range(len(titles)):
+                sheet.write(0, i, titles[i], style)
+            for i, l in enumerate(data):
+                for j, col in enumerate(l):
+                    sheet.write(i + 1, j, col)
+
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename=search_results.xls'
+            workbook.save(response)
+            return response
+
+    raise Http404

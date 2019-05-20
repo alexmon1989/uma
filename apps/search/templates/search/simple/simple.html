@@ -34,7 +34,7 @@
                     </div>
 
                     <div class="col-md-9">
-                        <div class="d-md-flex justify-content-between g-mb-30">
+                        <div class="d-md-flex justify-content-between g-mb-10">
                             <div class="align-self-center g-mb-30 g-mb-0--md h-100">
                                 <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
                                         class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
@@ -42,6 +42,24 @@
 
                             {% sort_params %}
                         </div>
+
+
+                    {% if results.paginator.count >= 5000 %}
+                        <div class="d-md-flex g-mb-20">
+                            <a class="btn btn-sm u-btn-purple disabled"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                href="{% url 'search:download_xls_simple' %}?{{ request.GET.urlencode }}">
+                                <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
+                            </a>
+                            <div class="align-self-center g-ml-5 g-font-size-12 g-color-pink">{% trans "Завантаження результатів можливе, якщо кількість результатів пошуку менша або рівна 5000" %}</div>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-sm u-btn-purple g-mb-20"
+                            href="{% url 'search:download_xls_simple' %}?{{ request.GET.urlencode }}">
+                            <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
+                        </a>
+                    {% endif %}
 
                         {% for hit in results %}
                             {# Изобретения, полезные модели #}
@@ -66,7 +84,8 @@
                 <div class="g-mt-10">
                     <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
                             data-target="#collapseForm"
-                            aria-expanded="false" aria-controls="collapseExample">
+                            aria-expanded="false"
+                            aria-controls="collapseExample">
                         <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
                     </button>
                     <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>

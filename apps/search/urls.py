@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (SimpleListView, AdvancedListView, add_filter_params, ObjectDetailView, download_docs_zipped,
-                    download_doc, download_selection_inv_um_ld, download_selection_tm)
+                    download_doc, download_selection_inv_um_ld, download_selection_tm, download_xls_simple)
 
 app_name = 'search'
 urlpatterns = [
@@ -20,4 +20,5 @@ urlpatterns = [
         download_selection_tm,
         name="download_selection_tm"
     ),
+    path('download-csv-simple/', download_xls_simple, name="download_xls_simple"),
 ]

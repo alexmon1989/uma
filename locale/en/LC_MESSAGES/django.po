@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-17 11:05+0000\n"
+"POT-Creation-Date: 2019-05-20 09:56+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -21,6 +21,7 @@ msgstr ""
 #: apps/about/templates/about/_partials/breadcrumbs.html:16
 #: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
 #: apps/help/templates/help/_partials/breadcrumbs.html:16
+#: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:16
 #: apps/my_auth/templates/my_auth/login_simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:27
@@ -37,29 +38,29 @@ msgstr "Database administrator"
 
 #: apps/contacts/templates/contacts/_partials/details.html:12
 #: apps/contacts/templates/contacts/_partials/details.html:13
-#: templates/_partials/footer.html:89
+#: templates/_partials/footer.html:90
 msgid "Телефон"
 msgstr "Phone"
 
 #: apps/contacts/templates/contacts/_partials/details.html:18
-#: templates/_partials/footer.html:90
+#: templates/_partials/footer.html:91
 msgid "Режим роботи"
 msgstr "Operating mode"
 
 #: apps/contacts/templates/contacts/_partials/details.html:19
 #: apps/contacts/templates/contacts/_partials/details.html:20
-#: templates/_partials/footer.html:91
+#: templates/_partials/footer.html:92
 msgid "з"
 msgstr "from"
 
 #: apps/contacts/templates/contacts/_partials/details.html:19
 #: apps/contacts/templates/contacts/_partials/details.html:21
-#: templates/_partials/footer.html:91
+#: templates/_partials/footer.html:92
 msgid "по"
 msgstr "to"
 
 #: apps/contacts/templates/contacts/_partials/details.html:20
-#: templates/_partials/footer.html:91
+#: templates/_partials/footer.html:92
 msgid "Перерва"
 msgstr "Break"
 
@@ -79,69 +80,117 @@ msgstr "Message"
 msgid "Відправити повідомлення"
 msgstr "Send"
 
+#: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:10
+#: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:20
+#: apps/my_auth/templates/my_auth/login/login.html:5
 #: apps/my_auth/templates/my_auth/login_simple/_partials/breadcrumbs.html:10
 #: apps/my_auth/templates/my_auth/login_simple/_partials/breadcrumbs.html:20
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:4
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:16
 msgid "Авторизація"
-msgstr ""
+msgstr "Authorization"
 
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:32
+msgid "Оберіть ЦСК"
+msgstr "Select key certification center"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:40
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:47
+#, fuzzy
+#| msgid "Простий пошук"
+msgid "Особистий ключ"
+msgstr "Simple search"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:51
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:72
+msgid "Огляд"
+msgstr "Browse"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:61
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:68
+msgid "Сертифікат(и)"
+msgstr "Certificate(s)"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:76
+msgid "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)"
+msgstr "Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:83
+msgid "Пароль захисту ключа"
+msgstr "Key password"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:101
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:72
+#: apps/my_auth/templates/my_auth/login_simple/login_simple.html:77
+msgid "Запам'ятати"
+msgstr "Remember me"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:108
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:109
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
+#: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
+#: templates/_partials/header.html:102
+msgid "Вхід"
+msgstr "Enter"
+
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:32
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:36
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:39
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:43
 msgid "Логін"
 msgstr "Username"
 
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:48
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:54
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:54
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:60
 msgid "Пароль"
 msgstr "Password"
 
-#: apps/my_auth/templates/my_auth/login_simple/login_simple.html:77
-msgid "Запам'ятати"
-msgstr "Remember me"
+#: apps/my_auth/templates/my_auth/login/login.html:15
+msgid "Будь-ласка, авторизуйтесь зручним для вас способом"
+msgstr "Please, sign in with a convenient way"
 
-#: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-msgid "Вхід"
-msgstr "Enter"
-
-#: apps/search/admin.py:27 apps/search/admin.py:89
+#: apps/search/admin.py:27 apps/search/admin.py:94
 #, fuzzy
 #| msgid "Стан об'єкта"
 msgid "Статус об'єкта"
 msgstr "Object state"
 
-#: apps/search/admin.py:32 apps/search/admin.py:88
+#: apps/search/admin.py:32 apps/search/admin.py:93
 #: apps/search/templates/search/advanced/_partials/id_item.html:47
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
+#: apps/search/views.py:463
 msgid "Заявка"
 msgstr "Claim"
 
-#: apps/search/admin.py:33 apps/search/admin.py:87
+#: apps/search/admin.py:33 apps/search/admin.py:92
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
+#: apps/search/views.py:463
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: apps/search/admin.py:74
+#: apps/search/admin.py:79
 msgid "ІНІД-код"
 msgstr "INID code"
 
-#: apps/search/admin.py:81
+#: apps/search/admin.py:86
 msgid "Тип об'єкта"
 msgstr "Object type"
 
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:24
 #: apps/search/templates/search/advanced/advanced.html:6
-#: templates/_partials/footer.html:37 templates/_partials/header.html:46
+#: templates/_partials/footer.html:37 templates/_partials/header.html:47
 msgid "Розширений пошук"
 msgstr "Advanced search"
 
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:20
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:20
-#: templates/_partials/header.html:37
+#: templates/_partials/header.html:38
 msgid "Пошук"
 msgstr "Search"
 
@@ -180,6 +229,7 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
+#: apps/search/views.py:458
 #, fuzzy
 #| msgid "Номер платежу"
 msgid "Номер заявки"
@@ -187,6 +237,7 @@ msgstr "Payment number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
+#: apps/search/views.py:459
 #, fuzzy
 #| msgid "Дата відправки"
 msgid "Дата подання заявки"
@@ -288,7 +339,7 @@ msgstr ""
 #: apps/search/templates/search/advanced/_partials/sidebar.html:9
 #: apps/search/templates/search/advanced/advanced.html:72
 #: apps/search/templates/search/simple/_partials/sidebar.html:10
-#: apps/search/templates/search/simple/simple.html:78
+#: apps/search/templates/search/simple/simple.html:89
 #, fuzzy
 #| msgid "Розширений пошук"
 msgid "Показати умови пошуку"
@@ -340,18 +391,13 @@ msgstr ""
 msgid "Некоректні умови пошуку!"
 msgstr "Wrong search params!"
 
-#: apps/search/templates/search/advanced/advanced.html:39
-#: apps/search/templates/search/simple/simple.html:38
+#: apps/search/templates/search/advanced/advanced.html:40
+#: apps/search/templates/search/simple/simple.html:39
 msgid "Всього результатів"
 msgstr "Results"
 
-#: apps/search/templates/search/advanced/advanced.html:43
-#: apps/search/templates/search/simple/simple.html:42
-msgid "Сортувати за"
-msgstr "Sort by"
-
 #: apps/search/templates/search/advanced/advanced.html:74
-#: apps/search/templates/search/simple/simple.html:80
+#: apps/search/templates/search/simple/simple.html:91
 msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
 msgstr "No results"
 
@@ -707,9 +753,22 @@ msgstr " Utility Model Application"
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
 #: apps/search/templates/search/simple/simple.html:6
-#: templates/_partials/footer.html:31 templates/_partials/header.html:43
+#: templates/_partials/footer.html:31 templates/_partials/header.html:44
 msgid "Простий пошук"
 msgstr "Simple search"
+
+#: apps/search/templates/search/simple/simple.html:53
+#: apps/search/templates/search/simple/simple.html:60
+#, fuzzy
+#| msgid "Розширений пошук"
+msgid "Завантажити результати пошуку (.xls)"
+msgstr "Show search conditions"
+
+#: apps/search/templates/search/simple/simple.html:55
+msgid ""
+"Завантаження результатів можливе, якщо кількість результатів пошуку менша "
+"або рівна 5000"
+msgstr ""
 
 #: apps/search/templates/search/templatetags/registration_status.html:4
 msgid "Патент діє"
@@ -735,6 +794,38 @@ msgstr "Ceased to be effective"
 msgid "Статус невідомий"
 msgstr "Object state"
 
+#: apps/search/templates/search/templatetags/sort_params.html:4
+msgid "Сортувати за"
+msgstr "Sort by"
+
+#: apps/search/templates/search/templatetags/sort_params.html:7
+msgid "Релевантністю"
+msgstr ""
+
+#: apps/search/views.py:456
+#, fuzzy
+#| msgid "об'єкта інтелектуальної власності"
+msgid "Тип об'єкта промислової власності"
+msgstr " of intellectual property object"
+
+#: apps/search/views.py:457
+#, fuzzy
+#| msgid "об'єкта інтелектуальної власності"
+msgid "Стан об'єкта промислової власності"
+msgstr " of intellectual property object"
+
+#: apps/search/views.py:460
+#, fuzzy
+#| msgid "Охоронний документ"
+msgid "Номер охоронного документа"
+msgstr "Protective document"
+
+#: apps/search/views.py:461
+#, fuzzy
+#| msgid "Охоронний документ"
+msgid "Дата охоронного документа"
+msgstr "Protective document"
+
 #: templates/_partials/footer.html:16
 #, fuzzy
 #| msgid "Детальна інформація по об'єкту"
@@ -752,15 +843,15 @@ msgstr ""
 msgid "Меню"
 msgstr "Menu"
 
-#: templates/_partials/footer.html:43 templates/_partials/header.html:53
+#: templates/_partials/footer.html:43 templates/_partials/header.html:54
 msgid "Про сервіс"
 msgstr "About"
 
-#: templates/_partials/footer.html:49 templates/_partials/header.html:57
+#: templates/_partials/footer.html:49 templates/_partials/header.html:58
 msgid "Допомога"
 msgstr "Help"
 
-#: templates/_partials/footer.html:55 templates/_partials/header.html:61
+#: templates/_partials/footer.html:55 templates/_partials/header.html:62
 msgid "Контакти"
 msgstr "Contacts"
 
@@ -768,27 +859,31 @@ msgstr "Contacts"
 msgid "Статистика"
 msgstr "Statistics"
 
-#: templates/_partials/footer.html:71
+#: templates/_partials/footer.html:72
 msgid "Дата актуалізації"
 msgstr "Actualization date"
 
-#: templates/_partials/footer.html:76
+#: templates/_partials/footer.html:77
 msgid "Кількість документів"
 msgstr "Count of documents"
 
-#: templates/_partials/footer.html:84
+#: templates/_partials/footer.html:85
 msgid "Зв'язок з нами"
 msgstr "Contact us"
 
-#: templates/_partials/footer.html:88
+#: templates/_partials/footer.html:89
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
 
-#: templates/_partials/footer.html:108
+#: templates/_partials/footer.html:109
 msgid ""
 "Державне підприємство &laquo;Український інститут інтелектуальної "
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
+
+#: templates/_partials/header.html:100
+msgid "Вихід"
+msgstr ""
 
 #~ msgid "Індекс (індекси) Міжнародної класифікації промислових зразків"
 #~ msgstr ""
