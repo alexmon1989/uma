@@ -459,19 +459,7 @@ def download_xls_simple(request):
             else:
                 s = s.sort('_score')
 
-            titles = [
-                _("Тип об'єкта промислової власності"),
-                _("Стан об'єкта промислової власності"),
-                _("Номер заявки"),
-                _("Дата подання заявки"),
-                _("Номер охоронного документа"),
-                _("Дата охоронного документа"),
-                _("Ключові слова"),
-                _("Заявник"),
-                _("Власник"),
-                _("Винахідник"),
-                _("Представник"),
-            ]
+            # Формировние данных для заполнения в Excel
             obj_states = [_('Заявка'), _('Охоронний документ')]
             lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
             obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
@@ -504,18 +492,35 @@ def download_xls_simple(request):
                     agent,
                 ])
 
-            import json
-
+            # Формировние Excel-файла
             workbook = xlwt.Workbook()
             sheet = workbook.add_sheet("Search results")
+
+            # Заголовки
             style = xlwt.easyxf('font: bold 1')
+            titles = [
+                _("Тип об'єкта промислової власності"),
+                _("Стан об'єкта промислової власності"),
+                _("Номер заявки"),
+                _("Дата подання заявки"),
+                _("Номер охоронного документа"),
+                _("Дата охоронного документа"),
+                _("Ключові слова"),
+                _("Заявник"),
+                _("Власник"),
+                _("Винахідник"),
+                _("Представник"),
+            ]
             for i in range(len(titles)):
                 sheet.write(0, i, titles[i], style)
+
+            # Данные
             style = xlwt.easyxf('align: wrap on, vert top;')
             for i, l in enumerate(data):
                 for j, col in enumerate(l):
                     sheet.write(i + 1, j, col, style)
 
+            # Отправка в браузер
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename=search_results.xls'
             workbook.save(response)
