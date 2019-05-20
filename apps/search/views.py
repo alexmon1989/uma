@@ -19,7 +19,8 @@ from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
-import os, io, json, time, xlwt, datetime
+import os, io, json, xlwt, datetime
+from uma.utils import iterable
 
 
 class SimpleListView(TemplateView):
@@ -449,9 +450,15 @@ def download_xls_simple(request):
             s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
 
         if s.count() <= 5000:
-            # Сортировка
-            s = s.sort('_score')
+
             s = s.source(['search_data', 'Document'])
+
+            # Сортировка
+            if request.GET.get('sort_by'):
+                s = sort_results(s, request.GET['sort_by'])
+            else:
+                s = s.sort('_score')
+
             titles = [
                 _("Тип об'єкта промислової власності"),
                 _("Стан об'єкта промислової власності"),
@@ -459,16 +466,26 @@ def download_xls_simple(request):
                 _("Дата подання заявки"),
                 _("Номер охоронного документа"),
                 _("Дата охоронного документа"),
+                _("Ключові слова"),
+                _("Заявник"),
+                _("Власник"),
+                _("Винахідник"),
+                _("Представник"),
             ]
             obj_states = [_('Заявка'), _('Охоронний документ')]
             lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
             obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
             data = list()
-            for h in s.params(size=1000).scan():
+            for h in s.params(size=1000, preserve_order=True).scan():
                 obj_type = obj_types[h.Document.idObjType - 1]
                 obj_state = obj_states[h.search_data.obj_state - 1]
                 app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
                 rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime('%d.%m.%Y') if h.search_data.rights_date else ''
+                title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(h.search_data.applicant) else h.search_data.applicant
+                owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(h.search_data.inventor) else h.search_data.inventor
+                agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
                 data.append([
                     obj_type,
@@ -477,16 +494,24 @@ def download_xls_simple(request):
                     app_date,
                     h.search_data.protective_doc_number,
                     rights_date,
+                    title,
+                    applicant,
+                    owner,
+                    inventor,
+                    agent,
                 ])
 
+            import json
+
             workbook = xlwt.Workbook()
-            sheet = workbook.add_sheet("Sheet Name")
+            sheet = workbook.add_sheet("Search results")
             style = xlwt.easyxf('font: bold 1')
             for i in range(len(titles)):
                 sheet.write(0, i, titles[i], style)
+            style = xlwt.easyxf('align: wrap on, vert top;')
             for i, l in enumerate(data):
                 for j, col in enumerate(l):
-                    sheet.write(i + 1, j, col)
+                    sheet.write(i + 1, j, col, style)
 
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename=search_results.xls'

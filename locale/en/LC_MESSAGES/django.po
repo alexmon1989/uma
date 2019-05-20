@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-20 09:56+0000\n"
+"POT-Creation-Date: 2019-05-20 10:52+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -113,7 +113,8 @@ msgstr "Certificate(s)"
 
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:76
 msgid "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)"
-msgstr "Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
+msgstr ""
+"Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
 
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:83
 msgid "Пароль захисту ключа"
@@ -162,14 +163,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
-#: apps/search/views.py:463
+#: apps/search/views.py:475
 msgid "Заявка"
 msgstr "Claim"
 
 #: apps/search/admin.py:33 apps/search/admin.py:92
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
-#: apps/search/views.py:463
+#: apps/search/views.py:475
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -229,7 +230,7 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/views.py:458
+#: apps/search/views.py:465
 #, fuzzy
 #| msgid "Номер платежу"
 msgid "Номер заявки"
@@ -237,7 +238,7 @@ msgstr "Payment number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
-#: apps/search/views.py:459
+#: apps/search/views.py:466
 #, fuzzy
 #| msgid "Дата відправки"
 msgid "Дата подання заявки"
@@ -802,29 +803,55 @@ msgstr "Sort by"
 msgid "Релевантністю"
 msgstr ""
 
-#: apps/search/views.py:456
+#: apps/search/views.py:463
 #, fuzzy
 #| msgid "об'єкта інтелектуальної власності"
 msgid "Тип об'єкта промислової власності"
 msgstr " of intellectual property object"
 
-#: apps/search/views.py:457
+#: apps/search/views.py:464
 #, fuzzy
 #| msgid "об'єкта інтелектуальної власності"
 msgid "Стан об'єкта промислової власності"
 msgstr " of intellectual property object"
 
-#: apps/search/views.py:460
+#: apps/search/views.py:467
 #, fuzzy
 #| msgid "Охоронний документ"
 msgid "Номер охоронного документа"
 msgstr "Protective document"
 
-#: apps/search/views.py:461
+#: apps/search/views.py:468
 #, fuzzy
 #| msgid "Охоронний документ"
 msgid "Дата охоронного документа"
 msgstr "Protective document"
+
+#: apps/search/views.py:469
+msgid "Ключові слова"
+msgstr ""
+
+#: apps/search/views.py:470
+#, fuzzy
+#| msgid "Заявка"
+msgid "Заявник"
+msgstr "Claim"
+
+#: apps/search/views.py:471
+#, fuzzy
+#| msgid "Власник(и)"
+msgid "Власник"
+msgstr "Owner(s)"
+
+#: apps/search/views.py:472
+#, fuzzy
+#| msgid "Власник(и)"
+msgid "Винахідник"
+msgstr "Owner(s)"
+
+#: apps/search/views.py:473
+msgid "Представник"
+msgstr ""
 
 #: templates/_partials/footer.html:16
 #, fuzzy
