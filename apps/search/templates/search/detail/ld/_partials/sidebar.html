@@ -1,0 +1,84 @@
+{% load i18n %}
+{% load uma_extras %}
+
+<!-- Nav tabs -->
+<ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav g-mb-20"
+    role="tablist"
+    data-target="nav-1-1-primary-ver"
+    data-tabs-mobile-type="slide-up-down"
+    data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover active"
+           data-toggle="tab"
+           href="#nav-biblio"
+           role="tab"
+        >{% trans "Бібліографічні дані" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.cl %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-cl"
+           role="tab"
+        >{% trans "Формула" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.de %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-de"
+           role="tab"
+        >{% trans "Опис" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.de_pub %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-de_pub"
+           role="tab"
+        >{% trans "Опублікований опис" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ua %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-ab_ua"
+           role="tab"
+        >{% trans "Реферат" %} (UA)</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_ru %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-ab_ru"
+           role="tab"
+        >{% trans "Реферат" %} (RU)</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not biblio_documents.ab_en %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-ab_en"
+           role="tab"
+        >{% trans "Реферат" %} (EN)</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover"
+           data-toggle="tab"
+           href="#nav-docs"
+           role="tab"
+        >{% trans "Стан діловодства" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if transactions|length == 0 %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-transactions"
+           role="tab"
+        >{% trans "Сповіщення" %}</a>
+    </li>
+</ul>
+<!-- End Nav tabs -->
+
+{% if hit.search_data.obj_state == 2 %}
+    <a href="{% url "search:download_shared_docs" id_app_number=id_app_number %}"
+       class="btn btn-md u-btn-darkpurple d-block g-mb-20"><i
+            class="fa fa-download"></i>&nbsp;{% trans "Архів документів (.zip)" %}</a>
+
+    {% if request.user.is_superuser or request.user|has_group:"Посадовці (чиновники)" %}
+        {% include 'search/detail/ld/_partials/selection_form.html' %}
+    {% endif %}
+{% endif %}

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (SimpleListView, AdvancedListView, add_filter_params, ObjectDetailView, download_docs_zipped,
                     download_doc, download_selection_inv_um_ld, download_selection_tm, download_xls_simple,
-                    download_xls_advanced)
+                    download_xls_advanced, download_shared_docs)
 
 app_name = 'search'
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
     ),
     path('download-xls-simple/', download_xls_simple, name="download_xls_simple"),
     path('download-xls-advanced/', download_xls_advanced, name="download_xls_advanced"),
+    path('download_shared_docs/<int:id_app_number>/', download_shared_docs, name="download_shared_docs"),
 ]

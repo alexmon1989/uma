@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load uma_extras %}
+
+<!-- Nav tabs -->
+<ul class="nav flex-column u-nav-v1-1 u-nav-primary g-bg-gray-light-v5 details-nav g-mb-40" role="tablist"
+    data-target="nav-1-1-primary-ver"
+    data-tabs-mobile-type="slide-up-down"
+    data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover active"
+           data-toggle="tab"
+           href="#nav-1-1-primary-ver--1"
+           role="tab"
+        >{% trans "Бібліографічні дані" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover"
+           data-toggle="tab"
+           href="#nav-1-1-primary-ver--7"
+           role="tab"
+        >{% trans "Стан діловодства" %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link g-text-underline--hover {% if not hit.Design.Transactions %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-1-1-primary-ver--8"
+           role="tab"
+        >{% trans "Сповіщення" %}</a>
+    </li>
+</ul>
+<!-- End Nav tabs -->

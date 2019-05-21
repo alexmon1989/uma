@@ -3,7 +3,6 @@ from django.db.models import F
 from django.forms import formset_factory
 from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse, HttpResponse
 from django.utils.http import urlencode
-from django.utils.translation import ugettext as _
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -19,8 +18,8 @@ from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
-import os, io, json, datetime
-from uma.utils import iterable
+from pathlib import Path
+import os, io, json
 
 
 class SimpleListView(TemplateView):
@@ -524,3 +523,25 @@ def download_xls_advanced(request):
                 return response
 
     raise Http404
+
+
+def download_shared_docs(request, id_app_number):
+    """Инициирует загрузку у пользователя документов, которые доступны всем пользователям"""
+    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
+
+    # Создание архива
+    in_memory = io.BytesIO()
+    zip_ = ZipFile(in_memory, "a")
+    for document in app.appdocuments_set.all():
+        zip_.write(
+            document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
+            Path(document.file_name.replace('\\', '/')).name
+        )
+
+    # fix for Linux zip files read in Windows
+    for file in zip_.filelist:
+        file.create_system = 0
+
+    zip_.close()
+    in_memory.seek(0)
+    return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
