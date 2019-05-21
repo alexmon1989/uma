@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.utils.translation import ugettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from .models import ObjType, InidCodeSchedule, OrderService, SortParameter
@@ -9,10 +10,8 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
-import re
-import time
-import datetime
-import io
+import re, time, datetime, io, xlwt
+from uma.utils import iterable
 
 
 def get_search_groups(search_data):
@@ -1138,3 +1137,74 @@ def user_has_access_to_docs(user, id_app_number):
             return True
 
     return False
+
+
+def create_search_res_doc(data):
+    """Формировние Excel-файла с результатами поиска."""
+    workbook = xlwt.Workbook()
+    sheet = workbook.add_sheet("Search results")
+
+    # Заголовки
+    style = xlwt.easyxf('font: bold 1')
+    titles = [
+        _("Тип об'єкта промислової власності"),
+        _("Стан об'єкта промислової власності"),
+        _("Номер заявки"),
+        _("Дата подання заявки"),
+        _("Номер охоронного документа"),
+        _("Дата охоронного документа"),
+        _("Ключові слова"),
+        _("Заявник"),
+        _("Власник"),
+        _("Винахідник"),
+        _("Представник"),
+    ]
+    for i in range(len(titles)):
+        sheet.write(0, i, titles[i], style)
+
+    # Данные
+    style = xlwt.easyxf('align: wrap on, vert top;')
+    for i, l in enumerate(data):
+        for j, col in enumerate(l):
+            sheet.write(i + 1, j, col, style)
+
+    return workbook
+
+
+def prepare_data_for_search_report(s, lang_code):
+    """Подготавливает данные для файла Excel."""
+    obj_states = [_('Заявка'), _('Охоронний документ')]
+    obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
+    data = list()
+    for h in s.params(size=1000, preserve_order=True).scan():
+        obj_type = obj_types[h.Document.idObjType - 1]
+        obj_state = obj_states[h.search_data.obj_state - 1]
+        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+            '%d.%m.%Y') if h.search_data.rights_date else ''
+        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+        applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+            h.search_data.applicant) else h.search_data.applicant
+        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+        if hasattr(h.search_data, 'inventor'):
+            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                h.search_data.inventor) else h.search_data.inventor
+        else:
+            inventor = ''
+        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+
+        data.append([
+            obj_type,
+            obj_state,
+            h.search_data.app_number,
+            app_date,
+            h.search_data.protective_doc_number,
+            rights_date,
+            title,
+            applicant,
+            owner,
+            inventor,
+            agent,
+        ])
+
+    return data

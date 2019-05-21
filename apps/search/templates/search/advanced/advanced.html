@@ -35,7 +35,7 @@
                     {% include 'search/advanced/_partials/sidebar.html' %}
 
                     <div class="col-lg-9">
-                        <div class="d-md-flex justify-content-between g-mb-30">
+                        <div class="d-md-flex justify-content-between g-mb-10">
                             <div class="align-self-center g-mb-30 g-mb-0--md h-100">
                                 <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
                                         class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
@@ -43,6 +43,8 @@
 
                             {% sort_params %}
                         </div>
+
+                        {% include 'search/advanced/_partials/import_results_btn.html' %}
 
                         {% for hit in results %}
                             {# Изобретения, полезные модели #}

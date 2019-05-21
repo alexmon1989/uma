@@ -14,12 +14,12 @@ from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
                     get_data_for_selection_tm, create_selection_tm, filter_bad_apps, sort_results,
-                    user_has_access_to_docs_decorator)
+                    user_has_access_to_docs_decorator, create_search_res_doc, prepare_data_for_search_report)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
-import os, io, json, xlwt, datetime
+import os, io, json, datetime
 from uma.utils import iterable
 
 
@@ -459,71 +459,68 @@ def download_xls_simple(request):
             else:
                 s = s.sort('_score')
 
-            # Формировние данных для заполнения в Excel
-            obj_states = [_('Заявка'), _('Охоронний документ')]
+            # Текущий язык
             lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-            obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
-            data = list()
-            for h in s.params(size=1000, preserve_order=True).scan():
-                obj_type = obj_types[h.Document.idObjType - 1]
-                obj_state = obj_states[h.search_data.obj_state - 1]
-                app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-                rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime('%d.%m.%Y') if h.search_data.rights_date else ''
-                title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(h.search_data.applicant) else h.search_data.applicant
-                owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-                if hasattr(h.search_data, 'inventor'):
-                    inventor = ';\r\n'.join(h.search_data.inventor) if iterable(h.search_data.inventor) else h.search_data.inventor
-                else:
-                    inventor = ''
-                agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-                data.append([
-                    obj_type,
-                    obj_state,
-                    h.search_data.app_number,
-                    app_date,
-                    h.search_data.protective_doc_number,
-                    rights_date,
-                    title,
-                    applicant,
-                    owner,
-                    inventor,
-                    agent,
-                ])
+            # Данные для Excel-файла
+            data = prepare_data_for_search_report(s, lang_code)
 
             # Формировние Excel-файла
-            workbook = xlwt.Workbook()
-            sheet = workbook.add_sheet("Search results")
-
-            # Заголовки
-            style = xlwt.easyxf('font: bold 1')
-            titles = [
-                _("Тип об'єкта промислової власності"),
-                _("Стан об'єкта промислової власності"),
-                _("Номер заявки"),
-                _("Дата подання заявки"),
-                _("Номер охоронного документа"),
-                _("Дата охоронного документа"),
-                _("Ключові слова"),
-                _("Заявник"),
-                _("Власник"),
-                _("Винахідник"),
-                _("Представник"),
-            ]
-            for i in range(len(titles)):
-                sheet.write(0, i, titles[i], style)
-
-            # Данные
-            style = xlwt.easyxf('align: wrap on, vert top;')
-            for i, l in enumerate(data):
-                for j, col in enumerate(l):
-                    sheet.write(i + 1, j, col, style)
+            workbook = create_search_res_doc(data)
 
             # Отправка в браузер
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename=search_results.xls'
             workbook.save(response)
             return response
+
+    raise Http404
+
+
+def download_xls_advanced(request):
+    """Формирует CSV-файл с результатами расширенного поиска и инициирует его загрузку у пользователя."""
+    AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
+    if request.GET:
+        formset = AdvancedSearchFormSet(request.GET)
+
+        # Поиск в ElasticSearch
+        if formset.is_valid():
+            # Разбивка поисковых данных на поисковые группы
+            search_groups = get_search_groups(formset.cleaned_data)
+
+            # Поиск в ElasticSearch по каждой группе
+            s = get_elastic_results(search_groups)
+
+            # Фильтрация
+            if request.GET.get('filter_obj_type'):
+                # Фильтрация по типу объекта
+                s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
+            if request.GET.get('filter_obj_state'):
+                # Фильтрация по статусу объекта
+                s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
+
+            if s.count() <= 5000:
+                s = s.source(['search_data', 'Document'])
+
+                # Сортировка
+                if request.GET.get('sort_by'):
+                    s = sort_results(s, request.GET['sort_by'])
+                else:
+                    s = s.sort('_score')
+
+                # Текущий язык
+                lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+
+                # Данные для Excel-файла
+                data = prepare_data_for_search_report(s, lang_code)
+
+                # Формировние Excel-файла
+                workbook = create_search_res_doc(data)
+
+                # Отправка в браузер
+                response = HttpResponse(content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = 'attachment; filename=search_results.xls'
+                workbook.save(response)
+                return response
 
     raise Http404
