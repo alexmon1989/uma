@@ -1,9 +1,14 @@
+import 'es6-promise/auto';
+import 'babel-polyfill';
+
 // Шаблон
 import './template.js';
+
 import Vue from 'vue';
 
 import SimpleSearchForm from "./vue-components/SimpleSearchForm/SimpleSearchForm.vue";
 import AdvancedSearchForm from "./vue-components/AdvancedSearchForm/AdvancedSearchForm.vue";
+import TransactionsSearchForm from "./vue-components/TransactionsSearchForm/TransactionsSearchForm.vue";
 
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);
@@ -14,6 +19,7 @@ const app = new Vue({
     el: '#app',
     components: {
         SimpleSearchForm,
-        AdvancedSearchForm
+        AdvancedSearchForm,
+        TransactionsSearchForm
     }
 });
