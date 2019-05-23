@@ -19,7 +19,6 @@ const app = new Vue({
     el: '#app',
     components: {
         SimpleSearchForm,
-        AdvancedSearchForm,
-        TransactionsSearchForm
+        AdvancedSearchForm
     }
 });
