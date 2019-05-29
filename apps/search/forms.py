@@ -1,9 +1,11 @@
 from django import forms
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q, Index
 from .models import SimpleSearchField, InidCodeSchedule, ObjType, IpcCode
-from .utils import prepare_advanced_query, prepare_simple_query
+from .utils import prepare_advanced_query, prepare_simple_query, get_transactions_types
+from datetime import datetime
 
 
 def get_param_type_choices():
@@ -146,3 +148,33 @@ class QueryForm(forms.Form):
             raise forms.ValidationError(
                 "Невірний запит"
             )
+
+
+class TransactionsSearchForm(forms.Form):
+    """Форма поиска по оповещениям."""
+    obj_type = forms.IntegerField()
+    transaction_type = forms.MultipleChoiceField()
+    date = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(TransactionsSearchForm, self).__init__(*args, **kwargs)
+        self.fields['obj_type'].choices = get_obj_type_choices()
+        transaction_types = []
+        try:
+            transaction_types = get_transactions_types(int(self.data['obj_type']))
+        except ValueError:
+            pass
+        self.fields['transaction_type'].choices = [(x, x) for x in transaction_types]
+
+    def clean_date(self):
+        data = self.cleaned_data['date']
+        dates = data.split(' ~ ')
+        try:
+            date_from = datetime.strptime(dates[0], '%d.%m.%Y')
+            date_to = datetime.strptime(dates[1], '%d.%m.%Y')
+        except ValueError:
+            raise forms.ValidationError(_("Невірний діапазон дат"))
+        return {
+            'date_from': date_from.strftime('%Y-%m-%d'),
+            'date_to': date_to.strftime('%Y-%m-%d'),
+        }

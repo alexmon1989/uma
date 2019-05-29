@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "es6-promise": "^4.2.6"
+    "es6-promise": "^4.2.6",
+    "vue2-datepicker": "^2.11.2"
   }
 }

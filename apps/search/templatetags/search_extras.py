@@ -89,7 +89,7 @@ def documents_count():
     client = Elasticsearch(settings.ELASTIC_HOST)
     qs = Q('query_string', query='*')
     qs = filter_bad_apps(qs)
-    s = Search(using=client, index='uma').query(qs)
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
     return s.count()
 
 

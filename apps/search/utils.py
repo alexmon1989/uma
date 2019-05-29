@@ -107,7 +107,7 @@ def get_elastic_results(search_groups):
             qs_result |= qs
 
     client = Elasticsearch(settings.ELASTIC_HOST)
-    s = Search(using=client, index="uma").query(qs_result).sort('_score')
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
 
     return s
 
@@ -1208,3 +1208,81 @@ def prepare_data_for_search_report(s, lang_code):
         ])
 
     return data
+
+
+def get_transactions_types(id_obj_type):
+    """Возвращает возможные типы транзакций для определённого типа объекта."""
+    client = Elasticsearch(settings.ELASTIC_HOST)
+    q = Q(
+        'bool',
+        must=[Q('match', Document__idObjType=id_obj_type)],
+    )
+    if id_obj_type in (1, 2, 3):
+        # Изобретения, полезные модели, топографии
+        field='TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
+    elif id_obj_type == 4:
+        # Знаки для товаров и услуг
+        field='TradeMark.Transactions.Transaction.@name.keyword'
+    else:
+        # Пром. образцы
+        field = 'Design.Transactions.Transaction.@name.keyword'
+
+    a = A('terms', field=field, size=10000, order={"_key": "asc"})
+
+    s = Search().using(client).query(q).extra(size=0)
+    s.aggs.bucket('transactions_types', a)
+
+    return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['buckets']]
+
+
+def get_search_in_transactions(search_params):
+    client = Elasticsearch(settings.ELASTIC_HOST)
+
+    transaction_path = ''
+    transaction_type_field = ''
+    transaction_date_field = ''
+    if search_params['obj_type'] in (1, 2, 3):
+        transaction_path = 'TRANSACTIONS.TRANSACTION'
+        transaction_type_field = 'TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
+        transaction_date_field = 'TRANSACTIONS.TRANSACTION.BULLETIN_DATE'
+    elif search_params['obj_type'] == 4:
+        transaction_path = 'TradeMark.Transactions.Transaction'
+        transaction_type_field = 'TradeMark.Transactions.Transaction.@name.keyword'
+        transaction_date_field = 'TradeMark.Transactions.Transaction.@bulletinDate'
+    elif search_params['obj_type'] == 6:
+        transaction_path = 'Design.Transactions.Transaction'
+        transaction_type_field = 'Design.Transactions.Transaction.@name.keyword'
+        transaction_date_field = 'Design.Transactions.Transaction.@bulletinDate'
+
+    if transaction_type_field and transaction_date_field:
+        qs = Q(
+            'bool',
+            must=[
+                Q('match', search_data__obj_state=2),
+                Q('match', Document__idObjType=search_params['obj_type']),
+            ]
+        )
+        qs &= Q(
+            'nested',
+            path=transaction_path,
+            query=Q(
+                'bool',
+                must=[
+                    Q(
+                        'query_string',
+                        query=' OR '.join([f"\"{x}\"" for x in search_params['transaction_type']]),
+                        default_field=transaction_type_field,
+                        default_operator='AND'
+                    ),
+                    Q('range', **{transaction_date_field: {
+                        'gte': search_params['date']['date_from'],
+                        'lte': search_params['date']['date_to']}
+                    })
+                ]
+            )
+        )
+        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+
+        return s
+
+    return False

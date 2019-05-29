@@ -2,6 +2,7 @@ from django.views.generic import TemplateView
 from django.db.models import F
 from django.forms import formset_factory
 from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse, HttpResponse
+from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -9,11 +10,12 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
 from django.core.exceptions import SuspiciousOperation
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
-from .forms import AdvancedSearchForm, SimpleSearchForm
+from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
                     get_data_for_selection_tm, create_selection_tm, filter_bad_apps, sort_results,
-                    user_has_access_to_docs_decorator, create_search_res_doc, prepare_data_for_search_report)
+                    user_has_access_to_docs_decorator, create_search_res_doc, prepare_data_for_search_report,
+                    get_transactions_types, get_search_in_transactions)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -81,7 +83,7 @@ class SimpleListView(TemplateView):
                     # Не показывать неопубликованные заявки
                     # qs = filter_unpublished_apps(self.request.user, qs)
 
-                s = Search(using=client, index='uma').query(qs)
+                s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
                 # Сортировка
                 if self.request.GET.get('sort_by'):
@@ -437,7 +439,7 @@ def download_xls_simple(request):
             # Не показывать неопубликованные заявки
             # qs = filter_unpublished_apps(self.request.user, qs)
 
-        s = Search(using=client, index='uma').query(qs)
+        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
         # Фильтрация
         if request.GET.get('filter_obj_type'):
@@ -545,3 +547,88 @@ def download_shared_docs(request, id_app_number):
     zip_.close()
     in_memory.seek(0)
     return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
+
+
+class TransactionsSearchView(TemplateView):
+    """Отображает страницу с возможностью поиска по оповещениям."""
+    template_name = 'search/transactions/index.html'
+
+    def get_context_data(self, **kwargs):
+        """Передаёт доп. переменные в шаблон."""
+        context = super().get_context_data(**kwargs)
+
+        # Текущий язык приложения
+        context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
+        # Типы ОПС
+        context['obj_types'] = list(
+            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{context['lang_code']}")).values('id', 'value')
+        )
+
+        # Типы оповещений
+        for obj_type in context['obj_types']:
+            obj_type['transactions_types'] = get_transactions_types(obj_type['id'])
+
+        context['initial_data'] = dict()
+        context['is_search'] = False
+        if self.request.GET:
+            form = TransactionsSearchForm(self.request.GET)
+            is_valid = form.is_valid()
+            context['is_search'] = True
+            context['form'] = form
+            context['initial_data'] = dict(six.iterlists(self.request.GET))
+
+            # Поиск
+            if is_valid:
+                s = get_search_in_transactions(form.cleaned_data)
+                if s:
+                    # Сортировка
+                    if self.request.GET.get('sort_by'):
+                        s = sort_results(s, self.request.GET['sort_by'])
+                    else:
+                        s = s.sort('_score')
+
+                    # Пагинация
+                    context['results'] = paginate_results(s, self.request.GET.get('page'), 10)
+
+        return context
+
+
+def download_xls_transactions(request):
+    """Формирует CSV-файл с результатами поиска по транзакциям."""
+    form = TransactionsSearchForm(request.GET)
+    if form.is_valid():
+
+        s = get_search_in_transactions(form.cleaned_data)
+        if s:
+            # Сортировка
+            if request.GET.get('sort_by'):
+                s = sort_results(s, request.GET['sort_by'])
+            else:
+                s = s.sort('_score')
+
+            if s.count() <= 5000:
+                s = s.source(['search_data', 'Document'])
+
+                # Сортировка
+                if request.GET.get('sort_by'):
+                    s = sort_results(s, request.GET['sort_by'])
+                else:
+                    s = s.sort('_score')
+
+                # Текущий язык
+                lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+
+                # Данные для Excel-файла
+                data = prepare_data_for_search_report(s, lang_code)
+
+                # Формировние Excel-файла
+                workbook = create_search_res_doc(data)
+
+                # Отправка в браузер
+                response = HttpResponse(content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = 'attachment; filename=search_results.xls'
+                workbook.save(response)
+                return response
+
+    raise Http404

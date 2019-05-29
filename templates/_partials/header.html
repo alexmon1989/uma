@@ -46,6 +46,9 @@
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'search:advanced'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'search:advanced' %}">{% trans "Розширений пошук" %}</a>
                                 </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'search:transactions'%}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'search:transactions' %}">{% trans "Пошук по сповіщенням" %}</a>
+                                </li>
                             </ul>
                             <!-- End Submenu -->
                         </li>

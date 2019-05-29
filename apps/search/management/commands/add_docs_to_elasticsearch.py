@@ -152,6 +152,17 @@ class Command(BaseCommand):
                 # Оповещения
                 if data.get('TRANSACTIONS'):
                     res['TRANSACTIONS'] = data['TRANSACTIONS']
+                    # Дополнительное поле с датой бюлетня для поиска по ней
+                    if type(res['TRANSACTIONS']['TRANSACTION']) is dict:
+                        res['TRANSACTIONS']['TRANSACTION'] = [res['TRANSACTIONS']['TRANSACTION']]
+                    for transaction in res['TRANSACTIONS']['TRANSACTION']:
+                        bulletin = transaction['BULLETIN'].split(', ')
+                        try:
+                            transaction['BULLETIN_DATE'] = datetime.datetime.strptime(
+                                bulletin[1], '%d.%m.%Y'
+                            ).strftime('%Y-%m-%d')
+                        except (ValueError, IndexError):  # Строка бюлетня не содержит дату
+                            pass
 
                 # Поисковые данные (для сортировки и т.д.)
                 res['search_data'] = {
@@ -202,7 +213,7 @@ class Command(BaseCommand):
                 res['TradeMark']['PaymentDetails'] = data.get('PaymentDetails')
             if data.get('DocFlow'):
                 res['TradeMark']['DocFlow'] = data.get('DocFlow')
-            if data.get('PaymentDetails'):
+            if data.get('Transactions'):
                 res['TradeMark']['Transactions'] = data.get('Transactions')
 
             # Форматирование даты
@@ -281,7 +292,7 @@ class Command(BaseCommand):
                 res['Design']['PaymentDetails'] = data.get('PaymentDetails')
             if data.get('DocFlow'):
                 res['Design']['DocFlow'] = data.get('DocFlow')
-            if data.get('PaymentDetails'):
+            if data.get('Transactions'):
                 res['Design']['Transactions'] = data.get('Transactions')
 
             applicant = None
@@ -337,10 +348,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
-        self.es = Elasticsearch()
+        self.es = Elasticsearch(settings.ELASTIC_HOST)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.filter(elasticindexed=0).values(
+        documents = IpcAppList.objects.filter(elasticindexed=0, obj_type__id__in=(1,2,3)).values(
             'id',
             'files_path',
             'obj_type_id',
@@ -360,12 +371,12 @@ class Command(BaseCommand):
             # Изобретения, полезные модели, топографии интегральных микросхем
             if doc['obj_type_id'] in (1, 2, 3):
                 self.process_inv_um_ld(doc)
-            # Знаки для товаров и услуг
-            elif doc['obj_type_id'] == 4:
-                self.process_tm(doc)
-            # Пром. образцы
-            elif doc['obj_type_id'] == 6:
-                self.process_id(doc)
+            # # Знаки для товаров и услуг
+            # elif doc['obj_type_id'] == 4:
+            #     self.process_tm(doc)
+            # # Пром. образцы
+            # elif doc['obj_type_id'] == 6:
+            #     self.process_id(doc)
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
             self.indexation_process.save()

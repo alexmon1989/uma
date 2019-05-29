@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load search_extras %}
+
+{% block title %}{% trans "Пошук по сповіщенням" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'search/transactions/_partials/breadcrumbs.html' %}
+
+    <div class="container g-py-70">
+        {% if is_search and not form.errors %}
+            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
+                    data-target="#collapseForm"
+                    aria-expanded="false" aria-controls="collapseExample">
+                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+            </button>
+        {% endif %}
+
+        <div class="collapse g-mb-20 {% if not is_search or form.errors %}show{% endif %}" id="collapseForm">
+            {% if form.errors %}
+                <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
+            {% endif %}
+
+            <transactions-search-form v-bind:obj-types="{{ obj_types }}" v-bind:initial="{{ initial_data }}"/>
+        </div>
+
+        {% if is_search and not formset_errors %}
+            {% if results %}
+                <div class="row g-pt-20 g-pb-9">
+                    <div class="col-12">
+                        <div class="d-md-flex justify-content-between g-mb-10">
+                            <div class="align-self-center g-mb-30 g-mb-0--md h-100">
+                                <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
+                                        class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
+                            </div>
+
+                            {% sort_params %}
+                        </div>
+
+                        {% include 'search/transactions/_partials/import_results_btn.html' %}
+
+                        {% for hit in results %}
+                            {# Изобретения, полезные модели #}
+                            {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                                {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                            {# Топографии #}
+                            {% elif hit.Document.idObjType == 3 %}
+                                {% ld_item hit forloop.counter0|add:results.start_index %}
+                            {# Знаки для товаров и услуг #}
+                            {% elif hit.Document.idObjType == 4 %}
+                                {% tm_item hit forloop.counter0|add:results.start_index %}
+                            {# Пром. образец #}
+                            {% elif hit.Document.idObjType == 6 %}
+                                {% id_item hit forloop.counter0|add:results.start_index %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% include 'search/transactions/_partials/pagination.html' %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="g-mt-10">
+                    <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+{% endblock %}
