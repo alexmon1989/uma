@@ -371,12 +371,12 @@ class Command(BaseCommand):
             # Изобретения, полезные модели, топографии интегральных микросхем
             if doc['obj_type_id'] in (1, 2, 3):
                 self.process_inv_um_ld(doc)
-            # # Знаки для товаров и услуг
-            # elif doc['obj_type_id'] == 4:
-            #     self.process_tm(doc)
-            # # Пром. образцы
-            # elif doc['obj_type_id'] == 6:
-            #     self.process_id(doc)
+            # Знаки для товаров и услуг
+            elif doc['obj_type_id'] == 4:
+                self.process_tm(doc)
+            # Пром. образцы
+            elif doc['obj_type_id'] == 6:
+                self.process_id(doc)
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
             self.indexation_process.save()
