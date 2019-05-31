@@ -1120,21 +1120,33 @@ def user_has_access_to_docs(user, id_app_number):
     if hasattr(user, 'certificateowner'):
         user_fullname = user.certificateowner.pszSubjFullName.upper()
 
-        applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
-        if applicants and user_fullname in map(str.upper, applicants):
-            return True
+        try:
+            applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
+            if applicants and user_fullname in map(str.upper, applicants):
+                return True
+        except KeyError:
+            pass
 
-        inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
-        if inventors and user_fullname in map(str.upper, inventors):
-            return True
+        try:
+            inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
+            if inventors and user_fullname in map(str.upper, inventors):
+                return True
+        except KeyError:
+            pass
 
-        owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
-        if owners and user_fullname in map(str.upper, owners):
-            return True
+        try:
+            owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
+            if owners and user_fullname in map(str.upper, owners):
+                return True
+        except KeyError:
+            pass
 
-        agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
-        if agents and user_fullname in map(str.upper, agents):
-            return True
+        try:
+            agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
+            if agents and user_fullname in map(str.upper, agents):
+                return True
+        except KeyError:
+            pass
 
     return False
 
