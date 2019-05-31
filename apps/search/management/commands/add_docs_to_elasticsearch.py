@@ -351,7 +351,7 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.filter(elasticindexed=0, obj_type__id__in=(1,2,3)).values(
+        documents = IpcAppList.objects.filter(elasticindexed=0).values(
             'id',
             'files_path',
             'obj_type_id',
