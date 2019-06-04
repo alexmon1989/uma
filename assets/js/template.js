@@ -10,6 +10,7 @@ import '../vendor/icon-hs/style.css';
 import '../vendor/animate.css';
 import '../vendor/chosen/chosen.css';
 import '../vendor/fancybox/jquery.fancybox.min.css';
+import '../../node_modules/toastr/build/toastr.css';
 import '../include/scss/unify.scss'
 
 // Scripts

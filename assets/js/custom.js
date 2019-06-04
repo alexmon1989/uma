@@ -1,3 +1,6 @@
+import { saveAs } from 'file-saver';
+import * as Toastr from 'toastr';
+
 /**
  * Обновляет GET-параметр в url.
  */
@@ -47,10 +50,12 @@ function updateURLParameter(url, param, paramVal)
 }
 
 $(function () {
-    $filterForm = $("#filter-form");
-    $filterForm.find("input[type=checkbox]").change(function () {
-        $filterForm.submit();
-    });
+    let $filterForm = $("#filter-form");
+    if ($filterForm) {
+        $filterForm.find("input[type=checkbox]").change(function () {
+            $filterForm.submit();
+        });
+    }
 
     // Показать/скрыть все аналоги изобретений/полезных моделей
     $(".i_56 .show-all").click(function (e) {
@@ -108,5 +113,32 @@ $(function () {
     // Обработчик события смены параметра сортировки результатов
     $("#sort_by").change(function () {
         window.location.href = updateURLParameter(window.location.href, 'sort_by', $(this).val());
+    });
+
+    // Обработчик события нажатия кнопки скачивания выписки
+    $('#download-selection-btn').click(function (e) {
+        e.preventDefault();
+        let $btn = $(this);
+        let $form = $("#selection-form");
+        let oldHtml = $btn.html();
+        $btn.html('<i class="fa fa-spinner g-mr-5"></i>' + gettext('Зачекайте...'));
+        $btn.attr('disabled', true);
+
+        let xhr = new XMLHttpRequest();
+
+        let url = $form.attr("action") + '?' + $form.serialize();
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                saveAs(this.response);
+            } else {
+                Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            }
+            $btn.html(oldHtml);
+            $btn.attr('disabled', false);
+        };
+        xhr.send();
     });
 });
