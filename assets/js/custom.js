@@ -132,7 +132,11 @@ $(function () {
 
         xhr.onload = function () {
             if (xhr.status === 200) {
-                saveAs(this.response);
+                let header = xhr.getResponseHeader('Content-Disposition');
+                let startIndex = header.indexOf("filename=") + 10;
+                let endIndex = header.length - 1;
+                let filename = header.substring(startIndex, endIndex);
+                saveAs(this.response, filename);
             } else {
                 Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
             }
