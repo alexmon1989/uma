@@ -46,7 +46,7 @@
             }
         },
         mounted() {
-            if (this.initial) {
+            if (this.initial['obj_type']) {
                 this.obj_type = this.initial['obj_type'][0].toString();
                 this.date = this.initial['date'][0].split(' ~ ');
                 this.$nextTick(function () {

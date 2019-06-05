@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils.translation import ugettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
+from elasticsearch_dsl.aggs import Terms, Nested
 from .models import ObjType, InidCodeSchedule, OrderService, SortParameter
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
@@ -1232,19 +1233,23 @@ def get_transactions_types(id_obj_type):
     if id_obj_type in (1, 2, 3):
         # Изобретения, полезные модели, топографии
         field='TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
+        nested = 'TRANSACTIONS.TRANSACTION'
     elif id_obj_type == 4:
         # Знаки для товаров и услуг
         field='TradeMark.Transactions.Transaction.@name.keyword'
+        nested = 'TradeMark.Transactions'
     else:
         # Пром. образцы
         field = 'Design.Transactions.Transaction.@name.keyword'
-
-    a = A('terms', field=field, size=10000, order={"_key": "asc"})
+        nested = 'Design.Transactions'
 
     s = Search().using(client).query(q).extra(size=0)
-    s.aggs.bucket('transactions_types', a)
+    s.aggs.bucket('transactions_types', Nested(path=nested)).bucket('transactions_types', Terms(field=field, size=1000, order={"_key": "asc"}))
 
-    return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['buckets']]
+    try:
+        return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
+    except KeyError:
+        return []
 
 
 def get_search_in_transactions(search_params):
