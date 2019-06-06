@@ -27,19 +27,21 @@
             </li>
         {% endif %}
 
-        {% for i in results.paginator.page_range %}
-            {% if results.number == i %}
-                <li class="list-inline-item">
-                    <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-7-14"
+        {% spaceless %}
+            {% for i in results.paginator.page_range %}
+                {% if results.number == i %}
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-7-14"
+                               href="?{% url_replace request 'page' i %}">{{ i }}</a>
+                    </li>
+                {% elif i > results.number|add:'-5' and i < results.number|add:'5' %}
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
                            href="?{% url_replace request 'page' i %}">{{ i }}</a>
-                </li>
-            {% elif i > results.number|add:'-5' and i < results.number|add:'5' %}
-                <li class="list-inline-item">
-                    <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
-                       href="?{% url_replace request 'page' i %}">{{ i }}</a>
-                </li>
-            {% endif %}
-        {% endfor %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endspaceless %}
 
         {% if results.paginator.num_pages > results.number|add:'4' %}
             <li class="list-inline-item">
