@@ -1237,14 +1237,17 @@ def get_transactions_types(id_obj_type):
     elif id_obj_type == 4:
         # Знаки для товаров и услуг
         field='TradeMark.Transactions.Transaction.@name.keyword'
-        nested = 'TradeMark.Transactions'
+        nested = 'TradeMark.Transactions.Transaction'
     else:
         # Пром. образцы
         field = 'Design.Transactions.Transaction.@name.keyword'
-        nested = 'Design.Transactions'
+        nested = 'Design.Transactions.Transaction'
 
     s = Search().using(client).query(q).extra(size=0)
     s.aggs.bucket('transactions_types', Nested(path=nested)).bucket('transactions_types', Terms(field=field, size=1000, order={"_key": "asc"}))
+
+    import json
+    print(json.dumps(s.to_dict()))
 
     try:
         return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
