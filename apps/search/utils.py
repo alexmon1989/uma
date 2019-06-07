@@ -1121,33 +1121,41 @@ def user_has_access_to_docs(user, id_app_number):
 
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
     if hasattr(user, 'certificateowner'):
-        user_fullname = user.certificateowner.pszSubjFullName.upper()
+        user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
 
         try:
             applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
-            if applicants and user_fullname in map(str.upper, applicants):
-                return True
+            if applicants:
+                for applicant in applicants:
+                    if user_fullname in applicant.upper():
+                        return True
         except KeyError:
             pass
 
         try:
             inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
-            if inventors and user_fullname in map(str.upper, inventors):
-                return True
+            if inventors:
+                for inventor in inventors:
+                    if user_fullname in inventor.upper():
+                        return True
         except KeyError:
             pass
 
         try:
             owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
-            if owners and user_fullname in map(str.upper, owners):
-                return True
+            if owners:
+                for owner in owners:
+                    if user_fullname in owner.upper():
+                        return True
         except KeyError:
             pass
 
         try:
             agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
-            if agents and user_fullname in map(str.upper, agents):
-                return True
+            if agents:
+                for agent in agents:
+                    if user_fullname in agent.upper():
+                        return True
         except KeyError:
             pass
 
