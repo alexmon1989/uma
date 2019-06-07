@@ -28,8 +28,12 @@
                                         {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier }}</span>
                                     </div>
                                 {% endif %}
+                            </div>
+                        {% endif %}
 
-                                <div class="g-font-weight-600 ml-auto"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i>{{ hit.Document.RegistrationStatus }}</div>
+                        {% if hit.search_data.obj_state == 2 %}
+                            <div class="g-pb-10 d-flex justify-content-end">
+                                {% registration_status hit=hit %}
                             </div>
                         {% endif %}
 

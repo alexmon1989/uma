@@ -22,7 +22,7 @@
 
                         {% if hit.search_data.obj_state == 2 %}
                             <div class="g-pb-10 d-flex justify-content-end">
-                                {% registration_status status=hit.Document.RegistrationStatus %}
+                                {% registration_status hit=hit %}
                             </div>
                         {% endif %}
 

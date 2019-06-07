@@ -19,7 +19,7 @@
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
-            <div class="g-font-weight-600"><i class="fa fa-circle g-color-gray-light-v1 g-mr-5"></i> {{ hit.Document.RegistrationStatus }}</div>
+            {% registration_status hit=hit %}
         {% endif %}
     </div>
 

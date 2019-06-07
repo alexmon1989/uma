@@ -109,6 +109,8 @@ def get_elastic_results(search_groups):
 
     client = Elasticsearch(settings.ELASTIC_HOST)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
+    import json
+    print(json.dumps(s.to_dict()))
 
     return s
 

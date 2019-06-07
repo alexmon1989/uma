@@ -19,7 +19,7 @@
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
-            {% registration_status status=hit.Document.RegistrationStatus %}
+            {% registration_status hit=hit %}
         {% endif %}
     </div>
 

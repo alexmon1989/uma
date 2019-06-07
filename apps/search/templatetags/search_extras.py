@@ -74,9 +74,54 @@ def obj_type_title(id, lang):
 
 
 @register.inclusion_tag('search/templatetags/registration_status.html')
-def registration_status(status):
-    return {'status': status}
+def registration_status(hit):
+    """Выводит статус охранного документа (зелёный, желтый, красный)."""
+    status = 'gray'
+    if hit.Document.idObjType in (1, 2, 3):
+        if hit.Document.RegistrationStatus == 'A':
+            status = 'green'
+        elif hit.Document.RegistrationStatus == 'N':
+            status = 'red'
+        elif hit.Document.RegistrationStatus == 'T':
+            status = 'yellow'
+    elif hit.Document.idObjType == 4:
+        status = 'green'
 
+        red_transaction_types = [
+            'TerminationNoRenewalFee',
+            'TotalTerminationByOwner',
+            'TotalInvalidationByCourt',
+            'TotalTerminationByCourt',
+            'TotalInvalidationByAppeal',
+        ]
+
+        if hasattr(hit.TradeMark, 'Transactions') and hit.TradeMark.Transactions:
+            last_transaction_type = \
+                hit.TradeMark.Transactions.Transaction[len(hit.TradeMark.Transactions.Transaction) - 1]['@type']
+
+            if last_transaction_type in red_transaction_types:
+                status = 'red'
+
+    elif hit.Document.idObjType == 6:
+        status = 'green'
+
+        red_transaction_types = [
+            'Termination',
+            'TerminationByAppeal',
+            'TerminationNoRenewalFee',
+            'TotalInvalidationByAppeal',
+            'TotalInvalidationByCourt',
+            'TotalTerminationByOwner',
+        ]
+
+        if hasattr(hit.Design, 'Transactions'):
+            last_transaction_type = \
+                hit.Design.Transactions.Transaction[len(hit.Design.Transactions.Transaction) - 1]['@type']
+
+            if last_transaction_type in red_transaction_types:
+                status = 'red'
+
+    return {'status': status, 'hit': hit}
 
 @register.simple_tag
 def user_can_watch_docs(user):
