@@ -141,7 +141,7 @@ class AdvancedListView(TemplateView):
                 search_groups = get_search_groups(formset.cleaned_data)
 
                 # Поиск в ElasticSearch по каждой группе
-                s = get_elastic_results(search_groups)
+                s = get_elastic_results(search_groups, self.request.user)
 
                 # Сортировка
                 if self.request.GET.get('sort_by'):

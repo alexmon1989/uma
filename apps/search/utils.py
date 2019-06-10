@@ -59,7 +59,7 @@ def prepare_simple_query(query, field_type):
     return query
 
 
-def get_elastic_results(search_groups):
+def get_elastic_results(search_groups, user):
     """Поиск в ElasticSearch по группам."""
     qs_list = []
     for group in search_groups:
@@ -93,7 +93,7 @@ def get_elastic_results(search_groups):
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
                 qs = filter_bad_apps(qs)
-                qs = filter_unpublished_apps(qs)
+                qs = filter_unpublished_apps(user, qs)
 
                 qs_list.append(qs)
 
