@@ -93,9 +93,7 @@ def get_elastic_results(search_groups):
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
                 qs = filter_bad_apps(qs)
-
-                # TODO: для всех показывать только статусы 3 и 4, для вип-ролей - всё.
-                # qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+                qs = filter_unpublished_apps(qs)
 
                 qs_list.append(qs)
 
@@ -109,8 +107,6 @@ def get_elastic_results(search_groups):
 
     client = Elasticsearch(settings.ELASTIC_HOST)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
-    import json
-    print(json.dumps(s.to_dict()))
 
     return s
 
@@ -167,7 +163,8 @@ def filter_bad_apps(qs):
 def filter_unpublished_apps(user, qs):
     """Исключает из результатов запроса неопубликованные заявки для обычных пользователей."""
     if user.is_anonymous or not user.is_vip():
-        qs &= Q('query_string', query="3 OR 4", default_field='Document.Status')
+        qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+
     return qs
 
 
