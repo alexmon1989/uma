@@ -163,6 +163,8 @@ def filter_unpublished_apps(user, qs):
     if user.is_anonymous or not user.is_vip():
         # Не показывать заявки на знаки со статусом 1000
         qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+        # Не показывать заявки по пром. образцам и полезным моделям
+        qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
         # Показывать только заявки с датой заяки
         qs &= Q('query_string', query="_exists_:search_data.app_date")
 
