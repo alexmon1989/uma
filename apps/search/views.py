@@ -211,7 +211,7 @@ class ObjectDetailView(TemplateView):
             must=[Q('match', _id=id_app_number)],
         )
         q = filter_bad_apps(q) # Исключение заявок, не пригодных к отображению
-        q = filter_unpublished_apps(q)
+        q = filter_unpublished_apps(self.request.user, q)
         s = Search().using(client).query(q).execute()
         if not s:
             raise Http404("Об'єкт не знайдено")
