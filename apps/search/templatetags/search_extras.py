@@ -4,7 +4,7 @@ from django.db.models import F
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from ..models import ObjType, SortParameter, IndexationProcess
-from ..utils import filter_bad_apps, user_has_access_to_docs as user_has_access_to_docs_
+from ..utils import filter_bad_apps, user_has_access_to_docs as user_has_access_to_docs_, filter_unpublished_apps
 
 register = template.Library()
 
@@ -128,12 +128,13 @@ def user_can_watch_docs(user):
     return user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists()
 
 
-@register.simple_tag
-def documents_count():
+@register.simple_tag(takes_context=True)
+def documents_count(context):
     """Возвращает количество документов доступных для поиска"""
     client = Elasticsearch(settings.ELASTIC_HOST)
     qs = Q('query_string', query='*')
     qs = filter_bad_apps(qs)
+    qs = filter_unpublished_apps(context['request'].user, qs)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
     return s.count()
 
