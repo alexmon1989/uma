@@ -154,8 +154,6 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    # Показывать только заявки с датой заяки
-    qs &= Q('query_string', query="_exists_:search_data.app_date")
 
     return qs
 
@@ -163,7 +161,10 @@ def filter_bad_apps(qs):
 def filter_unpublished_apps(user, qs):
     """Исключает из результатов запроса неопубликованные заявки для обычных пользователей."""
     if user.is_anonymous or not user.is_vip():
+        # Не показывать заявки на знаки со статусом 1000
         qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+        # Показывать только заявки с датой заяки
+        qs &= Q('query_string', query="_exists_:search_data.app_date")
 
     return qs
 

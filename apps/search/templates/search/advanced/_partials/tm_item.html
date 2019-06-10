@@ -6,7 +6,7 @@
         {{ item_num }}.
         <a href="{% url 'search:detail' id_app_number=hit.meta.id %}"
            class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
-        >{{ hit.search_data.title }}</a>
+        >{{ hit.search_data.title|default_if_none:"---" }}</a>
     </h3>
 
     <div class="g-py-5 d-flex justify-content-between">
@@ -50,12 +50,14 @@
                data-placement="top"
                title="(210) Номер заявки"
             >{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</a><br>
-            <a href="#!"
-               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
-               data-toggle="tooltip"
-               data-placement="bottom"
-               title="(220) Дата подання заявки"
-            >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+            {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
+                <a href="#!"
+                   class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                   data-toggle="tooltip"
+                   data-placement="bottom"
+                   title="(220) Дата подання заявки"
+                >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+            {% endif %}
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
