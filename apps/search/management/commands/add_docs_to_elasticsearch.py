@@ -380,9 +380,12 @@ class Command(BaseCommand):
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
             self.indexation_process.save()
-            # Удаление JSON
-            os.remove(self.get_json_path(doc))
 
+            # Удаление JSON
+            try:
+                os.remove(self.get_json_path(doc))
+            except FileNotFoundError:
+                pass
 
         # Время окончания процесса индексации и сохранение данных процесса индексации
         self.indexation_process.finish_date = datetime.datetime.now()
