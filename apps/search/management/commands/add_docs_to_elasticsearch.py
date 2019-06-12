@@ -179,21 +179,7 @@ class Command(BaseCommand):
                 }
 
                 # Запись в индекс
-                try:
-                    self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
-                except elasticsearch_exceptions.RequestError as e:
-                    json_path = self.get_json_path(doc)
-                    self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
-                    IndexationError.objects.create(
-                        app_id=doc['id'],
-                        type='ElasticSearch RequestError',
-                        text=e,
-                        json_path=json_path,
-                        indexation_process=self.indexation_process
-                    )
-                else:
-                    # Пометка в БД что этот документ проиндексирован
-                    IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+                self.write_to_es_index(doc, res)
 
     def process_tm(self, doc):
         """Добавляет документ типа "знак для товаров и услуг" ElasticSearch."""
@@ -258,21 +244,7 @@ class Command(BaseCommand):
             }
 
             # Запись в индекс
-            try:
-                self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
-            except elasticsearch_exceptions.RequestError as e:
-                json_path = self.get_json_path(doc)
-                self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
-                IndexationError.objects.create(
-                    app_id=doc['id'],
-                    type='ElasticSearch RequestError',
-                    text=e,
-                    json_path=json_path,
-                    indexation_process=self.indexation_process
-                )
-            else:
-                # Пометка в БД что этот документ проиндексирован
-                IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+            self.write_to_es_index(doc, res)
 
     def process_id(self, doc):
         """Добавляет документ типа "пром. образец" ElasticSearch."""
@@ -330,21 +302,36 @@ class Command(BaseCommand):
             }
 
             # Запись в индекс
-            try:
-                self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=res)
-            except elasticsearch_exceptions.RequestError as e:
-                json_path = self.get_json_path(doc)
-                self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
-                IndexationError.objects.create(
-                    app_id=doc['id'],
-                    type='ElasticSearch RequestError',
-                    text=e,
-                    json_path=json_path,
-                    indexation_process=self.indexation_process
-                )
-            else:
-                # Пометка в БД что этот документ проиндексирован
-                IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+            self.write_to_es_index(doc, res)
+
+    def write_to_es_index(self, doc, body):
+        """Записывает в индекс ES."""
+        try:
+            self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=body,
+                          request_timeout=30)
+        except elasticsearch_exceptions.RequestError as e:
+            json_path = self.get_json_path(doc)
+            self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
+            IndexationError.objects.create(
+                app_id=doc['id'],
+                type='ElasticSearch RequestError',
+                text=e,
+                json_path=json_path,
+                indexation_process=self.indexation_process
+            )
+        except elasticsearch_exceptions.ConnectionTimeout as e:
+            json_path = self.get_json_path(doc)
+            self.stdout.write(self.style.ERROR(f"ElasticSearch ConnectionTimeout: {e}: {json_path}"))
+            IndexationError.objects.create(
+                app_id=doc['id'],
+                type='ElasticSearch ConnectionTimeout',
+                text=e,
+                json_path=json_path,
+                indexation_process=self.indexation_process
+            )
+        else:
+            # Пометка в БД что этот документ проиндексирован
+            IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
