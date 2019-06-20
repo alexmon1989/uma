@@ -20,7 +20,7 @@ def validate_query_elasticsearch(query, field, search_type):
     elif search_type == 'advanced':
         query = prepare_advanced_query(query, field.field_type)
     client = Elasticsearch(settings.ELASTIC_HOST)
-    i = Index('uma', using=client).validate_query(body={
+    i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
         'query': Q(
             'query_string',
             query=query,
@@ -135,7 +135,7 @@ class QueryForm(forms.Form):
 
         # Валидация запроса в ElasticSearch
         client = Elasticsearch(settings.ELASTIC_HOST)
-        i = Index('uma', using=client).validate_query(body={
+        i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
             'query': Q(
                 'query_string',
                 query=query,

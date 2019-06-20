@@ -47,7 +47,7 @@ def prepare_advanced_query(query, field_type):
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
-    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT")
+    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT").replace("/", "//")
     return query
 
 
