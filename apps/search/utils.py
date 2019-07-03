@@ -130,10 +130,10 @@ class ResultsProxy(object):
         self.s = s
 
     def __len__(self):
-        return self.s.count()
+        return self.s['total']
 
     def __getitem__(self, item):
-        return self.s[item.start:item.stop].execute()
+        return self.s['items']
 
 
 def paginate_results(s, page, paginate_by=10):
@@ -198,7 +198,7 @@ def sort_results(s, sort_by_value):
 
     return s
 
-def filter_results(s, request):
+def filter_results(s, get_params):
     """Фильтрует результат запроса ElasticSearch и выполняет агрегацию для фильтров в сайдбаре."""
     # Агрегация для определения всех типов объектов и состояний
     s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
@@ -207,13 +207,13 @@ def filter_results(s, request):
     s_ = s
 
     # Фильтрация
-    if request.GET.get('filter_obj_type'):
+    if get_params.get('filter_obj_type'):
         # Фильтрация в основном запросе
-        s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
+        s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
         # Агрегация для определения количества объектов определённых типов после применения одного фильтра
         s_filter_obj_type = s_.filter(
             'terms',
-            Document__idObjType=request.GET.getlist('filter_obj_type')
+            Document__idObjType=get_params.get('filter_obj_type')
         )
         s_filter_obj_type.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
         aggregations_obj_state = s_filter_obj_type.execute().aggregations.to_dict()
@@ -225,14 +225,14 @@ def filter_results(s, request):
                 )
         aggregations['obj_state_terms']['buckets'] = aggregations_obj_state['obj_state_terms']['buckets']
 
-    if request.GET.get('filter_obj_state'):
+    if get_params.get('filter_obj_state'):
         # Фильтрация в основном запросе
-        s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
+        s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
         # Агрегация для определения количества объектов определённых состояний
         # после применения одного фильтра
         s_filter_obj_state = s_.filter(
             'terms',
-            search_data__obj_state=request.GET.getlist('filter_obj_state')
+            search_data__obj_state=get_params.get('filter_obj_state')
         )
         s_filter_obj_state.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
         aggregations_id_obj_type = s_filter_obj_state.execute().aggregations.to_dict()
@@ -253,44 +253,44 @@ def extend_doc_flow(hit):
     q = Q(
         'bool',
         must=[
-            Q('match', search_data__app_number=hit.search_data.app_number),
+            Q('match', search_data__app_number=hit['search_data']['app_number']),
             Q('match', search_data__obj_state=1)
         ]
     )
     client = Elasticsearch(settings.ELASTIC_HOST)
     application = Search().using(client).query(q).execute()
     if application:
-        application = application[0]
+        application = application[0].to_dict()
 
         try:
             # Объединение стадий
-            stages = application.DOCFLOW.STAGES
-            stages.extend(hit.DOCFLOW.STAGES)
-            hit.DOCFLOW.STAGES = stages
+            stages = application['DOCFLOW']['STAGES']
+            stages.extend(hit['DOCFLOW']['STAGES'])
+            hit['DOCFLOW']['STAGES'] = stages
         except AttributeError:
             pass
 
         try:
             # Объединение документов
-            documents = application.DOCFLOW.DOCUMENTS
-            documents.extend(hit.DOCFLOW.DOCUMENTS)
-            hit.DOCFLOW.DOCUMENTS = documents
+            documents = application['DOCFLOW']['DOCUMENTS']
+            documents.extend(hit['DOCFLOW']['DOCUMENTS'])
+            hit['DOCFLOW']['DOCUMENTS'] = documents
         except AttributeError:
             pass
 
         try:
             # Объединение платежей
-            payments = application.DOCFLOW.PAYMENTS
-            payments.extend(hit.DOCFLOW.PAYMENTS)
-            hit.DOCFLOW.PAYMENTS = payments
+            payments = application['DOCFLOW']['PAYMENTS']
+            payments.extend(hit['DOCFLOW']['PAYMENTS'])
+            hit['DOCFLOW']['PAYMENTS'] = payments
         except AttributeError:
             pass
 
         try:
             # Объединение сборов
-            collections = application.DOCFLOW.COLLECTIONS
-            collections.extend(hit.DOCFLOW.COLLECTIONS)
-            hit.DOCFLOW.COLLECTIONS = collections
+            collections = application['DOCFLOW']['COLLECTIONS']
+            collections.extend(hit['DOCFLOW']['COLLECTIONS'])
+            hit['DOCFLOW']['COLLECTIONS'] = collections
         except AttributeError:
             pass
 

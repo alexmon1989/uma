@@ -8,7 +8,7 @@
 
             {% for item in sort_params %}
                 <option value="{{ item.value }}"
-                        {% if request_get_params.sort_by == item.value %}selected=""{% endif %}
+                        {% if request_get_params.sort_by.0 == item.value %}selected=""{% endif %}
                 >{{ item.title }}</option>
             {% endfor %}
         </select>

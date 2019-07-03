@@ -11,25 +11,25 @@ register = template.Library()
 
 @register.filter
 def get_person_name(value):
-    values = list(value.to_dict().values())
+    values = list(value.values())
     return values[0]
 
 
 @register.filter
 def get_person_country(value):
-    values = list(value.to_dict().values())
+    values = list(value.values())
     return values[1]
 
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html')
 def inv_um_item(hit, item_num):
-    biblio_data = hit.Claim if hit.search_data.obj_state == 1 else hit.Patent
+    biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
 @register.inclusion_tag('search/advanced/_partials/ld_item.html')
 def ld_item(hit, item_num):
-    biblio_data = hit.Claim if hit.search_data.obj_state == 1 else hit.Patent
+    biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
@@ -77,14 +77,14 @@ def obj_type_title(id, lang):
 def registration_status(hit):
     """Выводит статус охранного документа (зелёный, желтый, красный)."""
     status = 'gray'
-    if hit.Document.idObjType in (1, 2, 3):
-        if hit.Document.RegistrationStatus == 'A':
+    if hit['Document']['idObjType'] in (1, 2, 3):
+        if hit['Document']['RegistrationStatus'] == 'A':
             status = 'green'
-        elif hit.Document.RegistrationStatus == 'N':
+        elif hit['Document']['RegistrationStatus'] == 'N':
             status = 'red'
-        elif hit.Document.RegistrationStatus == 'T':
+        elif hit['Document']['RegistrationStatus'] == 'T':
             status = 'yellow'
-    elif hit.Document.idObjType == 4:
+    elif hit['Document']['idObjType'] == 4:
         status = 'green'
 
         red_transaction_types = [
@@ -95,14 +95,14 @@ def registration_status(hit):
             'TotalInvalidationByAppeal',
         ]
 
-        if hasattr(hit.TradeMark, 'Transactions') and hit.TradeMark.Transactions:
+        if hit.get('TradeMark', {}).get('Transactions'):
             last_transaction_type = \
-                hit.TradeMark.Transactions.Transaction[len(hit.TradeMark.Transactions.Transaction) - 1]['@type']
+                hit['TradeMark']['Transactions']['Transaction'][len(hit['TradeMark']['Transactions']['Transaction']) - 1]['@type']
 
             if last_transaction_type in red_transaction_types:
                 status = 'red'
 
-    elif hit.Document.idObjType == 6:
+    elif hit['Document']['idObjType'] == 6:
         status = 'green'
 
         red_transaction_types = [
@@ -114,9 +114,9 @@ def registration_status(hit):
             'TotalTerminationByOwner',
         ]
 
-        if hasattr(hit.Design, 'Transactions'):
+        if hit.get('Design', {}).get('Transactions'):
             last_transaction_type = \
-                hit.Design.Transactions.Transaction[len(hit.Design.Transactions.Transaction) - 1]['@type']
+                hit['Design']['Transactions']['Transaction'][len(hit['Design']['Transactions']['Transaction']) - 1]['@type']
 
             if last_transaction_type in red_transaction_types:
                 status = 'red'
@@ -171,7 +171,7 @@ def sort_params(context):
             'title',
             'value'
         ),
-        'request_get_params': context['request'].GET
+        'request_get_params': context['get_params']
     }
 
 

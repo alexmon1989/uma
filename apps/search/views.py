@@ -8,7 +8,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
-from django.core.exceptions import SuspiciousOperation
+from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
@@ -21,7 +21,9 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
 from pathlib import Path
+from celery.result import AsyncResult
 import os, io, json
+from .tasks import perform_simple_search, validate_query as validate_query_task, get_app_details
 
 
 class SimpleListView(TemplateView):
@@ -59,45 +61,37 @@ class SimpleListView(TemplateView):
             context['is_search'] = True
 
             if is_valid:
-                # Формирование поискового запроса ElasticSearch
-                client = Elasticsearch(settings.ELASTIC_HOST)
-                qs = None
-                for s in formset.cleaned_data:
-                    elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
-                    if elastic_field:
-                        q = Q(
-                            'query_string',
-                            query=prepare_simple_query(s['value'], elastic_field.field_type),
-                            default_field=elastic_field.field_name,
-                            default_operator='AND'
-                        )
-                        if qs is not None:
-                            qs &= q
-                        else:
-                            qs = q
-
-                if qs is not None:
-                    # Не показывать заявки, по которым выдан охранный документ
-                    qs = filter_bad_apps(qs)
-
-                    # Не показывать неопубликованные заявки
-                    qs = filter_unpublished_apps(self.request.user, qs)
-
-                s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
-
-                # Сортировка
-                if self.request.GET.get('sort_by'):
-                    s = sort_results(s, self.request.GET['sort_by'])
-                else:
-                    s = s.sort('_score')
-
-                # Фильтрация, агрегация
-                s, context['aggregations'] = filter_results(s, self.request)
-
-                # Пагинация
-                context['results'] = paginate_results(s, self.request.GET.get('page'), 10)
+                # Создание асинхронной задачи для Celery
+                task = perform_simple_search.delay(
+                    formset.cleaned_data,
+                    self.request.user.pk,
+                    dict(six.iterlists(self.request.GET))
+                )
+                context['task_id'] = task.id
 
         return context
+
+
+def get_simple_results_html(request):
+    """Возвращает HTML с результатами простого поиска."""
+    task_id = request.GET.get('task_id', None)
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        data = {}
+        if task.state == 'SUCCESS':
+            context = task.result
+            context['lang_code'] = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+            data['state'] = 'SUCCESS'
+            # Пагинация
+            page = task.result['get_params']['page'][0] if task.result['get_params'].get('page') else 1
+            context['results'] = paginate_results(task.result['results'], page, 10)
+            # Формирование HTML с результатами
+            data['result'] = render_to_string(
+                'search/simple/_partials/results.html',
+                context,
+                request)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpResponse('No job id given.')
 
 
 class AdvancedListView(TemplateView):
@@ -200,6 +194,13 @@ class ObjectDetailView(TemplateView):
         """Передаёт доп. переменные в шаблон."""
         context = super().get_context_data(**kwargs)
 
+        # Создание асинхронной задачи на получение данных объекта
+        task = get_app_details.delay(
+            kwargs['id_app_number'],
+            self.request.user.pk
+        )
+        context['task_id'] = task.id
+
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
@@ -252,6 +253,26 @@ class ObjectDetailView(TemplateView):
 
         context['id_app_number'] = id_app_number
         return context
+
+
+def get_object_detail_html(request):
+    """Возвращает HTML с результатами простого поиска."""
+    task_id = request.GET.get('task_id', None)
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        data = {}
+        if task.state == 'SUCCESS':
+            context = task.result
+            context['lang_code'] = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+            data['state'] = 'SUCCESS'
+
+            # Формирование HTML с результатами
+            data['result'] = render_to_string(
+                'search/simple/_partials/results.html',
+                context,
+                request)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpResponse('No job id given.')
 
 
 @require_POST
@@ -400,16 +421,9 @@ def download_selection_tm(request, id_app_number):
 
 
 def validate_query(request):
-    """Проводит валидацию запроса, который идёт в ElasticSearch (для валидации на стороне клиента)"""
-    search_type = request.GET.get('search_type')
-    if search_type == 'simple':
-        form = SimpleSearchForm(request.GET)
-    elif search_type == 'advanced':
-        form = AdvancedSearchForm(request.GET)
-    else:
-        raise SuspiciousOperation("Невірні параметри.")
-
-    return JsonResponse({'result': int(form.is_valid())})
+    """Создаёт задание на валидацию запроса, который идёт в ElasticSearch (для валидации на стороне клиента)"""
+    task = validate_query_task.delay(request.GET)
+    return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
 
 def download_xls_simple(request):
@@ -633,3 +647,17 @@ def download_xls_transactions(request):
                 return response
 
     raise Http404
+
+
+def get_task_info(request):
+    """Возвращает JSON с результатами выполнения асинхронного задания."""
+    task_id = request.GET.get('task_id', None)
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        data = {
+            'state': task.state,
+            'result': task.result,
+        }
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return HttpResponse('No job id given.')
