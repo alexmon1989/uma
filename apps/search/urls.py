@@ -2,14 +2,15 @@ from django.urls import path
 from .views import (SimpleListView, AdvancedListView, add_filter_params, ObjectDetailView, download_docs_zipped,
                     download_doc, download_selection_inv_um_ld, download_selection_tm, download_xls_simple,
                     download_xls_advanced, download_shared_docs, TransactionsSearchView, download_xls_transactions,
-                    get_simple_results_html)
+                    get_simple_results_html, get_data_app_html)
 
 app_name = 'search'
 urlpatterns = [
     path('simple/', SimpleListView.as_view(), name="simple"),
     path('advanced/', AdvancedListView.as_view(), name="advanced"),
     path('transactions/', TransactionsSearchView.as_view(), name="transactions"),
-    path('detail/<int:id_app_number>/', ObjectDetailView.as_view(), name="detail"),
+    path('detail/<int:pk>/', ObjectDetailView.as_view(), name="detail"),
+    path('get-data-app/', get_data_app_html, name="get_data_app_html"),
     path('add_filter_params/', add_filter_params, name="add_filter_params"),
     path('download-docs/', download_docs_zipped, name="download_docs_zipped"),
     path('download-doc/<int:id_app_number>/<int:id_cead_doc>/', download_doc, name="download_doc"),

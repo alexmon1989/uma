@@ -47,7 +47,7 @@
     {% get_current_language as LANGUAGE_CODE %}
     <script>
         function get_task_info(task_id) {
-            $resultsDiv = $(".results");
+            var $resultsDiv = $(".results");
 
             $.ajax({
                 type: 'get',
@@ -55,7 +55,7 @@
                 data: {'task_id': task_id},
                 success: function (data) {
                     if (data.state === 'SUCCESS') {
-                        $(".results").html(data.result);
+                        $resultsDiv.html(data.result);
                         $('[data-toggle="popover"]').popover();
                         $.HSCore.components.HSPopup.init('.js-fancybox');
                     } else {

@@ -116,8 +116,10 @@ def get_app_details(id_app_number, user_id):
         # Документы заявки (библиографические)
         hit['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 
-        # # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
+        # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
         if hit['search_data']['obj_state'] == 2:
              extend_doc_flow(hit)
+
+    hit['id_app_number'] = id_app_number
 
     return hit

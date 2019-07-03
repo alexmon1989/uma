@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView
+from django.views.generic.detail import DetailView
 from django.db.models import F
 from django.forms import formset_factory
-from django.http import Http404, HttpResponseServerError, FileResponse, JsonResponse, HttpResponse
+from django.http import Http404, HttpResponseServerError, FileResponse, HttpResponse
 from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
@@ -9,13 +10,13 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
 from django.template.loader import render_to_string
-from .models import ObjType, InidCodeSchedule, SimpleSearchField, AppDocuments, OrderService, OrderDocument, IpcAppList
+from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results, extend_doc_flow, get_completed_order, create_selection_inv_um_ld,
-                    get_data_for_selection_tm, create_selection_tm, filter_bad_apps, sort_results,
-                    user_has_access_to_docs_decorator, create_search_res_doc, prepare_data_for_search_report,
-                    get_transactions_types, get_search_in_transactions, filter_unpublished_apps)
+                    filter_results, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
+                    create_selection_tm, filter_bad_apps, sort_results, user_has_access_to_docs_decorator,
+                    create_search_res_doc, prepare_data_for_search_report, get_transactions_types,
+                    get_search_in_transactions, filter_unpublished_apps)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -176,19 +177,10 @@ def add_filter_params(request):
     return redirect(f"{path}?{get_params}")
 
 
-class ObjectDetailView(TemplateView):
+class ObjectDetailView(DetailView):
     """Отображает страницу с детальной информацией по объекту"""
-    hit = None
-
-    def get_template_names(self):
-        if self.hit['Document']['idObjType'] in (1, 2):
-            return ['search/detail/inv_um/detail.html']
-        elif self.hit['Document']['idObjType'] == 3:
-            return ['search/detail/ld/detail.html']
-        elif self.hit['Document']['idObjType'] == 4:
-            return ['search/detail/tm/detail.html']
-        elif self.hit['Document']['idObjType'] == 6:
-            return ['search/detail/id/detail.html']
+    model = IpcAppList
+    template_name = 'search/detail/detail.html'
 
     def get_context_data(self, **kwargs):
         """Передаёт доп. переменные в шаблон."""
@@ -196,7 +188,7 @@ class ObjectDetailView(TemplateView):
 
         # Создание асинхронной задачи на получение данных объекта
         task = get_app_details.delay(
-            kwargs['id_app_number'],
+            self.object.pk,
             self.request.user.pk
         )
         context['task_id'] = task.id
@@ -204,73 +196,61 @@ class ObjectDetailView(TemplateView):
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
-        # Поиск в ElasticSearch по номеру заявки, который является _id документа
-        id_app_number = kwargs['id_app_number']
-        client = Elasticsearch(settings.ELASTIC_HOST)
-        q = Q(
-            'bool',
-            must=[Q('match', _id=id_app_number)],
-        )
-        q = filter_bad_apps(q) # Исключение заявок, не пригодных к отображению
-        q = filter_unpublished_apps(self.request.user, q)
-        s = Search().using(client).query(q).execute()
-        if not s:
-            raise Http404("Об'єкт не знайдено")
-        context['hit'], self.hit = s[0], s[0]
-
-        if self.hit['Document']['idObjType'] in (1, 2, 3):
-            context['biblio_data'] = self.hit.Claim if self.hit.search_data.obj_state == 1 else self.hit.Patent
-
-            # Оповещения
-            context['transactions'] = self.hit.to_dict().get('TRANSACTIONS', {}).get('TRANSACTION', [])
-            if type(context['transactions']) is dict:
-                context['transactions'] = [context['transactions']]
-            # Документы заявки (библиографические)
-            context['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
-
-            # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
-            if self.hit.search_data.obj_state == 2:
-                extend_doc_flow(context['hit'])
-
-        # Видимость полей библиографических данных
-        ipc_fields = InidCodeSchedule.objects.filter(
-            ipc_code__obj_type__id=self.hit.Document.idObjType
-        ).annotate(
-            code_title=F(f"ipc_code__code_value_{context['lang_code']}"),
-            ipc_code_short=F('ipc_code__code_inid')
-        ).values('ipc_code_short', 'code_title', 'enable_view')
-        if self.hit['search_data']['obj_state'] == 1:
-            ipc_fields = ipc_fields.filter(
-                schedule_type__id__gte=9,
-                schedule_type__id__lte=15,
-            )
-        else:
-            ipc_fields = ipc_fields.filter(
-                schedule_type__id__gte=3,
-                schedule_type__id__lte=8,
-            )
-        context['ipc_fields'] = ipc_fields
-
-        context['id_app_number'] = id_app_number
         return context
 
 
-def get_object_detail_html(request):
-    """Возвращает HTML с результатами простого поиска."""
+def get_data_app_html(request):
+    """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
     task_id = request.GET.get('task_id', None)
     if task_id is not None:
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':
-            context = task.result
-            context['lang_code'] = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+            context = dict()
             data['state'] = 'SUCCESS'
+            if task.result:
+                context['hit'] = task.result
+                context['lang_code'] = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+
+                # Видимость полей библиографических данных
+                ipc_fields = InidCodeSchedule.objects.filter(
+                    ipc_code__obj_type__id=context['hit']['Document']['idObjType']
+                ).annotate(
+                    code_title=F(f"ipc_code__code_value_{context['lang_code']}"),
+                    ipc_code_short=F('ipc_code__code_inid')
+                ).values('ipc_code_short', 'code_title', 'enable_view')
+                if context['hit']['search_data']['obj_state'] == 1:
+                    ipc_fields = ipc_fields.filter(
+                        schedule_type__id__gte=9,
+                        schedule_type__id__lte=15,
+                    )
+                else:
+                    ipc_fields = ipc_fields.filter(
+                        schedule_type__id__gte=3,
+                        schedule_type__id__lte=8,
+                    )
+                context['ipc_fields'] = ipc_fields
+
+                # Путь к шаблону в зависимости от типа объекта
+                if context['hit']['Document']['idObjType'] in (1, 2):
+                    template = 'search/detail/inv_um/detail.html'
+                elif context['hit']['Document']['idObjType'] == 3:
+                    template = 'search/detail/ld/detail.html'
+                elif context['hit']['Document']['idObjType'] == 4:
+                    template = 'search/detail/tm/detail.html'
+                elif context['hit']['Document']['idObjType'] == 6:
+                    template = 'search/detail/id/detail.html'
+                else:
+                    template = 'search/detail/not_found.html'
+            else:
+                template = 'search/detail/not_found.html'
 
             # Формирование HTML с результатами
             data['result'] = render_to_string(
-                'search/simple/_partials/results.html',
+                template,
                 context,
-                request)
+                request
+            )
         return HttpResponse(json.dumps(data), content_type='application/json')
     return HttpResponse('No job id given.')
 

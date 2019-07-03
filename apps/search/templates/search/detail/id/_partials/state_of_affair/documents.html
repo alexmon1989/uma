@@ -13,7 +13,7 @@
             <div class="table-responsive">
                 <form action="{% url "search:download_docs_zipped" %}" method="post" id="documents-form">
                     {% csrf_token %}
-                    <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
+                    <input type="hidden" name="id_app_number" value="{{ hit.id_app_number }}">
                     <table class="table table-striped table-bordered u-table--v1 mb-0">
                         <thead>
                         <tr>
@@ -42,7 +42,7 @@
                                 <td>
                                     {% if doc.DocRecord.DocType %}
                                         {% if doc.DocRecord.DocIdDocCEAD %}
-                                            <a href="{% url 'search:download_doc' id_app_number=hit.meta.id id_cead_doc=doc.DocRecord.DocIdDocCEAD %}"
+                                            <a href="{% url 'search:download_doc' id_app_number=hit.id_app_number id_cead_doc=doc.DocRecord.DocIdDocCEAD %}"
                                                target="_blank"
                                                class="g-color-blue-dark-v1">{{ doc.DocRecord.DocType }}</a>
                                         {% else %}

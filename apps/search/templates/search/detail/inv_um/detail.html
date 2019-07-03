@@ -1,105 +1,99 @@
-{% extends "base.html" %}
-{% load search_extras %}
 {% load i18n %}
+{% load search_extras %}
 
-{% block title %}{% trans "Детальна інформація по об'єкту" %}{% endblock %}
+{% include 'search/detail/inv_um/_partials/breadcrumbs.html' %}
 
-{% block content %}
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <div class="col-md-3 g-mb-20">
+            {% include 'search/detail/inv_um/_partials/sidebar.html' %}
+        </div>
 
-    {% include 'search/detail/inv_um/_partials/breadcrumbs.html' %}
+        <div class="col-md-9">
+            <!-- Tab panes -->
+            <div id="nav-1-1-primary-ver" class="tab-content">
+                <div class="tab-pane fade show active" id="nav-biblio" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
 
-    <div class="container g-min-height-200 g-py-20 g-py-70--lg">
-        <div class="row">
-            <div class="col-md-3 g-mb-20">
-                {% include 'search/detail/inv_um/_partials/sidebar.html' %}
-            </div>
+                    {% if hit.search_data.obj_state == 2 %}
+                        <div class="g-pb-10 d-flex justify-content-end">
+                            {% registration_status hit=hit %}
+                        </div>
+                    {% endif %}
 
-            <div class="col-md-9">
-                <!-- Tab panes -->
-                <div id="nav-1-1-primary-ver" class="tab-content">
-                    <div class="tab-pane fade show active" id="nav-biblio" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
-
-                        {% if hit.search_data.obj_state == 2 %}
-                            <div class="g-pb-10 d-flex justify-content-end">
-                                {% registration_status hit=hit %}
-                            </div>
-                        {% endif %}
-
-                        {% include 'search/detail/inv_um/_partials/blblio_data/biblio.html' %}
-                    </div>
-
-
-                    <div class="tab-pane fade" id="nav-cl" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Формула" %}</h3>
-
-                        {% if biblio_documents.cl %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/cl.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-de" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Опис" %}</h3>
-
-                        {% if biblio_documents.de %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/de.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-de_pub" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Опублікований опис" %}</h3>
-
-                        {% if biblio_documents.de_pub %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/de_pub.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-ab_ua" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Реферат (UA)" %}</h3>
-
-                        {% if biblio_documents.ab_ua %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ua.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-ab_ru" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Реферат (RU)" %}</h3>
-
-                        {% if biblio_documents.ab_ru %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_ru.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-ab_en" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Реферат (EN)" %}</h3>
-
-                        {% if biblio_documents.ab_en %}
-                            {% include 'search/detail/inv_um/_partials/blblio_data/ab_en.html' %}
-                        {% endif %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-docs" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
-
-                        {% user_has_access_to_docs request.user id_app_number as user_has_access_to_docs %}
-                        {% if user_has_access_to_docs %}
-                            {% include 'search/detail/inv_um/_partials/state_of_affair/documents.html' %}
-                        {% else %}
-                            {% include 'search/detail/inv_um/_partials/state_of_affair/documents_without_links.html' %}
-                        {% endif %}
-
-                        {% include 'search/detail/inv_um/_partials/state_of_affair/collections.html' %}
-                        {% include 'search/detail/inv_um/_partials/state_of_affair/payments.html' %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-transactions" role="tabpanel">
-                        <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
-
-                        {% include 'search/detail/inv_um/_partials/transactions.html' %}
-                    </div>
+                    {% include 'search/detail/inv_um/_partials/blblio_data/biblio.html' %}
                 </div>
-                <!-- End Tab panes -->
+
+
+                <div class="tab-pane fade" id="nav-cl" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Формула" %}</h3>
+
+                    {% if hit.biblio_documents.cl %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/cl.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-de" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Опис" %}</h3>
+
+                    {% if hit.biblio_documents.de %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/de.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-de_pub" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Опублікований опис" %}</h3>
+
+                    {% if hit.biblio_documents.de_pub %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/de_pub.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-ab_ua" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Реферат (UA)" %}</h3>
+
+                    {% if hit.biblio_documents.ab_ua %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/ab_ua.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-ab_ru" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Реферат (RU)" %}</h3>
+
+                    {% if hit.biblio_documents.ab_ru %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/ab_ru.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-ab_en" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Реферат (EN)" %}</h3>
+
+                    {% if hit.biblio_documents.ab_en %}
+                        {% include 'search/detail/inv_um/_partials/blblio_data/ab_en.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-docs" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
+
+                    {% user_has_access_to_docs request.user hit.id_app_number as user_has_access_to_docs %}
+                    {% if user_has_access_to_docs %}
+                        {% include 'search/detail/inv_um/_partials/state_of_affair/documents.html' %}
+                    {% else %}
+                        {% include 'search/detail/inv_um/_partials/state_of_affair/documents_without_links.html' %}
+                    {% endif %}
+
+                    {% include 'search/detail/inv_um/_partials/state_of_affair/collections.html' %}
+                    {% include 'search/detail/inv_um/_partials/state_of_affair/payments.html' %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-transactions" role="tabpanel">
+                    <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
+
+                    {% include 'search/detail/inv_um/_partials/transactions.html' %}
+                </div>
             </div>
+            <!-- End Tab panes -->
         </div>
     </div>
-{% endblock %}
+</div>
