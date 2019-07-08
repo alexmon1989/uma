@@ -3,12 +3,9 @@
 
 {% if results %}
     <div class="row g-pt-20">
+        {% include 'search/advanced/_partials/sidebar.html' %}
 
-        <div class="col-md-3">
-            {% include 'search/simple/_partials/sidebar.html' %}
-        </div>
-
-        <div class="col-md-9">
+        <div class="col-lg-9">
             <div class="d-md-flex justify-content-between g-mb-10">
                 <div class="align-self-center g-mb-30 g-mb-0--md h-100">
                     <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
@@ -18,25 +15,25 @@
                 {% sort_params %}
             </div>
 
-            {% include 'search/simple/_partials/import_results_btn.html' %}
+            {% include 'search/advanced/_partials/import_results_btn.html' %}
 
             {% for hit in results %}
                 {# Изобретения, полезные модели #}
                 {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
                     {% inv_um_item hit forloop.counter0|add:results.start_index %}
-                {# Топографии #}
+                    {# Топографии #}
                 {% elif hit.Document.idObjType == 3 %}
                     {% ld_item hit forloop.counter0|add:results.start_index %}
-                {# Знаки для товаров и услуг #}
+                    {# Знаки для товаров и услуг #}
                 {% elif hit.Document.idObjType == 4 %}
                     {% tm_item hit forloop.counter0|add:results.start_index %}
-                {# Пром. образец #}
+                    {# Пром. образец #}
                 {% elif hit.Document.idObjType == 6 %}
                     {% id_item hit forloop.counter0|add:results.start_index %}
                 {% endif %}
             {% endfor %}
 
-            {% include 'search/simple/_partials/pagination.html' %}
+            {% include 'search/advanced/_partials/pagination.html' %}
         </div>
     </div>
 {% else %}

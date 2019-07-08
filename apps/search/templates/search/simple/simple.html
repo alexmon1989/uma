@@ -51,8 +51,8 @@
 
             $.ajax({
                 type: 'get',
-                url: '/{{ LANGUAGE_CODE }}/search/simple/results/',
-                data: {'task_id': task_id},
+                url: '/{{ LANGUAGE_CODE }}/search/results/',
+                data: {'task_id': task_id, 'search_type': 'simple'},
                 success: function (data) {
                     if (data.state === 'SUCCESS') {
                         $resultsDiv.html(data.result);

@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_results, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
+                    get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, filter_bad_apps, sort_results, user_has_access_to_docs_decorator,
                     create_search_res_doc, prepare_data_for_search_report, get_transactions_types,
                     get_search_in_transactions, filter_unpublished_apps)
@@ -24,7 +24,8 @@ from zipfile import ZipFile
 from pathlib import Path
 from celery.result import AsyncResult
 import os, io, json
-from .tasks import perform_simple_search, validate_query as validate_query_task, get_app_details
+from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
+                    perform_advanced_search)
 
 
 class SimpleListView(TemplateView):
@@ -73,10 +74,11 @@ class SimpleListView(TemplateView):
         return context
 
 
-def get_simple_results_html(request):
+def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    search_type = request.GET.get('search_type', None)
+    if task_id is not None and search_type in ('simple', 'advanced'):
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':
@@ -88,7 +90,7 @@ def get_simple_results_html(request):
             context['results'] = paginate_results(task.result['results'], page, 10)
             # Формирование HTML с результатами
             data['result'] = render_to_string(
-                'search/simple/_partials/results.html',
+                f"search/{search_type}/_partials/results.html",
                 context,
                 request)
         return HttpResponse(json.dumps(data), content_type='application/json')
@@ -132,23 +134,13 @@ class AdvancedListView(TemplateView):
 
             # Поиск в ElasticSearch
             if is_valid:
-                # Разбивка поисковых данных на поисковые группы
-                search_groups = get_search_groups(formset.cleaned_data)
-
-                # Поиск в ElasticSearch по каждой группе
-                s = get_elastic_results(search_groups, self.request.user)
-
-                # Сортировка
-                if self.request.GET.get('sort_by'):
-                    s = sort_results(s, self.request.GET['sort_by'])
-                else:
-                    s = s.sort('_score')
-
-                # Фильтрация, агрегация
-                s, context['aggregations'] = filter_results(s, self.request)
-
-                # Пагинация
-                context['results'] = paginate_results(s, self.request.GET.get('page'), 10)
+                # Создание асинхронной задачи для Celery
+                task = perform_advanced_search.delay(
+                    formset.cleaned_data,
+                    self.request.user.pk,
+                    dict(six.iterlists(self.request.GET))
+                )
+                context['task_id'] = task.id
 
         return context
 
@@ -402,7 +394,7 @@ def download_selection_tm(request, id_app_number):
 
 def validate_query(request):
     """Создаёт задание на валидацию запроса, который идёт в ElasticSearch (для валидации на стороне клиента)"""
-    task = validate_query_task.delay(request.GET)
+    task = validate_query_task.delay(dict(six.iterlists(request.GET)))
     return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
 
