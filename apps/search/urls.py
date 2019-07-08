@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (SimpleListView, AdvancedListView, add_filter_params, ObjectDetailView, download_docs_zipped,
                     download_doc, download_selection_inv_um_ld, download_selection_tm, download_xls_simple,
                     download_xls_advanced, download_shared_docs, TransactionsSearchView, download_xls_transactions,
-                    get_results_html, get_data_app_html)
+                    get_results_html, get_data_app_html, get_obj_types_with_transactions)
 
 app_name = 'search'
 urlpatterns = [
@@ -29,4 +29,5 @@ urlpatterns = [
     path('download-xls-transactions/', download_xls_transactions, name="download_xls_transactions"),
     path('download_shared_docs/<int:id_app_number>/', download_shared_docs, name="download_shared_docs"),
     path('results/', get_results_html, name="get_results_html"),
+    path('get_obj_types_with_transactions/', get_obj_types_with_transactions, name="get_obj_types_with_transactions"),
 ]

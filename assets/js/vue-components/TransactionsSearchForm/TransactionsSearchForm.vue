@@ -27,17 +27,19 @@
     import TransactionsTypeInput from "./TransactionsTypeInput.vue";
     import DateInput from "./DateInput.vue";
     import {translations} from "./mixins/translations";
+    import axios from 'axios';
 
     export default {
         name: "TransactionsSearchForm",
         components: {ObjTypeInput, Actions, TransactionsTypeInput, DateInput},
         mixins: [translations],
         props: {
-            objTypes: Array,
-            initial: Object
+            initial: Object,
+            langCode: String
         },
         data() {
             return {
+                objTypes: [],
                 obj_type: '',
                 transaction_type: [],
                 date: [],
@@ -46,13 +48,39 @@
             }
         },
         mounted() {
-            if (this.initial['obj_type']) {
-                this.obj_type = this.initial['obj_type'][0].toString();
-                this.date = this.initial['date'][0].split(' ~ ');
-                this.$nextTick(function () {
-                    this.transaction_type = this.initial['transaction_type'];
-                });
-            }
+            // Перехватчик результата запроса для повторного запроса на статус и результат задачи.
+            axios.interceptors.response.use(function (response) {
+                if (response && response.data && response.data.state && response.data.state === 'PENDING') {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            resolve(axios.request(response.config));
+                        }, 1000)
+                    });
+                }
+                return response;
+            }, function (error) {
+                return Promise.reject(error);
+            });
+
+            axios
+                .get('/' + this.langCode + '/search/get_obj_types_with_transactions/')
+                .then(response => {
+                    return response.data['task_id'];
+                }).then(task_id => {
+                    this.getTaskInfo(task_id).then(result => {
+                        this.objTypes = result;
+                        if (this.initial['obj_type']) {
+                            this.date = this.initial['date'][0].split(' ~ ');
+                            this.$nextTick(function () {
+                                this.obj_type = this.initial['obj_type'][0].toString();
+                                    this.$nextTick(function () {
+                                        this.transaction_type = this.initial['transaction_type'];
+                                    });
+                            });
+                        }
+                    }
+                );
+            });
         },
         methods: {
             handleSubmit: function () {
@@ -64,11 +92,20 @@
                         this.isFormSubmitting = false;
                     }
                 });
+            },
+
+            // Получает статус и результат выполнения задачи
+            getTaskInfo: function (taskId) {
+                return axios
+                    .get('/search/get-task-info/?task_id=' + taskId)
+                    .then(response => {
+                        return response.data['result'];
+                    });
             }
         },
         computed: {
             transactionTypes: function () {
-                if (this.obj_type) {
+                if (this.obj_type && this.objTypes.length > 0) {
                     return this.objTypes.find(x => x.id === parseInt(this.obj_type))['transactions_types'];
                 } else {
                     return [];

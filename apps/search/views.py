@@ -15,8 +15,8 @@ from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
                     get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, filter_bad_apps, sort_results, user_has_access_to_docs_decorator,
-                    create_search_res_doc, prepare_data_for_search_report, get_transactions_types,
-                    get_search_in_transactions, filter_unpublished_apps)
+                    create_search_res_doc, prepare_data_for_search_report, get_search_in_transactions,
+                    filter_unpublished_apps)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -25,7 +25,8 @@ from pathlib import Path
 from celery.result import AsyncResult
 import os, io, json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
-                    perform_advanced_search)
+                    perform_advanced_search, perform_transactions_search,
+                    get_obj_types_with_transactions as get_obj_types_with_transactions_task)
 
 
 class SimpleListView(TemplateView):
@@ -78,7 +79,7 @@ def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
     search_type = request.GET.get('search_type', None)
-    if task_id is not None and search_type in ('simple', 'advanced'):
+    if task_id is not None and search_type in ('simple', 'advanced', 'transactions'):
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':
@@ -547,15 +548,6 @@ class TransactionsSearchView(TemplateView):
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
-        # Типы ОПС
-        context['obj_types'] = list(
-            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{context['lang_code']}")).values('id', 'value')
-        )
-
-        # Типы оповещений
-        for obj_type in context['obj_types']:
-            obj_type['transactions_types'] = get_transactions_types(obj_type['id'])
-
         context['initial_data'] = dict()
         context['is_search'] = False
         if self.request.GET:
@@ -567,16 +559,12 @@ class TransactionsSearchView(TemplateView):
 
             # Поиск
             if is_valid:
-                s = get_search_in_transactions(form.cleaned_data)
-                if s:
-                    # Сортировка
-                    if self.request.GET.get('sort_by'):
-                        s = sort_results(s, self.request.GET['sort_by'])
-                    else:
-                        s = s.sort('_score')
-
-                    # Пагинация
-                    context['results'] = paginate_results(s, self.request.GET.get('page'), 10)
+                # Создание асинхронной задачи для Celery
+                task = perform_transactions_search.delay(
+                    form.cleaned_data,
+                    dict(six.iterlists(self.request.GET))
+                )
+                context['task_id'] = task.id
 
         return context
 
@@ -633,3 +621,10 @@ def get_task_info(request):
         return HttpResponse(json.dumps(data), content_type='application/json')
     else:
         return HttpResponse('No job id given.')
+
+
+def get_obj_types_with_transactions(request):
+    """Создаёт задачу на получение типов объектов их типами оповещений."""
+    lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    task = get_obj_types_with_transactions_task.delay(lang_code)
+    return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

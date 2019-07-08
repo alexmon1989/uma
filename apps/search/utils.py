@@ -1310,6 +1310,7 @@ def get_search_in_transactions(search_params):
                 ]
             )
         )
+
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
         return s

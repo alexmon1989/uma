@@ -3,9 +3,11 @@ from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from .models import SimpleSearchField, AppDocuments
+from django.db.models import F
+from .models import SimpleSearchField, AppDocuments, ObjType
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
-                    extend_doc_flow, get_search_groups, get_elastic_results)
+                    extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
+                    get_transactions_types)
 from .forms import AdvancedSearchForm, SimpleSearchForm
 
 
@@ -171,3 +173,51 @@ def perform_advanced_search(cleaned_data, user_id, get_params):
         'results': results,
         'get_params': get_params
     }
+
+
+@shared_task
+def perform_transactions_search(cleaned_data, get_params):
+    """Выполняет поиск в транзациях"""
+    s = get_search_in_transactions(cleaned_data)
+
+    # Сортировка
+    if get_params.get('sort_by'):
+        s = sort_results(s, get_params['sort_by'][0])
+    else:
+        s = s.sort('_score')
+
+    # Фильтрация, агрегация
+    s, aggregations = filter_results(s, get_params)
+
+    # Пагинация
+    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + 10
+    items = []
+    for i in s[res_from:res_to]:
+        item = i.to_dict()
+        item['meta'] = i.meta.to_dict()
+        items.append(item)
+    results = {
+        'items': items,
+        'total': s.count()
+    }
+
+    return {
+        'aggregations': aggregations,
+        'results': results,
+        'get_params': get_params
+    }
+
+
+@shared_task
+def get_obj_types_with_transactions(lang_code):
+    """Возвращает типы объектов вместе с типами оповещений."""
+    obj_types = list(
+        ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value')
+    )
+
+    # Типы оповещений
+    for obj_type in obj_types:
+        obj_type['transactions_types'] = get_transactions_types(obj_type['id'])
+
+    return obj_types
