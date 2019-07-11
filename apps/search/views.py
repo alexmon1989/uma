@@ -193,6 +193,8 @@ class ObjectDetailView(TemplateView):
             return ['search/detail/ld/detail.html']
         elif self.hit['Document']['idObjType'] == 4:
             return ['search/detail/tm/detail.html']
+        elif self.hit['Document']['idObjType'] == 5:
+            return ['search/detail/qi/detail.html']
         elif self.hit['Document']['idObjType'] == 6:
             return ['search/detail/id/detail.html']
 
