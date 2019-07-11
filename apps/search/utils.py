@@ -1250,6 +1250,10 @@ def get_transactions_types(id_obj_type):
         # Знаки для товаров и услуг
         field='TradeMark.Transactions.Transaction.@name.keyword'
         nested = 'TradeMark.Transactions.Transaction'
+    elif id_obj_type == 5:
+        # КЗПТ
+        field='Geo.Transactions.Transaction.@name.keyword'
+        nested = 'Geo.Transactions.Transaction'
     else:
         # Пром. образцы
         field = 'Design.Transactions.Transaction.@name.keyword'
@@ -1259,7 +1263,7 @@ def get_transactions_types(id_obj_type):
     s.aggs.bucket('transactions_types', Nested(path=nested)).bucket('transactions_types', Terms(field=field, size=1000, order={"_key": "asc"}))
 
     try:
-        return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
+        return [x['key'].capitalize() for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
     except KeyError:
         return []
 
