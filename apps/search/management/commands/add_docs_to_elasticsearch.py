@@ -304,6 +304,42 @@ class Command(BaseCommand):
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
+    def process_kzpt(self, doc):
+        """Добавляет документ типа "географічне зазначення" ElasticSearch."""
+        # Получает данные для загрузки из файла JSON
+        data = self.get_data_from_json(doc)
+
+        res = {}
+        if data is not None:
+            # Секция Document
+            res['Document'] = data.get('Document')
+
+            # Секция Geo
+            res['Geo'] = data.get('Geo')
+
+            # Поисковые данные (для сортировки и т.д.)
+            res['search_data'] = {
+                'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
+                'app_number': res['Geo']['GeoDetails'].get('ApplicationNumber'),
+                'app_date': res['Geo']['GeoDetails'].get('ApplicationDate'),
+                'protective_doc_number': res['Geo']['GeoDetails'].get('RegistrationNumber'),
+                'rights_date': res['Geo']['GeoDetails'].get('RegistrationDate'),
+                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['Geo']['GeoDetails']['HolderDetails']['Holder']]
+                if res['Geo']['GeoDetails'].get('HolderDetails') else None,
+
+                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          res['Geo']['GeoDetails']['RepresentativeDetails']['Representative']]
+                if res['Geo']['GeoDetails'].get('RepresentativeDetails') else None,
+
+                'title': res['Geo']['GeoDetails'].get('Indication')
+            }
+
+            # Запись в индекс
+            self.write_to_es_index(doc, res)
+
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
         try:
@@ -361,6 +397,9 @@ class Command(BaseCommand):
             # Знаки для товаров и услуг
             elif doc['obj_type_id'] == 4:
                 self.process_tm(doc)
+            # КЗПТ
+            elif doc['obj_type_id'] == 5:
+                self.process_kzpt(doc)
             # Пром. образцы
             elif doc['obj_type_id'] == 6:
                 self.process_id(doc)

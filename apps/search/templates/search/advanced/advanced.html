@@ -56,6 +56,9 @@
                             {# Знаки для товаров и услуг #}
                             {% elif hit.Document.idObjType == 4 %}
                                 {% tm_item hit forloop.counter0|add:results.start_index %}
+                            {# КЗПТ #}
+                            {% elif hit.Document.idObjType == 5 %}
+                                {% qi_item hit forloop.counter0|add:results.start_index %}
                             {# Пром. образец #}
                             {% elif hit.Document.idObjType == 6 %}
                                 {% id_item hit forloop.counter0|add:results.start_index %}

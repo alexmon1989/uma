@@ -1,0 +1,16 @@
+{% load uma_extras %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm g-font-size-13">
+        {% for transaction in hit.Geo.Transactions.Transaction %}
+            <tr>
+                <th class="g-px-10" width="20%">{{ transaction|get:"@name"|capfirst }}</th>
+                <td>
+                    {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                        <span class="g-font-weight-600">Дата публікації та номер бюлетеня:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
