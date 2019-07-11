@@ -1208,8 +1208,11 @@ def prepare_data_for_search_report(s, lang_code):
         rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
             '%d.%m.%Y') if h.search_data.rights_date else ''
         title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-            h.search_data.applicant) else h.search_data.applicant
+        if hasattr(h.search_data, 'inventor'):
+            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                h.search_data.applicant) else h.search_data.applicant
+        else:
+            applicant = ''
         owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
         if hasattr(h.search_data, 'inventor'):
             inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
@@ -1263,7 +1266,7 @@ def get_transactions_types(id_obj_type):
     s.aggs.bucket('transactions_types', Nested(path=nested)).bucket('transactions_types', Terms(field=field, size=1000, order={"_key": "asc"}))
 
     try:
-        return [x['key'].capitalize() for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
+        return [x['key'] for x in s.execute().aggregations.to_dict()['transactions_types']['transactions_types']['buckets']]
     except KeyError:
         return []
 
@@ -1282,6 +1285,10 @@ def get_search_in_transactions(search_params):
         transaction_path = 'TradeMark.Transactions.Transaction'
         transaction_type_field = 'TradeMark.Transactions.Transaction.@name.keyword'
         transaction_date_field = 'TradeMark.Transactions.Transaction.@bulletinDate'
+    elif search_params['obj_type'] == 5:
+        transaction_path = 'Geo.Transactions.Transaction'
+        transaction_type_field = 'Geo.Transactions.Transaction.@name.keyword'
+        transaction_date_field = 'Geo.Transactions.Transaction.@bulletinDate'
     elif search_params['obj_type'] == 6:
         transaction_path = 'Design.Transactions.Transaction'
         transaction_type_field = 'Design.Transactions.Transaction.@name.keyword'

@@ -108,8 +108,8 @@ $(function () {
     });
     $(".kzpt-desc-full a.hide").click(function (e) {
         e.preventDefault();
-        $(".kzpt-desc-full").fadeOut();
-        $(".kzpt-desc-short").show();
+        $(".kzpt-desc-full").hide();
+        $(".kzpt-desc-short").fadeIn();
     });
 
     $(".kzpt-geo table").addClass('table').addClass('table-bordered');
