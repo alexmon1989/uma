@@ -135,3 +135,9 @@
       display: none;
     }
   }
+
+.kzpt-desc-short, .kzpt-desc-full, .kzpt-geo {
+  p {
+    margin-bottom: 0;
+  }
+}

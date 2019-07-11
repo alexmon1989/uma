@@ -100,6 +100,20 @@ $(function () {
         $this.find('i').toggleClass('fa-minus').toggleClass('fa-plus');
     });
 
+    // Показать/скрыть описание КЗПТ
+    $(".kzpt-desc-short a.show").click(function (e) {
+        e.preventDefault();
+        $(".kzpt-desc-short").hide();
+        $(".kzpt-desc-full").fadeIn();
+    });
+    $(".kzpt-desc-full a.hide").click(function (e) {
+        e.preventDefault();
+        $(".kzpt-desc-full").hide();
+        $(".kzpt-desc-short").fadeIn();
+    });
+
+    $(".kzpt-geo table").addClass('table').addClass('table-bordered');
+
     // Выделитть (снять выделение) все документы
     $("#documents-form #select-all-documents").click(function () {
         var $this = $(this);
