@@ -165,8 +165,8 @@ def filter_unpublished_apps(user, qs):
         qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
         # Не показывать заявки по пром. образцам и полезным моделям
         qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
-        # Показывать только заявки с датой заяки
-        qs &= Q('query_string', query="_exists_:search_data.app_date")
+        # Показывать только заявки с датой заяки (но показывать все КЗПТ)
+        qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
         # Для заявок на изобретения нужно чтоб существовал I_43.D
         qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
 
