@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.db.models import F
 from django.forms import formset_factory
-from django.http import Http404, HttpResponseServerError, FileResponse, HttpResponse
+from django.http import Http404, HttpResponseServerError, FileResponse, HttpResponse, JsonResponse
 from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
@@ -26,7 +26,7 @@ from celery.result import AsyncResult
 import os, io, json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
-                    get_obj_types_with_transactions as get_obj_types_with_transactions_task)
+                    get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents)
 
 
 class SimpleListView(TemplateView):
@@ -292,7 +292,7 @@ def download_docs_zipped(request):
 
 @user_has_access_to_docs_decorator
 def download_doc(request, id_app_number, id_cead_doc):
-    """Инициирует у пользование скачивание документа."""
+    """Возвращает JSON с id асинхронной задачи на заказ документа."""
     # Создание заказа
     order = OrderService(
         # user=request.user,
@@ -303,30 +303,9 @@ def download_doc(request, id_app_number, id_cead_doc):
     order.save()
     OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
 
-    # Проверка обработан ли заказ
-    order_id = order.id
-    order = get_completed_order(order_id)
-    if order:
-        # Получение документа из БД
-        doc = order.orderdocument_set.first()
-        if doc is None:
-            raise Http404()
-
-        # Путь к файлу
-        file_path = os.path.join(
-            settings.ORDERS_ROOT,
-            str(order.user_id),
-            str(order.id),
-            doc.file_name
-        )
-
-        # Инициирование загрузки
-        try:
-            return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
-        except FileNotFoundError:
-            raise Http404()
-    else:
-        return HttpResponseServerError('Помилка сервісу видачі документів.')
+    # Создание асинхронной задачи для получения документа
+    task = get_order_documents.delay(order.id)
+    return JsonResponse({'task_id': task.id})
 
 
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())

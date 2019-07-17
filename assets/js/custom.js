@@ -49,6 +49,47 @@ function updateURLParameter(url, param, paramVal)
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
+function downloadDoc(taskId, $elem) {
+    $.ajax({
+        type: 'get',
+        url: '/search/get-task-info/',
+        data: {'task_id': taskId},
+        success: function (data) {
+            if (data.state === 'SUCCESS') {
+                if (data.result === false) {
+                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                    $elem.removeAttr('disabled')
+                        .find('i').first()
+                        .removeClass('fa-spinner')
+                        .addClass('fa-download');
+                } else {
+                    Toastr.success(gettext('Посилання для відкриття файлу було сформовано.'));
+                    $elem.removeClass('btn-primary')
+                        .addClass('btn-success')
+                        .removeAttr('disabled')
+                        .attr('title', gettext('Відкрити'))
+                        .find('i').first()
+                        .removeClass('fa-spinner')
+                        .addClass('fa-external-link btn-success');
+
+                    $elem.attr('onclick','').unbind('click').click(function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        saveAs(data.result, data.result.split('/').pop());
+                    });
+                }
+            } else {
+                setTimeout(function () {
+                    downloadDoc(taskId, $elem)
+                }, 1000);
+            }
+        },
+        error: function (data) {
+            console.log("Something went wrong!");
+        }
+    });
+}
+
 $(function () {
     $(document).on(
         'change',
@@ -170,4 +211,17 @@ $(function () {
         };
         xhr.send();
     });
+
+    // Обработчтк события нажатия на кнопку формирования ссылки на документ
+    $(document).on('click', '#documents-form button.download-doc', function (e) {
+        e.preventDefault();
+        let $this = $(this);
+        $this.attr('disabled', true);
+        $this.find('i').first().removeClass('fa-download').addClass('fa-spinner');
+        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування документу.'), {timeOut: 5000});
+        $.getJSON($this.data('task-create-url'), function (data) {
+            downloadDoc(data.task_id, $this);
+        });
+    });
+
 });

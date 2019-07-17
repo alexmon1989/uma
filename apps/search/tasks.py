@@ -7,8 +7,10 @@ from django.db.models import F
 from .models import SimpleSearchField, AppDocuments, ObjType
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
-                    get_transactions_types)
+                    get_transactions_types, get_completed_order)
 from .forms import AdvancedSearchForm, SimpleSearchForm
+import os
+from zipfile import ZipFile
 
 
 @shared_task
@@ -221,3 +223,45 @@ def get_obj_types_with_transactions(lang_code):
         obj_type['transactions_types'] = get_transactions_types(obj_type['id'])
 
     return obj_types
+
+
+@shared_task
+def get_order_documents(order_id):
+    """Возвращает название файла документа иил архива с документами, заказанного(ых) через "стол заказов"."""
+    # Получение обработанного заказа
+    order = get_completed_order(order_id)
+    if order:
+        # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
+        if order.orderdocument_set.count() == 1:
+            doc = order.orderdocument_set.first()
+            # Путь к файлу
+            file_path = os.path.join(
+                settings.MEDIA_URL,
+                'OrderService',
+                str(order.user_id),
+                str(order.id),
+                doc.file_name
+            )
+            return file_path
+
+        elif order.orderdocument_set.count() > 1:
+            file_path = os.path.join(
+                settings.ORDERS_ROOT,
+                str(order.user_id),
+                str(order.id),
+                'docs.zip'
+            )
+            with ZipFile(file_path, 'w') as zip_:
+                for document in order.orderdocument_set.all():
+                    zip_.write(
+                        os.path.join(
+                            settings.DOCUMENTS_MOUNT_FOLDER,
+                            'OrderService',
+                            order.user_id,
+                            order.id,
+                            document.file_name),
+                        f"{document.file_name}"
+                    )
+            return file_path
+
+    return False
