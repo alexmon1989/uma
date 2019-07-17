@@ -80,12 +80,51 @@ function downloadDoc(taskId, $elem) {
                 }
             } else {
                 setTimeout(function () {
-                    downloadDoc(taskId, $elem)
+                    downloadDoc(taskId, $elem);
                 }, 1000);
             }
         },
         error: function (data) {
-            console.log("Something went wrong!");
+            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            $elem.removeAttr('disabled')
+                .find('i').first()
+                .removeClass('fa-spinner')
+                .addClass('fa-download');
+        }
+    });
+}
+
+function downloadArchive(taskId, $elem) {
+    $.ajax({
+        type: 'get',
+        url: '/search/get-task-info/',
+        data: {'task_id': taskId},
+        success: function (data) {
+            if (data.state === 'SUCCESS') {
+                if (data.result === false) {
+                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                } else {
+                    Toastr.success(gettext('Файл було сформовано.'));
+                    saveAs(data.result, data.result.split('/').pop());
+                }
+                $elem.find('button[type=submit]')
+                    .removeAttr('disabled')
+                    .find('i').first()
+                    .removeClass('fa-spinner')
+                    .addClass('fa-download');
+            } else {
+                setTimeout(function () {
+                    downloadArchive(taskId, $elem);
+                }, 1000);
+            }
+        },
+        error: function (data) {
+            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            $elem.find('button[type=submit]')
+                .removeAttr('disabled')
+                .find('i').first()
+                .removeClass('fa-spinner')
+                .addClass('fa-download');
         }
     });
 }
@@ -224,4 +263,23 @@ $(function () {
         });
     });
 
+    // Обработчтк события нажатия на кнопку загрузки архива с документами
+    $(document).on('submit', '#documents-form', function (e) {
+        e.preventDefault();
+        let $form = $(this);
+        // Проверка стоит ли галочка хотя бы на одном документе
+        if ($("input[name='cead_id']").filter(':checked').length > 0) {
+            Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
+            $form.find('button[type=submit]')
+                .attr('disabled', true)
+                .find('i').first()
+                .removeClass('fa-download')
+                .addClass('fa-spinner');
+            $.post($form.attr('action'), $form.serialize(), function (data) {
+                downloadArchive(data.task_id, $form);
+            });
+        } else {
+            Toastr.error(gettext('Не було обрано жодного документу.'));
+        }
+    });
 });

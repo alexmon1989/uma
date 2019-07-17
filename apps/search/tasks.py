@@ -227,7 +227,7 @@ def get_obj_types_with_transactions(lang_code):
 
 @shared_task
 def get_order_documents(order_id):
-    """Возвращает название файла документа иил архива с документами, заказанного(ых) через "стол заказов"."""
+    """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
     # Получение обработанного заказа
     order = get_completed_order(order_id)
     if order:
@@ -243,25 +243,30 @@ def get_order_documents(order_id):
                 doc.file_name
             )
             return file_path
-
-        elif order.orderdocument_set.count() > 1:
-            file_path = os.path.join(
+        else:
+            file_path_zip = os.path.join(
                 settings.ORDERS_ROOT,
                 str(order.user_id),
                 str(order.id),
                 'docs.zip'
             )
-            with ZipFile(file_path, 'w') as zip_:
+            with ZipFile(file_path_zip, 'w') as zip_:
                 for document in order.orderdocument_set.all():
                     zip_.write(
                         os.path.join(
                             settings.DOCUMENTS_MOUNT_FOLDER,
                             'OrderService',
-                            order.user_id,
-                            order.id,
+                            str(order.user_id),
+                            str(order.id),
                             document.file_name),
                         f"{document.file_name}"
                     )
-            return file_path
+            return os.path.join(
+                settings.MEDIA_URL,
+                'OrderService',
+                str(order.user_id),
+                str(order.id),
+                'docs.zip'
+            )
 
     return False

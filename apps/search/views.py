@@ -23,7 +23,7 @@ from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
 from pathlib import Path
 from celery.result import AsyncResult
-import os, io, json
+import io, json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents)
@@ -264,28 +264,9 @@ def download_docs_zipped(request):
         for id_cead_doc in request.POST.getlist('cead_id'):
             OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
 
-        # Проверка обработан ли заказ
-        order_id = order.id
-        order = get_completed_order(order_id)
-        if order:
-            # Создание архива
-            in_memory = io.BytesIO()
-            zip_ = ZipFile(in_memory, "a")
-            for document in order.orderdocument_set.all():
-                zip_.write(
-                    f"{settings.DOCUMENTS_MOUNT_FOLDER}/OrderService/{order.user_id}/{order.id}/{document.file_name}",
-                    f"{document.file_name}"
-                )
-
-            # fix for Linux zip files read in Windows
-            for file in zip_.filelist:
-                file.create_system = 0
-
-            zip_.close()
-            in_memory.seek(0)
-            return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
-        else:
-            return HttpResponseServerError('Помилка сервісу видачі документів.')
+        # Создание асинхронной задачи для получения архива с документами
+        task = get_order_documents.delay(order.id)
+        return JsonResponse({'task_id': task.id})
     else:
         raise Http404('Файли не було обрано!')
 

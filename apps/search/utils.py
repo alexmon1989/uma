@@ -1104,62 +1104,26 @@ def user_has_access_to_docs_decorator(f):
     return wrapper
 
 
-def user_has_access_to_docs(user, id_app_number):
+def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
     if user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists():
         return True
 
-    # Поиск документа в Elastic
-    client = Elasticsearch(settings.ELASTIC_HOST)
-    q = Q(
-        'bool',
-        must=[Q('match', _id=id_app_number)],
-    )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    s = Search().using(client).query(q).execute()
-    if not s:
-        return False
-
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
     if hasattr(user, 'certificateowner'):
         user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
 
-        try:
-            applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
-            if applicants:
-                for applicant in applicants:
-                    if user_fullname in applicant.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
-            if inventors:
-                for inventor in inventors:
-                    if user_fullname in inventor.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
-            if owners:
-                for owner in owners:
-                    if user_fullname in owner.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
-            if agents:
-                for agent in agents:
-                    if user_fullname in agent.upper():
-                        return True
-        except KeyError:
-            pass
+        for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+            try:
+                persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
+                    hit['search_data'][person_type]
+                if persons:
+                    for person in persons:
+                        if user_fullname in person.upper():
+                            return True
+            except KeyError:
+                pass
 
     return False
 
