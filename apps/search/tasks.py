@@ -4,12 +4,14 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.db.models import F
-from .models import SimpleSearchField, AppDocuments, ObjType
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
-                    get_transactions_types, get_completed_order)
+                    get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
+                    create_selection_tm)
 from .forms import AdvancedSearchForm, SimpleSearchForm
 import os
+import json
 from zipfile import ZipFile
 
 
@@ -270,3 +272,70 @@ def get_order_documents(order_id):
             )
 
     return False
+
+
+@shared_task
+def create_selection(id_app_number, user_id, user_ip, get_data):
+    """Возвращает url файла документа с выпиской по заявке."""
+    try:
+        app = IpcAppList.objects.get(id=id_app_number, registration_number__gt=0)
+    except IpcAppList.DoesNotExist:
+        return False
+
+    # Каталог с выписками пользователя
+    directory_path = os.path.join(
+        settings.ORDERS_ROOT,
+        str(user_id),
+        'selections',
+        str(id_app_number)
+    )
+    os.makedirs(directory_path, exist_ok=True)
+    # Файл с выпиской
+    file_path = os.path.join(directory_path, f"{id_app_number}.docx")
+
+    # Изобретения, полезные модели, топографии
+    if app.obj_type_id in (1, 2, 3):
+        # Создание заказа
+        order = OrderService(
+            user_id=user_id,
+            ip_user=user_ip,
+            app_id=id_app_number,
+            create_external_documents=1,
+            externaldoc_enternum=270,
+            order_completed=False
+        )
+        order.save()
+
+        # Проверка обработан ли заказ
+        order = get_completed_order(order.id)
+
+        if order:
+            # Формирование выписки и сохранение её на диск
+            create_selection_inv_um_ld(json.loads(order.external_doc_body), get_data, file_path)
+        else:
+            return False
+
+    # Знаки для товаров и услуг
+    elif app.obj_type_id == 4:
+        client = Elasticsearch(settings.ELASTIC_HOST)
+        q = Q('match', _id=id_app_number)
+        s = Search().using(client).query(q).execute()
+        if s:
+            hit = s[0]
+            data = get_data_for_selection_tm(hit)
+            # Формирование выписки и сохранение её на диск
+            create_selection_tm(data, get_data, file_path)
+        else:
+            return False
+    else:
+        return False
+
+    # Возврат url сформированного файла с выпиской
+    return os.path.join(
+        settings.MEDIA_URL,
+        'OrderService',
+        str(user_id),
+        'selections',
+        str(id_app_number),
+        f"{id_app_number}.docx"
+    )

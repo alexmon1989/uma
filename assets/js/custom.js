@@ -129,6 +129,41 @@ function downloadArchive(taskId, $elem) {
     });
 }
 
+function downloadSelection(taskId, $elem) {
+    $.ajax({
+        type: 'get',
+        url: '/search/get-task-info/',
+        data: {'task_id': taskId},
+        success: function (data) {
+            if (data.state === 'SUCCESS') {
+                if (data.result === false) {
+                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                } else {
+                    Toastr.success(gettext('Файл було сформовано.'));
+                    saveAs(data.result, data.result.split('/').pop());
+                }
+                $elem.find('button[type=submit]')
+                    .removeAttr('disabled')
+                    .find('i').first()
+                    .removeClass('fa-spinner')
+                    .addClass('fa-download');
+            } else {
+                setTimeout(function () {
+                    downloadSelection(taskId, $elem);
+                }, 1000);
+            }
+        },
+        error: function (data) {
+            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            $elem.find('button[type=submit]')
+                .removeAttr('disabled')
+                .find('i').first()
+                .removeClass('fa-spinner')
+                .addClass('fa-download');
+        }
+    });
+}
+
 $(function () {
     $(document).on(
         'change',
@@ -220,35 +255,19 @@ $(function () {
             window.location.href = updateURLParameter(window.location.href, 'sort_by', $(this).val());
         });
 
-    // Обработчик события нажатия кнопки скачивания выписки
-    $('#download-selection-btn').click(function (e) {
+    // Обработчик события отправки формы формирования выписки
+    $(document).on('submit', '#selection-form', function (e) {
         e.preventDefault();
-        let $btn = $(this);
-        let $form = $("#selection-form");
-        let oldHtml = $btn.html();
-        $btn.html('<i class="fa fa-spinner g-mr-5"></i>' + gettext('Зачекайте...'));
-        $btn.attr('disabled', true);
-
-        let xhr = new XMLHttpRequest();
-
-        let url = $form.attr("action") + '?' + $form.serialize();
-        xhr.open("GET", url);
-        xhr.responseType = "blob";
-
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                let header = xhr.getResponseHeader('Content-Disposition');
-                let startIndex = header.indexOf("filename=") + 10;
-                let endIndex = header.length - 1;
-                let filename = header.substring(startIndex, endIndex);
-                saveAs(this.response, filename);
-            } else {
-                Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-            }
-            $btn.html(oldHtml);
-            $btn.attr('disabled', false);
-        };
-        xhr.send();
+        let $form = $(this);
+        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
+        $form.find('button[type=submit]')
+            .attr('disabled', true)
+            .find('i').first()
+            .removeClass('fa-download')
+            .addClass('fa-spinner');
+        $.getJSON($form.attr('action'), $form.serialize(), function (data) {
+            downloadSelection(data.task_id, $form);
+        });
     });
 
     // Обработчтк события нажатия на кнопку формирования ссылки на документ

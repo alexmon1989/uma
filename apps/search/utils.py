@@ -11,7 +11,7 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
-import re, time, datetime, io, xlwt
+import re, time, datetime, xlwt
 from uma.utils import iterable
 
 
@@ -310,8 +310,8 @@ def get_completed_order(order_id, attempts=10, timeout=2):
             time.sleep(timeout)
 
 
-def create_selection_inv_um_ld(data_from_json, params):
-    """Формирует документ ворд в BytesIO"""
+def create_selection_inv_um_ld(data_from_json, params, file_path):
+    """Формирует документ ворд и сохраняет его на диск"""
     data = dict()
     data['category'] = data_from_json.pop('Category', None)
     data['contracts_comment'] = data_from_json.pop('Contracts_comment', None)
@@ -591,11 +591,8 @@ def create_selection_inv_um_ld(data_from_json, params):
     run.bold = True
     run.font.size = Pt(12)
 
-    file_stream = io.BytesIO()
-    document.save(file_stream)
-    file_stream.seek(0)
-
-    return file_stream
+    # Сохранение в файл
+    document.save(file_path)
 
 
 def set_cell_border(cell, **kwargs):
@@ -734,8 +731,8 @@ def get_data_for_selection_tm(hit):
     return data
 
 
-def create_selection_tm(data, params):
-    """Формирует документ ворд в BytesIO"""
+def create_selection_tm(data, params, file_path):
+    """Формирует документ ворд и сохраняет его на диск."""
     # Формирование выписки
     document = Document('selection_templates/template.docx')
 
@@ -1086,11 +1083,7 @@ def create_selection_tm(data, params):
     run.bold = True
     run.font.size = Pt(12)
 
-    file_stream = io.BytesIO()
-    document.save(file_stream)
-    file_stream.seek(0)
-
-    return file_stream
+    document.save(file_path)
 
 
 def user_has_access_to_docs_decorator(f):

@@ -21,7 +21,7 @@
         <div id="accordion-11-body-02" class="collapse" role="tabpanel"
              aria-labelledby="accordion-11-heading-02" data-parent="#accordion-11">
             <div class="u-accordion__body g-color-gray-dark-v5">
-                <form action="{% url 'search:download_selection_inv_um_ld' id_app_number=hit.id_app_number %}"
+                <form action="{% url 'search:download_selection' id_app_number=hit.id_app_number %}"
                       id="selection-form">
                     <h4 class="h6 g-font-weight-700 g-mb-10">Включити у виписку:</h4>
 
@@ -111,8 +111,10 @@
                     <!-- End Toggles Checkbox -->
 
                     <div class="d-flex justify-content-center">
-                        <button class="btn btn-md u-btn-indigo" id="download-selection-btn"><i class="fa fa-download"></i> {% trans "Завантажити" %}
-                        </button>
+                        <button type="submit"
+                                class="btn btn-md u-btn-indigo"
+                                id="download-selection-btn"
+                        ><i class="fa fa-download"></i> {% trans "Завантажити" %}</button>
                     </div>
                 </form>
             </div>

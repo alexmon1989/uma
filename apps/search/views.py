@@ -13,10 +13,8 @@ from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
-                    create_selection_tm, filter_bad_apps, sort_results, user_has_access_to_docs_decorator,
-                    create_search_res_doc, prepare_data_for_search_report, get_search_in_transactions,
-                    filter_unpublished_apps)
+                    filter_bad_apps, sort_results, user_has_access_to_docs_decorator, create_search_res_doc,
+                    prepare_data_for_search_report, get_search_in_transactions, filter_unpublished_apps)
 from urllib.parse import parse_qs, urlparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -26,7 +24,8 @@ from celery.result import AsyncResult
 import io, json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
-                    get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents)
+                    get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
+                    create_selection)
 
 
 class SimpleListView(TemplateView):
@@ -290,67 +289,10 @@ def download_doc(request, id_app_number, id_cead_doc):
 
 
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
-def download_selection_inv_um_ld(request, id_app_number):
-    """Инициирует загрузку выписки по охранному документу для изобретений, полезных моделей, топографий."""
-    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
-
-    # Создание заказа
-    order = OrderService(
-        # user=request.user,
-        user_id=request.user.pk,
-        ip_user=get_client_ip(request),
-        app_id=id_app_number,
-        create_external_documents=1,
-        externaldoc_enternum=270,
-        order_completed=False
-    )
-    order.save()
-
-    # Проверка обработан ли заказ
-    order_id = order.id
-    order = get_completed_order(order_id)
-    if order:
-        # Формирование выписки
-        file_stream = create_selection_inv_um_ld(json.loads(order.external_doc_body), request.GET)
-
-        return FileResponse(
-            file_stream,
-            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            as_attachment=True,
-            filename=f"{app.registration_number}.docx"
-        )
-    else:
-        return HttpResponseServerError('Помилка сервісу видачі документів.')
-
-
-@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
-def download_selection_tm(request, id_app_number):
-    """Инициирует загрузку выписки по охранному документу для знаков для товаров и услуг."""
-    # Формирование поискового запроса ElasticSearch
-    client = Elasticsearch(settings.ELASTIC_HOST)
-    q = Q(
-        'bool',
-        must=[
-            Q('match', _id=id_app_number),
-            Q('match', Document__Status=3),
-            Q('match', search_data__obj_state=2),
-            Q('match', Document__idObjType=4),
-        ],
-    )
-    s = Search().using(client).query(q).execute()
-    if s:
-        hit = s[0]
-        data = get_data_for_selection_tm(hit)
-        file_stream = create_selection_tm(data, request.GET)
-
-        return FileResponse(
-            file_stream,
-            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            as_attachment=True,
-            filename=f"{hit.search_data.protective_doc_number}.docx"
-        )
-    else:
-        raise Http404("Об'єкт не знайдено")
+def download_selection(request, id_app_number):
+    """Возвращает JSON с id асинхронной задачи на формирование выписки."""
+    task = create_selection.delay(id_app_number, request.user.pk, get_client_ip(request), request.GET)
+    return JsonResponse({'task_id': task.id})
 
 
 def validate_query(request):
