@@ -315,6 +315,8 @@ class IndexationProcess(models.Model):
     processed_count = models.PositiveIntegerField("Опрацьовано об'єктів", default=0)
     begin_date = models.DateTimeField("Дата та час початку індексації")
     finish_date = models.DateTimeField("Дата та час закінчення індексації", null=True, blank=True)
+    documents_in_index = models.PositiveIntegerField("Всього документів", null=True, blank=True)
+    documents_in_index_shared = models.PositiveIntegerField("Всього документів опублікованих", null=True, blank=True)
 
     def __str__(self):
         return self.finish_date

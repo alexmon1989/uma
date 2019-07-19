@@ -131,12 +131,14 @@ def user_can_watch_docs(user):
 @register.simple_tag(takes_context=True)
 def documents_count(context):
     """Возвращает количество документов доступных для поиска"""
-    client = Elasticsearch(settings.ELASTIC_HOST)
-    qs = Q('query_string', query='*')
-    qs = filter_bad_apps(qs)
-    qs = filter_unpublished_apps(context['request'].user, qs)
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
-    return s.count()
+    p = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
+    doc_count = None
+    if p.count() > 0:
+        if context['request'].user.is_anonymous or not context['request'].user.is_vip():
+            doc_count = p.first().documents_in_index_shared
+        else:
+            doc_count = p.first().documents_in_index
+    return doc_count or '-'
 
 
 @register.simple_tag
