@@ -14,6 +14,7 @@ from .forms import AdvancedSearchForm, SimpleSearchForm
 import os
 import json
 from zipfile import ZipFile
+from pathlib import Path
 
 
 @shared_task
@@ -404,7 +405,7 @@ def create_simple_search_results_file(cleaned_data, user_id, get_params, lang_co
         )
         os.makedirs(directory_path, exist_ok=True)
         # Имя файла с результатами поиска
-        file_name = f"{get_unique_filename('simple_search_')}.xls"
+        file_name = f"{get_unique_filename('simple_search')}.xls"
         file_path = os.path.join(directory_path, file_name)
 
         # Сохранение файла
@@ -462,7 +463,7 @@ def create_advanced_search_results_file(cleaned_data, user_id, get_params, lang_
         )
         os.makedirs(directory_path, exist_ok=True)
         # Имя файла с результатами поиска
-        file_name = f"{get_unique_filename('advanced_search_')}.xls"
+        file_name = f"{get_unique_filename('advanced_search')}.xls"
         file_path = os.path.join(directory_path, file_name)
 
         # Сохранение файла
@@ -478,7 +479,7 @@ def create_advanced_search_results_file(cleaned_data, user_id, get_params, lang_
 
 
 @shared_task
-def create_transactions_search_results_file(cleaned_data, user_id, get_params, lang_code):
+def create_transactions_search_results_file(cleaned_data, get_params, lang_code):
     """Возвращает url файла с результатами поиска по оповещениям."""
     s = get_search_in_transactions(cleaned_data)
     if s:
@@ -509,7 +510,7 @@ def create_transactions_search_results_file(cleaned_data, user_id, get_params, l
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('ransactions_search_')}.xls"
+            file_name = f"{get_unique_filename('transactions_search')}.xls"
             file_path = os.path.join(directory_path, file_name)
 
             # Сохранение файла
@@ -522,3 +523,44 @@ def create_transactions_search_results_file(cleaned_data, user_id, get_params, l
                 file_name
             )
     return False
+
+
+@shared_task
+def create_shared_docs_archive(id_app_number):
+    """Возвращает url файла с архивом доступных всем документов."""
+    try:
+        app = IpcAppList.objects.get(id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
+    except IpcAppList.DoesNotExist:
+        return False
+
+    directory_path = os.path.join(
+        settings.MEDIA_ROOT,
+        'shared_docs'
+    )
+    os.makedirs(directory_path, exist_ok=True)
+    file_name = f"{get_unique_filename(app.app_number)}.zip"
+    file_path = os.path.join(
+        directory_path,
+        file_name
+    )
+
+    # Создание архива
+    zip_ = ZipFile(file_path, "a")
+    for document in app.appdocuments_set.filter(file_type='pdf').all():
+        zip_.write(
+            document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
+            Path(document.file_name.replace('\\', '/')).name
+        )
+
+    # fix for Linux zip files read in Windows
+    for file in zip_.filelist:
+        file.create_system = 0
+
+    zip_.close()
+
+    # Возврат url сформированного файла
+    return os.path.join(
+        settings.MEDIA_URL,
+        'shared_docs',
+        file_name
+    )

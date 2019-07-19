@@ -2,28 +2,24 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.db.models import F
 from django.forms import formset_factory
-from django.http import Http404, FileResponse, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.utils import six
 from django.utils.http import urlencode
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
-from django.conf import settings
 from django.contrib.admin.views.decorators import user_passes_test
 from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
-from .utils import (get_client_ip, paginate_results, sort_results, user_has_access_to_docs_decorator,
-                    create_search_res_doc,  prepare_data_for_search_report, get_search_in_transactions)
+from .utils import (get_client_ip, paginate_results, user_has_access_to_docs_decorator)
 from urllib.parse import parse_qs, urlparse
-from zipfile import ZipFile
-from pathlib import Path
 from celery.result import AsyncResult
-import io, json
+import json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
                     create_selection, create_simple_search_results_file, create_advanced_search_results_file,
-                    create_transactions_search_results_file)
+                    create_transactions_search_results_file, create_shared_docs_archive)
 
 
 class SimpleListView(TemplateView):
@@ -333,25 +329,10 @@ def download_xls_advanced(request):
 
 
 def download_shared_docs(request, id_app_number):
-    """Инициирует загрузку у пользователя документов, которые доступны всем пользователям"""
-    app = get_object_or_404(IpcAppList, id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
-
-    # Создание архива
-    in_memory = io.BytesIO()
-    zip_ = ZipFile(in_memory, "a")
-    for document in app.appdocuments_set.all():
-        zip_.write(
-            document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
-            Path(document.file_name.replace('\\', '/')).name
-        )
-
-    # fix for Linux zip files read in Windows
-    for file in zip_.filelist:
-        file.create_system = 0
-
-    zip_.close()
-    in_memory.seek(0)
-    return FileResponse(in_memory, as_attachment=True, filename='documents.zip')
+    """Возвращает JSON с id асинхронной задачи на формирование архива с документами,
+     которые доступны всем пользователям."""
+    task = create_shared_docs_archive.delay(id_app_number)
+    return JsonResponse({'task_id': task.id})
 
 
 class TransactionsSearchView(TemplateView):
@@ -393,7 +374,6 @@ def download_xls_transactions(request):
     if form.is_valid():
         task = create_transactions_search_results_file.delay(
             form.cleaned_data,
-            request.user.pk,
             dict(six.iterlists(request.GET)),
             'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
         )
