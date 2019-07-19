@@ -164,6 +164,39 @@ function downloadSelection(taskId, $elem) {
     });
 }
 
+function downloadSearchResults(taskId, $elem) {
+    $.ajax({
+        type: 'get',
+        url: '/search/get-task-info/',
+        data: {'task_id': taskId},
+        success: function (data) {
+            if (data.state === 'SUCCESS') {
+                if (data.result === false) {
+                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                } else {
+                    Toastr.success(gettext('Файл було сформовано.'));
+                    saveAs(data.result, data.result.split('/').pop());
+                }
+                $elem.removeAttr('disabled')
+                    .find('i').first()
+                    .removeClass('fa-spinner')
+                    .addClass('fa-download');
+            } else {
+                setTimeout(function () {
+                    downloadSearchResults(taskId, $elem);
+                }, 1000);
+            }
+        },
+        error: function (data) {
+            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            $elem.removeAttr('disabled')
+                .find('i').first()
+                .removeClass('fa-spinner')
+                .addClass('fa-download');
+        }
+    });
+}
+
 $(function () {
     $(document).on(
         'change',
@@ -282,7 +315,7 @@ $(function () {
         });
     });
 
-    // Обработчтк события нажатия на кнопку загрузки архива с документами
+    // Обработчик события нажатия на кнопку загрузки архива с документами
     $(document).on('submit', '#documents-form', function (e) {
         e.preventDefault();
         let $form = $(this);
@@ -300,5 +333,17 @@ $(function () {
         } else {
             Toastr.error(gettext('Не було обрано жодного документу.'));
         }
+    });
+
+    // Обработчик события нажатия на кнопку формирования и загрузки файла с результатами поиска
+    $(document).on('click', '#search-result-download-btn', function (e) {
+        e.preventDefault();
+        let $this = $(this);
+        $this.attr('disabled', true);
+        $this.find('i').first().removeClass('fa-download').addClass('fa-spinner');
+        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 10000});
+        $.getJSON($this.data('task-create-url'), function (data) {
+            downloadSearchResults(data.task_id, $this);
+        });
     });
 });

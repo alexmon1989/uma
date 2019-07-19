@@ -1161,7 +1161,8 @@ def prepare_data_for_search_report(s, lang_code):
     for h in s.params(size=1000, preserve_order=True).scan():
         obj_type = obj_types[h.Document.idObjType - 1]
         obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
+            if h.search_data.app_date else ''
         rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
             '%d.%m.%Y') if h.search_data.rights_date else ''
         title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title

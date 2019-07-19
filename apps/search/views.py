@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.db.models import F
 from django.forms import formset_factory
-from django.http import Http404, HttpResponseServerError, FileResponse, HttpResponse, JsonResponse
+from django.http import Http404, FileResponse, HttpResponse, JsonResponse
 from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
@@ -12,12 +12,9 @@ from django.contrib.admin.views.decorators import user_passes_test
 from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
 from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
-from .utils import (get_search_groups, get_elastic_results, get_client_ip, prepare_simple_query, paginate_results,
-                    filter_bad_apps, sort_results, user_has_access_to_docs_decorator, create_search_res_doc,
-                    prepare_data_for_search_report, get_search_in_transactions, filter_unpublished_apps)
+from .utils import (get_client_ip, paginate_results, sort_results, user_has_access_to_docs_decorator,
+                    create_search_res_doc,  prepare_data_for_search_report, get_search_in_transactions)
 from urllib.parse import parse_qs, urlparse
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q
 from zipfile import ZipFile
 from pathlib import Path
 from celery.result import AsyncResult
@@ -25,7 +22,8 @@ import io, json
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
-                    create_selection)
+                    create_selection, create_simple_search_results_file, create_advanced_search_results_file,
+                    create_transactions_search_results_file)
 
 
 class SimpleListView(TemplateView):
@@ -302,117 +300,34 @@ def validate_query(request):
 
 
 def download_xls_simple(request):
-    """Формирует CSV-файл с результатами простого поиска и инициирует его загрузку у пользователя."""
+    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами простого поиска."""
     SimpleSearchFormSet = formset_factory(SimpleSearchForm)
     formset = SimpleSearchFormSet(request.GET)
     if formset.is_valid:
-        # Формирование поискового запроса ElasticSearch
-        client = Elasticsearch(settings.ELASTIC_HOST)
-        qs = None
-        for s in formset.cleaned_data:
-            elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
-            if elastic_field:
-                q = Q(
-                    'query_string',
-                    query=prepare_simple_query(s['value'], elastic_field.field_type),
-                    default_field=elastic_field.field_name,
-                    default_operator='AND'
-                )
-                if qs is not None:
-                    qs &= q
-                else:
-                    qs = q
-
-        if qs is not None:
-            # Не показывать заявки, по которым выдан охранный документ
-            qs = filter_bad_apps(qs)
-            # Не показывать неопубликованные заявки
-            qs = filter_unpublished_apps(request.user, qs)
-
-        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
-
-        # Фильтрация
-        if request.GET.get('filter_obj_type'):
-            # Фильтрация по типу объекта
-            s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
-
-        if request.GET.get('filter_obj_state'):
-            # Фильтрация по статусу объекта
-            s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
-
-        if s.count() <= 5000:
-
-            s = s.source(['search_data', 'Document'])
-
-            # Сортировка
-            if request.GET.get('sort_by'):
-                s = sort_results(s, request.GET['sort_by'])
-            else:
-                s = s.sort('_score')
-
-            # Текущий язык
-            lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-
-            # Данные для Excel-файла
-            data = prepare_data_for_search_report(s, lang_code)
-
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
-            # Отправка в браузер
-            response = HttpResponse(content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename=search_results.xls'
-            workbook.save(response)
-            return response
-
+        task = create_simple_search_results_file.delay(
+            formset.cleaned_data,
+            request.user.pk,
+            dict(six.iterlists(request.GET)),
+            'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+        )
+        return JsonResponse({'task_id': task.id})
     raise Http404
 
 
 def download_xls_advanced(request):
-    """Формирует CSV-файл с результатами расширенного поиска и инициирует его загрузку у пользователя."""
+    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами расширенного поиска."""
     AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
     if request.GET:
         formset = AdvancedSearchFormSet(request.GET)
 
-        # Поиск в ElasticSearch
         if formset.is_valid():
-            # Разбивка поисковых данных на поисковые группы
-            search_groups = get_search_groups(formset.cleaned_data)
-
-            # Поиск в ElasticSearch по каждой группе
-            s = get_elastic_results(search_groups)
-
-            # Фильтрация
-            if request.GET.get('filter_obj_type'):
-                # Фильтрация по типу объекта
-                s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
-            if request.GET.get('filter_obj_state'):
-                # Фильтрация по статусу объекта
-                s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
-
-            if s.count() <= 5000:
-                s = s.source(['search_data', 'Document'])
-
-                # Сортировка
-                if request.GET.get('sort_by'):
-                    s = sort_results(s, request.GET['sort_by'])
-                else:
-                    s = s.sort('_score')
-
-                # Текущий язык
-                lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-
-                # Данные для Excel-файла
-                data = prepare_data_for_search_report(s, lang_code)
-
-                # Формировние Excel-файла
-                workbook = create_search_res_doc(data)
-
-                # Отправка в браузер
-                response = HttpResponse(content_type='application/vnd.ms-excel')
-                response['Content-Disposition'] = 'attachment; filename=search_results.xls'
-                workbook.save(response)
-                return response
+            task = create_advanced_search_results_file.delay(
+                formset.cleaned_data,
+                request.user.pk,
+                dict(six.iterlists(request.GET)),
+                'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+            )
+            return JsonResponse({'task_id': task.id})
 
     raise Http404
 
@@ -472,41 +387,17 @@ class TransactionsSearchView(TemplateView):
 
 
 def download_xls_transactions(request):
-    """Формирует CSV-файл с результатами поиска по транзакциям."""
+    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами поиска по оповещениям."""
     form = TransactionsSearchForm(request.GET)
+
     if form.is_valid():
-
-        s = get_search_in_transactions(form.cleaned_data)
-        if s:
-            # Сортировка
-            if request.GET.get('sort_by'):
-                s = sort_results(s, request.GET['sort_by'])
-            else:
-                s = s.sort('_score')
-
-            if s.count() <= 5000:
-                s = s.source(['search_data', 'Document'])
-
-                # Сортировка
-                if request.GET.get('sort_by'):
-                    s = sort_results(s, request.GET['sort_by'])
-                else:
-                    s = s.sort('_score')
-
-                # Текущий язык
-                lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-
-                # Данные для Excel-файла
-                data = prepare_data_for_search_report(s, lang_code)
-
-                # Формировние Excel-файла
-                workbook = create_search_res_doc(data)
-
-                # Отправка в браузер
-                response = HttpResponse(content_type='application/vnd.ms-excel')
-                response['Content-Disposition'] = 'attachment; filename=search_results.xls'
-                workbook.save(response)
-                return response
+        task = create_transactions_search_results_file.delay(
+            form.cleaned_data,
+            request.user.pk,
+            dict(six.iterlists(request.GET)),
+            'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+        )
+        return JsonResponse({'task_id': task.id})
 
     raise Http404
 
