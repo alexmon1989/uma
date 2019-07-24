@@ -17,7 +17,7 @@ class Command(BaseCommand):
         # Выборка всех охранных документов из ElasticSearch
         q = Q(
             'query_string',
-            query='search_data.obj_state:2 AND Document.idObjType:4 '
+            query='search_data.obj_state:2'
         )
         s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(q)
 
