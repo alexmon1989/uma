@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'bootstrap4',
+    'rest_framework',
     'debug_toolbar',
     'apps.home.apps.HomeConfig',
     'apps.my_auth.apps.MyAuthConfig',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'apps.contacts.apps.ContactsConfig',
     'apps.about.apps.AboutConfig',
     'apps.help.apps.HelpConfig',
+    'apps.api.apps.ApiConfig',
     'ckeditor',
     'ckeditor_uploader'
 ]
@@ -303,4 +305,9 @@ CKEDITOR_CONFIGS = {
             'elementspath'
         ]),
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
