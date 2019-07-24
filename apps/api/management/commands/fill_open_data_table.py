@@ -42,3 +42,5 @@ class Command(BaseCommand):
             open_data_record, created = OpenData.objects.get_or_create(app=app)
             open_data_record.data = json.dumps(data)
             open_data_record.save()
+
+        self.stdout.write(self.style.SUCCESS('Finished'))
