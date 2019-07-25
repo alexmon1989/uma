@@ -38,6 +38,7 @@ urlpatterns += i18n_patterns(
 )
 
 urlpatterns += [
+    path('api/', include('apps.api.urls')),
     path('search/validate-query/', validate_query, name="validate_query")
 ]
 
