@@ -50,18 +50,6 @@ class OpenDataListView(generics.ListAPIView):
             except ObjType.DoesNotExist:
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
-        # Стан об'єкта
-        obj_state = self.request.query_params.get('obj_state', None)
-        if obj_state:
-            try:
-                obj_state = int(obj_state)
-                if obj_state == 1:
-                    queryset = queryset.filter(app__registration_date__isnull=True)
-                elif obj_state == 2:
-                    queryset = queryset.filter(app__registration_date__isnull=False)
-            except ValueError:
-                raise exceptions.ParseError("Невірне значення параметру obj_state")
-
         return queryset.values(
             'app__obj_type__obj_type_ua',
             'app__app_number',
