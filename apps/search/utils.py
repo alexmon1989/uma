@@ -1125,41 +1125,17 @@ def user_has_access_to_docs(user, id_app_number):
     if hasattr(user, 'certificateowner'):
         user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
 
-        try:
-            applicants = [s[0]['search_data']['applicant']] if isinstance(s[0]['search_data']['applicant'], str) else s[0]['search_data']['applicant']
-            if applicants:
-                for applicant in applicants:
-                    if user_fullname in applicant.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            inventors = [s[0]['search_data']['inventor']] if isinstance(s[0]['search_data']['inventor'], str) else s[0]['search_data']['inventor']
-            if inventors:
-                for inventor in inventors:
-                    if user_fullname in inventor.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            owners = [s[0]['search_data']['owner']] if isinstance(s[0]['search_data']['owner'], str) else s[0]['search_data']['owner']
-            if owners:
-                for owner in owners:
-                    if user_fullname in owner.upper():
-                        return True
-        except KeyError:
-            pass
-
-        try:
-            agents = [s[0]['search_data']['agent']] if isinstance(s[0]['search_data']['agent'], str) else s[0]['search_data']['agent']
-            if agents:
-                for agent in agents:
-                    if user_fullname in agent.upper():
-                        return True
-        except KeyError:
-            pass
+        for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+            try:
+                persons = [s[0]['search_data'][person_type]] if isinstance(s[0]['search_data'][person_type], str) else \
+                    s[0]['search_data'][person_type]
+                if persons:
+                    for person in persons:
+                        print(user_fullname, person.replace('i', 'і').upper())
+                        if user_fullname in person.replace('i', 'і').upper(): # замена латинской i на кириллицу
+                            return True
+            except KeyError:
+                pass
 
     return False
 
