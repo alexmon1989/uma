@@ -1131,7 +1131,6 @@ def user_has_access_to_docs(user, id_app_number):
                     s[0]['search_data'][person_type]
                 if persons:
                     for person in persons:
-                        print(user_fullname, person.replace('i', 'і').upper())
                         if user_fullname in person.replace('i', 'і').upper(): # замена латинской i на кириллицу
                             return True
             except KeyError:
