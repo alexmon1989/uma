@@ -537,7 +537,7 @@ def download_shared_docs(request, id_app_number):
     # Создание архива
     in_memory = io.BytesIO()
     zip_ = ZipFile(in_memory, "a")
-    for document in app.appdocuments_set.all():
+    for document in app.appdocuments_set.filter(file_type='pdf').all():
         zip_.write(
             document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
             Path(document.file_name.replace('\\', '/')).name
