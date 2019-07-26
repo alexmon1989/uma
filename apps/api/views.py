@@ -9,7 +9,7 @@ class OpenDataListView(generics.ListAPIView):
     serializer_class = OpenDataSerializer
 
     def get_queryset(self):
-        queryset = OpenData.objects.all()
+        queryset = OpenData.objects.order_by('pk').all()
 
         # Дата від
         date_from = self.request.query_params.get('date_from', None)
