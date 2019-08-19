@@ -43,6 +43,11 @@ def id_item(hit, item_num):
     return {'hit': hit, 'item_num': item_num}
 
 
+@register.inclusion_tag('search/advanced/_partials/qi_item.html')
+def qi_item(hit, item_num):
+    return {'hit': hit, 'item_num': item_num}
+
+
 @register.filter
 def document_path(file_name):
     return file_name.replace("\\\\bear\share\\", settings.MEDIA_URL).replace("\\", "/")

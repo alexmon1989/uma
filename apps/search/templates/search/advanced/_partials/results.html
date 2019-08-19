@@ -21,13 +21,16 @@
                 {# Изобретения, полезные модели #}
                 {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
                     {% inv_um_item hit forloop.counter0|add:results.start_index %}
-                    {# Топографии #}
+                {# Топографии #}
                 {% elif hit.Document.idObjType == 3 %}
                     {% ld_item hit forloop.counter0|add:results.start_index %}
-                    {# Знаки для товаров и услуг #}
+                {# Знаки для товаров и услуг #}
                 {% elif hit.Document.idObjType == 4 %}
                     {% tm_item hit forloop.counter0|add:results.start_index %}
-                    {# Пром. образец #}
+                {# КЗПТ #}
+                {% elif hit.Document.idObjType == 5 %}
+                    {% qi_item hit forloop.counter0|add:results.start_index %}
+                {# Пром. образец #}
                 {% elif hit.Document.idObjType == 6 %}
                     {% id_item hit forloop.counter0|add:results.start_index %}
                 {% endif %}

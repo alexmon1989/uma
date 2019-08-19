@@ -1,0 +1,100 @@
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+    <h3 class="card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        {{ item_num }}.
+        <a href="{% url 'search:detail' pk=hit.meta.id %}"
+           class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
+        >{{ hit.search_data.title|default_if_none:"---" }}</a>
+    </h3>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% if '/' in hit.search_data.protective_doc_number %}
+                Свідоцтво на використання кваліфікованого зазначення походження товару
+            {% else %}
+                Свідоцтво на кваліфіковане зазначення походження товару
+            {% endif %}
+        </div>
+
+        {% if hit.search_data.obj_state == 2 %}
+            {% registration_status hit=hit %}
+        {% endif %}
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Назва товару:</h4>
+            {{ hit.Geo.GeoDetails.ProductName }}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Номер заявки"
+            >{{ hit.Geo.GeoDetails.ApplicationNumber }}</a><br>
+            {% if hit.Geo.GeoDetails.ApplicationDate %}
+                <a href="#!"
+                   class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                   data-toggle="tooltip"
+                   data-placement="bottom"
+                   title="Дата подання заявки"
+                >{{ hit.Geo.GeoDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+            {% endif %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Свідоцтво:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Номер реєстрації"
+            >{{ hit.Geo.GeoDetails.RegistrationNumber }}</a><br>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="Дата реєстрації"
+            >{{ hit.Geo.GeoDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</a>
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
+            {% for holder in hit.Geo.GeoDetails.HolderDetails.Holder %}
+                {% if forloop.counter <= 2 %}
+                    {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                {% elif forloop.counter == 3 %}
+                    <a href="#!"
+                       data-toggle="popover"
+                       data-title="Повний список власників"
+                       data-html="true"
+                       data-trigger="focus"
+                       data-content="
+                               {% for holder_ in hit.Geo.GeoDetails.HolderDetails.Holder %}{{ holder_.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder_.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                    >(+{{ hit.Geo.GeoDetails.HolderDetails.Holder|length|add:"-2" }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if hit.Geo.GeoDetails.GeoImageDetails %}
+            <div class="col-md-3">
+                <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                   href="javascript:;"
+                   data-src="{{ hit.Document.filesPath|get_image_url:hit.Geo.GeoDetails.GeoImageDetails.0.GeoImage.GeoImageFilename }}">
+                    <img class="img-fluid img-thumbnail"
+                         src="{{ hit.Document.filesPath|get_image_url:hit.Geo.GeoDetails.GeoImageDetails.0.GeoImage.GeoImageFilename }}"
+                         alt="">
+
+                    <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                        <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                    </span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -167,6 +167,24 @@ $(function () {
             window.location.href = updateURLParameter(window.location.href, 'sort_by', $(this).val());
         });
 
+    // Показать/скрыть описание КЗПТ
+    $(document).on(
+        'click',
+        '.kzpt-desc-short a.show',
+        function (e) {
+            e.preventDefault();
+            $(".kzpt-desc-short").hide();
+            $(".kzpt-desc-full").fadeIn();
+        });
+    $(document).on(
+        'click',
+        '.kzpt-desc-full a.hide',
+        function (e) {
+            e.preventDefault();
+            $(".kzpt-desc-full").hide();
+            $(".kzpt-desc-short").fadeIn();
+        });
+
     // Обработчик события отправки формы формирования выписки
     $(document).on('submit', '#selection-form', function (e) {
         e.preventDefault();

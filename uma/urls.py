@@ -40,6 +40,7 @@ urlpatterns += i18n_patterns(
 urlpatterns += [
     path('search/validate-query/', validate_query, name="validate_query"),
     path('search/get-task-info/', get_task_info, name="get_task_info"),
+    path('api/', include('apps.api.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

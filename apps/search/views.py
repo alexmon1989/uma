@@ -224,6 +224,8 @@ def get_data_app_html(request):
                     template = 'search/detail/ld/detail.html'
                 elif context['hit']['Document']['idObjType'] == 4:
                     template = 'search/detail/tm/detail.html'
+                elif context['hit']['Document']['idObjType'] == 5:
+                    template = 'search/detail/qi/detail.html'
                 elif context['hit']['Document']['idObjType'] == 6:
                     template = 'search/detail/id/detail.html'
                 else:

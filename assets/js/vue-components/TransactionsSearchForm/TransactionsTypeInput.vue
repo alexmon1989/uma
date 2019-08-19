@@ -18,7 +18,7 @@
                     class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
                     :value="type"
                     :key="type"
-            >{{ type }}</option>
+            >{{ type.charAt(0).toUpperCase() + type.slice(1) }}</option>
         </chosen-select>
         <small class="form-control-feedback" v-if="errors.has('transaction_type')">{{ translations.validationErrors[errors.firstRule('transaction_type')] }}</small>
     </div>

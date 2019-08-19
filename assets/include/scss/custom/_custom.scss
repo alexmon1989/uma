@@ -139,3 +139,9 @@
 .g-min-height-160 {
   min-height: 160px;
 }
+
+.kzpt-desc-short, .kzpt-desc-full, .kzpt-geo {
+  p {
+    margin-bottom: 0;
+  }
+}

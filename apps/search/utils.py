@@ -165,8 +165,8 @@ def filter_unpublished_apps(user, qs):
         qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
         # Не показывать заявки по пром. образцам и полезным моделям
         qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
-        # Показывать только заявки с датой заяки
-        qs &= Q('query_string', query="_exists_:search_data.app_date")
+        # Показывать только заявки с датой заяки (но показывать все КЗПТ)
+        qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
         # Для заявок на изобретения нужно чтоб существовал I_43.D
         qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
 
@@ -1113,7 +1113,7 @@ def user_has_access_to_docs(user, hit):
                     hit['search_data'][person_type]
                 if persons:
                     for person in persons:
-                        if user_fullname in person.upper():
+                        if user_fullname in person.replace('i', 'і').upper():  # замена латинской i на кириллицу
                             return True
             except KeyError:
                 pass
@@ -1166,8 +1166,11 @@ def prepare_data_for_search_report(s, lang_code):
         rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
             '%d.%m.%Y') if h.search_data.rights_date else ''
         title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-            h.search_data.applicant) else h.search_data.applicant
+        if hasattr(h.search_data, 'inventor'):
+            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                h.search_data.applicant) else h.search_data.applicant
+        else:
+            applicant = ''
         owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
         if hasattr(h.search_data, 'inventor'):
             inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
@@ -1208,6 +1211,10 @@ def get_transactions_types(id_obj_type):
         # Знаки для товаров и услуг
         field='TradeMark.Transactions.Transaction.@name.keyword'
         nested = 'TradeMark.Transactions.Transaction'
+    elif id_obj_type == 5:
+        # КЗПТ
+        field='Geo.Transactions.Transaction.@name.keyword'
+        nested = 'Geo.Transactions.Transaction'
     else:
         # Пром. образцы
         field = 'Design.Transactions.Transaction.@name.keyword'
@@ -1236,6 +1243,10 @@ def get_search_in_transactions(search_params):
         transaction_path = 'TradeMark.Transactions.Transaction'
         transaction_type_field = 'TradeMark.Transactions.Transaction.@name.keyword'
         transaction_date_field = 'TradeMark.Transactions.Transaction.@bulletinDate'
+    elif search_params['obj_type'] == 5:
+        transaction_path = 'Geo.Transactions.Transaction'
+        transaction_type_field = 'Geo.Transactions.Transaction.@name.keyword'
+        transaction_date_field = 'Geo.Transactions.Transaction.@bulletinDate'
     elif search_params['obj_type'] == 6:
         transaction_path = 'Design.Transactions.Transaction'
         transaction_type_field = 'Design.Transactions.Transaction.@name.keyword'
