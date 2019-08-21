@@ -28,7 +28,7 @@
         {% if is_search and not formset_errors %}
             <div class="results">
                 <div class="g-mt-10">
-                    <p class="lead">{% trans "Зачекайте, відбувається формування результатів..." %}</p>
+                    <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається формування результатів" %}<loading-dots></loading-dots></p>
                 </div>
             </div>
         {% endif %}
@@ -39,8 +39,12 @@
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
     <script>
-        function get_task_info(task_id) {
+        function get_task_info(task_id, retries) {
             var $resultsDiv = $(".results");
+
+            var onError = function() {
+                $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
+            };
 
             $.ajax({
                 type: 'get',
@@ -52,20 +56,24 @@
                         $('[data-toggle="popover"]').popover();
                         $.HSCore.components.HSPopup.init('.js-fancybox');
                     } else {
-                        setTimeout(function () {
-                            get_task_info(task_id)
-                        }, 1000);
+                        if (retries > 0) {
+                            setTimeout(function () {
+                                get_task_info(task_id, --retries)
+                            }, 1000);
+                        } else {
+                            onError();
+                        }
                     }
                 },
                 error: function (data) {
-                    $resultsDiv.html("Something went wrong!");
+                    onError();
                 }
             });
         }
 
         {% if task_id %}
             $(function () {
-                get_task_info('{{ task_id }}');
+                get_task_info('{{ task_id }}', 20);
             });
         {% endif %}
     </script>

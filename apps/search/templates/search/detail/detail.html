@@ -15,7 +15,7 @@
 
         <div class="container g-min-height-200 g-py-20 g-py-70--lg">
             <div class="row">
-                <p class="lead">{% trans "Зачекайте, відбувається отримання даних об'єкта..." %}</p>
+                <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається отримання даних об'єкта" %}<loading-dots></loading-dots></p>
             </div>
         </div>
     </div>
@@ -25,8 +25,12 @@
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
     <script>
-        var get_obj_data = function (task_id) {
+        var get_obj_data = function (task_id, retries) {
             var $resultsDiv = $("#data");
+
+            var onError = function() {
+                $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
+            };
 
             $.ajax({
                 type: 'get',
@@ -38,20 +42,24 @@
                         $('[data-toggle="popover"]').popover();
                         $.HSCore.components.HSPopup.init('.js-fancybox');
                     } else {
-                        setTimeout(function () {
-                            get_obj_data(task_id)
-                        }, 1000);
+                        if (retries > 0) {
+                            setTimeout(function () {
+                                get_obj_data(task_id, retries--)
+                            }, 1000);
+                        } else {
+                            onError();
+                        }
                     }
                 },
                 error: function (data) {
-                    $resultsDiv.find('p').html("Something went wrong!");
+                    onError();
                 }
             });
         };
 
         {% if task_id %}
             $(function () {
-                get_obj_data('{{ task_id }}');
+                get_obj_data('{{ task_id }}', 20);
             });
         {% endif %}
     </script>

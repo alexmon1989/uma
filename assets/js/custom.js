@@ -49,7 +49,7 @@ function updateURLParameter(url, param, paramVal)
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
-function downloadFileAfterTaskExec(taskId, onSuccess, onError) {
+function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
     $.ajax({
         type: 'get',
         url: '/search/get-task-info/',
@@ -64,9 +64,14 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError) {
                 }
                 onSuccess(data);
             } else {
-                setTimeout(function () {
-                    downloadFileAfterTaskExec(taskId, onSuccess, onError);
-                }, 1000);
+                if (retries > 0) {
+                    setTimeout(function () {
+                        downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
+                    }, 1000);
+                } else {
+                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                    onError();
+                }
             }
         },
         error: function (data) {
