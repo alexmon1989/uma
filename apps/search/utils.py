@@ -47,7 +47,7 @@ def prepare_advanced_query(query, field_type):
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
-    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT").replace("/", "//")
+    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT").replace("/", "\\/")
     return query
 
 
@@ -56,7 +56,7 @@ def prepare_simple_query(query, field_type):
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
-    return query
+    return query.replace("/", "\\/")
 
 
 def get_elastic_results(search_groups, user):
@@ -82,7 +82,8 @@ def get_elastic_results(search_groups, user):
                         'query_string',
                         query=f"{prepare_advanced_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
                         default_field=inid_schedule.elastic_index_field.field_name,
-                        analyze_wildcard=True
+                        analyze_wildcard=True,
+                        default_operator='AND'
                     )
                     if not qs:
                         qs = q
