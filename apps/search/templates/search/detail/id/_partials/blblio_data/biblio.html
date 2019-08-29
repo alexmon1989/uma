@@ -135,9 +135,12 @@
                 <th>{{ ipc_field.code_title }}</th>
                 <td class="text-justify">
                     {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
-                        {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
-                        <br>
-                        {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                        {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                        {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine != 'address' %}
+                                <br>{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% endif %}
+                        {% endif %}
                         {% if not forloop.last %};<br>{% endif %}
                     {% endfor %}
                 </td>
