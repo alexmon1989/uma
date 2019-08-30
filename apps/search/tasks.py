@@ -4,13 +4,14 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.db.models import F
+from django.forms import formset_factory
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, prepare_data_for_search_report, create_search_res_doc)
 from uma.utils import get_unique_filename
-from .forms import AdvancedSearchForm, SimpleSearchForm
+from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
 import os
 import json
 from zipfile import ZipFile
@@ -18,12 +19,24 @@ from pathlib import Path
 
 
 @shared_task
-def perform_simple_search(cleaned_data, user_id, get_params):
+def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
+    # Валидация запроса
+    for key, value in get_params.items():
+        if len(value) == 1:
+            get_params[key] = value[0]
+    SimpleSearchFormSet = formset_factory(SimpleSearchForm)
+    formset = SimpleSearchFormSet(get_params)
+    if not formset.is_valid():
+        return {
+            'validation_errors': formset.errors,
+            'get_params': get_params
+        }
+
     # Формирование поискового запроса ElasticSearch
     client = Elasticsearch(settings.ELASTIC_HOST)
     qs = None
-    for s in cleaned_data:
+    for s in formset.cleaned_data:
         elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
         if elastic_field:
             q = Q(
@@ -138,8 +151,20 @@ def get_app_details(id_app_number, user_id):
 
 
 @shared_task
-def perform_advanced_search(cleaned_data, user_id, get_params):
+def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
+    # Валидация запроса
+    for key, value in get_params.items():
+        if len(value) == 1 and 'obj_state' not in key:
+            get_params[key] = value[0]
+    AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
+    formset = AdvancedSearchFormSet(get_params)
+    if not formset.is_valid():
+        return {
+            'validation_errors': formset.errors,
+            'get_params': get_params
+        }
+
     # Получение пользователя
     try:
         user = User.objects.get(id=user_id)
@@ -147,7 +172,7 @@ def perform_advanced_search(cleaned_data, user_id, get_params):
         user = AnonymousUser()
 
     # Разбивка поисковых данных на поисковые группы
-    search_groups = get_search_groups(cleaned_data)
+    search_groups = get_search_groups(formset.cleaned_data)
 
     # Поиск в ElasticSearch по каждой группе
     s = get_elastic_results(search_groups, user)
@@ -182,9 +207,21 @@ def perform_advanced_search(cleaned_data, user_id, get_params):
 
 
 @shared_task
-def perform_transactions_search(cleaned_data, get_params):
+def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
-    s = get_search_in_transactions(cleaned_data)
+    # Валидация запроса
+    for key, value in get_params.items():
+        if len(value) == 1 and 'transaction_type' not in key:
+            get_params[key] = value[0]
+    form = TransactionsSearchForm(get_params)
+    if not form.is_valid():
+        print(get_params)
+        return {
+            'validation_errors': form.errors,
+            'get_params': get_params
+        }
+
+    s = get_search_in_transactions(form.cleaned_data)
 
     # Сортировка
     if get_params.get('sort_by'):

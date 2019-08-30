@@ -48,22 +48,15 @@ class SimpleListView(TemplateView):
             formset = SimpleSearchFormSet(self.request.GET)
             context['initial_data'] = dict(formset.data.lists())
 
-            # Валидация поисковой формы
-            is_valid = formset.is_valid()
-            if not is_valid:
-                context['formset_errors'] = formset.errors
-
             # Признак того что производится поиск
             context['is_search'] = True
 
-            if is_valid:
-                # Создание асинхронной задачи для Celery
-                task = perform_simple_search.delay(
-                    formset.cleaned_data,
-                    self.request.user.pk,
-                    dict(six.iterlists(self.request.GET))
-                )
-                context['task_id'] = task.id
+            # Создание асинхронной задачи для Celery
+            task = perform_simple_search.delay(
+                self.request.user.pk,
+                dict(six.iterlists(self.request.GET))
+            )
+            context['task_id'] = task.id
 
         return context
 
@@ -79,9 +72,14 @@ def get_results_html(request):
             context = task.result
             context['lang_code'] = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
             data['state'] = 'SUCCESS'
-            # Пагинация
-            page = task.result['get_params']['page'][0] if task.result['get_params'].get('page') else 1
-            context['results'] = paginate_results(task.result['results'], page, 10)
+
+            if task.result.get('validation_errors'):
+                context['validation_errors'] = task.result['validation_errors']
+            else:
+                # Пагинация
+                page = task.result['get_params']['page'][0] if task.result['get_params'].get('page') else 1
+                context['results'] = paginate_results(task.result['results'], page, 10)
+
             # Формирование HTML с результатами
             data['result'] = render_to_string(
                 f"search/{search_type}/_partials/results.html",
@@ -118,23 +116,16 @@ class AdvancedListView(TemplateView):
             # Иниц. данные для формы
             context['initial_data'] = dict(formset.data.lists())
 
-            # Валидация поисковой формы
-            is_valid = formset.is_valid()
-            if not is_valid:
-                context['formset_errors'] = formset.errors
-
             # Признак того что производится поиск
             context['is_search'] = True
 
             # Поиск в ElasticSearch
-            if is_valid:
-                # Создание асинхронной задачи для Celery
-                task = perform_advanced_search.delay(
-                    formset.cleaned_data,
-                    self.request.user.pk,
-                    dict(six.iterlists(self.request.GET))
-                )
-                context['task_id'] = task.id
+            # Создание асинхронной задачи для Celery
+            task = perform_advanced_search.delay(
+                self.request.user.pk,
+                dict(six.iterlists(self.request.GET))
+            )
+            context['task_id'] = task.id
 
         return context
 
@@ -351,20 +342,15 @@ class TransactionsSearchView(TemplateView):
         context['initial_data'] = dict()
         context['is_search'] = False
         if self.request.GET:
-            form = TransactionsSearchForm(self.request.GET)
-            is_valid = form.is_valid()
             context['is_search'] = True
-            context['form'] = form
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
             # Поиск
-            if is_valid:
-                # Создание асинхронной задачи для Celery
-                task = perform_transactions_search.delay(
-                    form.cleaned_data,
-                    dict(six.iterlists(self.request.GET))
-                )
-                context['task_id'] = task.id
+            # Создание асинхронной задачи для Celery
+            task = perform_transactions_search.delay(
+                dict(six.iterlists(self.request.GET))
+            )
+            context['task_id'] = task.id
 
         return context
 

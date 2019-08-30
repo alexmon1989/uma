@@ -18,18 +18,14 @@
             {% endblocktrans %}
         </p>
 
-        <div class="collapse g-mb-20 {% if not is_search or formset_errors %}show{% endif %}" id="collapseForm">
-            {% if formset_errors %}
-                <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
-            {% endif %}
-
+        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
             <advanced-search-form v-bind:obj-types="{{ obj_types }}"
                                   v-bind:ipc-codes="{{ ipc_codes }}"
                                   v-bind:initial-data="{{ initial_data }}"
             ></advanced-search-form>
         </div>
 
-        {% if is_search and not formset_errors %}
+        {% if is_search %}
             <div class="results">
                 <div class="g-mt-10">
                     <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"

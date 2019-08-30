@@ -9,7 +9,7 @@
     {% include 'search/transactions/_partials/breadcrumbs.html' %}
 
     <div class="container g-py-70">
-        {% if is_search and not form.errors %}
+        {% if is_search %}
             <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
                     data-target="#collapseForm"
                     aria-expanded="false" aria-controls="collapseExample">
@@ -17,15 +17,11 @@
             </button>
         {% endif %}
 
-        <div class="collapse g-mb-20 {% if not is_search or form.errors %}show{% endif %}" id="collapseForm">
-            {% if form.errors %}
-                <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
-            {% endif %}
-
+        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
             <transactions-search-form v-bind:lang-code="'{{ request.LANGUAGE_CODE }}'" v-bind:initial="{{ initial_data }}"/>
         </div>
 
-        {% if is_search and not formset_errors %}
+        {% if is_search %}
             <div class="results">
                 <div class="g-mt-10">
                     <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається формування результатів" %}<loading-dots></loading-dots></p>
