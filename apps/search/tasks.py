@@ -4,14 +4,13 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.db.models import F
-from django.forms import formset_factory
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, prepare_data_for_search_report, create_search_res_doc)
 from uma.utils import get_unique_filename
-from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
+from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
 import json
 from zipfile import ZipFile
@@ -21,17 +20,12 @@ from pathlib import Path
 @shared_task
 def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
+    formset = get_search_form('simple', get_params)
     # Валидация запроса
-    get_params_validation = get_params.copy()
-    for key, value in get_params.items():
-        if len(value) == 1:
-            get_params_validation[key] = value[0]
-    SimpleSearchFormSet = formset_factory(SimpleSearchForm)
-    formset = SimpleSearchFormSet(get_params_validation)
     if not formset.is_valid():
         return {
             'validation_errors': formset.errors,
-            'get_params': get_params_validation
+            'get_params': get_params
         }
 
     # Формирование поискового запроса ElasticSearch
@@ -154,17 +148,12 @@ def get_app_details(id_app_number, user_id):
 @shared_task
 def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
+    formset = get_search_form('advanced', get_params)
     # Валидация запроса
-    get_params_validation = get_params.copy()
-    for key, value in get_params_validation.items():
-        if len(value) == 1 and 'obj_state' not in key:
-            get_params_validation[key] = value[0]
-    AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
-    formset = AdvancedSearchFormSet(get_params_validation)
     if not formset.is_valid():
         return {
             'validation_errors': formset.errors,
-            'get_params': get_params_validation
+            'get_params': get_params
         }
 
     # Получение пользователя
@@ -211,16 +200,12 @@ def perform_advanced_search(user_id, get_params):
 @shared_task
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
+    form = get_search_form('transactions', get_params)
     # Валидация запроса
-    get_params_validation = get_params.copy()
-    for key, value in get_params_validation.items():
-        if len(value) == 1 and 'transaction_type' not in key:
-            get_params_validation[key] = value[0]
-    form = TransactionsSearchForm(get_params_validation)
     if not form.is_valid():
         return {
             'validation_errors': form.errors,
-            'get_params': get_params_validation
+            'get_params': get_params
         }
 
     s = get_search_in_transactions(form.cleaned_data)
@@ -383,150 +368,109 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
 
 
 @shared_task
-def create_simple_search_results_file(cleaned_data, user_id, get_params, lang_code):
+def create_simple_search_results_file(user_id, get_params, lang_code):
     """Возвращает url файла с результатами простого поиска."""
-    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-    qs = None
-    for s in cleaned_data:
-        elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
-        if elastic_field:
-            q = Q(
-                'query_string',
-                query=prepare_simple_query(s['value'], elastic_field.field_type),
-                default_field=elastic_field.field_name,
-                default_operator='AND'
+    formset = get_search_form('simple', get_params)
+    # Валидация запроса
+    if formset.is_valid():
+        client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+        qs = None
+        for s in formset.cleaned_data:
+            elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
+            if elastic_field:
+                q = Q(
+                    'query_string',
+                    query=prepare_simple_query(s['value'], elastic_field.field_type),
+                    default_field=elastic_field.field_name,
+                    default_operator='AND'
+                )
+                if qs is not None:
+                    qs &= q
+                else:
+                    qs = q
+
+        if qs is not None:
+            # Не показывать заявки, по которым выдан охранный документ
+            qs = filter_bad_apps(qs)
+
+            # Не показывать неопубликованные заявки
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                user = AnonymousUser()
+            qs = filter_unpublished_apps(user, qs)
+
+        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
+
+        # Фильтрация
+        if get_params.get('filter_obj_type'):
+            # Фильтрация по типу объекта
+            s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
+
+        if get_params.get('filter_obj_state'):
+            # Фильтрация по статусу объекта
+            s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
+
+        if s.count() <= 5000:
+            s = s.source(['search_data', 'Document'])
+
+            # Данные для Excel-файла
+            data = prepare_data_for_search_report(s, lang_code)
+
+            # Формировние Excel-файла
+            workbook = create_search_res_doc(data)
+
+            directory_path = os.path.join(
+                settings.MEDIA_ROOT,
+                'search_results',
             )
-            if qs is not None:
-                qs &= q
-            else:
-                qs = q
+            os.makedirs(directory_path, exist_ok=True)
+            # Имя файла с результатами поиска
+            file_name = f"{get_unique_filename('simple_search')}.xls"
+            file_path = os.path.join(directory_path, file_name)
 
-    if qs is not None:
-        # Не показывать заявки, по которым выдан охранный документ
-        qs = filter_bad_apps(qs)
+            # Сохранение файла
+            workbook.save(file_path)
 
-        # Не показывать неопубликованные заявки
+            # Возврат url сформированного файла с результатами поиска
+            return os.path.join(
+                settings.MEDIA_URL,
+                'search_results',
+                file_name
+            )
+    return False
+
+
+@shared_task
+def create_advanced_search_results_file(user_id, get_params, lang_code):
+    """Возвращает url файла с результатами расширенного поиска."""
+    formset = get_search_form('advanced', get_params)
+    # Валидация запроса
+    if not formset.is_valid():
+        # Разбивка поисковых данных на поисковые группы
+        search_groups = get_search_groups(formset.cleaned_data)
+
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             user = AnonymousUser()
-        qs = filter_unpublished_apps(user, qs)
 
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+        # Поиск в ElasticSearch по каждой группе
+        s = get_elastic_results(search_groups, user)
 
-    # Сортировка
-    if get_params.get('sort_by'):
-        s = sort_results(s, get_params['sort_by'][0])
-    else:
-        s = s.sort('_score')
-
-    # Фильтрация
-    if get_params.get('filter_obj_type'):
-        # Фильтрация по типу объекта
-        s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
-
-    if get_params.get('filter_obj_state'):
-        # Фильтрация по статусу объекта
-        s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
-
-    if s.count() <= 5000:
-        s = s.source(['search_data', 'Document'])
-
-        # Данные для Excel-файла
-        data = prepare_data_for_search_report(s, lang_code)
-
-        # Формировние Excel-файла
-        workbook = create_search_res_doc(data)
-
-        directory_path = os.path.join(
-            settings.MEDIA_ROOT,
-            'search_results',
-        )
-        os.makedirs(directory_path, exist_ok=True)
-        # Имя файла с результатами поиска
-        file_name = f"{get_unique_filename('simple_search')}.xls"
-        file_path = os.path.join(directory_path, file_name)
-
-        # Сохранение файла
-        workbook.save(file_path)
-
-        # Возврат url сформированного файла с результатами поиска
-        return os.path.join(
-            settings.MEDIA_URL,
-            'search_results',
-            file_name
-        )
-    return False
-
-
-@shared_task
-def create_advanced_search_results_file(cleaned_data, user_id, get_params, lang_code):
-    """Возвращает url файла с результатами расширенного поиска."""
-    # Разбивка поисковых данных на поисковые группы
-    search_groups = get_search_groups(cleaned_data)
-
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        user = AnonymousUser()
-
-    # Поиск в ElasticSearch по каждой группе
-    s = get_elastic_results(search_groups, user)
-
-    # Фильтрация
-    if get_params.get('filter_obj_type'):
-        # Фильтрация по типу объекта
-        s = s.filter('terms', Document__idObjType=get_params.getlist('filter_obj_type'))
-    if get_params.get('filter_obj_state'):
-        # Фильтрация по статусу объекта
-        s = s.filter('terms', search_data__obj_state=get_params.getlist('filter_obj_state'))
-
-    if s.count() <= 5000:
-        s = s.source(['search_data', 'Document'])
-
-        # Сортировка
-        if get_params.get('sort_by'):
-            s = sort_results(s, get_params['sort_by'])
-        else:
-            s = s.sort('_score')
-
-        # Данные для Excel-файла
-        data = prepare_data_for_search_report(s, lang_code)
-
-        # Формировние Excel-файла
-        workbook = create_search_res_doc(data)
-
-        directory_path = os.path.join(
-            settings.MEDIA_ROOT,
-            'search_results',
-        )
-        os.makedirs(directory_path, exist_ok=True)
-        # Имя файла с результатами поиска
-        file_name = f"{get_unique_filename('advanced_search')}.xls"
-        file_path = os.path.join(directory_path, file_name)
-
-        # Сохранение файла
-        workbook.save(file_path)
-
-        # Возврат url сформированного файла с результатами поиска
-        return os.path.join(
-            settings.MEDIA_URL,
-            'search_results',
-            file_name
-        )
-    return False
-
-
-@shared_task
-def create_transactions_search_results_file(cleaned_data, get_params, lang_code):
-    """Возвращает url файла с результатами поиска по оповещениям."""
-    s = get_search_in_transactions(cleaned_data)
-    if s:
-        # Сортировка
-        if get_params.get('sort_by'):
-            s = sort_results(s, get_params['sort_by'])
-        else:
-            s = s.sort('_score')
+        # Фильтрация
+        if get_params.get('filter_obj_type'):
+            # Фильтрация по типу объекта
+            s = s.filter('terms', Document__idObjType=get_params.getlist('filter_obj_type'))
+        if get_params.get('filter_obj_state'):
+            # Фильтрация по статусу объекта
+            s = s.filter('terms', search_data__obj_state=get_params.getlist('filter_obj_state'))
 
         if s.count() <= 5000:
             s = s.source(['search_data', 'Document'])
@@ -549,7 +493,7 @@ def create_transactions_search_results_file(cleaned_data, get_params, lang_code)
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('transactions_search')}.xls"
+            file_name = f"{get_unique_filename('advanced_search')}.xls"
             file_path = os.path.join(directory_path, file_name)
 
             # Сохранение файла
@@ -561,6 +505,56 @@ def create_transactions_search_results_file(cleaned_data, get_params, lang_code)
                 'search_results',
                 file_name
             )
+    return False
+
+
+@shared_task
+def create_transactions_search_results_file(get_params, lang_code):
+    """Возвращает url файла с результатами поиска по оповещениям."""
+    form = get_search_form('transactions', get_params)
+    # Валидация запроса
+    if not form.is_valid():
+        s = get_search_in_transactions(form.cleaned_data)
+        if s:
+            # Сортировка
+            if get_params.get('sort_by'):
+                s = sort_results(s, get_params['sort_by'])
+            else:
+                s = s.sort('_score')
+
+            if s.count() <= 5000:
+                s = s.source(['search_data', 'Document'])
+
+                # Сортировка
+                if get_params.get('sort_by'):
+                    s = sort_results(s, get_params['sort_by'])
+                else:
+                    s = s.sort('_score')
+
+                # Данные для Excel-файла
+                data = prepare_data_for_search_report(s, lang_code)
+
+                # Формировние Excel-файла
+                workbook = create_search_res_doc(data)
+
+                directory_path = os.path.join(
+                    settings.MEDIA_ROOT,
+                    'search_results',
+                )
+                os.makedirs(directory_path, exist_ok=True)
+                # Имя файла с результатами поиска
+                file_name = f"{get_unique_filename('transactions_search')}.xls"
+                file_path = os.path.join(directory_path, file_name)
+
+                # Сохранение файла
+                workbook.save(file_path)
+
+                # Возврат url сформированного файла с результатами поиска
+                return os.path.join(
+                    settings.MEDIA_URL,
+                    'search_results',
+                    file_name
+                )
     return False
 
 

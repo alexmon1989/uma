@@ -11,7 +11,10 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
-import re, time, datetime, xlwt
+import re
+import time
+import datetime
+import xlwt
 from uma.utils import iterable
 
 

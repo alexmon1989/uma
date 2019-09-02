@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.forms import formset_factory
 from django.utils.translation import ugettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q, Index
@@ -30,6 +31,27 @@ def validate_query_elasticsearch(query, field, search_type):
     })
     return i['valid']
 
+
+def get_search_form(search_type, get_params):
+    """Валидация поискового запроса."""
+    # Подготовка данных
+    get_params_validation = get_params.copy()
+    for key, value in get_params_validation.items():
+        if len(value) == 1 and 'obj_state' not in key and key != 'transaction_type':
+            get_params_validation[key] = value[0]
+
+    if search_type == 'simple':
+        SimpleSearchFormSet = formset_factory(SimpleSearchForm)
+        form = SimpleSearchFormSet(get_params_validation)
+    elif search_type == 'advanced':
+        AdvancedFormSet = formset_factory(AdvancedSearchForm)
+        form = AdvancedFormSet(get_params_validation)
+    elif search_type == 'transactions':
+        form = TransactionsSearchForm(get_params_validation)
+    else:
+        raise Exception('Неизвестный тип поиска')
+
+    return form
 
 class SimpleSearchForm(forms.Form):
     """Простая форма поиска."""

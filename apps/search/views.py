@@ -290,35 +290,22 @@ def validate_query(request):
 
 def download_xls_simple(request):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами простого поиска."""
-    SimpleSearchFormSet = formset_factory(SimpleSearchForm)
-    formset = SimpleSearchFormSet(request.GET)
-    if formset.is_valid:
-        task = create_simple_search_results_file.delay(
-            formset.cleaned_data,
-            request.user.pk,
-            dict(six.iterlists(request.GET)),
-            'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-        )
-        return JsonResponse({'task_id': task.id})
-    raise Http404
+    task = create_simple_search_results_file.delay(
+        request.user.pk,
+        dict(six.iterlists(request.GET)),
+        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    )
+    return JsonResponse({'task_id': task.id})
 
 
 def download_xls_advanced(request):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами расширенного поиска."""
-    AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
-    if request.GET:
-        formset = AdvancedSearchFormSet(request.GET)
-
-        if formset.is_valid():
-            task = create_advanced_search_results_file.delay(
-                formset.cleaned_data,
-                request.user.pk,
-                dict(six.iterlists(request.GET)),
-                'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-            )
-            return JsonResponse({'task_id': task.id})
-
-    raise Http404
+    task = create_advanced_search_results_file.delay(
+        request.user.pk,
+        dict(six.iterlists(request.GET)),
+        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    )
+    return JsonResponse({'task_id': task.id})
 
 
 def download_shared_docs(request, id_app_number):
@@ -357,17 +344,11 @@ class TransactionsSearchView(TemplateView):
 
 def download_xls_transactions(request):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами поиска по оповещениям."""
-    form = TransactionsSearchForm(request.GET)
-
-    if form.is_valid():
-        task = create_transactions_search_results_file.delay(
-            form.cleaned_data,
-            dict(six.iterlists(request.GET)),
-            'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-        )
-        return JsonResponse({'task_id': task.id})
-
-    raise Http404
+    task = create_transactions_search_results_file.delay(
+        dict(six.iterlists(request.GET)),
+        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    )
+    return JsonResponse({'task_id': task.id})
 
 
 def get_task_info(request):
