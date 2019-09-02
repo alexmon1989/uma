@@ -467,10 +467,10 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
         # Фильтрация
         if get_params.get('filter_obj_type'):
             # Фильтрация по типу объекта
-            s = s.filter('terms', Document__idObjType=get_params.getlist('filter_obj_type'))
+            s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
         if get_params.get('filter_obj_state'):
             # Фильтрация по статусу объекта
-            s = s.filter('terms', search_data__obj_state=get_params.getlist('filter_obj_state'))
+            s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
 
         if s.count() <= 5000:
             s = s.source(['search_data', 'Document'])
