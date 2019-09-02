@@ -22,7 +22,7 @@ from pathlib import Path
 def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
     # Валидация запроса
-    get_params_validation = {}
+    get_params_validation = get_params.copy()
     for key, value in get_params.items():
         if len(value) == 1:
             get_params_validation[key] = value[0]
@@ -155,8 +155,8 @@ def get_app_details(id_app_number, user_id):
 def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
     # Валидация запроса
-    get_params_validation = {}
-    for key, value in get_params.items():
+    get_params_validation = get_params.copy()
+    for key, value in get_params_validation.items():
         if len(value) == 1 and 'obj_state' not in key:
             get_params_validation[key] = value[0]
     AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
@@ -212,7 +212,7 @@ def perform_advanced_search(user_id, get_params):
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
     # Валидация запроса
-    get_params_validation = {}
+    get_params_validation = get_params
     for key, value in get_params_validation.items():
         if len(value) == 1 and 'transaction_type' not in key:
             get_params_validation[key] = value[0]
