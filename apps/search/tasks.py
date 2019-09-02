@@ -212,7 +212,7 @@ def perform_advanced_search(user_id, get_params):
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
     # Валидация запроса
-    get_params_validation = get_params
+    get_params_validation = get_params.copy()
     for key, value in get_params_validation.items():
         if len(value) == 1 and 'transaction_type' not in key:
             get_params_validation[key] = value[0]
