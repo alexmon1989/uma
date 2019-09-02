@@ -452,7 +452,7 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
     """Возвращает url файла с результатами расширенного поиска."""
     formset = get_search_form('advanced', get_params)
     # Валидация запроса
-    if not formset.is_valid():
+    if formset.is_valid():
         # Разбивка поисковых данных на поисковые группы
         search_groups = get_search_groups(formset.cleaned_data)
 
@@ -513,7 +513,7 @@ def create_transactions_search_results_file(get_params, lang_code):
     """Возвращает url файла с результатами поиска по оповещениям."""
     form = get_search_form('transactions', get_params)
     # Валидация запроса
-    if not form.is_valid():
+    if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
         if s:
             # Сортировка
