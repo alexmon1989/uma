@@ -374,7 +374,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
-        self.es = Elasticsearch(settings.ELASTIC_HOST)
+        self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
         documents = IpcAppList.objects.filter(elasticindexed=0).values(

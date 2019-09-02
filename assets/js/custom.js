@@ -320,7 +320,9 @@ $(function () {
                         .find('i').first()
                         .removeClass('fa-spinner')
                         .addClass('fa-download');
-                });
+                },
+                60
+            );
         });
     });
 });

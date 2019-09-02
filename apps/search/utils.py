@@ -106,7 +106,7 @@ def get_elastic_results(search_groups, user):
         else:
             qs_result |= qs
 
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
 
     return s
@@ -259,7 +259,7 @@ def extend_doc_flow(hit):
             Q('match', search_data__obj_state=1)
         ]
     )
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     application = Search().using(client).query(q).execute()
     if application:
         application = application[0].to_dict()
@@ -1200,7 +1200,7 @@ def prepare_data_for_search_report(s, lang_code):
 
 def get_transactions_types(id_obj_type):
     """Возвращает возможные типы транзакций для определённого типа объекта."""
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
         must=[Q('match', Document__idObjType=id_obj_type)],
@@ -1232,7 +1232,7 @@ def get_transactions_types(id_obj_type):
 
 
 def get_search_in_transactions(search_params):
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
     transaction_path = ''
     transaction_type_field = ''

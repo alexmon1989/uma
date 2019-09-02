@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
-        self.es = Elasticsearch(settings.ELASTIC_HOST)
+        self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Выборка всех охранных документов из ElasticSearch
         q = Q(

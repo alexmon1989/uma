@@ -35,7 +35,7 @@ def perform_simple_search(user_id, get_params):
         }
 
     # Формирование поискового запроса ElasticSearch
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     qs = None
     for s in formset.cleaned_data:
         elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
@@ -112,7 +112,7 @@ def validate_query(get_params):
 @shared_task
 def get_app_details(id_app_number, user_id):
     """Задача для получения деталей по заявке."""
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
         must=[Q('match', _id=id_app_number)],
@@ -358,7 +358,7 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
 
     # Знаки для товаров и услуг
     elif app.obj_type_id == 4:
-        client = Elasticsearch(settings.ELASTIC_HOST)
+        client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
         q = Q('match', _id=id_app_number)
         s = Search().using(client).query(q).execute()
         if s:
@@ -385,7 +385,7 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
 @shared_task
 def create_simple_search_results_file(cleaned_data, user_id, get_params, lang_code):
     """Возвращает url файла с результатами простого поиска."""
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     qs = None
     for s in cleaned_data:
         elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field

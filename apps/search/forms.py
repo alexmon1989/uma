@@ -19,7 +19,7 @@ def validate_query_elasticsearch(query, field, search_type):
         query = prepare_simple_query(query, field.field_type)
     elif search_type == 'advanced':
         query = prepare_advanced_query(query, field.field_type)
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
         'query': Q(
             'query_string',
@@ -134,7 +134,7 @@ class QueryForm(forms.Form):
                 )
 
         # Валидация запроса в ElasticSearch
-        client = Elasticsearch(settings.ELASTIC_HOST)
+        client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
         i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
             'query': Q(
                 'query_string',
