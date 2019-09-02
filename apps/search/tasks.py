@@ -22,15 +22,16 @@ from pathlib import Path
 def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
     # Валидация запроса
+    get_params_validation = {}
     for key, value in get_params.items():
         if len(value) == 1:
-            get_params[key] = value[0]
+            get_params_validation[key] = value[0]
     SimpleSearchFormSet = formset_factory(SimpleSearchForm)
-    formset = SimpleSearchFormSet(get_params)
+    formset = SimpleSearchFormSet(get_params_validation)
     if not formset.is_valid():
         return {
             'validation_errors': formset.errors,
-            'get_params': get_params
+            'get_params': get_params_validation
         }
 
     # Формирование поискового запроса ElasticSearch
@@ -154,15 +155,16 @@ def get_app_details(id_app_number, user_id):
 def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
     # Валидация запроса
+    get_params_validation = {}
     for key, value in get_params.items():
         if len(value) == 1 and 'obj_state' not in key:
-            get_params[key] = value[0]
+            get_params_validation[key] = value[0]
     AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
-    formset = AdvancedSearchFormSet(get_params)
+    formset = AdvancedSearchFormSet(get_params_validation)
     if not formset.is_valid():
         return {
             'validation_errors': formset.errors,
-            'get_params': get_params
+            'get_params': get_params_validation
         }
 
     # Получение пользователя
@@ -210,15 +212,15 @@ def perform_advanced_search(user_id, get_params):
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
     # Валидация запроса
-    for key, value in get_params.items():
+    get_params_validation = {}
+    for key, value in get_params_validation.items():
         if len(value) == 1 and 'transaction_type' not in key:
-            get_params[key] = value[0]
-    form = TransactionsSearchForm(get_params)
+            get_params_validation[key] = value[0]
+    form = TransactionsSearchForm(get_params_validation)
     if not form.is_valid():
-        print(get_params)
         return {
             'validation_errors': form.errors,
-            'get_params': get_params
+            'get_params': get_params_validation
         }
 
     s = get_search_in_transactions(form.cleaned_data)

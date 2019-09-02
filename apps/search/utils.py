@@ -199,6 +199,7 @@ def sort_results(s, sort_by_value):
 
     return s
 
+
 def filter_results(s, get_params):
     """Фильтрует результат запроса ElasticSearch и выполняет агрегацию для фильтров в сайдбаре."""
     # Агрегация для определения всех типов объектов и состояний
