@@ -10,8 +10,8 @@ from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import user_passes_test
 from django.template.loader import render_to_string
 from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
-from .forms import AdvancedSearchForm, SimpleSearchForm, TransactionsSearchForm
-from .utils import (get_client_ip, paginate_results, user_has_access_to_docs_decorator)
+from .forms import AdvancedSearchForm, SimpleSearchForm
+from .utils import (get_client_ip, paginate_results)
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
@@ -235,7 +235,6 @@ def get_data_app_html(request):
 
 
 @require_POST
-@user_has_access_to_docs_decorator
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
     if request.POST.getlist('cead_id'):
@@ -251,13 +250,12 @@ def download_docs_zipped(request):
             OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
 
         # Создание асинхронной задачи для получения архива с документами
-        task = get_order_documents.delay(order.id)
+        task = get_order_documents.delay(request.user.pk, order.id)
         return JsonResponse({'task_id': task.id})
     else:
         raise Http404('Файли не було обрано!')
 
 
-@user_has_access_to_docs_decorator
 def download_doc(request, id_app_number, id_cead_doc):
     """Возвращает JSON с id асинхронной задачи на заказ документа."""
     # Создание заказа
@@ -271,7 +269,7 @@ def download_doc(request, id_app_number, id_cead_doc):
     OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
 
     # Создание асинхронной задачи для получения документа
-    task = get_order_documents.delay(order.id)
+    task = get_order_documents.delay(request.user.pk, order.id)
     return JsonResponse({'task_id': task.id})
 
 
