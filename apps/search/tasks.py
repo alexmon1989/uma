@@ -2,14 +2,13 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
 from django.db.models import F
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
-                    create_selection_tm, prepare_data_for_search_report, create_search_res_doc)
-from uma.utils import get_unique_filename
+                    create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs)
+from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
 import json
@@ -50,11 +49,7 @@ def perform_simple_search(user_id, get_params):
         qs = filter_bad_apps(qs)
 
         # Не показывать неопубликованные заявки
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            user = AnonymousUser()
-        qs = filter_unpublished_apps(user, qs)
+        qs = filter_unpublished_apps(get_user_or_anonymous(user_id), qs)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -112,12 +107,8 @@ def get_app_details(id_app_number, user_id):
         must=[Q('match', _id=id_app_number)],
     )
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        user = AnonymousUser()
     # Фильтр заявок, которые не положено публиковать в интернет
-    q = filter_unpublished_apps(user, q)
+    q = filter_unpublished_apps(get_user_or_anonymous(user_id), q)
 
     s = Search().using(client).query(q).execute()
     if not s:
@@ -156,17 +147,11 @@ def perform_advanced_search(user_id, get_params):
             'get_params': get_params
         }
 
-    # Получение пользователя
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        user = AnonymousUser()
-
     # Разбивка поисковых данных на поисковые группы
     search_groups = get_search_groups(formset.cleaned_data)
 
     # Поиск в ElasticSearch по каждой группе
-    s = get_elastic_results(search_groups, user)
+    s = get_elastic_results(search_groups, get_user_or_anonymous(user_id))
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -254,11 +239,28 @@ def get_obj_types_with_transactions(lang_code):
 
 
 @shared_task
-def get_order_documents(order_id):
+def get_order_documents(user_id, order_id):
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
     # Получение обработанного заказа
     order = get_completed_order(order_id)
-    if order:
+
+    # Получение документа (заявки) из ElasticSearch
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    q = Q(
+        'bool',
+        must=[Q('match', _id=order.app_id)],
+    )
+    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
+    # Фильтр заявок, которые не положено публиковать в интернет
+    user = get_user_or_anonymous(user_id)
+    q = filter_unpublished_apps(user, q)
+
+    s = Search().using(client).query(q).source(['search_data']).execute()
+    if not s:
+        return {}
+    hit = s[0].to_dict()
+
+    if order and user_has_access_to_docs(user, hit):
         # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
         if order.orderdocument_set.count() == 1:
             doc = order.orderdocument_set.first()
@@ -394,11 +396,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             qs = filter_bad_apps(qs)
 
             # Не показывать неопубликованные заявки
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                user = AnonymousUser()
-            qs = filter_unpublished_apps(user, qs)
+            qs = filter_unpublished_apps(get_user_or_anonymous(user_id), qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -456,13 +454,8 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
         # Разбивка поисковых данных на поисковые группы
         search_groups = get_search_groups(formset.cleaned_data)
 
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            user = AnonymousUser()
-
         # Поиск в ElasticSearch по каждой группе
-        s = get_elastic_results(search_groups, user)
+        s = get_elastic_results(search_groups, get_user_or_anonymous(user_id))
 
         # Фильтрация
         if get_params.get('filter_obj_type'):
