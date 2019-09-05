@@ -1,3 +1,5 @@
 from django.contrib import admin
+from singlemodeladmin import SingleModelAdmin
+from .models import ContactsPage
 
-# Register your models here.
+admin.site.register(ContactsPage, SingleModelAdmin)
