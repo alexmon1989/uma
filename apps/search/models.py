@@ -203,26 +203,26 @@ class AppDocuments(models.Model):
             app__id=id_app_number,
             enter_num__in=(98, 99, 100, 101),
             file_type='pdf'
-        )
+        ).values()
         documents = {}
         for document in objects:
             # Формула
-            if document.enter_num == 98:
+            if document['enter_num'] == 98:
                 documents['cl'] = document
             # Описание
-            elif document.enter_num == 99:
+            elif document['enter_num'] == 99:
                 documents['de'] = document
             # Описание
-            elif document.enter_num == 101:
+            elif document['enter_num'] == 101:
                 documents['de_pub'] = document
             else:
-                if 'A_UA' in document.file_name:
+                if 'A_UA' in document['file_name']:
                     # Реферат укр.
                     documents['ab_ua'] = document
-                if 'A_RU' in document.file_name:
+                if 'A_RU' in document['file_name']:
                     # Реферат рос.
                     documents['ab_ru'] = document
-                if 'A_EN' in document.file_name:
+                if 'A_EN' in document['file_name']:
                     # Реферат англ.
                     documents['ab_en'] = document
         return documents
@@ -315,6 +315,8 @@ class IndexationProcess(models.Model):
     processed_count = models.PositiveIntegerField("Опрацьовано об'єктів", default=0)
     begin_date = models.DateTimeField("Дата та час початку індексації")
     finish_date = models.DateTimeField("Дата та час закінчення індексації", null=True, blank=True)
+    documents_in_index = models.PositiveIntegerField("Всього документів", null=True, blank=True)
+    documents_in_index_shared = models.PositiveIntegerField("Всього документів опублікованих", null=True, blank=True)
 
     def __str__(self):
         return self.finish_date

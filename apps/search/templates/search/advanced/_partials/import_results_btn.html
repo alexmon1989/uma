@@ -1,18 +1,21 @@
 {% load i18n %}
+{% load uma_extras %}
 
 {% if results.paginator.count >= 5000 %}
     <div class="d-md-flex g-mb-20">
-        <a class="btn btn-sm u-btn-purple disabled"
+        <button class="btn btn-sm u-btn-purple disabled"
            data-toggle="tooltip"
-           data-placement="bottom"
-           href="{% url 'search:download_xls_advanced' %}?{{ request.GET.urlencode }}">
+           data-placement="bottom">
             <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
-        </a>
+        </button>
         <div class="align-self-center g-ml-5 g-font-size-12 g-color-pink">{% trans "Завантаження результатів можливе, якщо кількість результатів пошуку менша або рівна 5000" %}</div>
     </div>
 {% else %}
-    <a class="btn btn-sm u-btn-purple g-mb-20"
-       href="{% url 'search:download_xls_advanced' %}?{{ request.GET.urlencode }}">
-        <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
-    </a>
+    <div class="d-md-flex g-mb-20">
+        <button class="btn btn-sm u-btn-purple"
+           id="search-result-download-btn"
+           data-task-create-url="{% url 'search:download_xls_advanced' %}?{{ get_params|urlencode_dict }}">
+            <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
+        </button>
+    </div>
 {% endif %}

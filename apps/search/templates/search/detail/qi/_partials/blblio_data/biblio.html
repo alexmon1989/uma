@@ -23,10 +23,10 @@
         {% endif %}
 
         {% get_field '190' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationOriginCode %}
+        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationOriginCountry %}
             <tr>
                 <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.Geo.GeoDetails.RegistrationOriginCode }}</td>
+                <td>{{ hit.Geo.GeoDetails.RegistrationOriginCountry.0 }}</td>
             </tr>
         {% endif %}
 

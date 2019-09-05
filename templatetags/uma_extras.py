@@ -1,6 +1,7 @@
 from django import template
 from django.urls import translate_url
 from datetime import datetime
+import urllib.parse
 
 register = template.Library()
 
@@ -18,6 +19,17 @@ def url_replace(request, field, value):
     return dict_.urlencode()
 
 
+@register.simple_tag
+def replace_and_urlencode(get_params, field, value):
+    get_params[field] = value
+    return urllib.parse.urlencode(get_params, doseq=True)
+
+
+@register.filter
+def urlencode_dict(data):
+    return urllib.parse.urlencode(data, doseq=True)
+
+
 @register.filter
 def get(mapping, key):
     try:
@@ -28,7 +40,10 @@ def get(mapping, key):
 
 @register.filter
 def parse_date(value):
-    return datetime.strptime(value, '%Y-%m-%d')
+    try:
+        return datetime.strptime(value, '%Y-%m-%d')
+    except ValueError:
+        return value
 
 
 @register.filter

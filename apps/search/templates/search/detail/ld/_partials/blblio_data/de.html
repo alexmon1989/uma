@@ -1,6 +1,6 @@
 {% load search_extras %}
 {% load i18n %}
 
-{% document_pdf path=biblio_documents.de.file_name|document_path height=500 %}
+{% document_pdf path=hit.biblio_documents.de.file_name|document_path height=500 %}
 
-<p><a href="{{ biblio_documents.de.file_name|document_path }}" target="_blank"><i class="fa fa-external-link"></i>&nbsp;{% trans "Відкрити у новому вікні" %}</a></p>
+<p><a href="{{ hit.biblio_documents.de.file_name|document_path }}" target="_blank"><i class="fa fa-external-link"></i>&nbsp;{% trans "Відкрити у новому вікні" %}</a></p>

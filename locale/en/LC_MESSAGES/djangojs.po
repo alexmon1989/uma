@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-28 01:30+0000\n"
+"POT-Creation-Date: 2019-07-22 10:43+0000\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,28 +19,54 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:64
+#: assets/js/custom.js:60 assets/js/custom.js:73
+msgid "Виникла помилка. Будь-ласка, спробуйте пізніше."
+msgstr "Error! Please try again later."
+
+#: assets/js/custom.js:62
+msgid "Файл було сформовано."
+msgstr "File was created."
+
+#: assets/js/custom.js:174 assets/js/custom.js:247 assets/js/custom.js:284
+msgid "Будь-ласка, зачекайте, відбувається формування файлу."
+msgstr "Please wait for file creating."
+
+#: assets/js/custom.js:206
+msgid "Будь-ласка, зачекайте, відбувається формування документу."
+msgstr "Please wait for document creating."
+
+#: assets/js/custom.js:220
+msgid "Відкрити"
+msgstr "Open"
+
+#: assets/js/custom.js:273
+#, fuzzy
+#| msgid "Охоронний документ"
+msgid "Не було обрано жодного документу."
+msgstr "Protective document"
+
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:65
 msgid "Заявка"
 msgstr "Claim"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:65
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:66
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:70
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:67
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:71
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:69
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:6
 msgid "Показати результати"
 msgstr "Show results"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:71
-#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:74
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:66
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:72
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:75
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:68
 msgid "Додати параметр"
 msgstr "Add parameter"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:72
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:68
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:73
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:70
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:7
 msgid "Виконуємо пошук..."
 msgstr "Performing search..."
@@ -71,28 +97,28 @@ msgid "Бібліографічні елементи"
 msgstr "Bibliographic elements"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:269
-#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:73
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:65
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:74
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:67
 msgid "Значення"
 msgstr "Value"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:271
-#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:76
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:77
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
 msgid "Обов'язкове поле для заповнення"
 msgstr "Required field"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:272
-#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:77
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:78
 msgid "Поле містить невірне значення"
 msgstr "The field contains wrong value"
 
-#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:72
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:64
+#: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:73
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:66
 msgid "Оберіть параметр пошуку"
 msgstr "Select search parameter"
 
-#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:63
+#: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:65
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:5
 msgid "Для початку роботи заповніть форму пошуку"
 msgstr "Fill out the search form to get started"

@@ -13,7 +13,7 @@
             <div class="table-responsive">
                 <form action="{% url "search:download_docs_zipped" %}" method="post" id="documents-form">
                     {% csrf_token %}
-                    <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
+                    <input type="hidden" name="id_app_number" value="{{ hit.id_app_number }}">
                     <table class="table table-striped table-bordered u-table--v1 mb-0">
                         <thead>
                         <tr>
@@ -40,25 +40,25 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if doc.DocRecord.DocType %}
-                                        {% if doc.DocRecord.DocIdDocCEAD %}
-                                            <a href="{% url 'search:download_doc' id_app_number=hit.meta.id id_cead_doc=doc.DocRecord.DocIdDocCEAD %}"
-                                               target="_blank"
-                                               class="g-color-blue-dark-v1">{{ doc.DocRecord.DocType }}</a>
-                                        {% else %}
-                                            {{ doc.DocRecord.DocType }}
-                                        {% endif %}
-                                    {% endif %}
+                                    {{ doc.DocRecord.DocType }}
                                 </td>
                                 <td class="text-center">
                                     {% if doc.DocRecord.DocRegNumber %}
                                         {{ doc.DocRecord.DocRegNumber }}
                                     {% endif %}
                                 </td>
+                                <td class="text-center">
+                                    {% if doc.DocRecord.DocIdDocCEAD  %}
+                                        <button class="btn btn-xs btn-primary download-doc"
+                                                title="{% trans "Сформувати посилання для завантаження" %}"
+                                                data-task-create-url="{% url 'search:download_doc' id_app_number=hit.id_app_number id_cead_doc=doc.DocRecord.DocIdDocCEAD %}"
+                                        ><i class="fa fa-download"></i></button>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         <tr>
-                            <td colspan="6" class="g-bg-white">
+                            <td colspan="7" class="g-bg-white">
                                 {% if hit.TradeMark.DocFlow.Documents|length > 0 %}
                                     <button class="btn btn-primary"
                                             type="submit"><i

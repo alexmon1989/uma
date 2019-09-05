@@ -46,17 +46,19 @@
 
 <script>
     import SearchParam from "./SearchParam.vue";
-    import axios from 'axios';
+    import mixin from './../../mixins.js';
 
     export default {
         name: "SimpleSearchForm",
         components: {SearchParam},
+        mixins: [mixin],
         props: {
             searchParameterTypes: Array,
             initialData: Object
         },
         data() {
             return {
+                searchType: 'simple',
                 searchParameters: [],
 
                 translations: {
@@ -109,20 +111,6 @@
                     }
                 });
             }
-        },
-        created() {
-            this.$validator.extend('validQuery', {
-                validate: (value, args) => {
-                    return new Promise((resolve, reject) => {
-                        setTimeout(() => {
-                            axios
-                                .get('/search/validate-query/?search_type=simple&value='
-                                    + value + '&param_type=' + args[0])
-                                .then(response => resolve(response.data.result));
-                        }, 200);
-                    });
-                }
-            });
         }
     }
 </script>

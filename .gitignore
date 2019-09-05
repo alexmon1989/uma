@@ -115,3 +115,4 @@ venv.bak/
 /nohup.out
 /nginx.conf
 /certs/
+/celery_daemon.conf

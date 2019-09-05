@@ -11,7 +11,10 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
-import re, time, datetime, io, xlwt
+import re
+import time
+import datetime
+import xlwt
 from uma.utils import iterable
 
 
@@ -106,7 +109,7 @@ def get_elastic_results(search_groups, user):
         else:
             qs_result |= qs
 
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
 
     return s
@@ -131,10 +134,10 @@ class ResultsProxy(object):
         self.s = s
 
     def __len__(self):
-        return self.s.count()
+        return self.s['total']
 
     def __getitem__(self, item):
-        return self.s[item.start:item.stop].execute()
+        return self.s['items']
 
 
 def paginate_results(s, page, paginate_by=10):
@@ -199,7 +202,8 @@ def sort_results(s, sort_by_value):
 
     return s
 
-def filter_results(s, request):
+
+def filter_results(s, get_params):
     """Фильтрует результат запроса ElasticSearch и выполняет агрегацию для фильтров в сайдбаре."""
     # Агрегация для определения всех типов объектов и состояний
     s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
@@ -208,13 +212,13 @@ def filter_results(s, request):
     s_ = s
 
     # Фильтрация
-    if request.GET.get('filter_obj_type'):
+    if get_params.get('filter_obj_type'):
         # Фильтрация в основном запросе
-        s = s.filter('terms', Document__idObjType=request.GET.getlist('filter_obj_type'))
+        s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
         # Агрегация для определения количества объектов определённых типов после применения одного фильтра
         s_filter_obj_type = s_.filter(
             'terms',
-            Document__idObjType=request.GET.getlist('filter_obj_type')
+            Document__idObjType=get_params.get('filter_obj_type')
         )
         s_filter_obj_type.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
         aggregations_obj_state = s_filter_obj_type.execute().aggregations.to_dict()
@@ -226,14 +230,14 @@ def filter_results(s, request):
                 )
         aggregations['obj_state_terms']['buckets'] = aggregations_obj_state['obj_state_terms']['buckets']
 
-    if request.GET.get('filter_obj_state'):
+    if get_params.get('filter_obj_state'):
         # Фильтрация в основном запросе
-        s = s.filter('terms', search_data__obj_state=request.GET.getlist('filter_obj_state'))
+        s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
         # Агрегация для определения количества объектов определённых состояний
         # после применения одного фильтра
         s_filter_obj_state = s_.filter(
             'terms',
-            search_data__obj_state=request.GET.getlist('filter_obj_state')
+            search_data__obj_state=get_params.get('filter_obj_state')
         )
         s_filter_obj_state.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
         aggregations_id_obj_type = s_filter_obj_state.execute().aggregations.to_dict()
@@ -254,44 +258,44 @@ def extend_doc_flow(hit):
     q = Q(
         'bool',
         must=[
-            Q('match', search_data__app_number=hit.search_data.app_number),
+            Q('match', search_data__app_number=hit['search_data']['app_number']),
             Q('match', search_data__obj_state=1)
         ]
     )
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     application = Search().using(client).query(q).execute()
     if application:
-        application = application[0]
+        application = application[0].to_dict()
 
         try:
             # Объединение стадий
-            stages = application.DOCFLOW.STAGES
-            stages.extend(hit.DOCFLOW.STAGES)
-            hit.DOCFLOW.STAGES = stages
+            stages = application['DOCFLOW']['STAGES']
+            stages.extend(hit['DOCFLOW']['STAGES'])
+            hit['DOCFLOW']['STAGES'] = stages
         except AttributeError:
             pass
 
         try:
             # Объединение документов
-            documents = application.DOCFLOW.DOCUMENTS
-            documents.extend(hit.DOCFLOW.DOCUMENTS)
-            hit.DOCFLOW.DOCUMENTS = documents
+            documents = application['DOCFLOW']['DOCUMENTS']
+            documents.extend(hit['DOCFLOW']['DOCUMENTS'])
+            hit['DOCFLOW']['DOCUMENTS'] = documents
         except AttributeError:
             pass
 
         try:
             # Объединение платежей
-            payments = application.DOCFLOW.PAYMENTS
-            payments.extend(hit.DOCFLOW.PAYMENTS)
-            hit.DOCFLOW.PAYMENTS = payments
+            payments = application['DOCFLOW']['PAYMENTS']
+            payments.extend(hit['DOCFLOW']['PAYMENTS'])
+            hit['DOCFLOW']['PAYMENTS'] = payments
         except AttributeError:
             pass
 
         try:
             # Объединение сборов
-            collections = application.DOCFLOW.COLLECTIONS
-            collections.extend(hit.DOCFLOW.COLLECTIONS)
-            hit.DOCFLOW.COLLECTIONS = collections
+            collections = application['DOCFLOW']['COLLECTIONS']
+            collections.extend(hit['DOCFLOW']['COLLECTIONS'])
+            hit['DOCFLOW']['COLLECTIONS'] = collections
         except AttributeError:
             pass
 
@@ -311,8 +315,8 @@ def get_completed_order(order_id, attempts=10, timeout=2):
             time.sleep(timeout)
 
 
-def create_selection_inv_um_ld(data_from_json, params):
-    """Формирует документ ворд в BytesIO"""
+def create_selection_inv_um_ld(data_from_json, params, file_path):
+    """Формирует документ ворд и сохраняет его на диск"""
     data = dict()
     data['category'] = data_from_json.pop('Category', None)
     data['contracts_comment'] = data_from_json.pop('Contracts_comment', None)
@@ -592,11 +596,8 @@ def create_selection_inv_um_ld(data_from_json, params):
     run.bold = True
     run.font.size = Pt(12)
 
-    file_stream = io.BytesIO()
-    document.save(file_stream)
-    file_stream.seek(0)
-
-    return file_stream
+    # Сохранение в файл
+    document.save(file_path)
 
 
 def set_cell_border(cell, **kwargs):
@@ -735,8 +736,8 @@ def get_data_for_selection_tm(hit):
     return data
 
 
-def create_selection_tm(data, params):
-    """Формирует документ ворд в BytesIO"""
+def create_selection_tm(data, params, file_path):
+    """Формирует документ ворд и сохраняет его на диск."""
     # Формирование выписки
     document = Document('selection_templates/template.docx')
 
@@ -1087,11 +1088,7 @@ def create_selection_tm(data, params):
     run.bold = True
     run.font.size = Pt(12)
 
-    file_stream = io.BytesIO()
-    document.save(file_stream)
-    file_stream.seek(0)
-
-    return file_stream
+    document.save(file_path)
 
 
 def user_has_access_to_docs_decorator(f):
@@ -1105,22 +1102,11 @@ def user_has_access_to_docs_decorator(f):
     return wrapper
 
 
-def user_has_access_to_docs(user, id_app_number):
+def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
     if user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists():
         return True
-
-    # Поиск документа в Elastic
-    client = Elasticsearch(settings.ELASTIC_HOST)
-    q = Q(
-        'bool',
-        must=[Q('match', _id=id_app_number)],
-    )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    s = Search().using(client).query(q).execute()
-    if not s:
-        return False
 
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
     if hasattr(user, 'certificateowner'):
@@ -1128,11 +1114,11 @@ def user_has_access_to_docs(user, id_app_number):
 
         for person_type in ('applicant', 'inventor', 'owner', 'agent'):
             try:
-                persons = [s[0]['search_data'][person_type]] if isinstance(s[0]['search_data'][person_type], str) else \
-                    s[0]['search_data'][person_type]
+                persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
+                    hit['search_data'][person_type]
                 if persons:
                     for person in persons:
-                        if user_fullname in person.replace('i', 'і').upper(): # замена латинской i на кириллицу
+                        if user_fullname in person.replace('i', 'і').upper():  # замена латинской i на кириллицу
                             return True
             except KeyError:
                 pass
@@ -1180,7 +1166,8 @@ def prepare_data_for_search_report(s, lang_code):
     for h in s.params(size=1000, preserve_order=True).scan():
         obj_type = obj_types[h.Document.idObjType - 1]
         obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
+            if h.search_data.app_date else ''
         rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
             '%d.%m.%Y') if h.search_data.rights_date else ''
         title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
@@ -1216,7 +1203,7 @@ def prepare_data_for_search_report(s, lang_code):
 
 def get_transactions_types(id_obj_type):
     """Возвращает возможные типы транзакций для определённого типа объекта."""
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
         must=[Q('match', Document__idObjType=id_obj_type)],
@@ -1248,7 +1235,7 @@ def get_transactions_types(id_obj_type):
 
 
 def get_search_in_transactions(search_params):
-    client = Elasticsearch(settings.ELASTIC_HOST)
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
     transaction_path = ''
     transaction_type_field = ''
@@ -1297,6 +1284,7 @@ def get_search_in_transactions(search_params):
                 ]
             )
         )
+
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
         return s

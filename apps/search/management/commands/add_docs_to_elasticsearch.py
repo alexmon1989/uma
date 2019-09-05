@@ -1,7 +1,10 @@
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
+from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
+from ...utils import filter_bad_apps, filter_unpublished_apps
 import json
 import os.path
 import datetime
@@ -371,7 +374,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
-        self.es = Elasticsearch(settings.ELASTIC_HOST)
+        self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
         documents = IpcAppList.objects.filter(elasticindexed=0).values(
@@ -415,6 +418,17 @@ class Command(BaseCommand):
 
         # Время окончания процесса индексации и сохранение данных процесса индексации
         self.indexation_process.finish_date = datetime.datetime.now()
+
+        qs = Q('query_string', query='*')
+        qs = filter_bad_apps(qs)
+        # Количество документов в индексе
+        s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
+        self.indexation_process.documents_in_index = s.count()
+        # Количество опубликованных документов в индексе
+        qs = filter_unpublished_apps(AnonymousUser(), qs)
+        s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
+        self.indexation_process.documents_in_index_shared = s.count()
+
         self.indexation_process.save()
 
         self.stdout.write(self.style.SUCCESS('Finished'))

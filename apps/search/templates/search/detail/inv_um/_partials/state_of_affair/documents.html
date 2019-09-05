@@ -13,7 +13,7 @@
             <div class="table-responsive">
                 <form action="{% url "search:download_docs_zipped" %}" method="post" id="documents-form">
                     {% csrf_token %}
-                    <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
+                    <input type="hidden" name="id_app_number" value="{{ hit.id_app_number }}">
                     <table class="table table-striped table-bordered u-table--v1 mb-0">
                         <thead>
                         <tr>
@@ -23,6 +23,7 @@
                             <th class="text-nowrap text-center">{% trans "Дата відправки" %}</th>
                             <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
                             <th class="text-nowrap text-center">{% trans "Реєстраційний номер" %}</th>
+                            <th class="text-nowrap text-center">{% trans "Дії" %}</th>
                         </tr>
                         </thead>
 
@@ -45,26 +46,24 @@
                                         {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
                                     {% endif %}
                                 </td>
-                                <td>
-                                    {% if doc.DOCRECORD.DOCTYPE %}
-                                        {% if doc.DOCRECORD.DOCIDDOCCEAD %}
-                                            <a href="{% url 'search:download_doc' id_app_number=hit.meta.id id_cead_doc=doc.DOCRECORD.DOCIDDOCCEAD %}"
-                                               target="_blank"
-                                               class="g-color-blue-dark-v1">{{ doc.DOCRECORD.DOCTYPE }}</a>
-                                        {% else %}
-                                            {{ doc.DOCRECORD.DOCTYPE }}
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
+                                <td>{{ doc.DOCRECORD.DOCTYPE }}</td>
                                 <td class="text-center">
                                     {% if doc.DOCRECORD.DOCREGNUMBER %}
                                         {{ doc.DOCRECORD.DOCREGNUMBER }}
                                     {% endif %}
                                 </td>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCIDDOCCEAD %}
+                                        <button class="btn btn-xs btn-primary download-doc"
+                                                title="{% trans "Сформувати посилання для завантаження" %}"
+                                                data-task-create-url="{% url 'search:download_doc' id_app_number=hit.id_app_number id_cead_doc=doc.DOCRECORD.DOCIDDOCCEAD %}"
+                                        ><i class="fa fa-download"></i></button>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         <tr>
-                            <td colspan="6" class="g-bg-white">
+                            <td colspan="7" class="g-bg-white">
                                 {% if hit.DOCFLOW.DOCUMENTS|length > 0 %}
                                     <button class="btn btn-primary"
                                             type="submit"><i

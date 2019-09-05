@@ -1,65 +1,59 @@
-{% extends "base.html" %}
 {% load search_extras %}
 {% load uma_extras %}
 {% load i18n %}
 
-{% block title %}{% trans "Детальна інформація по об'єкту" %}{% endblock %}
+{% include 'search/detail/id/_partials/breadcrumbs.html' %}
 
-{% block content %}
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <div class="col-md-3 g-mb-20">
+            {% include 'search/detail/id/_partials/sidebar.html' %}
+        </div>
 
-    {% include 'search/detail/id/_partials/breadcrumbs.html' %}
+        <div class="col-md-9">
+            <!-- Tab panes -->
+            <div id="nav-1-1-primary-ver" class="tab-content">
+                <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
 
-    <div class="container g-min-height-200 g-py-20 g-py-70--lg">
-        <div class="row">
-            <div class="col-md-3 g-mb-20">
-                {% include 'search/detail/id/_partials/sidebar.html' %}
-            </div>
+                    {% if hit.search_data.obj_state == 2 %}
+                        <div class="g-pb-20 d-flex justify-content-between">
+                            {% if hit.Design.DesignDetails.RecordPublicationDetails %}
+                                <div>
+                                    {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+                                    {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationIdentifier }}</span>
+                                </div>
+                            {% endif %}
 
-            <div class="col-md-9">
-                <!-- Tab panes -->
-                <div id="nav-1-1-primary-ver" class="tab-content">
-                    <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
+                            {% if hit.search_data.obj_state == 2 %}
+                               {% registration_status hit=hit %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
-                        {% if hit.search_data.obj_state == 2 %}
-                            <div class="g-pb-20 d-flex justify-content-between">
-                                {% if hit.Design.DesignDetails.RecordPublicationDetails %}
-                                    <div>
-                                        {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
-                                        {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationIdentifier }}</span>
-                                    </div>
-                                {% endif %}
-
-                                {% if hit.search_data.obj_state == 2 %}
-                                   {% registration_status hit=hit %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-
-                        {% include 'search/detail/id/_partials/blblio_data/biblio.html' %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
-                        <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
-
-                        {% user_has_access_to_docs request.user id_app_number as user_has_access_to_docs %}
-                        {% if user_has_access_to_docs %}
-                            {% include 'search/detail/id/_partials/state_of_affair/documents.html' %}
-                        {% else %}
-                            {% include 'search/detail/id/_partials/state_of_affair/documents_without_links.html' %}
-                        {% endif %}
-
-                        {% include 'search/detail/id/_partials/state_of_affair/payments.html' %}
-                    </div>
-
-                    <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
-                        <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
-
-                        {% include 'search/detail/id/_partials/transactions.html' %}
-                    </div>
+                    {% include 'search/detail/id/_partials/blblio_data/biblio.html' %}
                 </div>
-                <!-- End Tab panes -->
+
+                <div class="tab-pane fade" id="nav-1-1-primary-ver--7" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Стан діловодства" %}</h3>
+
+                    {% user_has_access_to_docs request.user hit as user_has_access_to_docs %}
+                    {% if user_has_access_to_docs %}
+                        {% include 'search/detail/id/_partials/state_of_affair/documents.html' %}
+                    {% else %}
+                        {% include 'search/detail/id/_partials/state_of_affair/documents_without_links.html' %}
+                    {% endif %}
+
+                    {% include 'search/detail/id/_partials/state_of_affair/payments.html' %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-1-1-primary-ver--8" role="tabpanel">
+                    <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
+
+                    {% include 'search/detail/id/_partials/transactions.html' %}
+                </div>
             </div>
+            <!-- End Tab panes -->
         </div>
     </div>
-{% endblock %}
+</div>
