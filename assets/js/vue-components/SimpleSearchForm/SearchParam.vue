@@ -36,6 +36,7 @@
                             required: true,
                             validQuery: paramType
                        }"
+                       data-vv-delay="500"
                        v-model="value"
                        :placeholder="translations.value">
                 <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>

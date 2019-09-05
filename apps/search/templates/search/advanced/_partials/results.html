@@ -1,0 +1,64 @@
+{% load i18n %}
+{% load search_extras %}
+
+{% if validation_errors %}
+     <div class="g-mt-10">
+            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
+                    data-target="#collapseForm"
+                    aria-expanded="false"
+                    aria-controls="collapseExample">
+                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+            </button>
+            <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
+        </div>
+{% else %}
+    {% if results %}
+        <div class="row g-pt-20">
+            {% include 'search/advanced/_partials/sidebar.html' %}
+
+            <div class="col-lg-9">
+                <div class="d-md-flex justify-content-between g-mb-10">
+                    <div class="align-self-center g-mb-30 g-mb-0--md h-100">
+                        <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
+                                class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
+                    </div>
+
+                    {% sort_params %}
+                </div>
+
+                {% include 'search/advanced/_partials/import_results_btn.html' %}
+
+                {% for hit in results %}
+                    {# Изобретения, полезные модели #}
+                    {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                        {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                    {# Топографии #}
+                    {% elif hit.Document.idObjType == 3 %}
+                        {% ld_item hit forloop.counter0|add:results.start_index %}
+                    {# Знаки для товаров и услуг #}
+                    {% elif hit.Document.idObjType == 4 %}
+                        {% tm_item hit forloop.counter0|add:results.start_index %}
+                    {# КЗПТ #}
+                    {% elif hit.Document.idObjType == 5 %}
+                        {% qi_item hit forloop.counter0|add:results.start_index %}
+                    {# Пром. образец #}
+                    {% elif hit.Document.idObjType == 6 %}
+                        {% id_item hit forloop.counter0|add:results.start_index %}
+                    {% endif %}
+                {% endfor %}
+
+                {% include 'search/advanced/_partials/pagination.html' %}
+            </div>
+        </div>
+    {% else %}
+        <div class="g-mt-10">
+            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
+                    data-target="#collapseForm"
+                    aria-expanded="false"
+                    aria-controls="collapseExample">
+                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+            </button>
+            <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
+        </div>
+    {% endif %}
+{% endif %}

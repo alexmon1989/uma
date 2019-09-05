@@ -6,7 +6,7 @@
         {% if results.has_previous %}
             <li class="list-inline-item g-hidden-sm-down">
                 <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16"
-                   href="?{% url_replace request 'page' results.previous_page_number %}">
+                   href="?{% replace_and_urlencode get_params 'page' results.previous_page_number %}">
                     <span aria-hidden="true">
                         <i class="fa fa-chevron-left"></i>
                     </span>
@@ -23,7 +23,7 @@
         {% if results.number|add:'-4' > 1 %}
             <li class="list-inline-item">
                 <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
-                   href="?{% url_replace request 'page' results.number|add:'-5' %}">&hellip;</a>
+                   href="?{% replace_and_urlencode get_params 'page' results.number|add:'-5' %}">&hellip;</a>
             </li>
         {% endif %}
 
@@ -32,12 +32,12 @@
                 {% if results.number == i %}
                     <li class="list-inline-item">
                         <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-7-14"
-                               href="?{% url_replace request 'page' i %}">{{ i }}</a>
+                               href="?{% replace_and_urlencode get_params 'page' i %}">{{ i }}</a>
                     </li>
                 {% elif i > results.number|add:'-5' and i < results.number|add:'5' %}
                     <li class="list-inline-item">
                         <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
-                           href="?{% url_replace request 'page' i %}">{{ i }}</a>
+                           href="?{% replace_and_urlencode get_params 'page' i %}">{{ i }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
@@ -46,14 +46,14 @@
         {% if results.paginator.num_pages > results.number|add:'4' %}
             <li class="list-inline-item">
                 <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
-                   href="?{% url_replace request 'page' results.number|add:'5' %}">&hellip;</a>
+                   href="?{% replace_and_urlencode get_params 'page' results.number|add:'5' %}">&hellip;</a>
             </li>
         {% endif %}
 
         {% if results.has_next %}
             <li class="list-inline-item">
                 <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16"
-                   href="?{% url_replace request 'page' results.next_page_number %}">
+                   href="?{% replace_and_urlencode get_params 'page' results.next_page_number %}">
                     <span aria-hidden="true">
                         <i class="fa fa-chevron-right"></i>
                     </span>

@@ -1,0 +1,14 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<section
+    class="gradient g-bg-size-cover g-bg-pos-center g-bg-cover g-bg-black-opacity-0_1--after g-color-white g-min-height-160"
+    style="background-image: url({% static 'img/bg/bg-1.jpg' %});">
+    <div class="container g-bg-cover__inner"></div>
+</section>
+
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <p class="lead">{% trans "Об'єкт не знайдено або у вас недостатньо прав доступу." %}</p>
+    </div>
+</div>

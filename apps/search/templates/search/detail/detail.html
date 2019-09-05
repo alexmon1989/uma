@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Детальна інформація по об'єкту" %}{% endblock %}
+
+{% block content %}
+
+    <div id="data">
+        <section
+            class="gradient g-bg-size-cover g-bg-pos-center g-bg-cover g-bg-black-opacity-0_1--after g-color-white g-min-height-160"
+            style="background-image: url({% static 'img/bg/bg-1.jpg' %});">
+            <div class="container g-bg-cover__inner"></div>
+        </section>
+
+        <div class="container g-min-height-200 g-py-20 g-py-70--lg">
+            <div class="row">
+                <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається отримання даних об'єкта" %}<loading-dots></loading-dots></p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    {% get_current_language as LANGUAGE_CODE %}
+    <script>
+        var get_obj_data = function (task_id, retries) {
+            var $resultsDiv = $("#data");
+
+            var onError = function() {
+                $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
+            };
+
+            $.ajax({
+                type: 'get',
+                url: '/{{ LANGUAGE_CODE }}/search/get-data-app/',
+                data: {'task_id': task_id},
+                success: function (data) {
+                    if (data.state === 'SUCCESS') {
+                        $resultsDiv.html(data.result);
+                        $('[data-toggle="popover"]').popover();
+                        $.HSCore.components.HSPopup.init('.js-fancybox');
+                    } else {
+                        if (retries > 0) {
+                            setTimeout(function () {
+                                get_obj_data(task_id, retries--)
+                            }, 1000);
+                        } else {
+                            onError();
+                        }
+                    }
+                },
+                error: function (data) {
+                    onError();
+                }
+            });
+        };
+
+        {% if task_id %}
+            $(function () {
+                get_obj_data('{{ task_id }}', 20);
+            });
+        {% endif %}
+    </script>
+{% endblock %}

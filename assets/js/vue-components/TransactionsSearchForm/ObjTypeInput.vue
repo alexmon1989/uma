@@ -35,6 +35,13 @@
         props: {
             objTypes: Array,
             value: [Number, String],
+        },
+        watch: {
+            objTypes: function (val) {
+                this.$nextTick(function () {
+                    $("#objType").trigger('chosen:updated');
+                });
+            }
         }
     }
 </script>

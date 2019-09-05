@@ -5,7 +5,7 @@
 <div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
     <h3 class="card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
         {{ item_num }}.
-        <a href="{% url 'search:detail' id_app_number=hit.meta.id %}"
+        <a href="{% url 'search:detail' pk=hit.meta.id %}"
            class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
         >{{ biblio_data.I_54.0|get:"I_54.U" }}</a>
     </h3>
