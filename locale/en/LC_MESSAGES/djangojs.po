@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-22 10:43+0000\n"
+"POT-Creation-Date: 2019-09-06 11:37+0000\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/custom.js:60 assets/js/custom.js:73
+#: assets/js/custom.js:60 assets/js/custom.js:72 assets/js/custom.js:78
 msgid "Виникла помилка. Будь-ласка, спробуйте пізніше."
 msgstr "Error! Please try again later."
 
@@ -27,19 +27,19 @@ msgstr "Error! Please try again later."
 msgid "Файл було сформовано."
 msgstr "File was created."
 
-#: assets/js/custom.js:174 assets/js/custom.js:247 assets/js/custom.js:284
+#: assets/js/custom.js:197 assets/js/custom.js:270 assets/js/custom.js:307
 msgid "Будь-ласка, зачекайте, відбувається формування файлу."
 msgstr "Please wait for file creating."
 
-#: assets/js/custom.js:206
+#: assets/js/custom.js:229
 msgid "Будь-ласка, зачекайте, відбувається формування документу."
 msgstr "Please wait for document creating."
 
-#: assets/js/custom.js:220
+#: assets/js/custom.js:243
 msgid "Відкрити"
 msgstr "Open"
 
-#: assets/js/custom.js:273
+#: assets/js/custom.js:296
 #, fuzzy
 #| msgid "Охоронний документ"
 msgid "Не було обрано жодного документу."
@@ -103,6 +103,7 @@ msgid "Значення"
 msgstr "Value"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:271
+#: assets/js/vue-components/ContactForm.vue:88
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:77
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
 msgid "Обов'язкове поле для заповнення"
@@ -112,6 +113,40 @@ msgstr "Required field"
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:78
 msgid "Поле містить невірне значення"
 msgstr "The field contains wrong value"
+
+#: assets/js/vue-components/ContactForm.vue:81
+msgid "Форму було відправлено. Ми відповимо вам найближчим часом."
+msgstr "A from has been sent. We will contact you as soon as possible."
+
+#: assets/js/vue-components/ContactForm.vue:82
+msgid "Знайдено помилки!"
+msgstr "A form has errors"
+
+#: assets/js/vue-components/ContactForm.vue:83
+msgid "Ім'я"
+msgstr "Your name"
+
+#: assets/js/vue-components/ContactForm.vue:84
+msgid "Тема"
+msgstr "Subject"
+
+#: assets/js/vue-components/ContactForm.vue:85
+#, fuzzy
+#| msgid "Тип сповіщення"
+msgid "Повідомлення"
+msgstr "Transaction type"
+
+#: assets/js/vue-components/ContactForm.vue:86
+msgid "Відправити повідомлення"
+msgstr "Send message"
+
+#: assets/js/vue-components/ContactForm.vue:89
+msgid "Введіть вірну E-Mail адресу"
+msgstr "Enter correct E-Mail"
+
+#: assets/js/vue-components/ContactForm.vue:90
+msgid "Мінімальна довжина повідомлення має складати не менше 20 символів"
+msgstr "A minimal length of message has to be 20 symbols"
 
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:73
 #: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:66

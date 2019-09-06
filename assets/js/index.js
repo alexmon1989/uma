@@ -10,6 +10,7 @@ import SimpleSearchForm from "./vue-components/SimpleSearchForm/SimpleSearchForm
 import AdvancedSearchForm from "./vue-components/AdvancedSearchForm/AdvancedSearchForm.vue";
 import TransactionsSearchForm from "./vue-components/TransactionsSearchForm/TransactionsSearchForm.vue";
 import LoadingDots from "./vue-components/LoadingDots.vue";
+import ContactForm from "./vue-components/ContactForm.vue";
 
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);
@@ -22,6 +23,7 @@ const app = new Vue({
         SimpleSearchForm,
         AdvancedSearchForm,
         TransactionsSearchForm,
-        LoadingDots
+        LoadingDots,
+        ContactForm
     }
 });
