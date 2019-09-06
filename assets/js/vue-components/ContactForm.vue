@@ -16,7 +16,7 @@
                     <label class="g-color-gray-dark-v2 g-font-size-13">{{ translations.username }}:</label>
                     <input v-validate="'required'" data-vv-as="Имя" v-model="username" name="username"
                            :disabled="processing"
-                           class="form-control g-color-gray-dark-v5 g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
+                           class="form-control g-color-gray-dark-v2 g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
                            type="text">
                     <small v-show="errors.has('username')" class="form-control-feedback">{{ translations.validationErrors[errors.firstRule('username')] }}
                     </small>
@@ -26,7 +26,7 @@
                     <label class="g-color-gray-dark-v2 g-font-size-13">Email:</label>
                     <input v-validate="'required|email'" data-vv-as="Email" v-model="email" name="email"
                            :disabled="processing"
-                           class="form-control g-color-gray-dark-v5  g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
+                           class="form-control g-color-gray-dark-v2 g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
                            type="email">
                     <small v-show="errors.has('email')" class="form-control-feedback">{{ translations.validationErrors[errors.firstRule('email')] }}
                     </small>
@@ -35,7 +35,7 @@
                 <div class="col-md-12 form-group g-mb-20">
                     <label class="g-color-gray-dark-v2 g-font-size-13">{{ translations.subject }}:</label>
                     <input name="subject" v-model="subject" :disabled="processing"
-                           class="form-control g-color-gray-dark-v5 g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
+                           class="form-control g-color-gray-dark-v2 g-brd-gray-light-v4 g-brd-primary--focus rounded-3 g-py-13 g-px-15"
                            type="text">
                 </div>
 
@@ -44,7 +44,7 @@
                     <textarea v-validate="'required|min:20'" :disabled="processing" data-vv-as="Сообщение"
                               v-model="message"
                               name="message"
-                              class="form-control g-color-gray-dark-v5 g-brd-gray-light-v4 g-brd-primary--focus g-resize-none rounded-3 g-py-13 g-px-15"
+                              class="form-control g-color-gray-dark-v2 g-brd-gray-light-v4 g-brd-primary--focus g-resize-none rounded-3 g-py-13 g-px-15"
                               rows="7"></textarea>
                     <small v-show="errors.has('message')" class="form-control-feedback">{{ translations.validationErrors[errors.firstRule('message')] }}
                     </small>
