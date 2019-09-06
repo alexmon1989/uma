@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Контакти{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
 
@@ -9,8 +9,12 @@
     <section class="container g-pt-70 g-pb-20">
         <div class="row justify-content-between">
             <div class="col-md-7 g-mb-60">
+                {% if content %}
+                    <div class="lead g-font-weight-400 g-mb-20">{{ content|safe }}</div>
+                {% endif %}
+
                 <!-- Contact Form -->
-                {% include 'contacts/_partials/form.html' %}
+                <contact-form lang-code="{{ lang_code }}"></contact-form>
                 <!-- End Contact Form -->
             </div>
 
@@ -19,6 +23,5 @@
             </div>
         </div>
     </section>
-
 
 {% endblock %}
