@@ -7,7 +7,8 @@ from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderS
 from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
-                    create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs)
+                    create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs,
+                    sort_doc_flow)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
@@ -129,7 +130,10 @@ def get_app_details(id_app_number, user_id):
 
         # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
         if hit['search_data']['obj_state'] == 2:
-             extend_doc_flow(hit)
+            extend_doc_flow(hit)
+
+    # Сортировка документов заявки по дате
+    sort_doc_flow(hit)
 
     hit['id_app_number'] = id_app_number
 
