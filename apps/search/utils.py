@@ -1296,31 +1296,33 @@ def sort_doc_flow(hit):
     """Сортировка документов по дате."""
     # Изобретения, полезные модели, топографии
     if hit['Document']['idObjType'] in (1, 2, 3):
-        hit['DOCFLOW']['DOCUMENTS'].sort(
-            key=lambda document: time.strptime(document['DOCRECORD'].get(
-                'DOCREGDATE', document['DOCRECORD'].get(
-                    'DOCSENDINGDATE', '1970-01-01'
-                )
-            ), "%Y-%m-%d")
-        )
-        hit['DOCFLOW']['PAYMENTS'].sort(
-            key=lambda document: time.strptime(document['PFRECORD'].get(
-                'PFDATE', '1970-01-01'
-            ), "%Y-%m-%d")
-        )
-        hit['DOCFLOW']['COLLECTIONS'].sort(
-            key=lambda document: time.strptime(document['CLRECORD'].get(
-                'CLDATEBEGIN', '1970-01-01'
-            ), "%Y-%m-%d")
-        )
+        if hit.get('DOCFLOW'):
+            hit['DOCFLOW']['DOCUMENTS'].sort(
+                key=lambda document: time.strptime(document['DOCRECORD'].get(
+                    'DOCREGDATE', document['DOCRECORD'].get(
+                        'DOCSENDINGDATE', '1970-01-01'
+                    )
+                ), "%Y-%m-%d")
+            )
+            hit['DOCFLOW']['PAYMENTS'].sort(
+                key=lambda document: time.strptime(document['PFRECORD'].get(
+                    'PFDATE', '1970-01-01'
+                ), "%Y-%m-%d")
+            )
+            hit['DOCFLOW']['COLLECTIONS'].sort(
+                key=lambda document: time.strptime(document['CLRECORD'].get(
+                    'CLDATEBEGIN', '1970-01-01'
+                ), "%Y-%m-%d")
+            )
 
     # Знаки для товаров и услуг
-    if hit['Document']['idObjType'] == 4:
-        hit['TradeMark']['DocFlow']['Documents'].sort(
-            key=lambda document: time.strptime(document['DocRecord'].get(
-                'DocRegDate', '1970-01-01'
-            ), "%Y-%m-%d")
-        )
+    elif hit['Document']['idObjType'] == 4:
+        if hit['TradeMark'].get('DocFlow'):
+            hit['TradeMark']['DocFlow']['Documents'].sort(
+                key=lambda document: time.strptime(document['DocRecord'].get(
+                    'DocRegDate', '1970-01-01'
+                ), "%Y-%m-%d")
+            )
         if hit['TradeMark'].get('PaymentDetails'):
             hit['TradeMark']['PaymentDetails']['Payment'].sort(
                 key=lambda document: time.strptime(document.get(
@@ -1329,12 +1331,13 @@ def sort_doc_flow(hit):
             )
 
     # Пром образцы
-    if hit['Document']['idObjType'] == 6:
-        hit['Design']['DocFlow']['Documents'].sort(
-            key=lambda document: time.strptime(document['DocRecord'].get(
-                'DocRegDate', '1970-01-01'
-            ), "%Y-%m-%d")
-        )
+    elif hit['Document']['idObjType'] == 6:
+        if hit['Design'].get('DocFlow'):
+            hit['Design']['DocFlow']['Documents'].sort(
+                key=lambda document: time.strptime(document['DocRecord'].get(
+                    'DocRegDate', '1970-01-01'
+                ), "%Y-%m-%d")
+            )
         if hit['Design'].get('PaymentDetails'):
             hit['Design']['PaymentDetails']['Payment'].sort(
                 key=lambda document: time.strptime(document.get(
