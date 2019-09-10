@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'bootstrap4',
-    'rest_framework',
     'debug_toolbar',
+    'rest_framework',
     'apps.home.apps.HomeConfig',
     'apps.my_auth.apps.MyAuthConfig',
     'apps.search.apps.SearchConfig',
@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'apps.help.apps.HelpConfig',
     'apps.api.apps.ApiConfig',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'djcelery_email',
 ]
 
 MIDDLEWARE = [
@@ -317,10 +318,16 @@ CELERY_RESULT_BACKEND = 'amqp://'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_EMAIL_TASK_CONFIG = {
+    'ignore_result': True,
+}
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_USE_TLS = False
 EMAIL_HOST = ''
 EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+
+ADMINS = (('', ''),)
