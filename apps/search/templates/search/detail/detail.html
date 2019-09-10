@@ -44,7 +44,7 @@
                     } else {
                         if (retries > 0) {
                             setTimeout(function () {
-                                get_obj_data(task_id, retries--)
+                                get_obj_data(task_id, --retries)
                             }, 1000);
                         } else {
                             onError();

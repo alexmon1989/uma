@@ -272,7 +272,7 @@ def extend_doc_flow(hit):
             stages = application['DOCFLOW']['STAGES']
             stages.extend(hit['DOCFLOW']['STAGES'])
             hit['DOCFLOW']['STAGES'] = stages
-        except AttributeError:
+        except (AttributeError, KeyError):
             pass
 
         try:
@@ -280,7 +280,7 @@ def extend_doc_flow(hit):
             documents = application['DOCFLOW']['DOCUMENTS']
             documents.extend(hit['DOCFLOW']['DOCUMENTS'])
             hit['DOCFLOW']['DOCUMENTS'] = documents
-        except AttributeError:
+        except (AttributeError, KeyError):
             pass
 
         try:
@@ -288,7 +288,7 @@ def extend_doc_flow(hit):
             payments = application['DOCFLOW']['PAYMENTS']
             payments.extend(hit['DOCFLOW']['PAYMENTS'])
             hit['DOCFLOW']['PAYMENTS'] = payments
-        except AttributeError:
+        except (AttributeError, KeyError):
             pass
 
         try:
@@ -296,7 +296,7 @@ def extend_doc_flow(hit):
             collections = application['DOCFLOW']['COLLECTIONS']
             collections.extend(hit['DOCFLOW']['COLLECTIONS'])
             hit['DOCFLOW']['COLLECTIONS'] = collections
-        except AttributeError:
+        except (AttributeError, KeyError):
             pass
 
 
