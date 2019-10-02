@@ -24,7 +24,7 @@
                                     v-else><i class="fa fa-download g-mr-5"></i>{{ translations.btnText }}</button>
                         </div>
                     </div>
-                    <small class="form-control-feedback" v-if="errors.has('sec_code')">{{ errors.first('sec_code') }}</small>
+                    <small class="form-control-feedback" v-if="errors.has('sec_code')">{{ translations.validationErrors[errors.firstRule('sec_code')] }}</small>
                 </div>
             </div>
         </form>
