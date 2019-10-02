@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 11:44+0000\n"
+"POT-Creation-Date: 2019-10-02 10:45+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -31,6 +31,7 @@ msgstr ""
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:16
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:16
 msgid "Головна"
 msgstr "Home"
 
@@ -120,7 +121,7 @@ msgstr "Remember me"
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:109
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-#: templates/_partials/header.html:105
+#: templates/_partials/header.html:119
 msgid "Вхід"
 msgstr "Enter"
 
@@ -153,7 +154,7 @@ msgstr "Object state"
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
 #: apps/search/utils.py:1163
 msgid "Заявка"
-msgstr "Claim"
+msgstr "Application"
 
 #: apps/search/admin.py:33 apps/search/admin.py:92
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
@@ -414,7 +415,7 @@ msgstr "Download PDF"
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:31
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:31
 msgid "Заявка №"
-msgstr "Claim"
+msgstr "Application"
 
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:14
 #: apps/search/templates/search/detail/id/detail.html:17
@@ -451,7 +452,7 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/tm/_partials/sidebar.html:28
 #: apps/search/templates/search/detail/tm/detail.html:52
 msgid "Сповіщення"
-msgstr "Message"
+msgstr "Notifications"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:10
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:10
@@ -597,7 +598,7 @@ msgstr "Generate an extract"
 
 #: apps/search/templates/search/detail/inv_um/_partials/selection.html:96
 #: apps/search/templates/search/detail/inv_um/_partials/selection_form.html:117
-#: apps/search/templates/search/detail/ld/_partials/selection_form.html:114
+#: apps/search/templates/search/detail/ld/_partials/selection_form.html:117
 #: apps/search/templates/search/detail/tm/_partials/selection_form.html:66
 msgid "Завантажити"
 msgstr "Download PDF"
@@ -848,6 +849,17 @@ msgstr "Inventor"
 msgid "Представник"
 msgstr "Presenter"
 
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:20
+#: templates/_partials/header.html:58
+msgid "Сервіси"
+msgstr "Services"
+
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:24
+#, fuzzy
+#| msgid "Охоронний документ"
+msgid "Отримати оригінал документу"
+msgstr "Protective document"
+
 #: templates/_partials/footer.html:16
 msgid "Спеціальна інформаційна система Укрпатенту (СІС)."
 msgstr "Special information system of Ukrpatent (SIS)"
@@ -863,15 +875,15 @@ msgstr ""
 msgid "Меню"
 msgstr "Menu"
 
-#: templates/_partials/footer.html:49 templates/_partials/header.html:57
+#: templates/_partials/footer.html:49 templates/_partials/header.html:71
 msgid "Про сервіс"
 msgstr "About"
 
-#: templates/_partials/footer.html:55 templates/_partials/header.html:61
+#: templates/_partials/footer.html:55 templates/_partials/header.html:75
 msgid "Допомога"
 msgstr "Help"
 
-#: templates/_partials/footer.html:61 templates/_partials/header.html:65
+#: templates/_partials/footer.html:61 templates/_partials/header.html:79
 msgid "Контакти"
 msgstr "Contacts"
 
@@ -909,7 +921,11 @@ msgid ""
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:103
+#: templates/_partials/header.html:64
+msgid "Отримати оригінал докумнту"
+msgstr "Get original document"
+
+#: templates/_partials/header.html:117
 msgid "Вихід"
 msgstr "Exit"
 
