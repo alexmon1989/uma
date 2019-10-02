@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 11:37+0000\n"
+"POT-Creation-Date: 2019-10-02 10:26+0000\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,14 +20,17 @@ msgstr ""
 "X-Generator: Poedit 2.2\n"
 
 #: assets/js/custom.js:60 assets/js/custom.js:72 assets/js/custom.js:78
+#: assets/js/vue-components/GetOriginalDoc.vue:129
+#: assets/js/vue-components/GetOriginalDoc.vue:135
 msgid "Виникла помилка. Будь-ласка, спробуйте пізніше."
 msgstr "Error! Please try again later."
 
-#: assets/js/custom.js:62
+#: assets/js/custom.js:62 assets/js/vue-components/GetOriginalDoc.vue:149
 msgid "Файл було сформовано."
 msgstr "File was created."
 
 #: assets/js/custom.js:197 assets/js/custom.js:270 assets/js/custom.js:307
+#: assets/js/vue-components/GetOriginalDoc.vue:70
 msgid "Будь-ласка, зачекайте, відбувається формування файлу."
 msgstr "Please wait for file creating."
 
@@ -104,12 +107,14 @@ msgstr "Value"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:271
 #: assets/js/vue-components/ContactForm.vue:88
+#: assets/js/vue-components/GetOriginalDoc.vue:51
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:77
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
 msgid "Обов'язкове поле для заповнення"
 msgstr "Required field"
 
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:272
+#: assets/js/vue-components/GetOriginalDoc.vue:52
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:78
 msgid "Поле містить невірне значення"
 msgstr "The field contains wrong value"
@@ -147,6 +152,32 @@ msgstr "Enter correct E-Mail"
 #: assets/js/vue-components/ContactForm.vue:90
 msgid "Мінімальна довжина повідомлення має складати не менше 20 символів"
 msgstr "A minimal length of message has to be 20 symbols"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:46
+msgid ""
+"Для отримання документу, будь-ласка, введіть його ідентифікатор та натисніть "
+"кнопку \"Завантажити\""
+msgstr "To receive the document, please enter the document ID and click the Download button"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:47
+msgid "Введіть ідентифікатор документу"
+msgstr "Enter document id"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:48
+msgid "Завантажити"
+msgstr "Download"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:49
+msgid "Зачекайте..."
+msgstr "Wait..."
+
+#: assets/js/vue-components/GetOriginalDoc.vue:54
+msgid "Помилка звернення до сервера. Спробуйте, будь-ласка, пізніше."
+msgstr "Error accessing server. Please try again later."
+
+#: assets/js/vue-components/GetOriginalDoc.vue:55
+msgid "Вибачте, за даним ідентифікатором не знайдено жодного документа."
+msgstr "Sorry, no documents were found for this ID."
 
 #: assets/js/vue-components/SimpleSearchForm/SearchParam.vue:73
 #: assets/js/vue-components/SimpleSearchForm/SimpleSearchForm.vue:66
