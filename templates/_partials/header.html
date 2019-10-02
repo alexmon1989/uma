@@ -22,9 +22,15 @@
                 <!-- End Responsive Toggle Button -->
 
                 <!-- Logo -->
+                {% get_current_language as LANGUAGE_CODE %}
                 <a href="{% url 'home:index' %}" class="navbar-brand d-flex">
-                    <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
-                    <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        <img src="{% static 'img/logo/logo2-en.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo-mobile-en.png' %}" alt="" class="logo-mobile">
+                    {% else %}
+                        <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
+                    {% endif %}
                 </a>
                 <!-- End Logo -->
 
@@ -83,7 +89,6 @@
                 <!-- End Navigation -->
 
                 <!-- Смена языков -->
-                {% get_current_language as LANGUAGE_CODE %}
                 {% get_language_info for LANGUAGE_CODE as lang %}
                 <div class="g-pos-rel g-width-50 g-pt-3--lg g-ml-10 g-ml-0--lg">
                     <a href="#!" id="languages-dropdown-invoker-2"

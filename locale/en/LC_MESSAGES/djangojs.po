@@ -157,7 +157,7 @@ msgstr "A minimal length of message has to be 20 symbols"
 msgid ""
 "Для отримання документу, будь-ласка, введіть його ідентифікатор та натисніть "
 "кнопку \"Завантажити\""
-msgstr "To receive the document, please enter the document ID and click the Download button"
+msgstr "To get the document, please enter the document ID and click the Download button"
 
 #: assets/js/vue-components/GetOriginalDoc.vue:47
 msgid "Введіть ідентифікатор документу"
