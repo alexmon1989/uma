@@ -22,9 +22,15 @@
                 <!-- End Responsive Toggle Button -->
 
                 <!-- Logo -->
+                {% get_current_language as LANGUAGE_CODE %}
                 <a href="{% url 'home:index' %}" class="navbar-brand d-flex">
-                    <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
-                    <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        <img src="{% static 'img/logo/logo2-en.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo-mobile-en.png' %}" alt="" class="logo-mobile">
+                    {% else %}
+                        <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
+                    {% endif %}
                 </a>
                 <!-- End Logo -->
 
@@ -53,6 +59,20 @@
                             <!-- End Submenu -->
                         </li>
 
+                        <li class="nav-item hs-has-sub-menu g-mx-20--lg {% if 'services' in request.path %}active{% endif %}">
+                            <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
+                               aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Сервіси" %}
+                            </a>
+                            <!-- Submenu -->
+                            <ul class="hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-20 g-mt-10--lg--scrolling"
+                                id="nav-submenu-1" aria-labelledby="nav-link-1">
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'services:original_document'%}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'services:original_document' %}">{% trans "Отримати оригінал докумнту" %}</a>
+                                </li>
+                            </ul>
+                            <!-- End Submenu -->
+                        </li>
+
                         <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'about' in request.path %}active{% endif %}">
                             <a href="{% url 'about:about' %}" class="nav-link g-py-7 g-px-0">{% trans "Про сервіс" %}</a>
                         </li>
@@ -69,7 +89,6 @@
                 <!-- End Navigation -->
 
                 <!-- Смена языков -->
-                {% get_current_language as LANGUAGE_CODE %}
                 {% get_language_info for LANGUAGE_CODE as lang %}
                 <div class="g-pos-rel g-width-50 g-pt-3--lg g-ml-10 g-ml-0--lg">
                     <a href="#!" id="languages-dropdown-invoker-2"

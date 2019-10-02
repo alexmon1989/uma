@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 11:44+0000\n"
+"POT-Creation-Date: 2019-10-02 11:08+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -31,6 +31,7 @@ msgstr ""
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:16
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:16
 msgid "Головна"
 msgstr "Home"
 
@@ -42,17 +43,17 @@ msgstr "Database administrator"
 #: apps/contacts/templates/contacts/_partials/details.html:21
 #: apps/contacts/templates/contacts/_partials/details.html:24
 #: apps/contacts/templates/contacts/_partials/details.html:27
-#: templates/_partials/footer.html:96
+#: templates/_partials/footer.html:101
 msgid "Телефон"
 msgstr "Phone"
 
 #: apps/contacts/templates/contacts/_partials/details.html:32
-#: templates/_partials/footer.html:97
+#: templates/_partials/footer.html:102
 msgid "Режим роботи"
 msgstr "Operating mode"
 
 #: apps/contacts/templates/contacts/_partials/details.html:34
-#: templates/_partials/footer.html:98
+#: templates/_partials/footer.html:103
 msgid "Перерва"
 msgstr "Break"
 
@@ -120,7 +121,7 @@ msgstr "Remember me"
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:109
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-#: templates/_partials/header.html:105
+#: templates/_partials/header.html:124
 msgid "Вхід"
 msgstr "Enter"
 
@@ -153,7 +154,7 @@ msgstr "Object state"
 #: apps/search/templates/search/simple/_partials/sidebar.html:60
 #: apps/search/utils.py:1163
 msgid "Заявка"
-msgstr "Claim"
+msgstr "Application"
 
 #: apps/search/admin.py:33 apps/search/admin.py:92
 #: apps/search/templates/search/advanced/_partials/sidebar.html:59
@@ -177,14 +178,14 @@ msgstr "Wrong date range"
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:24
 #: apps/search/templates/search/advanced/advanced.html:6
-#: templates/_partials/footer.html:37 templates/_partials/header.html:47
+#: templates/_partials/footer.html:42 templates/_partials/header.html:53
 msgid "Розширений пошук"
 msgstr "Advanced search"
 
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:20
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:20
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:20
-#: templates/_partials/header.html:38
+#: templates/_partials/header.html:44
 msgid "Пошук"
 msgstr "Search"
 
@@ -414,7 +415,7 @@ msgstr "Download PDF"
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:31
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:31
 msgid "Заявка №"
-msgstr "Claim"
+msgstr "Application"
 
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:14
 #: apps/search/templates/search/detail/id/detail.html:17
@@ -451,7 +452,7 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/tm/_partials/sidebar.html:28
 #: apps/search/templates/search/detail/tm/detail.html:52
 msgid "Сповіщення"
-msgstr "Message"
+msgstr "Notifications"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:10
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:10
@@ -597,7 +598,7 @@ msgstr "Generate an extract"
 
 #: apps/search/templates/search/detail/inv_um/_partials/selection.html:96
 #: apps/search/templates/search/detail/inv_um/_partials/selection_form.html:117
-#: apps/search/templates/search/detail/ld/_partials/selection_form.html:114
+#: apps/search/templates/search/detail/ld/_partials/selection_form.html:117
 #: apps/search/templates/search/detail/tm/_partials/selection_form.html:66
 msgid "Завантажити"
 msgstr "Download PDF"
@@ -756,7 +757,7 @@ msgstr "Ukrainian Trademark certificate"
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
 #: apps/search/templates/search/simple/simple.html:6
-#: templates/_partials/footer.html:31 templates/_partials/header.html:44
+#: templates/_partials/footer.html:36 templates/_partials/header.html:50
 msgid "Простий пошук"
 msgstr "Simple search"
 
@@ -804,7 +805,7 @@ msgstr "Relevance"
 
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/transactions/index.html:5
-#: templates/_partials/footer.html:43 templates/_partials/header.html:50
+#: templates/_partials/footer.html:48 templates/_partials/header.html:56
 msgid "Пошук по сповіщенням"
 msgstr "Transaction search"
 
@@ -848,68 +849,82 @@ msgstr "Inventor"
 msgid "Представник"
 msgstr "Presenter"
 
-#: templates/_partials/footer.html:16
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:10
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:24
+msgid "Отримати оригінал документу"
+msgstr "Get the original document"
+
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:20
+#: templates/_partials/header.html:64
+msgid "Сервіси"
+msgstr "Services"
+
+#: templates/_partials/footer.html:21
 msgid "Спеціальна інформаційна система Укрпатенту (СІС)."
 msgstr "Special information system of Ukrpatent (SIS)"
 
-#: templates/_partials/footer.html:17
+#: templates/_partials/footer.html:22
 msgid ""
 "Сервіс створено для пошуку відомостей про об'єкти промислової власності."
 msgstr ""
 "The service was created to search for information about industrial property "
 "objects."
 
-#: templates/_partials/footer.html:24
+#: templates/_partials/footer.html:29
 msgid "Меню"
 msgstr "Menu"
 
-#: templates/_partials/footer.html:49 templates/_partials/header.html:57
+#: templates/_partials/footer.html:54 templates/_partials/header.html:77
 msgid "Про сервіс"
 msgstr "About"
 
-#: templates/_partials/footer.html:55 templates/_partials/header.html:61
+#: templates/_partials/footer.html:60 templates/_partials/header.html:81
 msgid "Допомога"
 msgstr "Help"
 
-#: templates/_partials/footer.html:61 templates/_partials/header.html:65
+#: templates/_partials/footer.html:66 templates/_partials/header.html:85
 msgid "Контакти"
 msgstr "Contacts"
 
-#: templates/_partials/footer.html:73
+#: templates/_partials/footer.html:78
 msgid "Статистика"
 msgstr "Statistics"
 
-#: templates/_partials/footer.html:78
+#: templates/_partials/footer.html:83
 msgid "Дата актуалізації"
 msgstr "Actualization date"
 
-#: templates/_partials/footer.html:83
+#: templates/_partials/footer.html:88
 msgid "Кількість документів"
 msgstr "Count of documents"
 
-#: templates/_partials/footer.html:91
+#: templates/_partials/footer.html:96
 msgid "Зв'язок з нами"
 msgstr "Contact us"
 
-#: templates/_partials/footer.html:95
+#: templates/_partials/footer.html:100
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
 
-#: templates/_partials/footer.html:98
+#: templates/_partials/footer.html:103
 msgid "з"
 msgstr "from"
 
-#: templates/_partials/footer.html:98
+#: templates/_partials/footer.html:103
 msgid "по"
 msgstr "to"
 
-#: templates/_partials/footer.html:115
+#: templates/_partials/footer.html:120
 msgid ""
 "Державне підприємство &laquo;Український інститут інтелектуальної "
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:103
+#: templates/_partials/header.html:70
+msgid "Отримати оригінал докумнту"
+msgstr "Get the original document"
+
+#: templates/_partials/header.html:122
 msgid "Вихід"
 msgstr "Exit"
 

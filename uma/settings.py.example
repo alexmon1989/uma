@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.about.apps.AboutConfig',
     'apps.help.apps.HelpConfig',
     'apps.api.apps.ApiConfig',
+    'apps.services.apps.ServicesConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',
@@ -98,6 +99,19 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '1433',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+
+    'ellav': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'UMA',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
 
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
