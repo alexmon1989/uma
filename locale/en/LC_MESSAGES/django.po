@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-02 11:08+0000\n"
+"POT-Creation-Date: 2019-10-03 07:47+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -851,6 +851,7 @@ msgstr "Presenter"
 
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:10
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:24
+#: templates/_partials/header.html:70
 msgid "Отримати оригінал документу"
 msgstr "Get the original document"
 
@@ -920,13 +921,12 @@ msgid ""
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:70
-msgid "Отримати оригінал докумнту"
-msgstr "Get the original document"
-
 #: templates/_partials/header.html:122
 msgid "Вихід"
 msgstr "Exit"
+
+#~ msgid "Отримати оригінал докумнту"
+#~ msgstr "Get the original document"
 
 #~ msgid "Патент зареєстровано"
 #~ msgstr "The patent is registered"
