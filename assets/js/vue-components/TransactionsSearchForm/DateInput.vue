@@ -44,7 +44,7 @@
 </script>
 
 <style lang="scss">
-    #date {
+    #date, .date-picker {
         .mx-input {
             height: 41px !important;
         }

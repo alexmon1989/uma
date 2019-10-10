@@ -53,6 +53,7 @@ def get_search_form(search_type, get_params):
 
     return form
 
+
 class SimpleSearchForm(forms.Form):
     """Простая форма поиска."""
     value = forms.CharField()
@@ -84,6 +85,7 @@ def get_obj_type_choices():
 def get_ipc_code_choices():
     """Возвращает возможные варианты для поля ipc_code формы AdvancedSearchForm."""
     return [(x.id, x.code_value_ua) for x in IpcCode.objects.all()]
+
 
 class AdvancedSearchForm(forms.Form):
     """Расширенная форма поиска."""

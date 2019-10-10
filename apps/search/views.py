@@ -37,10 +37,17 @@ class SimpleListView(TemplateView):
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
             field_label=F(f"field_label_{lang_code}")
+        ).annotate(
+            field_type=F('elastic_index_field__field_type')
         ).values(
             'id',
             'field_label',
-        ).filter(is_visible=True).order_by('-weight'))
+            'field_type',
+        ).filter(
+            is_visible=True
+        ).order_by(
+            '-weight'
+        ))
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)

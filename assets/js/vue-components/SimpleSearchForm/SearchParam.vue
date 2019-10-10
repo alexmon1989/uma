@@ -26,6 +26,24 @@
         <div class="col-md-6 g-px-8--md">
             <div class="form-group g-mb-20"
                  :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
+                <date-picker :input-name="'form-' + index + '-value'"
+                             :name="'form-' + index + '-value'"
+                             class="w-100 h-100 g-rounded-4 g-color-main g-color-primary--hover date-picker"
+                             v-model="value"
+                             range
+                             :lang="lang"
+                             :first-day-of-week="1"
+                             format="DD.MM.YYYY"
+                             value-type="format"
+                             v-validate="{
+                                  required: true,
+                                  validQuery: paramType
+                             }"
+                             placeholder="Оберіть діапазон дат"
+                             confirm
+                             :shortcuts="false"
+                             v-if="type === 'date'"
+                ></date-picker>
                 <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11"
                        type="text"
                        autocomplete="off"
@@ -36,7 +54,8 @@
                        }"
                        data-vv-delay="500"
                        v-model="value"
-                       :placeholder="translations.value">
+                       :placeholder="translations.value"
+                       v-else>
                 <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
             </div>
         </div>
@@ -54,10 +73,13 @@
 
 <script>
     import ChosenSelect from "../ChosenSelect.vue";
+    import DatePicker from 'vue2-datepicker';
+    import {translations} from "./mixins/translations";
 
     export default {
         name: "SearchParam",
-        components: {ChosenSelect},
+        mixins: [translations],
+        components: {ChosenSelect, DatePicker},
         inject: ['$validator'],
         props: {
             searchParameterTypes: Array,
@@ -67,17 +89,22 @@
         },
         data() {
             return {
-                translations: {
-                    selectParameter: gettext('Оберіть параметр пошуку'),
-                    value: gettext('Значення'),
-                    addBtnText: gettext('Додати параметр'),
-                    validationErrors: {
-                        required: gettext('Обов\'язкове поле для заповнення'),
-                        validQuery: gettext('Поле містить невірне значення'),
-                    },
-                },
                 paramType: '',
-                value: ''
+                value: '',
+                lang: 'en',
+            }
+        },
+        computed: {
+            // Тип параметра (text, date, integer, keyword)
+            type() {
+                let self = this;
+                let element = this.searchParameterTypes.find(function (el) {
+                     return el.id === parseInt(self.paramType);
+                });
+                if (element) {
+                    return element.field_type;
+                }
+                return '';
             }
         },
         mounted() {
@@ -86,12 +113,26 @@
             }
 
             if (this.initialData['form-' + this.index + '-value']) {
-                this.value = this.initialData['form-' + this.index + '-value'] || '';
+                if (this.type === "date") {
+                    this.value = this.initialData['form-' + this.index + '-value'][0].split(' ~ ');
+                } else {
+                    this.value = this.initialData['form-' + this.index + '-value'] || '';
+                }
             }
+
+            this.lang = this.translations.transactionDateLang;
         }
     }
 </script>
 
-<style scoped>
+<style lang="scss">
+    .mx-datepicker-btn-confirm {
+        color: #037fe2 !important;
+        border-color: #037fe2 !important;
+    }
 
+    .mx-datepicker-btn-confirm:hover {
+        color: lighten(#037fe2, 20%) !important;
+        border-color: lighten(#037fe2, 20%) !important;
+    }
 </style>
