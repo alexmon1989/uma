@@ -82,7 +82,7 @@
                            @focus="onValueFocus"
                            @blur="onValueBlur"
                            :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
-                           :autocomplete="autocomplete"
+                           autocomplete="off"
                            :placeholder="translations.value"
                            v-validate="{
                                 required: true,
@@ -157,14 +157,11 @@
                 if (!this.valueFocused && e.relatedTarget) {
                     e.relatedTarget.click();
                 }
-
-                this.autocomplete = 'on';
             },
 
             // Обработчик приобретения фокуса полем "Значение".
             onValueFocus: function (e) {
                 this.valueFocused = true;
-                this.autocomplete = 'off';
             }
         },
         mounted() {
@@ -233,7 +230,6 @@
                         'dataTypes': ['date', 'integer']
                     },
                 ],
-                autocomplete: 'on'
             }
         },
         computed: {
