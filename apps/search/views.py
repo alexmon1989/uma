@@ -9,7 +9,8 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import user_passes_test
 from django.template.loader import render_to_string
-from .models import ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList
+from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
+                     SimpleSearchPage, AdvancedSearchPage)
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_client_ip, paginate_results)
 from urllib.parse import parse_qs, urlparse
@@ -34,13 +35,24 @@ class SimpleListView(TemplateView):
         lang_code = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
         context['lang_code'] = lang_code
 
+        # Данные страницы
+        page_data, created = SimpleSearchPage.objects.get_or_create()
+        context['page_description'] = getattr(page_data, f"description_{self.request.LANGUAGE_CODE}")
+
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
             field_label=F(f"field_label_{lang_code}")
+        ).annotate(
+            field_type=F('elastic_index_field__field_type')
         ).values(
             'id',
             'field_label',
-        ).filter(is_visible=True).order_by('-weight'))
+            'field_type',
+        ).filter(
+            is_visible=True
+        ).order_by(
+            '-weight'
+        ))
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)
@@ -99,6 +111,10 @@ class AdvancedListView(TemplateView):
 
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
+        # Данные страницы
+        page_data, created = AdvancedSearchPage.objects.get_or_create()
+        context['page_description'] = getattr(page_data, f"description_{self.request.LANGUAGE_CODE}")
 
         # Типы ОПС
         context['obj_types'] = list(

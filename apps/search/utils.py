@@ -56,9 +56,14 @@ def prepare_advanced_query(query, field_type):
 
 def prepare_simple_query(query, field_type):
     """Обрабатывает строку простого запроса пользователя."""
+    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT").replace("/", "\\/")
     if field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
+
+        # На вход происходит получение диапазона дат в формате "дд.мм.гггг ~ дд.мм.гггг",
+        # его необходимо преобразовать запрос ElasticSearch
+        query = f">={query.replace(',', ' AND <=').replace(' ~ ', ' AND <=')}"
     return query.replace("/", "\\/")
 
 

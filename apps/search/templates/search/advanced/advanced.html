@@ -11,12 +11,18 @@
 
     <div class="container g-min-height-200 g-py-70">
 
-        <p class="g-mb-15 g-font-size-15">
-            {% documents_count as document_count %}
-            {% blocktrans with document_count=document_count|intword %}
-                Система дозволяє здійснювати пошук в <strong>{{ document_count }}</strong> патентних документів. Детальну інформацію про сферу охоплення бази даних можна отримати <a href="#">тут</a>.
-            {% endblocktrans %}
-        </p>
+        {% if page_description %}
+            <div class="g-mb-20 g-font-size-15">
+                {{ page_description|safe }}
+            </div>
+        {% else %}
+            <p class="g-mb-20 g-font-size-15">
+                {% documents_count as document_count %}
+                {% blocktrans with document_count=document_count|intword %}
+                    Система дозволяє здійснювати пошук в <strong>{{ document_count }}</strong> патентних документів. Детальну інформацію про сферу охоплення бази даних можна отримати <a href="#">тут</a>.
+                {% endblocktrans %}
+            </p>
+        {% endif %}
 
         <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
             <advanced-search-form v-bind:obj-types="{{ obj_types }}"

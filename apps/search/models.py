@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class IpcAppList(models.Model):
@@ -324,3 +325,29 @@ class IndexationProcess(models.Model):
     class Meta:
         verbose_name = 'Процес індексації'
         verbose_name_plural = 'Процеси індексації'
+
+
+class SimpleSearchPage(models.Model):
+    """Модель страниці простого поиска."""
+    description_uk = RichTextUploadingField('Опис сторінки (укр.)', blank=True)
+    description_en = RichTextUploadingField('Опис сторінки (англ.)', blank=True)
+
+    def __str__(self):
+        return 'Сторінка простого пошуку'
+
+    class Meta:
+        verbose_name = 'Сторінка простого пошуку'
+        verbose_name_plural = 'Сторінка простого пошуку'
+
+
+class AdvancedSearchPage(models.Model):
+    """Модель страниці простого поиска."""
+    description_uk = RichTextUploadingField('Опис сторінки (укр.)', blank=True)
+    description_en = RichTextUploadingField('Опис сторінки (англ.)', blank=True)
+
+    def __str__(self):
+        return 'Сторінка простого пошуку'
+
+    class Meta:
+        verbose_name = 'Сторінка розширенного пошуку'
+        verbose_name_plural = 'Сторінка розширенного пошуку'
