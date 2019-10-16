@@ -32,6 +32,16 @@ export default {
             validate: (value, args) => {
                 return new Promise((resolve, reject) => {
                     let validatePath = '';
+
+                    // Если на вход попался массив дат
+                    if (typeof value === 'object') {
+                        if (value[0] && value[1]) {
+                            value = value[0] + ' ~ ' + value[1];
+                        } else {
+                            value = '';
+                        }
+                    }
+
                     if (this.searchType === 'simple') {
                         validatePath = '/search/validate-query/?search_type=simple&value='
                             + value + '&param_type=' + args[0];

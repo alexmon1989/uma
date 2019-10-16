@@ -121,6 +121,13 @@
             }
 
             this.lang = this.translations.transactionDateLang;
+        },
+        watch: {
+            type: function (val, oldVal) {
+                if (oldVal && val !== oldVal && (val === "date" || oldVal === "date")) {
+                    this.value = '';
+                }
+            }
         }
     }
 </script>

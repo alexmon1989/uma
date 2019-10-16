@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q, Index
 from .models import SimpleSearchField, InidCodeSchedule, ObjType, IpcCode
-from .utils import prepare_advanced_query, prepare_simple_query, get_transactions_types
+from .utils import prepare_query, get_transactions_types
 from datetime import datetime
 
 
@@ -14,12 +14,9 @@ def get_param_type_choices():
     return [(x.pk, x.field_label_ua) for x in SimpleSearchField.objects.filter(is_visible=True)]
 
 
-def validate_query_elasticsearch(query, field, search_type):
+def validate_query_elasticsearch(query, field):
     """Отправляет запрос на валидацию в ElasticSearch."""
-    if search_type == 'simple':
-        query = prepare_simple_query(query, field.field_type)
-    elif search_type == 'advanced':
-        query = prepare_advanced_query(query, field.field_type)
+    query = prepare_query(query, field.field_type)
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
         'query': Q(
@@ -71,7 +68,7 @@ class SimpleSearchForm(forms.Form):
         if param and query:
             elastic_field = SimpleSearchField.objects.get(pk=param).elastic_index_field
 
-            if not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'simple'):
+            if not elastic_field or not validate_query_elasticsearch(query, elastic_field):
                 raise forms.ValidationError(
                     "Невірний запит"
                 )
@@ -114,7 +111,7 @@ class AdvancedSearchForm(forms.Form):
             if inid_code_schedule:
                 elastic_field = inid_code_schedule.elastic_index_field
 
-            if not inid_code_schedule or not elastic_field or not validate_query_elasticsearch(query, elastic_field, 'advanced'):
+            if not inid_code_schedule or not elastic_field or not validate_query_elasticsearch(query, elastic_field):
                 raise forms.ValidationError(
                     "Невірний запит"
                 )
