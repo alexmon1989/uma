@@ -74,32 +74,59 @@
                 <!-- Значення -->
                 <div class="col-md-3 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
-                    <input type="text"
-                           class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
-                           :name="'form-' + index + '-value'"
-                           v-model="value"
-                           ref="value"
-                           @focus="onValueFocus"
-                           @blur="onValueBlur"
-                           :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
-                           autocomplete="off"
-                           :placeholder="translations.value"
-                           v-validate="{
+                    <div v-if="dataType !== 'date'">
+                        <input type="text"
+                               class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
+                               :name="'form-' + index + '-value'"
+                               v-model="value"
+                               ref="value"
+                               @focus="onValueFocus"
+                               @blur="onValueBlur"
+                               :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
+                               autocomplete="off"
+                               :placeholder="translations.value"
+                               v-validate="{
                                 required: true,
                                 validQuery: [ipcCode, objType, objState]
                            }">
-                    <small class="form-control-feedback" v-if="errors.has('form-' + index + '-value')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
+                        <small class="form-control-feedback"
+                               v-if="errors.has('form-' + index + '-value')"
+                        >{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
 
-                    <div class="d-flex justify-content-around g-pt-5"
-                         @focus="valueFocused = true">
-                        <button type="button"
-                                v-for="(operator, index) in logicalOperators"
-                                v-show="valueFocused && operator.dataTypes.includes(dataType)"
-                                ref="logical_operator"
-                                class="btn btn-xs btn-secondary"
-                                @click="onLogicalOperatorBtnClick(operator.value)"
-                        >{{ operator.value }}
-                        </button>
+                        <div class="d-flex justify-content-around g-pt-5"
+                             @focus="valueFocused = true">
+                            <button type="button"
+                                    v-for="(operator, index) in logicalOperators"
+                                    v-show="valueFocused && operator.dataTypes.includes(dataType)"
+                                    ref="logical_operator"
+                                    class="btn btn-xs btn-secondary"
+                                    @click="onLogicalOperatorBtnClick(operator.value)"
+                            >{{ operator.value }}
+                            </button>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <date-picker :input-name="'form-' + index + '-value'"
+                             :name="'form-' + index + '-value'"
+                             class="w-100 h-100 g-rounded-4 g-color-main g-color-primary--hover date-picker"
+                             v-model="value"
+                             ref="value"
+                             range
+                             :lang="lang"
+                             :first-day-of-week="1"
+                             format="DD.MM.YYYY"
+                             value-type="format"
+                             v-validate="{
+                                  required: true,
+                                  validQuery: [ipcCode, objType, objState]
+                             }"
+                             placeholder="Оберіть діапазон дат"
+                             confirm
+                             :shortcuts="false"
+                        ></date-picker>
+                        <small class="form-control-feedback"
+                               v-if="errors.has('form-' + index + '-value')"
+                        >{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
                     </div>
                 </div>
                 <!-- END Значення -->
@@ -118,11 +145,14 @@
 
 <script>
     import ChosenSelect from "../ChosenSelect.vue";
+    import DatePicker from 'vue2-datepicker';
+    import {translations} from "./mixins/translations";
 
     export default {
         name: "ipcCode",
-        components: {ChosenSelect},
+        components: {ChosenSelect, DatePicker},
         inject: ['$validator'],
+        mixins: [translations],
         props: {
             objTypes: Array,
             objStates: Array,
@@ -174,11 +204,18 @@
             this.$nextTick(function () {
                 if (this.initialData['form-' + this.index + '-ipc_code']) {
                     this.ipcCode = this.initialData['form-' + this.index + '-ipc_code'];
+
+                    if (this.initialData['form-' + this.index + '-value']) {
+                        if (this.dataType === "date") {
+                            this.value = this.initialData['form-' + this.index + '-value'][0].split(' ~ ');
+                        } else {
+                            this.value = this.initialData['form-' + this.index + '-value'] || '';
+                        }
+                    }
                 }
             });
-            if (this.initialData['form-' + this.index + '-value']) {
-                this.value = this.initialData['form-' + this.index + '-value'];
-            }
+
+            this.lang = this.translations.transactionDateLang;
         },
         data: function () {
             return {
@@ -230,6 +267,7 @@
                         'dataTypes': ['date', 'integer']
                     },
                 ],
+                lang: 'en',
             }
         },
         computed: {
@@ -256,25 +294,18 @@
                 ipcCodes = ipcCodes.filter(item => item.schedule_types.some(x => selectedScheduleTypes.includes(x)));
                 return ipcCodes;
             },
-
-            translations: function () {
-                return {
-                    objType: gettext('Об\'єкт промислової власності'),
-                    objState: gettext('Правовий статус ОПВ'),
-                    ipcCode: gettext('Бібліографічні елементи'),
-                    value: gettext('Значення'),
-                    validationErrors: {
-                        required: gettext('Обов\'язкове поле для заповнення'),
-                        validQuery: gettext('Поле містить невірне значення'),
-                    },
-                }
-            }
         },
         watch: {
             ipcCodesFiltered: function (val) {
                 this.$nextTick(function () {
                     $(this.$refs.ipc_code.$el).trigger('chosen:updated');
                 });
+            },
+
+            dataType: function (val, oldVal) {
+                if (oldVal && val !== oldVal && (val === "date" || oldVal === "date")) {
+                    this.value = '';
+                }
             }
         }
     }

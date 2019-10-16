@@ -81,6 +81,38 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
     });
 }
 
+/**
+ * Печать элемента.
+ */
+function printElem(divId) {
+    let content = document.getElementById(divId).cloneNode(true);
+    let headHtml = document.getElementsByTagName('head')[0].innerHTML;
+
+    // remove all <a> elements
+    let elements = content.querySelectorAll('a:not(.js-fancybox)');
+    [].forEach.call(elements, function(el) {
+        el.remove();
+    });
+
+    elements = content.querySelectorAll(".hidden");
+    [].forEach.call(elements, function(el) {
+        el.classList.remove("hidden");
+    });
+
+    let myWindow = window.open('', 'Print', 'height=600,width=800');
+
+    myWindow.document.write('<html>' + headHtml);
+    myWindow.document.write('<body>' + content.innerHTML + '</body></html>');
+
+    myWindow.document.close();
+    myWindow.focus();
+    setTimeout(function () {
+        myWindow.print();
+        myWindow.close();
+    }, 1000);
+    return true;
+}
+
 $(function () {
     $(document).on(
         'change',
@@ -324,5 +356,49 @@ $(function () {
                 60
             );
         });
+    });
+
+
+    // Обработчик нажатия на конпку печати библиографических данных
+    $(document).on('click', '#biblio-print-btn', function (e) {
+        e.preventDefault();
+
+        let content = document.getElementById('biblio-data').cloneNode(true);
+        let headHtml = document.getElementsByTagName('head')[0].innerHTML;
+
+        // Удаление ссылок, которые не являются изображениями
+        let elements = content.querySelectorAll('a:not(.js-fancybox)');
+        [].forEach.call(elements, function(el) {
+            el.remove();
+        });
+
+        // Удаление класса hidden
+        elements = content.querySelectorAll(".hidden");
+        [].forEach.call(elements, function(el) {
+            el.classList.remove("hidden");
+        });
+
+        // Удаление элемента kzpt-desc-short
+        let element = content.querySelector(".kzpt-desc-short");
+        if (element) {
+            element.remove();
+        }
+        // Отображение элемента kzpt-desc-short
+        element = content.querySelector(".kzpt-desc-full");
+        if (element) {
+            element.style.display = 'block';
+        }
+
+        let myWindow = window.open('', 'Print', 'height=600,width=800');
+
+        myWindow.document.write('<html>' + headHtml);
+        myWindow.document.write('<body>' + content.innerHTML + '</body></html>');
+
+        myWindow.document.close();
+        myWindow.focus();
+        setTimeout(function () {
+            myWindow.print();
+            myWindow.close();
+        }, 1000);
     });
 });

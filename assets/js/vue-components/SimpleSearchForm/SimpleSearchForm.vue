@@ -47,11 +47,12 @@
 <script>
     import SearchParam from "./SearchParam.vue";
     import mixin from './../../mixins.js';
+    import {translations} from "./mixins/translations";
 
     export default {
         name: "SimpleSearchForm",
         components: {SearchParam},
-        mixins: [mixin],
+        mixins: [mixin, translations],
         props: {
             searchParameterTypes: Array,
             initialData: Object
@@ -60,16 +61,6 @@
             return {
                 searchType: 'simple',
                 searchParameters: [],
-
-                translations: {
-                    startText: gettext('Для початку роботи заповніть форму пошуку'),
-                    selectParameter: gettext('Оберіть параметр пошуку'),
-                    value: gettext('Значення'),
-                    addBtnText: gettext('Додати параметр'),
-                    searchBtnText: gettext('Показати результати'),
-                    performingSearch: gettext('Виконуємо пошук...'),
-                },
-
                 ipcModel: {},
                 valueModel: {},
                 totalForms: 1,

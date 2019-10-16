@@ -4,7 +4,7 @@ from celery import shared_task
 from django.conf import settings
 from django.db.models import F
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
-from .utils import (prepare_simple_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
+from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs,
@@ -36,7 +36,7 @@ def perform_simple_search(user_id, get_params):
         if elastic_field:
             q = Q(
                 'query_string',
-                query=prepare_simple_query(s['value'], elastic_field.field_type),
+                query=prepare_query(s['value'], elastic_field.field_type),
                 default_field=elastic_field.field_name,
                 default_operator='AND'
             )
@@ -386,7 +386,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             if elastic_field:
                 q = Q(
                     'query_string',
-                    query=prepare_simple_query(s['value'], elastic_field.field_type),
+                    query=prepare_query(s['value'], elastic_field.field_type),
                     default_field=elastic_field.field_name,
                     default_operator='AND'
                 )

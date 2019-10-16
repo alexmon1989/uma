@@ -2,155 +2,175 @@
 {% load search_extras %}
 {% load i18n %}
 
-<div class="table-responsive">
-    <table class="table table-sm table-trade-mark g-font-size-13">
-        <tbody>
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-20 d-flex justify-content-between">
+            {% if hit.Geo.GeoDetails.PublicationDetails %}
+                <div>
+                    {% trans "Опубліковано" %} <span
+                        class="g-font-weight-600">{{ hit.Geo.GeoDetails.PublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+                    {% trans "бюл." %} № <span
+                        class="g-font-weight-600">{{ hit.Geo.GeoDetails.PublicationDetails.0.PublicationIdentifier }}</span>
+                </div>
+            {% endif %}
 
-        {% get_field '111' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationNumber %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600 g-font-size-16">{{ hit.Geo.GeoDetails.RegistrationNumber }}</td>
-            </tr>
-        {% endif %}
+            {% if hit.search_data.obj_state == 2 %}
+                {% registration_status hit=hit %}
+            {% endif %}
+        </div>
+    {% endif %}
 
-        {% get_field '151' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
 
-        {% get_field '190' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationOriginCountry %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.Geo.GeoDetails.RegistrationOriginCountry.0 }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '111' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600 g-font-size-16">{{ hit.Geo.GeoDetails.RegistrationNumber }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '210' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationNumber %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.ApplicationNumber }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '151' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '220' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.Geo.GeoDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '190' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.RegistrationOriginCountry %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Geo.GeoDetails.RegistrationOriginCountry.0 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '539.I' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.Geo.GeoDetails.ProductName }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '210' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.ApplicationNumber }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '540' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.Indication %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.Indication }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '220' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Geo.GeoDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '529.A' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.Area %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="kzpt-geo">{{ hit.Geo.Area|safe }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '539.I' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Geo.GeoDetails.ProductName }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '539.D' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.ProductDesc %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    <div class="kzpt-desc-short">
-                        {{ hit.Geo.ProductDesc|safe|truncatechars_html:300 }}
-                        {% if hit.Geo.ProductDesc|length > 300 %}
-                            <a href="#" class="show">{% trans "показати все" %}</a>
-                        {% endif %}
-                    </div>
-                    <div class="kzpt-desc-full" style="display: none">
-                        {{ hit.Geo.ProductDesc|safe }}
-                        <a href="#" class="hide">{% trans "сховати" %}</a>
-                    </div>
-                </td>
-            </tr>
-        {% endif %}
+            {% get_field '540' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Indication %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.Indication }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '732' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.HolderDetails.Holder %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify g-font-weight-600">
-                    {% for holder in hit.Geo.GeoDetails.HolderDetails.Holder %}
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        <br>
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                        <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+            {% get_field '529.A' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.Area %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="kzpt-geo">{{ hit.Geo.Area|safe }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '740' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.RepresentativeDetails.Representative %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    {% for representative in hit.Geo.GeoDetails.RepresentativeDetails.Representative %}
-                        {% if representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine %}
-                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
+            {% get_field '539.D' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.ProductDesc %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        <div class="kzpt-desc-short">
+                            {{ hit.Geo.ProductDesc|safe|truncatechars_html:300 }}
+                            {% if hit.Geo.ProductDesc|length > 300 %}
+                                <a href="#" class="show">{% trans "показати все" %}</a>
+                            {% endif %}
+                        </div>
+                        <div class="kzpt-desc-full" style="display: none">
+                            {{ hit.Geo.ProductDesc|safe }}
+                            <a href="#" class="hide">{% trans "сховати" %}</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '732' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.HolderDetails.Holder %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify g-font-weight-600">
+                        {% for holder in hit.Geo.GeoDetails.HolderDetails.Holder %}
+                            {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                             <br>
-                        {% endif %}
-                        {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
-                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                        {% endif %}
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+                            {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
 
-        {% get_field '750' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine and hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.AddressLine %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}<br>
-                    {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.AddressLine }}
-                </td>
-            </tr>
-        {% endif %}
+            {% get_field '740' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.RepresentativeDetails.Representative %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for representative in hit.Geo.GeoDetails.RepresentativeDetails.Representative %}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine %}
+                                {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
+                                <br>
+                            {% endif %}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
+                                {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% endif %}
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
 
-        </tbody>
-    </table>
-</div>
-<!-- End Basic Table -->
+            {% get_field '750' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine and hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.AddressLine %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}<br>
+                        {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.AddressLine }}
+                    </td>
+                </tr>
+            {% endif %}
 
-{% if hit.Geo.GeoDetails.GeoImageDetails %}
-    <div class="row text-center g-mt-20">
-        {% for image in hit.Geo.GeoDetails.GeoImageDetails %}
-            <div class="col-md-4 g-mb-30--md">
-                <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-black-opacity-0_5--after"
-                   href="javascript:;"
-                   data-fancybox="lightbox-gallery-13-1-hidden"
-                   data-src="{{ hit.Document.filesPath|get_image_url:image.GeoImage.GeoImageFilename }}">
-                  <img class="img-fluid u-block-hover__main--zoom-v1" src="{{ hit.Document.filesPath|get_image_url:image.GeoImage.GeoImageFilename }}" alt="">
-                </a>
-            </div>
-        {% endfor %}
+            </tbody>
+        </table>
     </div>
-{% endif %}
+    <!-- End Basic Table -->
+
+    {% if hit.Geo.GeoDetails.GeoImageDetails %}
+        <div class="row text-center g-mt-20">
+            {% for image in hit.Geo.GeoDetails.GeoImageDetails %}
+                <div class="col-md-4 g-mb-30--md">
+                    <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-black-opacity-0_5--after"
+                       href="javascript:;"
+                       data-fancybox="lightbox-gallery-13-1-hidden"
+                       data-src="{{ hit.Document.filesPath|get_image_url:image.GeoImage.GeoImageFilename }}">
+                        <img class="img-fluid u-block-hover__main--zoom-v1"
+                             src="{{ hit.Document.filesPath|get_image_url:image.GeoImage.GeoImageFilename }}" alt="">
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

@@ -2,191 +2,211 @@
 {% load search_extras %}
 {% load i18n %}
 
-<div class="table-responsive">
-    <table class="table table-sm table-trade-mark g-font-size-13">
-        <tbody>
-
-        {% get_field '51' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.IndicationProductDetails %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">
-                    {% for i in hit.Design.DesignDetails.IndicationProductDetails %}
-                        <span class="g-font-weight-600">{{ i.Class }}{% if not forloop.last %};&nbsp;{% endif %}</span>
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '11' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.RegistrationNumber %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600 g-font-size-16">{{ hit.Design.DesignDetails.RegistrationNumber }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '24' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.RecordEffectiveDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordEffectiveDate|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '21' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationNumber %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationNumber }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '22' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '31' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityNumber %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityNumber }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '32' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityDate %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityDate|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '33' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '54' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignTitle %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignTitle }}</td>
-            </tr>
-        {% endif %}
-
-        {% get_field '71' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.ApplicantDetails.Applicant %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify">
-                    {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
-                        {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        {% if hit.search_data.obj_state == 2 %}
-                            <br>
-                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                        {% endif %}
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '72' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignerDetails.Designer %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify">
-                    {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
-                        {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '73' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.HolderDetails.Holder %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify g-font-weight-600">
-                    {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        <br>
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                        <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '74' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify">
-                    {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
-                        {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
-                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine != 'address' %}
-                                <br>{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                            {% endif %}
-                        {% endif %}
-                        {% if not forloop.last %};<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '98' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.CorrespondenceAddress %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify">
-                    {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                    <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                    <br>({{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.FormattedAddressCountryCode }})
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '28' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.Design.DesignDetails.TotalSpecimen %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="text-justify">
-                    {{ hit.Design.DesignDetails.TotalSpecimen }}
-                </td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
-</div>
-<!-- End Basic Table -->
-
-{% if hit.Design.DesignDetails.DesignSpecimenDetails %}
-    <div class="row text-center g-mt-20">
-        {% for design_specimen_details in hit.Design.DesignDetails.DesignSpecimenDetails %}
-            {% for image in design_specimen_details.DesignSpecimen %}
-                <div class="col-md-4 g-mb-30--md">
-                    <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-black-opacity-0_5--after"
-                       href="javascript:;"
-                       data-fancybox="lightbox-gallery-13-1-hidden"
-                       data-src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}">
-                      <img class="img-fluid u-block-hover__main--zoom-v1" src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}" alt="">
-                      <strong class="h5 d-block w-100 u-bg-overlay__inner g-absolute-centered g-px-20 g-font-weight-400 g-color-white g-mt-10"> {{ forloop.parentloop.counter }}.{{ forloop.counter }} </strong>
-                    </a>
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-20 d-flex justify-content-between">
+            {% if hit.Design.DesignDetails.RecordPublicationDetails %}
+                <div>
+                    {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+                    {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationIdentifier }}</span>
                 </div>
-            {% endfor %}
-        {% endfor %}
+            {% endif %}
+
+            {% if hit.search_data.obj_state == 2 %}
+               {% registration_status hit=hit %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
+
+            {% get_field '51' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.IndicationProductDetails %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">
+                        {% for i in hit.Design.DesignDetails.IndicationProductDetails %}
+                            <span class="g-font-weight-600">{{ i.Class }}{% if not forloop.last %};
+                                &nbsp;{% endif %}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '11' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.RegistrationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600 g-font-size-16">{{ hit.Design.DesignDetails.RegistrationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '24' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.RecordEffectiveDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordEffectiveDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '21' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '22' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '31' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '32' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '33' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '54' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignTitle %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignTitle }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '71' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify">
+                        {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            {% if hit.search_data.obj_state == 2 %}
+                                <br>
+                                {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% endif %}
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '72' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignerDetails.Designer %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify">
+                        {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
+                            {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '73' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.HolderDetails.Holder %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify g-font-weight-600">
+                        {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
+                            {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            <br>
+                            {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '74' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify">
+                        {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
+                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
+                                {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine != 'address' %}
+                                    <br>
+                                    {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                {% endif %}
+                            {% endif %}
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '98' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.CorrespondenceAddress %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify">
+                        {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                        <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                        <br>({{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.FormattedAddressCountryCode }})
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '28' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.TotalSpecimen %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="text-justify">
+                        {{ hit.Design.DesignDetails.TotalSpecimen }}
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
     </div>
-{% endif %}
+    <!-- End Basic Table -->
+
+    {% if hit.Design.DesignDetails.DesignSpecimenDetails %}
+        <div class="row text-center g-mt-20">
+            {% for design_specimen_details in hit.Design.DesignDetails.DesignSpecimenDetails %}
+                {% for image in design_specimen_details.DesignSpecimen %}
+                    <div class="col-md-4 g-mb-30--md">
+                        <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-black-opacity-0_5--after"
+                           href="javascript:;"
+                           data-fancybox="lightbox-gallery-13-1-hidden"
+                           data-src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}">
+                            <img class="img-fluid u-block-hover__main--zoom-v1"
+                                 src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}" alt="">
+                            <strong class="h5 d-block w-100 u-bg-overlay__inner g-absolute-centered g-px-20 g-font-weight-400 g-color-white g-mt-10"> {{ forloop.parentloop.counter }}.{{ forloop.counter }} </strong>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
