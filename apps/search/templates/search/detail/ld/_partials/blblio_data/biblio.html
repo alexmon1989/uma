@@ -2,249 +2,256 @@
 {% load search_extras %}
 {% load i18n %}
 
-<div class="table-responsive">
-    <table class="table table-sm table-biblio g-font-size-13">
-        <tbody>
-        {% get_field '11' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_11 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_11 }}</td>
-            </tr>
-        {% endif %}
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
 
-        {% get_field '13' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_13 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_13 }}</td>
-            </tr>
-        {% endif %}
+    <div class="table-responsive">
+        <table class="table table-sm table-biblio g-font-size-13">
+            <tbody>
+            {% get_field '11' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_11 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_11 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '19' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_19 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_19 }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '13' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_13 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_13 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '21' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_21 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_21 }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '19' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_19 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_19 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '22' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_22 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_22|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '21' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_21 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_21 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '24' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_24 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_24|parse_date|date:"d.m.Y" }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '22' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_22 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_22|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
 
-        {% if biblio_data.I_30 %}
-            {% for I_30 in biblio_data.I_30 %}
-                {% get_field '31' ipc_fields as ipc_field %}
-                {% if ipc_field.enable_view and hit.biblio_data.I_30.I_31 %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td>{{ hit.biblio_data.I_30.I_31 }}
-                            {% get_field '33' ipc_fields as ipc_field %}
-                            {% if ipc_field.enable_view and hit.biblio_data.I_30.I_33 %}
-                                <span title="{{ ipc_field.code_title }}">{{ hit.biblio_data.I_30.I_33 }}</span>
+            {% get_field '24' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_24 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_24|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% if biblio_data.I_30 %}
+                {% for I_30 in biblio_data.I_30 %}
+                    {% get_field '31' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and hit.biblio_data.I_30.I_31 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ hit.biblio_data.I_30.I_31 }}
+                                {% get_field '33' ipc_fields as ipc_field %}
+                                {% if ipc_field.enable_view and hit.biblio_data.I_30.I_33 %}
+                                    <span title="{{ ipc_field.code_title }}">{{ hit.biblio_data.I_30.I_33 }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '32' ipc_fields as ipc_field %}
+                    {% if hit.biblio_data.I_30.I_32 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ hit.biblio_data.I_30.I_32|parse_date|date:"d.m.Y" }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {% get_field '43.D' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data|get:'I_43.D' %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for I_43 in hit.biblio_data|get:'I_43.D' %}
+                            {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '45.D' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data|get:'I_45.D' %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for I_45 in hit.biblio_data|get:'I_45.D' %}
+                            {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '54' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_54 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for I_54 in hit.biblio_data.I_54 %}
+                            {% if I_54|get:'I_54.U' %}
+                                {{ I_54|get:'I_54.U' }} [UA]
                             {% endif %}
-                        </td>
-                    </tr>
-                {% endif %}
+                            {% if I_54|get:'I_54.R' %}
+                                {{ I_54|get:'I_54.R' }} [RU]
+                            {% endif %}
+                            {% if I_54|get:'I_54.E' %}
+                                {{ I_54|get:'I_54.E' }} [EN]
+                            {% endif %}
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
 
-                {% get_field '32' ipc_fields as ipc_field %}
-                {% if hit.biblio_data.I_30.I_32 %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td>{{ hit.biblio_data.I_30.I_32|parse_date|date:"d.m.Y" }}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+            {% get_field '56.A' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_56 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        <ul class="g-pl-15 g-mb-0 i_56">
+                            {% for I_56 in hit.biblio_data.I_56 %}
+                                <li class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                    {{ I_56|get:"I_56.A" }}
+                                    {% if forloop.counter == 2 and not forloop.last %}
+                                        &nbsp;<a href="#"
+                                                 class="show-all g-font-size-12"
+                                                 title="{% trans "Показати всі" %}"
+                                    ><i class="fa fa-plus"></i></a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endif %}
 
-        {% get_field '43.D' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data|get:'I_43.D' %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    {% for I_43 in hit.biblio_data|get:'I_43.D' %}
-                        {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+            {% if hit.biblio_data.i_62 %}
+                {% for i_62 in hit.biblio_data.i_62 %}
+                    {% get_field '62.N' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and i_62|get:"I_62.N" %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ i_62|get:"I_62.N" }}</td>
+                        </tr>
+                    {% endif %}
 
-        {% get_field '45.D' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data|get:'I_45.D' %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    {% for I_45 in hit.biblio_data|get:'I_45.D' %}
-                        {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+                    {% get_field '62.D' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and i_62|get:"I_62.D" %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ i_62|get:"I_62.D" }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
-        {% get_field '54' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_54 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    {% for I_54 in hit.biblio_data.I_54 %}
-                        {% if I_54|get:'I_54.U' %}
-                            {{ I_54|get:'I_54.U' }} [UA]
-                        {% endif %}
-                        {% if I_54|get:'I_54.R' %}
-                            {{ I_54|get:'I_54.R' }} [RU]
-                        {% endif %}
-                        {% if I_54|get:'I_54.E' %}
-                            {{ I_54|get:'I_54.E' }} [EN]
-                        {% endif %}
-                        {% if not forloop.last %}<br>{% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '56.A' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_56 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>
-                    <ul class="g-pl-15 g-mb-0 i_56">
-                        {% for I_56 in hit.biblio_data.I_56 %}
-                            <li class="{% if forloop.counter > 2 %}more hidden{% endif %}">
-                                {{ I_56|get:"I_56.A" }}
+            {% get_field '71' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_71 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="i_71">
+                        {% for I_71_ in hit.biblio_data.I_71 %}
+                            <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                            {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
                                 {% if forloop.counter == 2 and not forloop.last %}
                                     &nbsp;<a href="#"
                                              class="show-all g-font-size-12"
                                              title="{% trans "Показати всі" %}"
                                 ><i class="fa fa-plus"></i></a>
                                 {% endif %}
-                            </li>
+                                {% if not forloop.last %}<br>{% endif %}
+                        </span>
                         {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
 
-        {% if hit.biblio_data.i_62 %}
-            {% for i_62 in hit.biblio_data.i_62 %}
-                {% get_field '62.N' ipc_fields as ipc_field %}
-                {% if ipc_field.enable_view and i_62|get:"I_62.N" %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td>{{ i_62|get:"I_62.N" }}</td>
-                    </tr>
-                {% endif %}
-
-                {% get_field '62.D' ipc_fields as ipc_field %}
-                {% if ipc_field.enable_view and i_62|get:"I_62.D" %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td>{{ i_62|get:"I_62.D" }}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-
-        {% get_field '71' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_71 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="i_71">
-                    {% for I_71_ in hit.biblio_data.I_71 %}
-                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
-                            {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
-                            {% if forloop.counter == 2 and not forloop.last %}
-                                &nbsp;<a href="#"
-                                         class="show-all g-font-size-12"
-                                         title="{% trans "Показати всі" %}"
-                            ><i class="fa fa-plus"></i></a>
-                            {% endif %}
-                            {% if not forloop.last %}<br>{% endif %}
-                        </span>
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% get_field '72' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_72 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="i_72">
-                    {% for I_72_ in hit.biblio_data.I_72 %}
-                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+            {% get_field '72' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_72 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="i_72">
+                        {% for I_72_ in hit.biblio_data.I_72 %}
+                            <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
-                            {% if forloop.counter == 2 and not forloop.last %}
-                                &nbsp;<a href="#"
-                                         class="show-all g-font-size-12"
-                                         title="{% trans "Показати всі" %}"
-                            ><i class="fa fa-plus"></i></a>
-                            {% endif %}
-                            {% if not forloop.last %}<br>{% endif %}
+                                {% if forloop.counter == 2 and not forloop.last %}
+                                    &nbsp;<a href="#"
+                                             class="show-all g-font-size-12"
+                                             title="{% trans "Показати всі" %}"
+                                ><i class="fa fa-plus"></i></a>
+                                {% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
                         </span>
 
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
 
-        {% get_field '73' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_73 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td class="i_73">
-                    {% for I_73_ in hit.biblio_data.I_73 %}
-                        <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+            {% get_field '73' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_73 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="i_73">
+                        {% for I_73_ in hit.biblio_data.I_73 %}
+                            <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
-                            {% if forloop.counter == 2 and not forloop.last %}
-                                &nbsp;<a href="#"
-                                         class="show-all g-font-size-12"
-                                         title="{% trans "Показати всі" %}"
-                            ><i class="fa fa-plus"></i></a>
-                            {% endif %}
-                            {% if not forloop.last %}<br>{% endif %}
+                                {% if forloop.counter == 2 and not forloop.last %}
+                                    &nbsp;<a href="#"
+                                             class="show-all g-font-size-12"
+                                             title="{% trans "Показати всі" %}"
+                                ><i class="fa fa-plus"></i></a>
+                                {% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
                         </span>
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
 
-        {% get_field '74' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_74 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_74 }}</td>
-            </tr>
-        {% endif %}
+            {% get_field '74' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_74 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_74 }}</td>
+                </tr>
+            {% endif %}
 
-        {% get_field '98' ipc_fields as ipc_field %}
-        {% if ipc_field.enable_view and hit.biblio_data.I_98 %}
-            <tr>
-                <th>{{ ipc_field.code_title }}</th>
-                <td>{{ hit.biblio_data.I_98 }}</td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
+            {% get_field '98' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_98 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_98 }}</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
 </div>
-<!-- End Basic Table -->

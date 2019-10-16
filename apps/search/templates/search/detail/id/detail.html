@@ -14,22 +14,7 @@
             <!-- Tab panes -->
             <div id="nav-1-1-primary-ver" class="tab-content">
                 <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
-                    <h3 class="g-pb-15">{% trans "Бібліографічні дані" %}</h3>
-
-                    {% if hit.search_data.obj_state == 2 %}
-                        <div class="g-pb-20 d-flex justify-content-between">
-                            {% if hit.Design.DesignDetails.RecordPublicationDetails %}
-                                <div>
-                                    {% trans "Опубліковано" %} <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
-                                    {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Design.DesignDetails.RecordPublicationDetails.0.PublicationIdentifier }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if hit.search_data.obj_state == 2 %}
-                               {% registration_status hit=hit %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                    {% include 'search/detail/_partials/biblio_header.html' %}
 
                     {% include 'search/detail/id/_partials/blblio_data/biblio.html' %}
                 </div>
