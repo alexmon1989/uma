@@ -55,3 +55,7 @@ def get_list(dictionary, key):
 def has_group(user, group_name):
     return user.groups.filter(name=group_name).exists()
 
+
+@register.filter
+def list_of_dicts_unique(l):
+    return [i for n, i in enumerate(l) if i not in l[n + 1:]]

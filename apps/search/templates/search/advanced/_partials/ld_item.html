@@ -26,7 +26,7 @@
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
         <div class="col-md">
             <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Винахідник(и):</h4>
-            {% for I_72 in biblio_data.I_72 %}
+            {% for I_72 in biblio_data.I_72|list_of_dicts_unique %}
                 {% if forloop.counter <= 2 %}
                     {{ I_72|get_person_name }} [{{ I_72|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
@@ -36,15 +36,15 @@
                        data-html="true"
                        data-trigger="focus"
                        data-content="
-                               {% for I_72_ in biblio_data.I_72 %}{{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]<br>{% endfor %}"
-                    >(+{{ biblio_data.I_72|length|add:"-2" }})</a>
+                               {% for I_72_ in biblio_data.I_72|list_of_dicts_unique %}{{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]<br>{% endfor %}"
+                    >(+{{ biblio_data.I_72|list_of_dicts_unique|length|add:"-2" }})</a>
                 {% endif %}
             {% endfor %}
         </div>
 
         <div class="col-md">
             <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
-            {% for I_71 in biblio_data.I_71 %}
+            {% for I_71 in biblio_data.I_71|list_of_dicts_unique %}
                 {% if forloop.counter <= 2 %}
                     {{ I_71|get_person_name }} [{{ I_71|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
@@ -54,8 +54,8 @@
                        data-html="true"
                        data-trigger="focus"
                        data-content="
-                               {% for I_71_ in biblio_data.I_71 %}{{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]<br>{% endfor %}"
-                    >(+{{ biblio_data.I_71|length|add:"-2" }})</a>
+                               {% for I_71_ in biblio_data.I_71|list_of_dicts_unique %}{{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]<br>{% endfor %}"
+                    >(+{{ biblio_data.I_71|list_of_dicts_unique|length|add:"-2" }})</a>
                 {% endif %}
             {% endfor %}
         </div>
@@ -94,7 +94,7 @@
             </div>
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
-                {% for I_73 in biblio_data.I_73 %}
+                {% for I_73 in biblio_data.I_73|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
                         {{ I_73|get_person_name }} [{{ I_73|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                     {% elif forloop.counter == 3 %}
@@ -103,8 +103,8 @@
                            data-title="Повний список власників"
                            data-html="true"
                            data-trigger="focus"
-                           data-content="{% for I_73_ in biblio_data.I_73 %}{{ I_73|get_person_name }} [{{ I_73|get_person_country }}]<br>{% endfor %}"
-                        >(+{{ biblio_data.I_73|length|add:"-2" }})</a>
+                           data-content="{% for I_73_ in biblio_data.I_73|list_of_dicts_unique %}{{ I_73|get_person_name }} [{{ I_73|get_person_country }}]<br>{% endfor %}"
+                        >(+{{ biblio_data.I_73|list_of_dicts_unique|length|add:"-2" }})</a>
                     {% endif %}
                 {% endfor %}
             </div>
