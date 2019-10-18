@@ -18,6 +18,7 @@ class IpcAppList(models.Model):
     idstatus = models.IntegerField(db_column='idStatus', blank=True, null=True)
     app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
     elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
+    notification_date = models.DateTimeField(db_column='NotificationDate', blank=True, null=True)
 
     class Meta:
         managed = False
