@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
+from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
@@ -372,6 +373,28 @@ class Command(BaseCommand):
             # Пометка в БД что этот документ проиндексирован
             IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
 
+    def fill_notification_date(self):
+        """Заполняет поле NotificationDate в таблице IPC_AppList."""
+        app_list = IpcAppList.objects.filter(obj_type__id__in=(1, 2))
+        registration_date__max = app_list.aggregate(Max('registration_date'))['registration_date__max']
+        q = Q(
+            "nested",
+            path="TRANSACTIONS.TRANSACTION",
+            query=Q(
+                "query_string",
+                query=f"{registration_date__max.year}-{registration_date__max.month}-{registration_date__max.day}",
+                default_field="TRANSACTIONS.TRANSACTION.BULLETIN_DATE",
+            )
+        )
+        s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(q).source(False)
+        total = s.count()
+        s = s[0:total]
+        results = s.execute()
+        ids = []
+        for res in results:
+            ids.append(res.meta.id)
+        IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
+
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
@@ -430,5 +453,8 @@ class Command(BaseCommand):
         self.indexation_process.documents_in_index_shared = s.count()
 
         self.indexation_process.save()
+
+        # Заполнение поля NotificationDate в таблице IPC_AppList
+        self.fill_notification_date()
 
         self.stdout.write(self.style.SUCCESS('Finished'))
