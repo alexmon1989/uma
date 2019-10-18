@@ -177,7 +177,7 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="i_71">
-                        {% for I_71_ in hit.biblio_data.I_71 %}
+                        {% for I_71_ in hit.biblio_data.I_71|list_of_dicts_unique %}
                             <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
                                 {% if forloop.counter == 2 and not forloop.last %}
@@ -198,7 +198,7 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="i_72">
-                        {% for I_72_ in hit.biblio_data.I_72 %}
+                        {% for I_72_ in hit.biblio_data.I_72|list_of_dicts_unique %}
                             <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
                                 {% if forloop.counter == 2 and not forloop.last %}
@@ -220,7 +220,7 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="i_73">
-                        {% for I_73_ in hit.biblio_data.I_73 %}
+                        {% for I_73_ in hit.biblio_data.I_73|list_of_dicts_unique %}
                             <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
                             {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
                                 {% if forloop.counter == 2 and not forloop.last %}
