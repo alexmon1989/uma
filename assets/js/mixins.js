@@ -34,7 +34,7 @@ export default {
                     let validatePath = '';
 
                     // Если на вход попался массив дат
-                    if (typeof value === 'object') {
+                    if (typeof value === 'object' && value.length === 2) {
                         if (value[0] && value[1]) {
                             value = value[0] + ' ~ ' + value[1];
                         } else {
