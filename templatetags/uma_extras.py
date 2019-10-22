@@ -58,6 +58,6 @@ def has_group(user, group_name):
 
 @register.filter
 def list_of_dicts_unique(l):
-    if len(l) > 1:
+    if l is not None:
         return [i for n, i in enumerate(l) if i not in l[n + 1:]]
     return l
