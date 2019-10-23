@@ -46,13 +46,13 @@
 
 <script>
     import SearchParam from "./SearchParam.vue";
-    import mixin from './../../mixins.js';
+    import validationMixin from './../../vue-mixins/validation_mixin.js';
     import {translations} from "./mixins/translations";
 
     export default {
         name: "SimpleSearchForm",
         components: {SearchParam},
-        mixins: [mixin, translations],
+        mixins: [validationMixin, translations],
         props: {
             searchParameterTypes: Array,
             initialData: Object

@@ -5,6 +5,7 @@
 
         <date-picker name="date"
                      id="date"
+                     placeholder="Оберіть діапазон дат"
                      class="w-100 h-100 g-rounded-4 g-color-main g-color-primary--hover"
                      :value="value"
                      @input="$emit('input', $event)"
@@ -14,6 +15,9 @@
                      format="DD.MM.YYYY"
                      value-type="format"
                      v-validate="'required'"
+                     confirm
+                     :shortcuts="false"
+                     v-on:confirm="onDateConfirm"
         ></date-picker>
 
         <small class="form-control-feedback" v-if="errors.has('date')">{{ translations.validationErrors[errors.firstRule('date')] }}</small>
@@ -23,6 +27,7 @@
 <script>
     import {translations} from "./mixins/translations";
     import DatePicker from 'vue2-datepicker';
+    import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
 
     export default {
         name: "DateInput",
@@ -38,7 +43,7 @@
         mounted() {
             this.lang = this.translations.transactionDateLang;
         },
-        mixins: [translations],
+        mixins: [translations, datePickerMixin],
         inject: ['$validator'],
     }
 </script>

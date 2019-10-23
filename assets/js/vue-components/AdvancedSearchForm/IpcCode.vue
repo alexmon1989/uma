@@ -123,6 +123,7 @@
                              placeholder="Оберіть діапазон дат"
                              confirm
                              :shortcuts="false"
+                             v-on:confirm="onDateConfirm"
                         ></date-picker>
                         <small class="form-control-feedback"
                                v-if="errors.has('form-' + index + '-value')"
@@ -147,12 +148,13 @@
     import ChosenSelect from "../ChosenSelect.vue";
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
+    import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
 
     export default {
         name: "ipcCode",
         components: {ChosenSelect, DatePicker},
         inject: ['$validator'],
-        mixins: [translations],
+        mixins: [translations, datePickerMixin],
         props: {
             objTypes: Array,
             objStates: Array,
@@ -192,7 +194,7 @@
             // Обработчик приобретения фокуса полем "Значение".
             onValueFocus: function (e) {
                 this.valueFocused = true;
-            }
+            },
         },
         mounted() {
             if (this.initialData['form-' + this.index + '-obj_type']) {

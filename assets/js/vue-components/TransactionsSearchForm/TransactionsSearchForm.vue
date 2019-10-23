@@ -73,9 +73,9 @@
                             this.date = this.initial['date'][0].split(' ~ ');
                             this.$nextTick(function () {
                                 this.obj_type = this.initial['obj_type'][0].toString();
-                                    this.$nextTick(function () {
-                                        this.transaction_type = this.initial['transaction_type'];
-                                    });
+                                this.$nextTick(function () {
+                                    this.transaction_type = this.initial['transaction_type'];
+                                });
                             });
                         }
                     }
