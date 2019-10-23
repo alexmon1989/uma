@@ -43,6 +43,7 @@
                              confirm
                              :shortcuts="false"
                              v-if="type === 'date'"
+                             v-on:confirm="onDateConfirm"
                 ></date-picker>
                 <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11"
                        type="text"
@@ -75,10 +76,11 @@
     import ChosenSelect from "../ChosenSelect.vue";
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
+    import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
 
     export default {
         name: "SearchParam",
-        mixins: [translations],
+        mixins: [translations, datePickerMixin],
         components: {ChosenSelect, DatePicker},
         inject: ['$validator'],
         props: {

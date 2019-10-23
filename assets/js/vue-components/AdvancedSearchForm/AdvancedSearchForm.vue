@@ -49,11 +49,11 @@
 
 <script>
     import IpcCode from './IpcCode.vue';
-    import mixin from './../../mixins.js';
+    import validationMixin from './../../vue-mixins/validation_mixin.js';
 
     export default {
         name: "AdvancedSearchForm",
-        mixins: [mixin],
+        mixins: [validationMixin],
         props: {
             objTypes: Array,
             ipcCodes: Array,
