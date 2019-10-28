@@ -151,7 +151,9 @@ def paginate_results(s, page, paginate_by=10):
 
 
 def filter_bad_apps(qs):
-    """Исключает из результатов запроса заявки, по которым выдан патент, а также заявки без даты подачи заявки."""
+    """Исключает из результатов запроса заявки, по которым выдан патент,
+    заявки без даты подачи заявки,
+    заявки на занки для товаров и услуг без платежей"""
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
@@ -170,7 +172,11 @@ def filter_unpublished_apps(user, qs):
         qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
         # Для заявок на изобретения нужно чтоб существовал I_43.D
         qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
-
+        # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
+        qs &= ~Q(
+            'query_string',
+            query="NOT _exists_:TradeMark.PaymentDetails AND search_data.obj_state:1 AND Document.idObjType:4"
+        )
     return qs
 
 
@@ -190,9 +196,9 @@ def sort_results(s, sort_by_value):
             param = f"{param}.raw"
         s = s.sort(
             {
-                param : {
-                    "order" : sort_param['ordering'],
-                    "missing" : '_last'
+                param: {
+                    "order": sort_param['ordering'],
+                    "missing": '_last'
                 }
             }
         )
