@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {% if lang == 'uk' %}
+        {{ question.title_uk }}
+    {% elif lang == 'en' %}
+        {{ question.title_en }}
+    {% endif %}
+    - {% trans "Допомога" %}
+{% endblock %}
+
+{% block content %}
+
+    {% include 'help/question/_partials/breadcrumbs.html' %}
+
+    <section class="container g-py-70">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>
+                    {% if lang == 'uk' %}
+                        {{ question.title_uk }}
+                    {% elif lang == 'en' %}
+                        {{ question.title_en }}
+                    {% endif %}
+                </h2>
+
+                <div class="g-font-size-16 text-justify">
+                    {% if lang == 'uk' %}
+                        {{ question.content_uk|safe }}
+                    {% elif lang == 'en' %}
+                        {{ question.content_en|safe }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                {% include 'help/question/_partials/sidebar.html' %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

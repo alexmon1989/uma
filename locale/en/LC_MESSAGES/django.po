@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 13:02+0000\n"
+"POT-Creation-Date: 2019-10-25 10:44+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,7 +20,10 @@ msgstr ""
 
 #: apps/about/templates/about/_partials/breadcrumbs.html:16
 #: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
-#: apps/help/templates/help/_partials/breadcrumbs.html:16
+#: apps/help/templates/help/index/_partials/breadcrumbs.html:16
+#: apps/help/templates/help/question/_partials/breadcrumbs.html:22
+#: apps/help/templates/help/search/_partials/breadcrumbs.html:16
+#: apps/help/templates/help/section/_partials/breadcrumbs.html:22
 #: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:16
 #: apps/my_auth/templates/my_auth/login_simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:16
@@ -72,6 +75,54 @@ msgstr "Message"
 #: apps/contacts/templates/contacts/_partials/form.html:31
 msgid "Відправити повідомлення"
 msgstr "Send"
+
+#: apps/help/templates/help/index/_partials/form.html:10
+#: apps/help/templates/help/search/_partials/form.html:11
+msgid "Пошук по розділам допомоги..."
+msgstr "Help search"
+
+#: apps/help/templates/help/index/_partials/form.html:14
+#: apps/help/templates/help/search/_partials/form.html:15
+msgid "Шукати"
+msgstr "Search"
+
+#: apps/help/templates/help/question/_partials/breadcrumbs.html:26
+#: apps/help/templates/help/question/question.html:11
+#: apps/help/templates/help/search/_partials/breadcrumbs.html:20
+#: apps/help/templates/help/search/search.html:5
+#: apps/help/templates/help/section/_partials/breadcrumbs.html:26
+#: apps/help/templates/help/section/section.html:11
+#: templates/_partials/footer.html:60 templates/_partials/header.html:81
+msgid "Допомога"
+msgstr "Help"
+
+#: apps/help/templates/help/search/_partials/breadcrumbs.html:10
+#: apps/help/templates/help/search/_partials/breadcrumbs.html:24
+#: apps/help/templates/help/search/search.html:5
+#, fuzzy
+#| msgid "Розширений пошук"
+msgid "Результати пошуку"
+msgstr "Advanced search"
+
+#: apps/help/templates/help/search/search.html:19
+msgid "Знайдено всього:"
+msgstr "Results:"
+
+#: apps/help/templates/help/search/search.html:40
+msgid "Розділ"
+msgstr "Section"
+
+#: apps/help/templates/help/search/search.html:54
+msgid ""
+"Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук знову "
+"або перегляньте наші <a href=\"/help\">категорії довідки</a>."
+msgstr "No Help pages matched your search. Try searching again, or browse our <a href='/help'>help sections</a> instead"
+
+#: apps/help/templates/help/section/section.html:34
+#, fuzzy
+#| msgid "Детальна інформація по об'єкту"
+msgid "Інформація поки що відсутня."
+msgstr "Object details"
 
 #: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:10
 #: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:20
@@ -409,7 +460,6 @@ msgid "Бібліографічні дані"
 msgstr "Bibliographic data"
 
 #: apps/search/templates/search/detail/_partials/biblio_header.html:7
-#| msgid "Бібліографічні дані"
 msgid "Роздрукувати бібліографічні дані об'єкта"
 msgstr "Print bibliographic data"
 
@@ -885,10 +935,6 @@ msgstr "Menu"
 #: templates/_partials/footer.html:54 templates/_partials/header.html:77
 msgid "Про сервіс"
 msgstr "About"
-
-#: templates/_partials/footer.html:60 templates/_partials/header.html:81
-msgid "Допомога"
-msgstr "Help"
 
 #: templates/_partials/footer.html:66 templates/_partials/header.html:85
 msgid "Контакти"
