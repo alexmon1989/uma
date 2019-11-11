@@ -18,7 +18,7 @@
                                     {% if lang == 'uk' %}
                                         {{ question.title_uk }}
                                     {% elif lang == 'en' %}
-                                        {{ question.title_en }}
+                                        {{ question.title_en|default:question.title_uk }}
                                     {% endif %}
                                 </a></li>
                             {% endfor %}

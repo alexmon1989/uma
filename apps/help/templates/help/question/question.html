@@ -18,11 +18,11 @@
     <section class="container g-py-70">
         <div class="row">
             <div class="col-md-8">
-                <h2>
+                <h2 class="g-mb-15">
                     {% if lang == 'uk' %}
                         {{ question.title_uk }}
                     {% elif lang == 'en' %}
-                        {{ question.title_en }}
+                        {{ question.title_en|default:question.title_uk }}
                     {% endif %}
                 </h2>
 
@@ -30,7 +30,7 @@
                     {% if lang == 'uk' %}
                         {{ question.content_uk|safe }}
                     {% elif lang == 'en' %}
-                        {{ question.content_en|safe }}
+                        {{ question.content_en|default:question.content_uk|safe }}
                     {% endif %}
                 </div>
             </div>

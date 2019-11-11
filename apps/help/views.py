@@ -64,7 +64,10 @@ class QuestionDetailView(DetailView):
     template_name = 'help/question/question.html'
 
     def get_queryset(self):
-        return Question.objects.filter(is_enabled=True)
+        if self.request.user.is_staff:
+            # Если администратор, то необходимо давать доступ к просмотру
+            return Question.objects.all()
+        return Question.objects.filter(is_enabled=True, section__is_enabled=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

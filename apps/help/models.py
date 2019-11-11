@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from uma.abstract_models import TimeStampedModel
 from ckeditor_uploader.fields import RichTextUploadingField
 
@@ -22,7 +23,7 @@ class Section(TimeStampedModel):
     """Модель раздела помощи."""
     title_uk = models.CharField('Заголовок укр.', max_length=255)
     title_en = models.CharField('Заголовок англ.', max_length=255, blank=True)
-    slug = models.SlugField(verbose_name='Ідентифікатор для URL')
+    slug = models.SlugField(verbose_name='Ідентифікатор для URL', unique=True)
     weight = models.PositiveIntegerField(
         'Вага',
         default=1000,
@@ -32,6 +33,9 @@ class Section(TimeStampedModel):
 
     def __str__(self):
         return self.title_uk
+
+    def get_absolute_url(self):
+        return reverse('help:section-detail', args=[self.slug])
 
     class Meta:
         verbose_name = 'Розділ'
@@ -52,7 +56,7 @@ class Question(TimeStampedModel):
     content_uk = RichTextUploadingField('Зміст укр.', blank=True)
     title_en = models.CharField('Заголовок англ.', max_length=255, blank=True)
     content_en = RichTextUploadingField('Зміст англ.', blank=True)
-    slug = models.SlugField(verbose_name='Ідентифікатор для URL')
+    slug = models.SlugField(verbose_name='Ідентифікатор для URL', unique=True)
     weight = models.PositiveIntegerField(
         'Вага',
         default=1000,
@@ -62,6 +66,9 @@ class Question(TimeStampedModel):
 
     def __str__(self):
         return self.title_uk
+
+    def get_absolute_url(self):
+        return reverse('help:question-detail', args=[self.slug])
 
     class Meta:
         verbose_name = 'Питання'

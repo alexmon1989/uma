@@ -13,14 +13,14 @@
                 {% if s == question.section %}
                     {% if question.section.question_set.all %}
                         <ul class="g-list-style-square">
-                            {% for q in question.section.question_set.all %}
+                            {% for q in s.question_set.all %}
                                 <li>
                                     <a href="{% url 'help:question-detail' slug=q.slug %}"
                                        {% if question == q %}class="g-font-weight-600"{% endif %}>
                                         {% if lang == 'uk' %}
                                             {{ q.title_uk }}
                                         {% elif lang == 'en' %}
-                                            {{ q.title_en }}
+                                            {{ q.title_en|default:q.title_uk }}
                                         {% endif %}
                                     </a>
                                 </li>

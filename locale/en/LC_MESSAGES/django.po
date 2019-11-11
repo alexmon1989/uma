@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-25 10:44+0000\n"
+"POT-Creation-Date: 2019-11-11 13:01+0000\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -77,19 +77,22 @@ msgid "Відправити повідомлення"
 msgstr "Send"
 
 #: apps/help/templates/help/index/_partials/form.html:10
-#: apps/help/templates/help/search/_partials/form.html:11
-msgid "Пошук по розділам допомоги..."
-msgstr "Help search"
+msgid "Пошук по сторінкам допомоги..."
+msgstr "Search help pages..."
 
 #: apps/help/templates/help/index/_partials/form.html:14
 #: apps/help/templates/help/search/_partials/form.html:15
 msgid "Шукати"
 msgstr "Search"
 
+#: apps/help/templates/help/index/index.html:43
+msgid "Показати більше"
+msgstr "Show more"
+
 #: apps/help/templates/help/question/_partials/breadcrumbs.html:26
 #: apps/help/templates/help/question/question.html:11
 #: apps/help/templates/help/search/_partials/breadcrumbs.html:20
-#: apps/help/templates/help/search/search.html:5
+#: apps/help/templates/help/search/search.html:6
 #: apps/help/templates/help/section/_partials/breadcrumbs.html:26
 #: apps/help/templates/help/section/section.html:11
 #: templates/_partials/footer.html:60 templates/_partials/header.html:81
@@ -98,31 +101,33 @@ msgstr "Help"
 
 #: apps/help/templates/help/search/_partials/breadcrumbs.html:10
 #: apps/help/templates/help/search/_partials/breadcrumbs.html:24
-#: apps/help/templates/help/search/search.html:5
-#, fuzzy
-#| msgid "Розширений пошук"
+#: apps/help/templates/help/search/search.html:6
 msgid "Результати пошуку"
-msgstr "Advanced search"
+msgstr "Search results"
 
-#: apps/help/templates/help/search/search.html:19
+#: apps/help/templates/help/search/_partials/form.html:11
+msgid "Пошук по розділам допомоги..."
+msgstr "Help search"
+
+#: apps/help/templates/help/search/search.html:20
 msgid "Знайдено всього:"
 msgstr "Results:"
 
-#: apps/help/templates/help/search/search.html:40
+#: apps/help/templates/help/search/search.html:41
 msgid "Розділ"
 msgstr "Section"
 
-#: apps/help/templates/help/search/search.html:54
+#: apps/help/templates/help/search/search.html:55
 msgid ""
 "Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук знову "
 "або перегляньте наші <a href=\"/help\">категорії довідки</a>."
-msgstr "No Help pages matched your search. Try searching again, or browse our <a href='/help'>help sections</a> instead"
+msgstr ""
+"No Help pages matched your search. Try searching again, or browse our <a "
+"href='/help'>help sections</a> instead"
 
 #: apps/help/templates/help/section/section.html:34
-#, fuzzy
-#| msgid "Детальна інформація по об'єкту"
 msgid "Інформація поки що відсутня."
-msgstr "Object details"
+msgstr "There is no information."
 
 #: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:10
 #: apps/my_auth/templates/my_auth/login/_partials/breadcrumbs.html:20
