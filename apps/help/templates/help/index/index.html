@@ -10,6 +10,12 @@
 
     <section class="container g-py-70">
         <div class="row">
+            {% if content %}
+                <div class="col-md-12">
+                    {{ content|safe }}
+                </div>
+            {% endif %}
+
             <div class="col-md-12">
                 {% include 'help/index/_partials/form.html' %}
             </div>
