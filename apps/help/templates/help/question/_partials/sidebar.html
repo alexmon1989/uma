@@ -1,0 +1,34 @@
+<div class="u-shadow-v1-3 g-py-20 g-pa-10">
+    <ul class="g-list-style-square g-font-size-16 g-line-height-1_8">
+        {% for s in sections %}
+            <li>
+                <a href="{% url 'help:section-detail' slug=s.slug %}" {% if s == question.section %}class="g-font-weight-600"{% endif %}>
+                    {% if lang == 'uk' %}
+                        {{ s.title_uk }}
+                    {% elif lang == 'en' %}
+                        {{ s.title_en }}
+                    {% endif %}
+                </a>
+
+                {% if s == question.section %}
+                    {% if question.section.question_set.all %}
+                        <ul class="g-list-style-square">
+                            {% for q in s.question_set.all %}
+                                <li>
+                                    <a href="{% url 'help:question-detail' slug=q.slug %}"
+                                       {% if question == q %}class="g-font-weight-600"{% endif %}>
+                                        {% if lang == 'uk' %}
+                                            {{ q.title_uk }}
+                                        {% elif lang == 'en' %}
+                                            {{ q.title_en|default:q.title_uk }}
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {% if lang == 'uk' %}
+        {{ section.title_uk }}
+    {% elif lang == 'en' %}
+        {{ section.title_en }}
+    {% endif %}
+    - {% trans "Допомога" %}
+{% endblock %}
+
+{% block content %}
+
+    {% include 'help/section/_partials/breadcrumbs.html' %}
+
+    <section class="container g-py-70">
+        <div class="row">
+            <div class="col-md-8 g-font-size-16 g-line-height-2">
+                {% if section.question_set.all %}
+                    <ul class="list-unstyled">
+                        {% for question in section.question_set.all %}
+                            <li><a href="{% url 'help:question-detail' slug=question.slug %}">
+                                {% if lang == 'uk' %}
+                                    {{ question.title_uk }}
+                                {% elif lang == 'en' %}
+                                    {{ question.title_en }}
+                                {% endif %}
+                            </a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{% trans "Інформація поки що відсутня." %}</p>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                {% include 'help/section/_partials/sidebar.html' %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
