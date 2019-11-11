@@ -2,6 +2,7 @@ from django import template
 from django.urls import translate_url
 from datetime import datetime
 import urllib.parse
+import re
 
 register = template.Library()
 
@@ -61,3 +62,12 @@ def list_of_dicts_unique(l):
     if l is not None:
         return [i for n, i in enumerate(l) if i not in l[n + 1:]]
     return l
+
+
+@register.filter
+def highlight(text, q):
+    if text:
+        index_l = text.lower().index(q.lower())
+        original_text = text[index_l:index_l + len(q)]
+        return text[:index_l] + f"<em class='g-bg-yellow'>{original_text}</em>" + text[index_l + len(q):]
+    return text

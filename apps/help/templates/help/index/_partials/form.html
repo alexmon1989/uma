@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<form class="g-bg-white g-pa-30 g-mb-30" action="{% url 'help:help-search' %}">
+    <div class="row g-mb-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control rounded-0 form-control-md"
+                       name="q"
+                       placeholder="{% trans "Пошук по сторінкам допомоги..." %}">
+                <div class="input-group-append">
+                    <button class="btn btn-md u-btn-primary rounded-0"
+                            type="submit"
+                    ><i class="fa fa-search g-mr-5"></i>{% trans "Шукати" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

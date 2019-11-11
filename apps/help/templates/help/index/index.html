@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+    {% include 'help/index/_partials/breadcrumbs.html' %}
+
+    <section class="container g-py-70">
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'help/index/_partials/form.html' %}
+            </div>
+
+            {% for section in sections %}
+                <div class="col-md-4 g-mb-30">
+                    <h3 class="h5">
+                        {% if lang == 'uk' %}
+                            {{ section.title_uk }}
+                        {% elif lang == 'en' %}
+                            {{ section.title_en }}
+                        {% endif %}
+                    </h3>
+                    <hr class="g-my-10">
+
+                    {% if section.question_set.all %}
+                        <ul class="list-unstyled">
+                            {% for question in section.question_set.all|slice:":5" %}
+                                <li class="g-mb-3"><a href="{% url 'help:question-detail' slug=question.slug %}">
+                                    {% if lang == 'uk' %}
+                                        {{ question.title_uk }}
+                                    {% elif lang == 'en' %}
+                                        {{ question.title_en|default:question.title_uk }}
+                                    {% endif %}
+                                </a></li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if section.question_set.all|length > 5 %}
+                            <a href="{% url 'help:section-detail' slug=section.slug %}"
+                               class="g-font-weight-600">» {% trans "Показати більше" %}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+{% endblock %}
