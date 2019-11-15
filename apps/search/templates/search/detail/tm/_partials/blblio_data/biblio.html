@@ -41,11 +41,30 @@
                 </tr>
             {% endif %}
 
-            {% get_field '181' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ExpiryDate %}
+            {% registration_status_color hit=hit as registration_status_color %}
+            {% if registration_status_color != 'red' %}
+                {% get_field '181' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ExpiryDate %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ExpiryDate|parse_date|date:"d.m.Y" }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                {% get_field '186' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ExpiryDate %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ExpiryDate|parse_date|date:"d.m.Y" }}</td>
+                    <td>{{ hit.TradeMark.TrademarkDetails.ExpiryDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+                {% endif %}
+            {% endif %}
+
+            {% get_field '141' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.TerminationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.TerminationDate|parse_date|date:"d.m.Y" }}</td>
                 </tr>
             {% endif %}
 
@@ -151,6 +170,18 @@
                     </td>
                 </tr>
             {% endif %}
+
+            {% get_field '591' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText|length > 0 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% for color in hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText %}
+                                {{ color|get:"#text" }}{% if not forloop.last %};{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
 
             {% get_field '511.I' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
