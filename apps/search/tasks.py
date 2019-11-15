@@ -110,7 +110,6 @@ def get_app_details(id_app_number, user_id):
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     # Фильтр заявок, которые не положено публиковать в интернет
     q = filter_unpublished_apps(get_user_or_anonymous(user_id), q)
-    print(q.to_dict())
 
     s = Search().using(client).query(q).execute()
     if not s:
