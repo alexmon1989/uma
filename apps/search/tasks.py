@@ -2,6 +2,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 from django.db.models import F
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
@@ -22,9 +24,15 @@ def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
     formset = get_search_form('simple', get_params)
     # Валидация запроса
-    if not formset.is_valid():
+    try:
+        if not formset.is_valid():
+            return {
+                'validation_errors': formset.errors,
+                'get_params': get_params
+            }
+    except ValidationError:
         return {
-            'validation_errors': formset.errors,
+            'validation_errors': _('Некоректні умови пошуку'),
             'get_params': get_params
         }
 
@@ -145,9 +153,15 @@ def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
     formset = get_search_form('advanced', get_params)
     # Валидация запроса
-    if not formset.is_valid():
+    try:
+        if not formset.is_valid():
+            return {
+                'validation_errors': formset.errors,
+                'get_params': get_params
+            }
+    except ValidationError:
         return {
-            'validation_errors': formset.errors,
+            'validation_errors': _('Некоректні умови пошуку'),
             'get_params': get_params
         }
 
@@ -191,9 +205,15 @@ def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
     form = get_search_form('transactions', get_params)
     # Валидация запроса
-    if not form.is_valid():
+    try:
+        if not form.is_valid():
+            return {
+                'validation_errors': form.errors,
+                'get_params': get_params
+            }
+    except ValidationError:
         return {
-            'validation_errors': form.errors,
+            'validation_errors': _('Некоректні умови пошуку'),
             'get_params': get_params
         }
 

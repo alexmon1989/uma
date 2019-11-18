@@ -56,7 +56,7 @@ class SimpleListView(TemplateView):
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)
-        if self.request.GET:
+        if self.request.GET.get('form-TOTAL_FORMS'):
             formset = SimpleSearchFormSet(self.request.GET)
             context['initial_data'] = dict(formset.data.lists())
 
@@ -126,7 +126,7 @@ class AdvancedListView(TemplateView):
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
-        if self.request.GET:
+        if self.request.GET.get('form-TOTAL_FORMS'):
             formset = AdvancedSearchFormSet(self.request.GET)
 
             # Иниц. данные для формы
@@ -342,7 +342,7 @@ class TransactionsSearchView(TemplateView):
 
         context['initial_data'] = dict()
         context['is_search'] = False
-        if self.request.GET:
+        if self.request.GET.get('form-TOTAL_FORMS'):
             context['is_search'] = True
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
