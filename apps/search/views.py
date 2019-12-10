@@ -342,7 +342,9 @@ class TransactionsSearchView(TemplateView):
 
         context['initial_data'] = dict()
         context['is_search'] = False
-        if self.request.GET.get('form-TOTAL_FORMS'):
+        print(self.request.GET)
+        if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
+                and self.request.GET.get('date'):
             context['is_search'] = True
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
