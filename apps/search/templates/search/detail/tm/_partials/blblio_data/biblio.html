@@ -145,8 +145,17 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="text-justify">
-                        {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine }}
-                        <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine }}
+                        {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine %}
+                            {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine }}
+                        {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine %}
+                            {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine }}
+                        {% endif %}
+
+                        {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine %}
+                            <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine }}
+                        {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine %}
+                            <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endif %}
