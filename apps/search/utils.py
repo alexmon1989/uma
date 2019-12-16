@@ -78,13 +78,31 @@ def get_elastic_results(search_groups, user):
 
                 # Проверка доступно ли поле для поиска
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
-                    q = Q(
-                        'query_string',
-                        query=f"{prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)}",
-                        default_field=inid_schedule.elastic_index_field.field_name,
-                        analyze_wildcard=True,
-                        default_operator='AND'
-                    )
+                    query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
+
+                    if inid_schedule.elastic_index_field.field_type == 'text' and '*' not in query:
+                        # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                        # и морфологического поиска
+                        q = Q(
+                            'query_string',
+                            query=f"*{query}*",
+                            default_field=inid_schedule.elastic_index_field.field_name,
+                            default_operator='AND',
+                            analyze_wildcard=True,
+                            boost=20
+                        ) | Q(
+                            "multi_match",
+                            query=query,
+                            fields=[inid_schedule.elastic_index_field.field_name],
+                            operator='AND'
+                        )
+                    else:
+                        q = Q(
+                            'query_string',
+                            query=query,
+                            default_field=inid_schedule.elastic_index_field.field_name,
+                            default_operator='AND'
+                        )
                     if not qs:
                         qs = q
                     else:
