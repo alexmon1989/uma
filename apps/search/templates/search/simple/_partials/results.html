@@ -13,22 +13,46 @@
         </div>
 {% else %}
     {% if results %}
-        <div class="row g-pt-20">
+        <div class="row">
             <div class="col-md-3">
+                <button class="btn btn-md u-btn-blue g-mb-20"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#collapseForm"
+                        aria-expanded="false"
+                        aria-controls="collapseExample">
+                    <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
+                </button>
                 {% include 'search/simple/_partials/sidebar.html' %}
             </div>
 
             <div class="col-md-9">
-                <div class="d-md-flex justify-content-between g-mb-10">
+                <div class="d-md-flex justify-content-between g-mb-20">
                     <div class="align-self-center g-mb-30 g-mb-0--md h-100">
                         <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
                                 class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
                     </div>
+                </div>
 
+                <div class="d-flex flex-column flex-lg-row justify-content-lg-between g-mb-20">
                     {% sort_params %}
+
+                    <div class="d-flex justify-content-between">
+                        <div class="g-mr-10 align-self-center g-font-weight-600">{% trans "Відображати на сторінці" %}:</div>
+                        <div>
+                            <select class="custom-select rounded-0" id="show">
+                                <option value="10" {% if not get_params.show or get_params.show.0|add:"0" <= 10 %}selected=""{% endif %}>10</option>
+                                <option value="20" {% if get_params.show.0|add:"0" == 20 %}selected=""{% endif %}>20</option>
+                                <option value="40" {% if get_params.show.0|add:"0" == 40 %}selected=""{% endif %}>50</option>
+                                <option value="100" {% if get_params.show.0|add:"0" >= 100 %}selected=""{% endif %}>100</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {% include 'search/simple/_partials/import_results_btn.html' %}
+
+                {% include 'search/simple/_partials/pagination.html' %}
 
                 {% for hit in results %}
                     {# Изобретения, полезные модели #}
@@ -49,7 +73,9 @@
                     {% endif %}
                 {% endfor %}
 
-                {% include 'search/simple/_partials/pagination.html' %}
+                <div class="g-py-50">
+                    {% include 'search/simple/_partials/pagination.html' %}
+                </div>
             </div>
         </div>
     {% else %}

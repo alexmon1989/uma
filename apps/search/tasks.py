@@ -88,8 +88,13 @@ def perform_simple_search(user_id, get_params):
     # Фильтрация, агрегация
     s, aggregations = filter_results(s, get_params)
 
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()
@@ -198,8 +203,13 @@ def perform_advanced_search(user_id, get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()
@@ -246,8 +256,13 @@ def perform_transactions_search(get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()

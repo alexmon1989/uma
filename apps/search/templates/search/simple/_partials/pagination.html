@@ -1,11 +1,11 @@
 {% load uma_extras %}
 
 {% if results.has_other_pages %}
-<nav class="text-center g-py-50" aria-label="Page Navigation">
+<nav class="text-center g-pb-20 g-pt-10" aria-label="Page Navigation">
     <ul class="list-inline">
         {% if results.has_previous %}
             <li class="list-inline-item g-hidden-sm-down">
-                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16"
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13"
                    href="?{% replace_and_urlencode get_params 'page' results.previous_page_number %}">
                     <span aria-hidden="true">
                         <i class="fa fa-chevron-left"></i>
@@ -14,7 +14,7 @@
             </li>
         {% else %}
             <li class="list-inline-item g-hidden-sm-down">
-                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16 text-muted g-brd-gray-dark-v5">
+                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13 text-muted g-brd-gray-dark-v5">
                     <i class="fa fa-chevron-left"></i>
                 </span>
             </li>
@@ -22,7 +22,7 @@
 
         {% if results.number|add:'-4' > 1 %}
             <li class="list-inline-item">
-                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
                    href="?{% replace_and_urlencode get_params 'page' results.number|add:'-5' %}">&hellip;</a>
             </li>
         {% endif %}
@@ -31,12 +31,12 @@
             {% for i in results.paginator.page_range %}
                 {% if results.number == i %}
                     <li class="list-inline-item">
-                        <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-7-14"
+                        <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-4-11"
                                href="?{% replace_and_urlencode get_params 'page' i %}">{{ i }}</a>
                     </li>
                 {% elif i > results.number|add:'-5' and i < results.number|add:'5' %}
                     <li class="list-inline-item">
-                        <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
+                        <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
                            href="?{% replace_and_urlencode get_params 'page' i %}">{{ i }}</a>
                     </li>
                 {% endif %}
@@ -45,14 +45,14 @@
 
         {% if results.paginator.num_pages > results.number|add:'4' %}
             <li class="list-inline-item">
-                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-14"
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
                    href="?{% replace_and_urlencode get_params 'page' results.number|add:'5' %}">&hellip;</a>
             </li>
         {% endif %}
 
         {% if results.has_next %}
             <li class="list-inline-item">
-                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16"
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13"
                    href="?{% replace_and_urlencode get_params 'page' results.next_page_number %}">
                     <span aria-hidden="true">
                         <i class="fa fa-chevron-right"></i>
@@ -61,7 +61,7 @@
             </li>
         {% else %}
             <li class="list-inline-item g-hidden-sm-down">
-                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-7-16 text-muted g-brd-gray-dark-v5">
+                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13 text-muted g-brd-gray-dark-v5">
                     <i class="fa fa-chevron-right"></i>
                 </span>
             </li>
