@@ -11,11 +11,11 @@
 
     <div class="container g-py-70">
         {% if page_description %}
-            <div class="g-mb-20 g-font-size-15">
+            <div class="g-mb-30 g-font-size-15">
                 {{ page_description|safe }}
             </div>
         {% else %}
-            <p class="g-mb-20 g-font-size-15">
+            <p class="g-mb-30 g-font-size-15">
                 {% documents_count as document_count %}
                 {% blocktrans with document_count=document_count|intword %}
                     Система дозволяє здійснювати пошук в <strong>{{ document_count }}</strong> патентних документів. Детальну інформацію про сферу охоплення бази даних можна отримати <a href="#">тут</a>.

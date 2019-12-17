@@ -204,6 +204,16 @@ $(function () {
             window.location.href = updateURLParameter(window.location.href, 'sort_by', $(this).val());
         });
 
+    // Обработчик события смены параметра сортировки результатов
+    $(document).on(
+        'change',
+        '#show',
+        function () {
+            // Выставление 1-ой страницы, чтоб не показывалась страница без результатов
+            var newHref =  updateURLParameter(window.location.href, 'page', 1);
+            window.location.href = updateURLParameter(newHref, 'show', $(this).val());
+        });
+
     // Показать/скрыть описание КЗПТ
     $(document).on(
         'click',

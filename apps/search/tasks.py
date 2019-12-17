@@ -42,12 +42,29 @@ def perform_simple_search(user_id, get_params):
     for s in formset.cleaned_data:
         elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
         if elastic_field:
-            q = Q(
-                'query_string',
-                query=prepare_query(s['value'], elastic_field.field_type),
-                default_field=elastic_field.field_name,
-                default_operator='AND'
-            )
+            query = prepare_query(s['value'], elastic_field.field_type)
+            if elastic_field.field_type == 'text' and '*' not in query:
+                # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                # и морфологического поиска
+                q = Q(
+                    'query_string',
+                    query=f"*{query}*",
+                    default_field=elastic_field.field_name,
+                    default_operator='AND',
+                    boost=20
+                ) | Q(
+                    "multi_match",
+                    query=query,
+                    fields=[elastic_field.field_name],
+                    operator='AND'
+                )
+            else:
+                q = Q(
+                    'query_string',
+                    query=query,
+                    default_field=elastic_field.field_name,
+                    default_operator='AND'
+                )
             if qs is not None:
                 qs &= q
             else:
@@ -71,8 +88,13 @@ def perform_simple_search(user_id, get_params):
     # Фильтрация, агрегация
     s, aggregations = filter_results(s, get_params)
 
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()
@@ -181,8 +203,13 @@ def perform_advanced_search(user_id, get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()
@@ -229,8 +256,13 @@ def perform_transactions_search(get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    res_from = 10 * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
-    res_to = res_from + 10
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
         item = i.to_dict()
@@ -404,12 +436,29 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
         for s in formset.cleaned_data:
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
-                q = Q(
-                    'query_string',
-                    query=prepare_query(s['value'], elastic_field.field_type),
-                    default_field=elastic_field.field_name,
-                    default_operator='AND'
-                )
+                query = prepare_query(s['value'], elastic_field.field_type)
+                if elastic_field.field_type == 'text' and '*' not in query:
+                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                    # и морфологического поиска
+                    q = Q(
+                        'query_string',
+                        query=f"*{query}*",
+                        default_field=elastic_field.field_name,
+                        default_operator='AND',
+                        boost=20
+                    ) | Q(
+                        "multi_match",
+                        query=query,
+                        fields=[elastic_field.field_name],
+                        operator='AND'
+                    )
+                else:
+                    q = Q(
+                        'query_string',
+                        query=query,
+                        default_field=elastic_field.field_name,
+                        default_operator='AND'
+                    )
                 if qs is not None:
                     qs &= q
                 else:

@@ -90,7 +90,8 @@ def get_results_html(request):
             else:
                 # Пагинация
                 page = task.result['get_params']['page'][0] if task.result['get_params'].get('page') else 1
-                context['results'] = paginate_results(task.result['results'], page, 10)
+                results_on_page = task.result['get_params']['show'][0] if task.result['get_params'].get('show') else 10
+                context['results'] = paginate_results(task.result['results'], page, results_on_page)
 
             # Формирование HTML с результатами
             data['result'] = render_to_string(
