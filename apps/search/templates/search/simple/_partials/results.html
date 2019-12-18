@@ -43,7 +43,7 @@
                             <select class="custom-select rounded-0" id="show">
                                 <option value="10" {% if not get_params.show or get_params.show.0|add:"0" <= 10 %}selected=""{% endif %}>10</option>
                                 <option value="20" {% if get_params.show.0|add:"0" == 20 %}selected=""{% endif %}>20</option>
-                                <option value="40" {% if get_params.show.0|add:"0" == 40 %}selected=""{% endif %}>50</option>
+                                <option value="50" {% if get_params.show.0|add:"0" == 50 %}selected=""{% endif %}>50</option>
                                 <option value="100" {% if get_params.show.0|add:"0" >= 100 %}selected=""{% endif %}>100</option>
                             </select>
                         </div>
