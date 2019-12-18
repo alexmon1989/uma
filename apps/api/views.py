@@ -11,12 +11,22 @@ class OpenDataListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = OpenData.objects.order_by('pk').all()
 
+        # Змінені/нові
+        changed = self.request.query_params.get('changed', None)
+        try:
+            changed = int(changed)
+        except:
+            raise exceptions.ParseError("Невірне значення параметру changed")
+
         # Дата від
         date_from = self.request.query_params.get('date_from', None)
         if date_from:
             try:
                 date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y').strftime('%Y-%m-%d')
-                queryset = queryset.filter(app__lastupdate__gte=date_from)
+                if changed:
+                    queryset = queryset.filter(app__lastupdate__gte=date_from)
+                else:
+                    queryset = queryset.filter(app__registration_date__gte=date_from)
             except:
                 raise exceptions.ParseError("Невірне значення параметру date_from")
 
@@ -25,21 +35,12 @@ class OpenDataListView(generics.ListAPIView):
         if date_to:
             try:
                 date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y').strftime('%Y-%m-%d')
-                queryset = queryset.filter(app__lastupdate__lte=date_to)
+                if changed:
+                    queryset = queryset.filter(app__lastupdate__lte=date_to)
+                else:
+                    queryset = queryset.filter(app__registration_date__lte=date_to)
             except:
                 raise exceptions.ParseError("Невірне значення параметру date_to")
-
-        # Змінені/нові
-        changed = self.request.query_params.get('changed', None)
-        if changed:
-            try:
-                changed = int(changed)
-                if changed == 0:
-                    queryset = queryset.filter(app__changescount=0)
-                else:
-                    queryset = queryset.filter(app__changescount__gt=0)
-            except ValueError:
-                raise exceptions.ParseError("Невірне значення параметру changed")
 
         # Тип об'єкта
         obj_type = self.request.query_params.get('obj_type', None)
