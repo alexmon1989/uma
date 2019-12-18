@@ -56,7 +56,6 @@ class OpenDataListView(generics.ListAPIView):
             'app__app_number',
             'app__registration_number',
             'app__registration_date',
-            'app__changescount',
             'app__lastupdate',
             'data',
         )
