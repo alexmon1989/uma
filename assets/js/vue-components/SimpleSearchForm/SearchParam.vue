@@ -5,7 +5,7 @@
             <div class="form-group g-mb-15"
                  :class="{ 'u-has-error-v1': errors.has('form-' + index + '-param_type') }">
                 <chosen-select
-                        class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
+                        class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9 g-z-index-9999"
                         :name="'form-' + index + '-param_type'"
                         v-validate="'required'"
                         v-model="paramType"
