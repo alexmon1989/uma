@@ -43,28 +43,25 @@ def perform_simple_search(user_id, get_params):
         elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
         if elastic_field:
             query = prepare_query(s['value'], elastic_field.field_type)
-            if elastic_field.field_type == 'text' and '*' not in query:
+
+            q = Q(
+                'query_string',
+                query=query,
+                default_field=elastic_field.field_name,
+                default_operator='AND'
+            )
+
+            if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
                 # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
                 # и морфологического поиска
-                q = Q(
+                q |= Q(
                     'query_string',
                     query=f"*{query}*",
                     default_field=elastic_field.field_name,
                     default_operator='AND',
                     boost=20
-                ) | Q(
-                    "multi_match",
-                    query=query,
-                    fields=[elastic_field.field_name],
-                    operator='AND'
                 )
-            else:
-                q = Q(
-                    'query_string',
-                    query=query,
-                    default_field=elastic_field.field_name,
-                    default_operator='AND'
-                )
+
             if qs is not None:
                 qs &= q
             else:
@@ -437,28 +434,25 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
-                if elastic_field.field_type == 'text' and '*' not in query:
+
+                q = Q(
+                    'query_string',
+                    query=query,
+                    default_field=elastic_field.field_name,
+                    default_operator='AND'
+                )
+
+                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
                     # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
                     # и морфологического поиска
-                    q = Q(
+                    q |= Q(
                         'query_string',
                         query=f"*{query}*",
                         default_field=elastic_field.field_name,
                         default_operator='AND',
                         boost=20
-                    ) | Q(
-                        "multi_match",
-                        query=query,
-                        fields=[elastic_field.field_name],
-                        operator='AND'
                     )
-                else:
-                    q = Q(
-                        'query_string',
-                        query=query,
-                        default_field=elastic_field.field_name,
-                        default_operator='AND'
-                    )
+
                 if qs is not None:
                     qs &= q
                 else:
