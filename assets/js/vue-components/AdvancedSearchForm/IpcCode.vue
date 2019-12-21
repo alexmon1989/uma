@@ -6,7 +6,7 @@
                 <div class="col-md-3 g-mb-15 g-pr-7--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_type') }">
                     <chosen-select
-                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9 g-z-index-9999"
+                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
                             :data-placeholder="translations.objType"
                             :name="'form-' + index + '-obj_type'"
                             v-model="objType"
