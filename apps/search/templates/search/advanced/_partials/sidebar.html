@@ -2,7 +2,7 @@
 {% load uma_extras %}
 {% load search_extras %}
 
-<div class="g-pr-40--lg g-mb-50 g-mb-0--lg sticky-top">
+<div class="g-pr-40--lg g-mb-50 g-mb-0--lg sticky-top g-z-index-99">
 
     <form action="{% url 'search:add_filter_params' %}" method="post" id="filter-form">
         {% csrf_token %}
