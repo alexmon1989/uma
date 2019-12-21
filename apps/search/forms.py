@@ -38,10 +38,10 @@ def get_search_form(search_type, get_params):
             get_params_validation[key] = value[0]
 
     if search_type == 'simple':
-        SimpleSearchFormSet = formset_factory(SimpleSearchForm)
+        SimpleSearchFormSet = formset_factory(SimpleSearchForm, min_num=1, validate_min=True)
         form = SimpleSearchFormSet(get_params_validation)
     elif search_type == 'advanced':
-        AdvancedFormSet = formset_factory(AdvancedSearchForm)
+        AdvancedFormSet = formset_factory(AdvancedSearchForm, min_num=1, validate_min=True)
         form = AdvancedFormSet(get_params_validation)
     elif search_type == 'transactions':
         form = TransactionsSearchForm(get_params_validation)

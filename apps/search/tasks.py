@@ -26,8 +26,11 @@ def perform_simple_search(user_id, get_params):
     # Валидация запроса
     try:
         if not formset.is_valid():
+            errors = []
+            errors.extend(formset.errors)
+            errors.extend(formset.non_form_errors())
             return {
-                'validation_errors': formset.errors,
+                'validation_errors': errors,
                 'get_params': get_params
             }
     except ValidationError:
@@ -40,32 +43,33 @@ def perform_simple_search(user_id, get_params):
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     qs = None
     for s in formset.cleaned_data:
-        elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
-        if elastic_field:
-            query = prepare_query(s['value'], elastic_field.field_type)
+        if s:
+            elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
+            if elastic_field:
+                query = prepare_query(s['value'], elastic_field.field_type)
 
-            q = Q(
-                'query_string',
-                query=query,
-                default_field=elastic_field.field_name,
-                default_operator='AND'
-            )
-
-            if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                # и морфологического поиска
-                q |= Q(
+                q = Q(
                     'query_string',
-                    query=f"*{query}*",
+                    query=query,
                     default_field=elastic_field.field_name,
-                    default_operator='AND',
-                    boost=20
+                    default_operator='AND'
                 )
 
-            if qs is not None:
-                qs &= q
-            else:
-                qs = q
+                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
+                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                    # и морфологического поиска
+                    q |= Q(
+                        'query_string',
+                        query=f"*{query}*",
+                        default_field=elastic_field.field_name,
+                        default_operator='AND',
+                        boost=20
+                    )
+
+                if qs is not None:
+                    qs &= q
+                else:
+                    qs = q
 
     if qs is not None:
         # Не показывать заявки, по которым выдан охранный документ
@@ -174,8 +178,11 @@ def perform_advanced_search(user_id, get_params):
     # Валидация запроса
     try:
         if not formset.is_valid():
+            errors = []
+            errors.extend(formset.errors)
+            errors.extend(formset.non_form_errors())
             return {
-                'validation_errors': formset.errors,
+                'validation_errors': errors,
                 'get_params': get_params
             }
     except ValidationError:
