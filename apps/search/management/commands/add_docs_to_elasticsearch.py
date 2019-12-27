@@ -16,6 +16,30 @@ class Command(BaseCommand):
     es = None
     indexation_process = None
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--id',
+            type=int,
+            help='Index only one record with certain idAPPNumber from table IPC_AppLIST'
+        )
+        parser.add_argument(
+            '--obj_type',
+            type=int,
+            help='Add to index only records with certain object type. '
+                 'Values: '
+                 '1 - Inventions, '
+                 '2 - Utility models, '
+                 '3 - Layout Designs (Topographies) of Integrated Circuit, '
+                 '4 - Trade Marks, '
+                 '5 - Qualified indications of the origin of goods, '
+                 '6 - Industrial designs'
+        )
+        parser.add_argument(
+            '--status',
+            type=int,
+            help='Add to index only records with certain status: 1 - applications, 2 - protective documents.'
+        )
+
     def get_json_path(self, doc):
         """Получает путь к файлу JSON с данными объекта."""
         # Путь к файлам объекта
@@ -406,7 +430,18 @@ class Command(BaseCommand):
             'obj_type_id',
             'registration_number',
             'app_number'
-        ).all()
+        )
+        # Фильтрация по параметрам командной строки
+        if options['id']:
+            documents = documents.filter(id=options['id'])
+        if options['obj_type']:
+            documents = documents.filter(obj_type=options['obj_type'])
+        if options['status']:
+            status = int(options['status'])
+            if status == 1:
+                documents = documents.filter(registration_number='')
+            elif status == 2:
+                documents = documents.exclude(registration_number='')
 
         # Создание процесса индексации в БД
         self.indexation_process = IndexationProcess.objects.create(
