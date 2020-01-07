@@ -1,7 +1,7 @@
 import tempfile
 from EUSignCP import *
 from django.conf import settings
-import os
+import os, json
 
 
 def set_key_center_settings(eu_interface, key_center):
@@ -19,24 +19,27 @@ def set_key_center_settings(eu_interface, key_center):
     }
     eu_interface.SetFileStoreSettings(ca_settings)
 
+    ocspAccessPointAddress = key_center.get('ocspAccessPointAddress', '')
     ca_settings = {
-        'bUseOCSP': key_center.ocspAccessPointAddress is not None and key_center.ocspAccessPointAddress != '',
-        'szAddress': key_center.ocspAccessPointAddress or '',
+        'bUseOCSP': ocspAccessPointAddress != '',
+        'szAddress': ocspAccessPointAddress,
         'bBeforeStore': True,
-        'szPort': str(key_center.ocspAccessPointPort),
+        'szPort': str(key_center['ocspAccessPointPort']),
     }
     eu_interface.SetOCSPSettings(ca_settings)
 
+    tspAddress = key_center.get('tspAddress')
     ca_settings = {
-        'bGetStamps': key_center.tspAddress is not None and key_center.tspAddress != '',
-        'szAddress': key_center.tspAddress or '',
-        'szPort': str(key_center.tspAddressPort),
+        'bGetStamps': tspAddress != '',
+        'szAddress': tspAddress,
+        'szPort': str(key_center.get('tspAddressPort', '')),
     }
     eu_interface.SetTSPSettings(ca_settings)
 
+    cmpAddress = key_center.get('cmpAddress', '')
     ca_settings = {
-        'bUseCMP': key_center.cmpAddress is not None and key_center.cmpAddress != '',
-        'szAddress': key_center.cmpAddress or '',
+        'bUseCMP': cmpAddress != '',
+        'szAddress': cmpAddress,
         'szPort': '80',
         'szCommonName': '',
     }
@@ -74,3 +77,40 @@ def save_file_to_eu_file_store(file):
         for chunk in file.chunks():
             f.write(chunk)
     return path
+
+
+def check_signed_data(signed_data, secret, key_center_title):
+    """Вроверяет валидность ЭЦП."""
+    res = False
+
+    # Загрузка бибилиотек ІІТ
+    EULoad()
+    pIface = EUGetInterface()
+    pIface.Initialize()
+    eu_interface = EUGetInterface()
+
+    # Считывание настроек центров сертификации из файла CAs.json
+    key_centers = open(os.path.join(settings.BASE_DIR, 'apps', 'my_auth', 'static', 'my_auth', 'CAs.json'), "r").read()
+    key_centers = json.loads(key_centers)
+
+    # Применение настроек центра сертификации
+    for key_center in key_centers:
+        if key_center_title in key_center['issuerCNs']:
+            set_key_center_settings(eu_interface, key_center)
+            break
+
+    # Проверка подписи
+    pData = secret.encode('utf-16-le')
+    signed_data = signed_data.encode()
+    try:
+        pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), None)
+    except:
+        pass
+    else:
+        res = True
+
+    # Выгрузка бибилиотек ІІТ
+    eu_interface.Finalize()
+    EUUnload()
+
+    return res

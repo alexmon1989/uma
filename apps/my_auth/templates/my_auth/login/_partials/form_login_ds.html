@@ -28,6 +28,8 @@
 
             <form class="g-py-15" onSubmit="return false">
 
+                <input type="hidden" id="secret" value="{{ request.session.secret }}">
+
                 <div class="mb-4">
                     <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Оберіть ЦСК" %}:</label>
                     <select class="form-control g-color-black g-brd-gray-light-v2 g-brd-primary--hover rounded g-py-15 g-px-15"
