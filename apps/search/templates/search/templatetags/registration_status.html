@@ -3,22 +3,22 @@
 <div class="g-font-weight-600 g-color-blue-dark-v1">
     {# Винаходи, корисні моделі (патенти) #}
     {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 or hit.Document.idObjType == 6 %}
-        {% if status == 'green' %}
+        {% if hit.search_data.registration_status_color == 'green' %}
             {% trans "Патент діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
-        {% elif status == 'red' %}
+        {% elif hit.search_data.registration_status_color == 'red' %}
             {% trans "Патент не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
-        {% elif status == 'yellow' %}
+        {% elif hit.search_data.registration_status_color == 'yellow' %}
             <span title="{% trans "Дію патента припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
         {% else %}
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
         {% endif %}
-    {# Товографії, знаки для товарів та послуг (свідоцтва) #}
-    {% elif hit.Document.idObjType == 3 or hit.Document.idObjType == 4 %}
-        {% if status == 'green' %}
+    {# Товографії, знаки для товарів та послуг (свідоцтва), КЗПТ #}
+    {% elif hit.Document.idObjType == 3 or hit.Document.idObjType == 4 or hit.Document.idObjType == 5 %}
+        {% if hit.search_data.registration_status_color == 'green' %}
             {% trans "Свідоцтво діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
-        {% elif status == 'red' %}
+        {% elif hit.search_data.registration_status_color == 'red' %}
             {% trans "Свідоцтво не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
-        {% elif status == 'yellow' %}
+        {% elif hit.search_data.registration_status_color == 'yellow' %}
             <span title="{% trans "Дію свідоцтва припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
         {% else %}
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>

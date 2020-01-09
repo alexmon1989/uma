@@ -38,7 +38,7 @@
 
         <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Правовий статус" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
         <hr class="g-brd-gray-light-v4 g-my-15">
-        <div class="g-mb-20">
+        <div class="g-mb-40">
             {% for obj_state in aggregations.obj_state_terms.buckets %}
                 <div class="form-group g-mb-5">
                     <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}g-color-gray-dark-v5{% endif %}">
@@ -60,6 +60,53 @@
                     </label>
                 </div>
             {% endfor %}
+        </div>
+
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус охоронного документа" %}</h2>
+        <hr class="g-brd-gray-light-v4 g-my-15">
+        <div class="g-mb-20">
+            <div class="form-group g-mb-5">
+                <label class="u-check g-pl-30 ">
+                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                           type="checkbox"
+                           name="filter_registration_status_color"
+                           value="green"
+                           {% if 'green' in get_params.filter_registration_status_color %}checked{% endif %}
+                    >
+                    <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                        <i class="fa" data-check-icon=""></i>
+                    </div>
+                    <i class="fa fa-circle g-color-green g-mr-5"></i>Діє
+                </label>
+            </div>
+            <div class="form-group g-mb-5">
+                <label class="u-check g-pl-30 ">
+                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                           type="checkbox"
+                           name="filter_registration_status_color"
+                           value="red"
+                           {% if 'red' in get_params.filter_registration_status_color %}checked{% endif %}
+                    >
+                    <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                        <i class="fa" data-check-icon=""></i>
+                    </div>
+                    <i class="fa fa-circle g-color-red g-mr-5"></i>Не діє
+                </label>
+            </div>
+            <div class="form-group g-mb-5">
+                <label class="u-check g-pl-30 ">
+                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                           type="checkbox"
+                           name="filter_registration_status_color"
+                           value="yellow"
+                           {% if 'yellow' in get_params.filter_registration_status_color %}checked{% endif %}
+                    >
+                    <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                        <i class="fa" data-check-icon=""></i>
+                    </div>
+                     <i class="fa fa-circle g-color-yellow g-mr-5"></i>Дію припинено
+                </label>
+            </div>
         </div>
     </form>
 </div>

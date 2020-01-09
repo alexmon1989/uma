@@ -153,12 +153,16 @@ def add_filter_params(request):
     get_params = parse_qs(request.POST.get('get_params'))
     get_params['filter_obj_type'] = request.POST.getlist('filter_obj_type')
     get_params['filter_obj_state'] = request.POST.getlist('filter_obj_state')
+    get_params['filter_registration_status_color'] = request.POST.getlist('filter_registration_status_color')
 
     if not get_params['filter_obj_type']:
         del get_params['filter_obj_type']
 
     if not get_params['filter_obj_state']:
         del get_params['filter_obj_state']
+
+    if not get_params['filter_registration_status_color']:
+        del get_params['filter_registration_status_color']
 
     if get_params.get('page'):
         del get_params['page']  # Для переадресации на 1 страницу
@@ -343,7 +347,6 @@ class TransactionsSearchView(TemplateView):
 
         context['initial_data'] = dict()
         context['is_search'] = False
-        print(self.request.GET)
         if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
                 and self.request.GET.get('date'):
             context['is_search'] = True

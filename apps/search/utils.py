@@ -226,6 +226,7 @@ def filter_results(s, get_params):
     # Агрегация для определения всех типов объектов и состояний
     s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
     s.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+    s.aggs.bucket('registration_status_color_terms', A('terms', field='search_data.registration_status_color'))
     aggregations = s.execute().aggregations.to_dict()
     s_ = s
 
@@ -236,17 +237,19 @@ def filter_results(s, get_params):
         # Агрегация для определения количества объектов определённых типов после применения одного фильтра
         s_filter_obj_type = s_.filter(
             'terms',
-            Document__idObjType=get_params.get('filter_obj_type')
+            search_data__obj_state=get_params.get('filter_obj_state')
+        ).filter(
+            'terms',
+            search_data__registration_status_color=get_params.get('filter_registration_status_color')
         )
-        s_filter_obj_type.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
-        aggregations_obj_state = s_filter_obj_type.execute().aggregations.to_dict()
-        for bucket in aggregations['obj_state_terms']['buckets']:
-            if not list(filter(lambda x: x['key'] == bucket['key'],
-                               aggregations_obj_state['obj_state_terms']['buckets'])):
-                aggregations_obj_state['obj_state_terms']['buckets'].append(
+        s_filter_obj_type.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
+        aggregations_ = s_filter_obj_type.execute().aggregations.to_dict()
+        for bucket in aggregations['idObjType_terms']['buckets']:
+            if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_['obj_state_terms']['buckets'])):
+                aggregations_['idObjType_terms']['buckets'].append(
                     {'key': bucket['key'], 'doc_count': 0}
                 )
-        aggregations['obj_state_terms']['buckets'] = aggregations_obj_state['obj_state_terms']['buckets']
+        aggregations['idObjType_terms']['buckets'] = aggregations_['idObjType_terms']['buckets']
 
     if get_params.get('filter_obj_state'):
         # Фильтрация в основном запросе
@@ -255,17 +258,45 @@ def filter_results(s, get_params):
         # после применения одного фильтра
         s_filter_obj_state = s_.filter(
             'terms',
-            search_data__obj_state=get_params.get('filter_obj_state')
+            search_data__registration_status_color=get_params.get('filter_registration_status_color')
+        ).filter(
+            'terms',
+            Document__idObjType=get_params.get('filter_obj_type')
         )
-        s_filter_obj_state.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
-        aggregations_id_obj_type = s_filter_obj_state.execute().aggregations.to_dict()
-        for bucket in aggregations['idObjType_terms']['buckets']:
+        s_filter_obj_state.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
+        aggregations_ = s_filter_obj_state.execute().aggregations.to_dict()
+        for bucket in aggregations['obj_state_terms']['buckets']:
             if not list(filter(lambda x: x['key'] == bucket['key'],
-                               aggregations_id_obj_type['idObjType_terms']['buckets'])):
-                aggregations_id_obj_type['idObjType_terms']['buckets'].append(
+                               aggregations_['obj_state_terms']['buckets'])):
+                aggregations_['obj_state_terms']['buckets'].append(
                     {'key': bucket['key'], 'doc_count': 0}
                 )
-        aggregations['idObjType_terms']['buckets'] = aggregations_id_obj_type['idObjType_terms']['buckets']
+        aggregations['obj_state_terms']['buckets'] = aggregations_['obj_state_terms']['buckets']
+
+    if get_params.get('filter_registration_status_color'):
+        # Фильтрация в основном запросе
+        s = s.filter('terms', search_data__registration_status_color=get_params.get('filter_registration_status_color'))
+        # Агрегация для определения количества объектов определённых состояний
+        # после применения одного фильтра
+        s_filter_registration_status_color = s_
+        if get_params.get('filter_obj_state'):
+            s_filter_registration_status_color = s_.filter(
+                'terms',
+                search_data__obj_state=get_params.get('filter_obj_state')
+            )
+        if get_params.get('filter_obj_type'):
+            s_filter_registration_status_color.filter(
+                'terms',
+                Document__idObjType=get_params.get('filter_obj_type')
+            )
+        s_filter_registration_status_color.aggs.bucket('registration_status_color_terms', A('terms', field='search_data.registration_status_color'))
+        aggregations_ = s_filter_registration_status_color.execute().aggregations.to_dict()
+        for bucket in aggregations['registration_status_color_terms']['buckets']:
+            if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_['idObjType_terms']['buckets'])):
+                aggregations_['registration_status_color_terms']['buckets'].append(
+                    {'key': bucket['key'], 'doc_count': 0}
+                )
+        aggregations['registration_status_color_terms']['buckets'] = aggregations_['registration_status_color_terms']['buckets']
 
     return s, aggregations
 
@@ -1368,12 +1399,15 @@ def get_registration_status_color(hit):
     """Возвращает цвте статуса охранного документа объекта пром. собств."""
     status = 'gray'
     if hit['Document']['idObjType'] in (1, 2, 3):
-        if hit['Document']['RegistrationStatus'] == 'A':
-            status = 'green'
-        elif hit['Document']['RegistrationStatus'] == 'N':
+        try:
+            if hit['Document']['RegistrationStatus'] == 'A':
+                status = 'green'
+            elif hit['Document']['RegistrationStatus'] == 'N':
+                status = 'red'
+            elif hit['Document']['RegistrationStatus'] == 'T':
+                status = 'yellow'
+        except KeyError:
             status = 'red'
-        elif hit['Document']['RegistrationStatus'] == 'T':
-            status = 'yellow'
     elif hit['Document']['idObjType'] == 4:
         status = 'green'
 
@@ -1386,12 +1420,14 @@ def get_registration_status_color(hit):
         ]
 
         if hit.get('TradeMark', {}).get('Transactions'):
-            last_transaction_type = \
-                hit['TradeMark']['Transactions']['Transaction'][
-                    len(hit['TradeMark']['Transactions']['Transaction']) - 1]['@type']
+            last_transaction_type = hit['TradeMark']['Transactions']['Transaction'][
+                len(hit['TradeMark']['Transactions']['Transaction']) - 1].get('@type')
 
             if last_transaction_type in red_transaction_types:
                 status = 'red'
+
+    elif hit['Document']['idObjType'] == 5:
+        status = 'green'
 
     elif hit['Document']['idObjType'] == 6:
         status = 'green'
@@ -1406,9 +1442,8 @@ def get_registration_status_color(hit):
         ]
 
         if hit.get('Design', {}).get('Transactions'):
-            last_transaction_type = \
-                hit['Design']['Transactions']['Transaction'][len(hit['Design']['Transactions']['Transaction']) - 1][
-                    '@type']
+            last_transaction_type = hit['Design']['Transactions']['Transaction'][
+                len(hit['Design']['Transactions']['Transaction']) - 1].get('@type')
 
             if last_transaction_type in red_transaction_types:
                 status = 'red'
