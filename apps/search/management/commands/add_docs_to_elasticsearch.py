@@ -207,7 +207,7 @@ class Command(BaseCommand):
                 }
 
                 # Статус охранного документа (цвет)
-                if res['search_data'] == 2:
+                if res['search_data']['obj_state'] == 2:
                     res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
                 # Запись в индекс
@@ -276,7 +276,7 @@ class Command(BaseCommand):
             }
 
             # Статус охранного документа (цвет)
-            if res['search_data'] == 2:
+            if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
             # Запись в индекс
@@ -338,7 +338,7 @@ class Command(BaseCommand):
             }
 
             # Статус охранного документа (цвет)
-            if res['search_data'] == 2:
+            if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
             # Запись в индекс
@@ -378,7 +378,7 @@ class Command(BaseCommand):
             }
 
             # Статус охранного документа (цвет)
-            if res['search_data'] == 2:
+            if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
             # Запись в индекс
