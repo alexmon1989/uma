@@ -481,13 +481,25 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             s = s.sort('_score')
 
         # Фильтрация
-        if get_params.get('filter_obj_type'):
-            # Фильтрация по типу объекта
-            s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
-
-        if get_params.get('filter_obj_state'):
-            # Фильтрация по статусу объекта
-            s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
+        # Возможные фильтры
+        filters = [
+            {
+                'title': 'obj_type',
+                'field': 'Document.idObjType'
+            },
+            {
+                'title': 'obj_state',
+                'field': 'search_data.obj_state'
+            },
+            {
+                'title': 'registration_status_color',
+                'field': 'search_data.registration_status_color'
+            },
+        ]
+        for item in filters:
+            if get_params.get(f"filter_{item['title']}"):
+                # Фильтрация в основном запросе
+                s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
             s = s.source(['search_data', 'Document'])
@@ -532,12 +544,25 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
         s = get_elastic_results(search_groups, get_user_or_anonymous(user_id))
 
         # Фильтрация
-        if get_params.get('filter_obj_type'):
-            # Фильтрация по типу объекта
-            s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
-        if get_params.get('filter_obj_state'):
-            # Фильтрация по статусу объекта
-            s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
+        # Возможные фильтры
+        filters = [
+            {
+                'title': 'obj_type',
+                'field': 'Document.idObjType'
+            },
+            {
+                'title': 'obj_state',
+                'field': 'search_data.obj_state'
+            },
+            {
+                'title': 'registration_status_color',
+                'field': 'search_data.registration_status_color'
+            },
+        ]
+        for item in filters:
+            if get_params.get(f"filter_{item['title']}"):
+                # Фильтрация в основном запросе
+                s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
             s = s.source(['search_data', 'Document'])

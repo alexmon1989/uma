@@ -7,7 +7,9 @@ from django.forms.models import model_to_dict
 from django.views.decorators.http import require_POST
 from apps.my_auth.forms import AuthFormDS, AuthFormSimple
 from apps.my_auth.models import CertificateOwner, KeyCenter
-
+from EUSignCP import *
+from .utils import check_signed_data
+import random, string
 
 def logout_view(request):
     """Логаут пользователя."""
@@ -28,6 +30,9 @@ def get_ca_data(request, pk):
 
 def login_view(request):
     """Страница логина пользователей."""
+    request.session['secret'] = ''.join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32)
+    )
     return render(
         request,
         'my_auth/login/login.html',
@@ -41,44 +46,46 @@ def login_view(request):
 @require_POST
 def login_ds(request):
     """Обработчик запроса на авторизацию по ЭЦП."""
-    try:
-        cert = CertificateOwner.objects.get(pszSerial=request.POST['serial'])
-    except CertificateOwner.DoesNotExist:
-        # Запись данных ключа в БД
-        cert = CertificateOwner(
-            pszIssuer=request.POST['issuer'],
-            pszIssuerCN=request.POST['issuerCN'],
-            pszSerial=request.POST['serial'],
-            pszSubject=request.POST['subject'],
-            pszSubjCN=request.POST['subjCN'],
-            pszSubjOrg=request.POST['subjOrg'],
-            pszSubjOrgUnit=request.POST['subjOrgUnit'],
-            pszSubjTitle=request.POST['subjTitle'],
-            pszSubjState=request.POST['subjState'],
-            pszSubjFullName=request.POST['subjFullName'],
-            pszSubjAddress=request.POST['subjAddress'],
-            pszSubjPhone=request.POST['subjPhone'],
-            pszSubjEMail=request.POST['subjEMail'],
-            pszSubjDNS=request.POST['subjDNS'],
-            pszSubjEDRPOUCode=request.POST['subjEDRPOUCode'],
-            pszSubjDRFOCode=request.POST['subjDRFOCode'],
-            pszSubjLocality=request.POST['subjLocality'],
-        )
-        cert.save()
-    user = authenticate(certificate=cert)
-    if user is not None:
-        login(request, user)
-        if not request.POST.get('remember_me'):
-            request.session.set_expiry(0)
-            request.session.modified = True
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            'Авторизація успішна.'
-        )
-        return JsonResponse({
-            'is_logged': 1
-        })
+    # Проверка валидности ЭЦП
+    if check_signed_data(request.POST['signed_data'], request.session['secret'], request.POST['key_center_title']):
+        try:
+            cert = CertificateOwner.objects.get(pszSerial=request.POST['serial'])
+        except CertificateOwner.DoesNotExist:
+            # Запись данных ключа в БД
+            cert = CertificateOwner(
+                pszIssuer=request.POST['issuer'],
+                pszIssuerCN=request.POST['issuerCN'],
+                pszSerial=request.POST['serial'],
+                pszSubject=request.POST['subject'],
+                pszSubjCN=request.POST['subjCN'],
+                pszSubjOrg=request.POST['subjOrg'],
+                pszSubjOrgUnit=request.POST['subjOrgUnit'],
+                pszSubjTitle=request.POST['subjTitle'],
+                pszSubjState=request.POST['subjState'],
+                pszSubjFullName=request.POST['subjFullName'],
+                pszSubjAddress=request.POST['subjAddress'],
+                pszSubjPhone=request.POST['subjPhone'],
+                pszSubjEMail=request.POST['subjEMail'],
+                pszSubjDNS=request.POST['subjDNS'],
+                pszSubjEDRPOUCode=request.POST['subjEDRPOUCode'],
+                pszSubjDRFOCode=request.POST['subjDRFOCode'],
+                pszSubjLocality=request.POST['subjLocality'],
+            )
+            cert.save()
+        user = authenticate(certificate=cert)
+        if user is not None:
+            login(request, user)
+            if not request.POST.get('remember_me'):
+                request.session.set_expiry(0)
+                request.session.modified = True
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Авторизація успішна.'
+            )
+            return JsonResponse({
+                'is_logged': 1
+            })
     return JsonResponse({
         'is_logged': 0
     })

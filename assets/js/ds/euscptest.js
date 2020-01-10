@@ -4,8 +4,8 @@ var URL_EMAIL_PARAM = "@EMAIL_PARAM";
 var URL_GET_KEP_CERTIFICATE_BY_EMAIL = "http://ca.iit.com.ua/services-cmp-getcert?eUserEMail=" + 
 		URL_EMAIL_PARAM + "&certType=2&respType=2";
 
-var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.18";
-var URL_CAS = "/static/my_auth/CAs.json?version=1.0.18";
+var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.22";
+var URL_CAS = "/static/my_auth/CAs.json?version=1.0.22";
 var URL_XML_HTTP_PROXY_SERVICE = "/proxy_handler/ProxyHandlerCURL.php";
 
 //=============================================================================
@@ -660,6 +660,8 @@ function() {
 
 				// Запрос на авторизацию
 				var data = euSign.GetPrivateKeyOwnerInfo();
+				data['signed_data'] = euSign.SignData(document.getElementById('secret').value, true);
+				data['key_center_title'] = document.getElementById('CAsServersSelect').value;
 				data['remember_me'] = document.getElementById('RememberMe').value;
 				data['csrfmiddlewaretoken'] = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 				$.post( "/uk/auth/login_ds/", data, function (data) {

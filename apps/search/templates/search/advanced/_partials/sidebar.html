@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load uma_extras %}
 {% load search_extras %}
+{% load humanize %}
 
 <div class="g-pr-40--lg g-mb-50 g-mb-0--lg sticky-top g-z-index-99">
 
@@ -13,22 +14,22 @@
         <hr class="g-brd-gray-light-v4 g-my-15">
 
         <div class="g-mb-40">
-            {% for obj_type in aggregations.idObjType_terms.buckets %}
+            {% for obj_type in aggregations.obj_type_terms.buckets|dictsort:"key" %}
                 <div class="form-group g-mb-5">
-                    <label class="u-check g-pl-30 {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in request.GET|get_list:'filter_obj_type' %}g-color-gray-dark-v5{% endif %}">
+                    <label class="u-check g-pl-30 {% if obj_type.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
                         <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
                                type="checkbox"
                                name="filter_obj_type"
                                value="{{ obj_type.key }}"
-                               {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in request.GET|get_list:'filter_obj_type' %}disabled="disabled"{% endif %}
+                               {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in get_params.filter_obj_type %}disabled="disabled"{% endif %}
                                {% if obj_type.key|stringformat:"i" in get_params.filter_obj_type %}checked{% endif %}>
                         <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
                             <i class="fa" data-check-icon=""></i>
                         </div>
                         {% obj_type_title id=obj_type.key lang=lang_code %}
-                        {% if obj_type.key|stringformat:"i" not in get_params.filter_obj_type %}
-                            <span class="g-color-gray-dark-v5">
-                                ({% if get_params.filter_obj_type %}+{% endif %}{{ obj_type.doc_count }})
+                        {% if obj_type.doc_count > 0 and obj_type.key|stringformat:"i" not in get_params.filter_obj_type %}
+                            <span class="g-color-gray-light-v1">
+                                ({% if get_params.filter_obj_type %}+{% endif %}{{ obj_type.doc_count|intcomma }})
                             </span>
                         {% endif %}
                     </label>
@@ -38,10 +39,10 @@
 
         <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Правовий статус" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
         <hr class="g-brd-gray-light-v4 g-my-15">
-        <div class="g-mb-20">
-            {% for obj_state in aggregations.obj_state_terms.buckets %}
+        <div class="g-mb-40">
+            {% for obj_state in aggregations.obj_state_terms.buckets|dictsort:"key" %}
                 <div class="form-group g-mb-5">
-                    <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}g-color-gray-dark-v5{% endif %}">
+                    <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
                         <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
                                type="checkbox"
                                name="filter_obj_state"
@@ -52,9 +53,43 @@
                             <i class="fa" data-check-icon=""></i>
                         </div>
                         {% if obj_state.key == 1 %}{% trans "Заявка" %}{% elif obj_state.key == 2 %}{% trans "Охоронний документ" %}{% endif %}
-                        {% if obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}
-                            <span class="g-color-gray-dark-v5">
-                                ({% if get_params.filter_obj_state %}+{% endif %}{{ obj_state.doc_count }})
+                        {% if obj_state.doc_count > 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}
+                            <span class="g-color-gray-light-v1">
+                                ({% if get_params.filter_obj_state %}+{% endif %}{{ obj_state.doc_count|intcomma }})
+                            </span>
+                        {% endif %}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус охоронного документа" %}</h2>
+        <hr class="g-brd-gray-light-v4 g-my-15">
+        <div class="g-mb-20">
+            {% for color in aggregations.registration_status_color_terms.buckets|dictsort:"key" %}
+                <div class="form-group g-mb-5">
+                    <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                               type="checkbox"
+                               name="filter_registration_status_color"
+                               value="{{ color.key }}"
+                               {% if color.doc_count == 0 and color.key not in get_params.filter_registration_status_color %}disabled="disabled"{% endif %}
+                               {% if color.key in get_params.filter_registration_status_color %}checked{% endif %}
+                        >
+                        <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon=""></i>
+                        </div>
+                        <i class="fa fa-circle g-color-{{ color.key }} {% if color.doc_count == 0 %}g-opacity-0_3{% endif %} g-mr-5"></i>
+                        {% if color.key == 'red' %}
+                            {% trans "Не діє" %}
+                        {% elif color.key == 'green' %}
+                            {% trans "Діє" %}
+                        {% elif color.key == 'yellow' %}
+                            {% trans "Дію припинено" %}
+                        {% endif %}
+                        {% if color.doc_count > 0 and color.key not in get_params.filter_registration_status_color %}
+                            <span class="g-color-gray-light-v1">
+                                ({% if get_params.filter_registration_status_color %}+{% endif %}{{ color.doc_count|intcomma }})
                             </span>
                         {% endif %}
                     </label>
