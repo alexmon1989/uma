@@ -79,7 +79,7 @@ def obj_type_title(id, lang):
 @register.inclusion_tag('search/templatetags/registration_status.html')
 def registration_status(hit):
     """Выводит статус охранного документа (зелёный, желтый, красный)."""
-    return {'status': get_registration_status_color(hit), 'hit': hit}
+    return {'hit': hit}
 
 
 @register.simple_tag

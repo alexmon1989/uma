@@ -5,7 +5,7 @@ from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
-from ...utils import filter_bad_apps, filter_unpublished_apps
+from ...utils import filter_bad_apps, filter_unpublished_apps, get_registration_status_color
 import json
 import os.path
 import datetime
@@ -15,6 +15,30 @@ class Command(BaseCommand):
     help = 'Adds or updates documents in ElasticSearch index.'
     es = None
     indexation_process = None
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--id',
+            type=int,
+            help='Index only one record with certain idAPPNumber from table IPC_AppLIST'
+        )
+        parser.add_argument(
+            '--obj_type',
+            type=int,
+            help='Add to index only records with certain object type. '
+                 'Values: '
+                 '1 - Inventions, '
+                 '2 - Utility models, '
+                 '3 - Layout Designs (Topographies) of Integrated Circuit, '
+                 '4 - Trade Marks, '
+                 '5 - Qualified indications of the origin of goods, '
+                 '6 - Industrial designs'
+        )
+        parser.add_argument(
+            '--status',
+            type=int,
+            help='Add to index only records with certain status: 1 - applications, 2 - protective documents.'
+        )
 
     def get_json_path(self, doc):
         """Получает путь к файлу JSON с данными объекта."""
@@ -179,8 +203,12 @@ class Command(BaseCommand):
                     'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
                     'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],
                     'agent': biblio_data.get('I_74'),
-                    'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])],
+                    'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
+
+                # Статус охранного документа (цвет)
+                if res['search_data'] == 2:
+                    res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
                 # Запись в индекс
                 self.write_to_es_index(doc, res)
@@ -247,6 +275,10 @@ class Command(BaseCommand):
                 if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
             }
 
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -305,6 +337,10 @@ class Command(BaseCommand):
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
             }
 
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -338,8 +374,12 @@ class Command(BaseCommand):
                           res['Geo']['GeoDetails']['RepresentativeDetails']['Representative']]
                 if res['Geo']['GeoDetails'].get('RepresentativeDetails') else None,
 
-                'title': res['Geo']['GeoDetails'].get('Indication')
+                'title': res['Geo']['GeoDetails'].get('Indication'),
             }
+
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -406,7 +446,18 @@ class Command(BaseCommand):
             'obj_type_id',
             'registration_number',
             'app_number'
-        ).all()
+        )
+        # Фильтрация по параметрам командной строки
+        if options['id']:
+            documents = documents.filter(id=options['id'])
+        if options['obj_type']:
+            documents = documents.filter(obj_type=options['obj_type'])
+        if options['status']:
+            status = int(options['status'])
+            if status == 1:
+                documents = documents.filter(registration_number='')
+            elif status == 2:
+                documents = documents.exclude(registration_number='')
 
         # Создание процесса индексации в БД
         self.indexation_process = IndexationProcess.objects.create(
