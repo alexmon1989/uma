@@ -223,80 +223,55 @@ def sort_results(s, sort_by_value):
 
 def filter_results(s, get_params):
     """Фильтрует результат запроса ElasticSearch и выполняет агрегацию для фильтров в сайдбаре."""
-    # Агрегация для определения всех типов объектов и состояний
-    s.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
-    s.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
-    s.aggs.bucket('registration_status_color_terms', A('terms', field='search_data.registration_status_color'))
+    # Возможные фильтры
+    filters = [
+        {
+            'title': 'obj_type',
+            'field': 'Document.idObjType'
+        },
+        {
+            'title': 'obj_state',
+            'field': 'search_data.obj_state'
+        },
+        {
+            'title': 'registration_status_color',
+            'field': 'search_data.registration_status_color'
+        },
+    ]
+
+    # Агрегация без фильтрации
+    for item in filters:
+        s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field']))
     aggregations = s.execute().aggregations.to_dict()
     s_ = s
 
     # Фильтрация
-    if get_params.get('filter_obj_type'):
-        # Фильтрация в основном запросе
-        s = s.filter('terms', Document__idObjType=get_params.get('filter_obj_type'))
-        # Агрегация для определения количества объектов определённых типов после применения одного фильтра
-        s_filter_obj_type = s_.filter(
-            'terms',
-            search_data__obj_state=get_params.get('filter_obj_state')
-        ).filter(
-            'terms',
-            search_data__registration_status_color=get_params.get('filter_registration_status_color')
-        )
-        s_filter_obj_type.aggs.bucket('idObjType_terms', A('terms', field='Document.idObjType'))
-        aggregations_ = s_filter_obj_type.execute().aggregations.to_dict()
-        for bucket in aggregations['idObjType_terms']['buckets']:
-            if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_['obj_state_terms']['buckets'])):
-                aggregations_['idObjType_terms']['buckets'].append(
-                    {'key': bucket['key'], 'doc_count': 0}
-                )
-        aggregations['idObjType_terms']['buckets'] = aggregations_['idObjType_terms']['buckets']
+    for item in filters:
+        if get_params.get(f"filter_{item['title']}"):
+            # Фильтрация в основном запросе
+            s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-    if get_params.get('filter_obj_state'):
-        # Фильтрация в основном запросе
-        s = s.filter('terms', search_data__obj_state=get_params.get('filter_obj_state'))
-        # Агрегация для определения количества объектов определённых состояний
-        # после применения одного фильтра
-        s_filter_obj_state = s_.filter(
-            'terms',
-            search_data__registration_status_color=get_params.get('filter_registration_status_color')
-        ).filter(
-            'terms',
-            Document__idObjType=get_params.get('filter_obj_type')
-        )
-        s_filter_obj_state.aggs.bucket('obj_state_terms', A('terms', field='search_data.obj_state'))
-        aggregations_ = s_filter_obj_state.execute().aggregations.to_dict()
-        for bucket in aggregations['obj_state_terms']['buckets']:
-            if not list(filter(lambda x: x['key'] == bucket['key'],
-                               aggregations_['obj_state_terms']['buckets'])):
-                aggregations_['obj_state_terms']['buckets'].append(
-                    {'key': bucket['key'], 'doc_count': 0}
+        # Применение остальных фильтров в отдельном запросе для последующей агрегации
+        s_item = s_
+        for item_ in filters:
+            if item_ != item and get_params.get(f"filter_{item_['title']}"):
+                s_item = s_item.filter(
+                    'terms',
+                    **{item_['field']: get_params.get(f"filter_{item_['title']}")}
                 )
-        aggregations['obj_state_terms']['buckets'] = aggregations_['obj_state_terms']['buckets']
 
-    if get_params.get('filter_registration_status_color'):
-        # Фильтрация в основном запросе
-        s = s.filter('terms', search_data__registration_status_color=get_params.get('filter_registration_status_color'))
-        # Агрегация для определения количества объектов определённых состояний
-        # после применения одного фильтра
-        s_filter_registration_status_color = s_
-        if get_params.get('filter_obj_state'):
-            s_filter_registration_status_color = s_.filter(
-                'terms',
-                search_data__obj_state=get_params.get('filter_obj_state')
-            )
-        if get_params.get('filter_obj_type'):
-            s_filter_registration_status_color.filter(
-                'terms',
-                Document__idObjType=get_params.get('filter_obj_type')
-            )
-        s_filter_registration_status_color.aggs.bucket('registration_status_color_terms', A('terms', field='search_data.registration_status_color'))
-        aggregations_ = s_filter_registration_status_color.execute().aggregations.to_dict()
-        for bucket in aggregations['registration_status_color_terms']['buckets']:
-            if not list(filter(lambda x: x['key'] == bucket['key'], aggregations_['idObjType_terms']['buckets'])):
-                aggregations_['registration_status_color_terms']['buckets'].append(
+        # Агрегация
+        aggregations_item = s_item.execute().aggregations.to_dict()
+        item_terms_title = f"{item['title']}_terms"
+        for bucket in aggregations[item_terms_title]['buckets']:
+            if not list(filter(
+                    lambda x: x['key'] == bucket['key'],
+                    aggregations_item[item_terms_title]['buckets']
+            )):
+                aggregations_item[item_terms_title]['buckets'].append(
                     {'key': bucket['key'], 'doc_count': 0}
                 )
-        aggregations['registration_status_color_terms']['buckets'] = aggregations_['registration_status_color_terms']['buckets']
+        aggregations[item_terms_title]['buckets'] = aggregations_item[item_terms_title]['buckets']
 
     return s, aggregations
 
