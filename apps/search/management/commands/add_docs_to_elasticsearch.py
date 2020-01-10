@@ -5,7 +5,7 @@ from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
-from ...utils import filter_bad_apps, filter_unpublished_apps
+from ...utils import filter_bad_apps, filter_unpublished_apps, get_registration_status_color
 import json
 import os.path
 import datetime
@@ -203,8 +203,12 @@ class Command(BaseCommand):
                     'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
                     'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],
                     'agent': biblio_data.get('I_74'),
-                    'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])],
+                    'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
+
+                # Статус охранного документа (цвет)
+                if res['search_data'] == 2:
+                    res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
                 # Запись в индекс
                 self.write_to_es_index(doc, res)
@@ -271,6 +275,10 @@ class Command(BaseCommand):
                 if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
             }
 
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -329,6 +337,10 @@ class Command(BaseCommand):
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
             }
 
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -362,8 +374,12 @@ class Command(BaseCommand):
                           res['Geo']['GeoDetails']['RepresentativeDetails']['Representative']]
                 if res['Geo']['GeoDetails'].get('RepresentativeDetails') else None,
 
-                'title': res['Geo']['GeoDetails'].get('Indication')
+                'title': res['Geo']['GeoDetails'].get('Indication'),
             }
+
+            # Статус охранного документа (цвет)
+            if res['search_data'] == 2:
+                res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
