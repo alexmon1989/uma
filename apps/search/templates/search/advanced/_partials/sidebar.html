@@ -21,7 +21,7 @@
                                type="checkbox"
                                name="filter_obj_type"
                                value="{{ obj_type.key }}"
-                               {% if obj_type.doc_count == 0 and obj_type.key|stringformat:"i" not in get_params.filter_obj_type %}disabled="disabled"{% endif %}
+                               {% if obj_type.doc_count == 0 %}onclick="return false;"{% endif %}
                                {% if obj_type.key|stringformat:"i" in get_params.filter_obj_type %}checked{% endif %}>
                         <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
                             <i class="fa" data-check-icon=""></i>
@@ -47,7 +47,7 @@
                                type="checkbox"
                                name="filter_obj_state"
                                value="{{ obj_state.key }}"
-                               {% if obj_state.doc_count == 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}disabled="disabled"{% endif %}
+                               {% if obj_state.doc_count == 0 %}onclick="return false;"{% endif %}
                                {% if obj_state.key|stringformat:"i" in get_params.filter_obj_state %}checked{% endif %}>
                         <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
                             <i class="fa" data-check-icon=""></i>
@@ -73,7 +73,7 @@
                                type="checkbox"
                                name="filter_registration_status_color"
                                value="{{ color.key }}"
-                               {% if color.doc_count == 0 and color.key not in get_params.filter_registration_status_color %}disabled="disabled"{% endif %}
+                               {% if color.doc_count == 0 %}onclick="return false;"{% endif %}
                                {% if color.key in get_params.filter_registration_status_color %}checked{% endif %}
                         >
                         <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
