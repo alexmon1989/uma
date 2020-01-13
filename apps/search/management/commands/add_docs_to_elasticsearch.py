@@ -422,7 +422,7 @@ class Command(BaseCommand):
             path="TRANSACTIONS.TRANSACTION",
             query=Q(
                 "query_string",
-                query=f"{registration_date__max.year}-{registration_date__max.month}-{registration_date__max.day}",
+                query=registration_date__max.date(),
                 default_field="TRANSACTIONS.TRANSACTION.BULLETIN_DATE",
             )
         )
