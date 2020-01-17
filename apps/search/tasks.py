@@ -18,9 +18,10 @@ from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
 import json
+import time
 from zipfile import ZipFile
 from pathlib import Path
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 @shared_task
@@ -705,3 +706,20 @@ def clear_results_table(minutes=5):
 def clear_sessions():
     """Очищает просроченные сессиии пользователей."""
     management.call_command('clearsessions')
+
+
+@shared_task
+def clear_old_files(path, older_than_minutes=10):
+    """Очищает каталог path. Удаляет файлы старше older_than_minutes минут, а затем удаляет пустые каталоги."""
+    for address, dirs, files in os.walk(path):
+        # Удаление старых файлов
+        for file in files:
+            full_path = os.path.join(address, file)
+            if os.stat(full_path).st_mtime < (time.time() - older_than_minutes*60):
+                os.remove(full_path)
+
+        # Удаление пустых каталогов
+        for dir_ in dirs:
+            full_path = os.path.join(address, dir_)
+            if not os.listdir(full_path):
+                os.rmdir(full_path)
