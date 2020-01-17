@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.db.models import F
+from django_celery_results.models import TaskResult
+from django.utils.timezone import now
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
@@ -17,6 +19,7 @@ import os
 import json
 from zipfile import ZipFile
 from pathlib import Path
+from datetime import timedelta
 
 
 @shared_task
@@ -689,3 +692,9 @@ def create_shared_docs_archive(id_app_number):
         'shared_docs',
         file_name
     )
+
+
+@shared_task
+def clear_results_table(minutes=5):
+    """Очищает таблицу django_celery_results_taskresult от записей старше minutes минут."""
+    TaskResult.objects.filter(date_done__lte=now() - timedelta(minutes=minutes)).delete()
