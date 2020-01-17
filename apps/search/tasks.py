@@ -3,6 +3,7 @@ from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core import management
 from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
@@ -698,3 +699,9 @@ def create_shared_docs_archive(id_app_number):
 def clear_results_table(minutes=5):
     """Очищает таблицу django_celery_results_taskresult от записей старше minutes минут."""
     TaskResult.objects.filter(date_done__lte=now() - timedelta(minutes=minutes)).delete()
+
+
+@shared_task
+def clear_sessions():
+    """Очищает просроченные сессиии пользователей."""
+    management.call_command('clearsessions')
