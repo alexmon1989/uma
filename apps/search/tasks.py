@@ -3,8 +3,11 @@ from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core import management
 from django.utils.translation import gettext as _
 from django.db.models import F
+from django_celery_results.models import TaskResult
+from django.utils.timezone import now
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
@@ -15,8 +18,10 @@ from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
 import json
+import time
 from zipfile import ZipFile
 from pathlib import Path
+from datetime import timedelta, datetime
 
 
 @shared_task
@@ -689,3 +694,33 @@ def create_shared_docs_archive(id_app_number):
         'shared_docs',
         file_name
     )
+
+
+@shared_task
+def clear_results_table(minutes=5):
+    """Очищает таблицу django_celery_results_taskresult от записей старше minutes минут."""
+    results = TaskResult.objects.filter(date_done__lte=now() - timedelta(minutes=minutes))
+    TaskResult.objects.filter(pk__in=results)._raw_delete(results.db)
+
+
+@shared_task
+def clear_sessions():
+    """Очищает просроченные сессиии пользователей."""
+    management.call_command('clearsessions')
+
+
+@shared_task
+def clear_old_files(path, older_than_minutes=10):
+    """Очищает каталог path. Удаляет файлы старше older_than_minutes минут, а затем удаляет пустые каталоги."""
+    for address, dirs, files in os.walk(path):
+        # Удаление старых файлов
+        for file in files:
+            full_path = os.path.join(address, file)
+            if os.stat(full_path).st_mtime < (time.time() - older_than_minutes*60):
+                os.remove(full_path)
+
+        # Удаление пустых каталогов
+        for dir_ in dirs:
+            full_path = os.path.join(address, dir_)
+            if not os.listdir(full_path):
+                os.rmdir(full_path)
