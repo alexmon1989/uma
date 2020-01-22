@@ -178,20 +178,37 @@ def filter_bad_apps(qs):
 
 def filter_unpublished_apps(user, qs):
     """Исключает из результатов запроса неопубликованные заявки для обычных пользователей."""
-    if user.is_anonymous or not user.is_vip():
-        # Не показывать заявки на знаки со статусом 1000
-        qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
-        # Не показывать заявки по пром. образцам и полезным моделям
-        qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
-        # Показывать только заявки с датой заяки (но показывать все КЗПТ)
-        qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
-        # Для заявок на изобретения нужно чтоб существовал I_43.D
-        qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
-        # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
-        qs &= ~Q(
-            'query_string',
-            query="NOT _exists_:TradeMark.PaymentDetails AND search_data.obj_state:1 AND Document.idObjType:4"
-        )
+    if not user.is_anonymous and user.is_vip():
+        # Если пользователь является членом группы "посадовці, чиновники",
+        # то ему возвращаются все результаты без фильтров
+        return qs
+
+    """Фильтры для обычных пользователей."""
+    # Не показывать заявки на знаки со статусом 1000
+    filter_qs = ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+    # Не показывать заявки по пром. образцам и полезным моделям
+    filter_qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+    # Показывать только заявки с датой заяки (но показывать все КЗПТ)
+    filter_qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
+    # Для заявок на изобретения нужно чтоб существовал I_43.D
+    filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
+    # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
+    filter_qs &= ~Q(
+        'query_string',
+        query="NOT _exists_:TradeMark.PaymentDetails AND search_data.obj_state:1 AND Document.idObjType:4"
+    )
+
+    if user.is_anonymous or not user.certificateowner:
+        # Для анонимных пользователей применяются все фильтры
+        qs &= filter_qs
+    else:
+        # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
+        user_name = user.certificateowner.pszSubjFullName.strip()
+        qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
+              | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
+              | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
+              | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
+
     return qs
 
 

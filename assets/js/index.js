@@ -14,9 +14,11 @@ import ContactForm from "./vue-components/ContactForm.vue";
 import GetOriginalDoc from "./vue-components/GetOriginalDoc.vue";
 
 import VeeValidate from 'vee-validate';
+import * as Toastr from "toastr";
 Vue.use(VeeValidate);
 
 window.$ = window.jQuery = require('jquery');
+window.toastr = Toastr;
 
 const app = new Vue({
     el: '#app',

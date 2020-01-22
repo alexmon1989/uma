@@ -1,5 +1,4 @@
 import { saveAs } from 'file-saver';
-import * as Toastr from 'toastr';
 
 /**
  * Обновляет GET-параметр в url.
@@ -57,9 +56,9 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
         success: function (data) {
             if (data.state === 'SUCCESS') {
                 if (data.result === false) {
-                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                    toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
                 } else {
-                    Toastr.success(gettext('Файл було сформовано.'));
+                    toastr.success(gettext('Файл було сформовано.'));
                     saveAs(data.result, data.result.split('/').pop());
                 }
                 onSuccess(data);
@@ -69,13 +68,13 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
                         downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
                     }, 1000);
                 } else {
-                    Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                    toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
                     onError();
                 }
             }
         },
         error: function (data) {
-            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
             onError();
         }
     });
@@ -236,7 +235,7 @@ $(function () {
     $(document).on('submit', '#selection-form', function (e) {
         e.preventDefault();
         let $form = $(this);
-        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
+        toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
         $form.find('button[type=submit]')
             .attr('disabled', true)
             .find('i').first()
@@ -268,7 +267,7 @@ $(function () {
         let $this = $(this);
         $this.attr('disabled', true);
         $this.find('i').first().removeClass('fa-download').addClass('fa-spinner');
-        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування документу.'), {timeOut: 5000});
+        toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування документу.'), {timeOut: 5000});
         $.getJSON($this.data('task-create-url'), function (data) {
             downloadFileAfterTaskExec(
                 data.task_id,
@@ -309,7 +308,7 @@ $(function () {
         let $form = $(this);
         // Проверка стоит ли галочка хотя бы на одном документе
         if ($("input[name='cead_id']").filter(':checked').length > 0) {
-            Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
+            toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 5000});
             $form.find('button[type=submit]')
                 .attr('disabled', true)
                 .find('i').first()
@@ -335,7 +334,7 @@ $(function () {
                     });
             });
         } else {
-            Toastr.error(gettext('Не було обрано жодного документу.'));
+            toastr.error(gettext('Не було обрано жодного документу.'));
         }
     });
 
@@ -346,7 +345,7 @@ $(function () {
         let $this = $(this);
         $this.attr('disabled', true);
         $this.find('i').first().removeClass('fa-download').addClass('fa-spinner');
-        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 10000});
+        toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 10000});
 
         $.getJSON($this.data('task-create-url'), function (data) {
             downloadFileAfterTaskExec(
