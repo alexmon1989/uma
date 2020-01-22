@@ -699,7 +699,8 @@ def create_shared_docs_archive(id_app_number):
 @shared_task
 def clear_results_table(minutes=5):
     """Очищает таблицу django_celery_results_taskresult от записей старше minutes минут."""
-    TaskResult.objects.filter(date_done__lte=now() - timedelta(minutes=minutes)).delete()
+    results = TaskResult.objects.filter(date_done__lte=now() - timedelta(minutes=minutes))
+    TaskResult.objects.filter(pk__in=results)._raw_delete(results.db)
 
 
 @shared_task
