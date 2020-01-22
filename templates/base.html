@@ -37,6 +37,15 @@
 
 <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 <script type="text/javascript" src="{% static 'bundles/app.js' %}" ></script>
+{% if messages %}
+    <script>
+        $(document).on('ready', function () {
+            {% for message in messages %}
+                toastr["{{ message.tags }}"]("{{ message }}");
+            {% endfor %}
+        });
+    </script>
+{% endif %}
 {% block extra_scripts %}{% endblock %}
 </body>
 
