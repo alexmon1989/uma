@@ -6,6 +6,7 @@ from datetime import datetime
 
 
 class OpenDataSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True, source="app__id")
     obj_type = serializers.CharField(read_only=True, source="app__obj_type__obj_type_ua")
     app_number = serializers.CharField(read_only=True, source="app__app_number")
     registration_number = serializers.CharField(read_only=True, source="app__registration_number")
@@ -41,6 +42,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = OpenData
         fields = (
+            'id',
             'obj_type',
             'app_number',
             'registration_number',

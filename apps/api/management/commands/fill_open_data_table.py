@@ -6,6 +6,7 @@ from apps.search.models import IpcAppList
 from ...models import OpenData
 import json
 
+
 class Command(BaseCommand):
     help = 'Fills open data db table'
     es = None
@@ -27,23 +28,27 @@ class Command(BaseCommand):
 
             data = h.to_dict()
             try:
+                data_to_write = {}
                 # Патенты на изобретения, Патенты на полезные модели, Свидетельства на топографии инт. микросхем
                 if app.obj_type_id in (1, 2, 3):
-                    data = data['Patent']
+                    data_to_write = data['Patent']
                 # Свидетельства на знаки для товаров и услуг
                 elif app.obj_type_id == 4:
-                    data = data['TradeMark']['TrademarkDetails']
+                    data_to_write = data['TradeMark']['TrademarkDetails']
                 # Свидетельства на КЗПТ
                 elif app.obj_type_id == 5:
-                    data = data['Geo']['GeoDetails']
+                    data_to_write = data['Geo']['GeoDetails']
                 # Патенты на пром. образцы
                 elif app.obj_type_id == 6:
-                    data = data['Design']['DesignDetails']
+                    data_to_write = data['Design']['DesignDetails']
+
+                if data['search_data']['obj_state'] == 2:
+                    data_to_write['registration_status_color'] = data['search_data']['registration_status_color']
             except KeyError as e:
                 self.stdout.write(self.style.ERROR(f"Can't get app data (idAPPNumber={app.id}, error text:{e})"))
             else:
                 open_data_record, created = OpenData.objects.get_or_create(app=app)
-                open_data_record.data = json.dumps(data)
+                open_data_record.data = json.dumps(data_to_write)
                 open_data_record.save()
 
         self.stdout.write(self.style.SUCCESS('Finished'))
