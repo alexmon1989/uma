@@ -52,6 +52,7 @@ class OpenDataListView(generics.ListAPIView):
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
         return queryset.values(
+            'app__id',
             'app__obj_type__obj_type_ua',
             'app__app_number',
             'app__registration_number',
