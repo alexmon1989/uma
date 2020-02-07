@@ -146,3 +146,9 @@ def sort_params(context):
 def user_has_access_to_docs(user, id_app_number):
     """Возвращает признак доступности документа(ов)."""
     return user_has_access_to_docs_(user, id_app_number)
+
+
+@register.filter
+def filter_bad_documents(documents):
+    """Исключает из списка документов документы без даты регистрации и barcode"""
+    return filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents)
