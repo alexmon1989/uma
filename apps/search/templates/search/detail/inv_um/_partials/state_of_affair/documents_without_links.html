@@ -24,29 +24,31 @@
 
                     <tbody>
                     {% for doc in hit.DOCFLOW.DOCUMENTS %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCREGDATE %}
-                                    {{ doc.DOCRECORD.DOCREGDATE|parse_date|date:"d.m.Y" }}
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCSENDINGDATE %}
-                                    {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if doc.DOCRECORD.DOCTYPE %}
-                                    {{ doc.DOCRECORD.DOCTYPE }}
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                {% if doc.DOCRECORD.DOCREGNUMBER %}
-                                    {{ doc.DOCRECORD.DOCREGNUMBER }}
-                                {% endif %}
-                            </td>
-                        </tr>
+                        {% if doc.DOCRECORD.DOCREGNUMBER or doc.DOCRECORD.DOCBARCODE %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCREGDATE %}
+                                        {{ doc.DOCRECORD.DOCREGDATE|parse_date|date:"d.m.Y" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCSENDINGDATE %}
+                                        {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if doc.DOCRECORD.DOCTYPE %}
+                                        {{ doc.DOCRECORD.DOCTYPE }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if doc.DOCRECORD.DOCREGNUMBER %}
+                                        {{ doc.DOCRECORD.DOCREGNUMBER }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>
