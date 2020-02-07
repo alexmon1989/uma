@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load uma_extras %}
+{% load search_extras %}
 
 <div class="row">
     <div class="col-md-12 g-mb-40">
@@ -28,7 +29,7 @@
                         </thead>
 
                         <tbody>
-                        {% for doc in hit.DOCFLOW.DOCUMENTS %}
+                        {% for doc in hit.DOCFLOW.DOCUMENTS|filter_bad_documents %}
                             <tr>
                                 <td>
                                     {% if doc.DOCRECORD.DOCIDDOCCEAD %}
@@ -64,7 +65,7 @@
                         {% endfor %}
                         <tr>
                             <td colspan="7" class="g-bg-white">
-                                {% if hit.DOCFLOW.DOCUMENTS|length > 0 %}
+                                {% if hit.DOCFLOW.DOCUMENTS|filter_bad_documents|length > 0 %}
                                     <button class="btn btn-primary"
                                             type="submit"><i
                                             class="fa fa-download"></i>&nbsp;{% trans "Завантажити обрані" %}</button>

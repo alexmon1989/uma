@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load uma_extras %}
+{% load search_extras %}
 
 <div class="row">
     <div class="col-md-12 g-mb-40">
@@ -23,7 +24,7 @@
                     </thead>
 
                     <tbody>
-                    {% for doc in hit.DOCFLOW.DOCUMENTS %}
+                    {% for doc in hit.DOCFLOW.DOCUMENTS|filter_bad_documents %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td class="text-center">
