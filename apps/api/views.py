@@ -24,9 +24,9 @@ class OpenDataListView(generics.ListAPIView):
             try:
                 date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y').strftime('%Y-%m-%d')
                 if changed:
-                    queryset = queryset.filter(app__lastupdate__gte=date_from)
+                    queryset = queryset.filter(last_update__gte=date_from)
                 else:
-                    queryset = queryset.filter(app__registration_date__gte=date_from)
+                    queryset = queryset.filter(registration_date__gte=date_from)
             except:
                 raise exceptions.ParseError("Невірне значення параметру date_from")
 
@@ -36,9 +36,9 @@ class OpenDataListView(generics.ListAPIView):
             try:
                 date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y').strftime('%Y-%m-%d')
                 if changed:
-                    queryset = queryset.filter(app__lastupdate__lte=date_to)
+                    queryset = queryset.filter(last_update__lte=date_to)
                 else:
-                    queryset = queryset.filter(app__registration_date__lte=date_to)
+                    queryset = queryset.filter(registration_date__lte=date_to)
             except:
                 raise exceptions.ParseError("Невірне значення параметру date_to")
 
@@ -47,16 +47,16 @@ class OpenDataListView(generics.ListAPIView):
         if obj_type:
             try:
                 obj_type = ObjType.objects.get(id=obj_type)
-                queryset = queryset.filter(app__obj_type=obj_type)
+                queryset = queryset.filter(obj_type=obj_type)
             except ObjType.DoesNotExist:
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
         return queryset.values(
-            'app__id',
-            'app__obj_type__obj_type_ua',
-            'app__app_number',
-            'app__registration_number',
-            'app__registration_date',
-            'app__lastupdate',
+            'app_id',
+            'obj_type__obj_type_ua',
+            'app_number',
+            'registration_number',
+            'registration_date',
+            'last_update',
             'data',
         )
