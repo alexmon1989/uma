@@ -151,4 +151,4 @@ def user_has_access_to_docs(user, id_app_number):
 @register.filter
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
-    return filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents)
+    return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents))
