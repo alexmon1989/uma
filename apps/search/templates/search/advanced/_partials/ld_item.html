@@ -103,7 +103,7 @@
                            data-title="Повний список власників"
                            data-html="true"
                            data-trigger="focus"
-                           data-content="{% for I_73_ in biblio_data.I_73|list_of_dicts_unique %}{{ I_73|get_person_name }} [{{ I_73|get_person_country }}]<br>{% endfor %}"
+                           data-content="{% for I_73_ in biblio_data.I_73|list_of_dicts_unique %}{{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]<br>{% endfor %}"
                         >(+{{ biblio_data.I_73|list_of_dicts_unique|length|add:"-2" }})</a>
                     {% endif %}
                 {% endfor %}
