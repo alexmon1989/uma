@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.utils.timezone import make_aware
+from django.db.models import Max
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Q, Search
+from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
 from ...models import OpenData
 import json
@@ -15,40 +17,57 @@ class Command(BaseCommand):
         # Инициализация клиента ElasticSearch
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
-        # Выборка всех охранных документов из ElasticSearch
-        q = Q(
-            'query_string',
-            query='search_data.obj_state:2'
-        )
-        s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(q)
+        # Получение максимальной даты обновления в таблице с данными для OpenData
+        max_date = OpenData.objects.aggregate(Max('last_update'))['last_update__max']
 
-        # Добавление в БД
-        for h in s.params(size=100, preserve_order=True).scan():
-            app = IpcAppList.objects.get(id=h.meta.id)
+        # Получение данных всех объектов, дата обновления у которых больше max_date,
+        # обновление их в таблице с данными для OpenData
+        items = IpcAppList.objects.filter(registration_date__isnull=False).order_by('lastupdate')
+        if max_date:
+            items = items.filter(lastupdate__gt=max_date)
 
-            data = h.to_dict()
-            try:
-                data_to_write = {}
-                # Патенты на изобретения, Патенты на полезные модели, Свидетельства на топографии инт. микросхем
-                if app.obj_type_id in (1, 2, 3):
-                    data_to_write = data['Patent']
-                # Свидетельства на знаки для товаров и услуг
-                elif app.obj_type_id == 4:
-                    data_to_write = data['TradeMark']['TrademarkDetails']
-                # Свидетельства на КЗПТ
-                elif app.obj_type_id == 5:
-                    data_to_write = data['Geo']['GeoDetails']
-                # Патенты на пром. образцы
-                elif app.obj_type_id == 6:
-                    data_to_write = data['Design']['DesignDetails']
+        for item in items:
+            open_data_record, created = OpenData.objects.get_or_create(
+                app_id=item.pk
+            )
+            # Обновление данных, если это необходимо
+            if open_data_record.last_update != make_aware(item.lastupdate):
+                open_data_record.obj_type_id = item.obj_type_id
+                open_data_record.last_update = make_aware(item.lastupdate)
+                open_data_record.app_number = item.app_number
+                open_data_record.registration_number = item.registration_number
+                open_data_record.registration_date = make_aware(item.registration_date)
 
-                if data['search_data']['obj_state'] == 2:
-                    data_to_write['registration_status_color'] = data['search_data']['registration_status_color']
-            except KeyError as e:
-                self.stdout.write(self.style.ERROR(f"Can't get app data (idAPPNumber={app.id}, error text:{e})"))
-            else:
-                open_data_record, created = OpenData.objects.get_or_create(app=app)
-                open_data_record.data = json.dumps(data_to_write)
+                # Получение данных с ElasticSearch
+                data = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query("match", _id=item.id).execute()
+
+                if data:
+                    data = data[0].to_dict()
+                    try:
+                        data_to_write = {}
+                        # Патенты на изобретения, Патенты на полезные модели, Свидетельства на топографии инт. микросхем
+                        if item.obj_type_id in (1, 2, 3):
+                            data_to_write = data['Patent']
+                        # Свидетельства на знаки для товаров и услуг
+                        elif item.obj_type_id == 4:
+                            data_to_write = data['TradeMark']['TrademarkDetails']
+                        # Свидетельства на КЗПТ
+                        elif item.obj_type_id == 5:
+                            data_to_write = data['Geo']['GeoDetails']
+                        # Патенты на пром. образцы
+                        elif item.obj_type_id == 6:
+                            data_to_write = data['Design']['DesignDetails']
+
+                        if data['search_data']['obj_state'] == 2:
+                            data_to_write['registration_status_color'] = data['search_data']['registration_status_color']
+                    except KeyError as e:
+                        self.stdout.write(
+                            self.style.ERROR(f"Can't get app data (idAPPNumber={item.id}, error text:{e})")
+                        )
+                    else:
+                        open_data_record.data = json.dumps(data_to_write)
+
+                # Сохранение в БД
                 open_data_record.save()
 
-        self.stdout.write(self.style.SUCCESS('Finished'))
+        self.stdout.write(self.style.SUCCESS(f'Finished'))

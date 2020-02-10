@@ -6,7 +6,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 class IpcAppList(models.Model):
     id = models.AutoField(db_column='idAPPNumber', primary_key=True)
     app_number = models.CharField(db_column='APP_Number', max_length=100, blank=True, null=True)
-    registration_number = models.IntegerField(db_column='RegistrationNumber', blank=True, null=True)
+    registration_number = models.CharField(db_column='RegistrationNumber', max_length=32, blank=True, null=True)
     registration_date = models.DateField(db_column='RegistrationDate', blank=True, null=True)
     id_shedule_type = models.IntegerField(db_column='idSheduleType')
     files_path = models.CharField(db_column='FilesPath', max_length=500, blank=True, null=True)

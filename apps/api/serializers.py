@@ -6,12 +6,8 @@ from datetime import datetime
 
 
 class OpenDataSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True, source="app__id")
-    obj_type = serializers.CharField(read_only=True, source="app__obj_type__obj_type_ua")
-    app_number = serializers.CharField(read_only=True, source="app__app_number")
-    registration_number = serializers.CharField(read_only=True, source="app__registration_number")
-    registration_date = serializers.DateTimeField(read_only=True, source="app__registration_date")
-    last_update = serializers.DateTimeField(read_only=True, source="app__lastupdate")
+    id = serializers.IntegerField(read_only=True, source="app_id")
+    obj_type = serializers.CharField(read_only=True, source="obj_type__obj_type_ua")
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
