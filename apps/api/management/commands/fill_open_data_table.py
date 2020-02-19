@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         # Получение данных всех объектов, дата обновления у которых больше max_date,
         # обновление их в таблице с данными для OpenData
-        items = IpcAppList.objects.filter(registration_date__isnull=False).order_by('lastupdate')
+        items = IpcAppList.objects.filter(registration_date__isnull=False, elasticindexed=1).order_by('lastupdate')
         if max_date:
             items = items.filter(lastupdate__gt=max_date)
 
@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 app_id=item.pk
             )
             # Обновление данных, если это необходимо
-            if open_data_record.last_update != make_aware(item.lastupdate):
+            if open_data_record.last_update != make_aware(item.lastupdate) or len(open_data_record.data) == 0:
                 open_data_record.obj_type_id = item.obj_type_id
                 open_data_record.last_update = make_aware(item.lastupdate)
                 open_data_record.app_number = item.app_number

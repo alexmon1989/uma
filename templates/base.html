@@ -40,8 +40,9 @@
 {% if messages %}
     <script>
         $(document).on('ready', function () {
+            toastr.options.escapeHtml = false;
             {% for message in messages %}
-                toastr["{{ message.tags }}"]("{{ message }}");
+                toastr["{{ message.tags }}"]("{{ message|safe }}");
             {% endfor %}
         });
     </script>

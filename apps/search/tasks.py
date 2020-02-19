@@ -171,7 +171,7 @@ def get_app_details(id_app_number, user_id):
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
 
-    hit['id_app_number'] = id_app_number
+    hit['meta'] = {'id': id_app_number}
 
     return hit
 

@@ -2,10 +2,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.aggs import Terms, Nested
-from .models import ObjType, InidCodeSchedule, OrderService, SortParameter
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -185,9 +186,9 @@ def filter_unpublished_apps(user, qs):
 
     """Фильтры для обычных пользователей."""
     # Не показывать заявки на знаки со статусом 1000
-    filter_qs = ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+    # filter_qs = ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
     # Не показывать заявки по пром. образцам и полезным моделям
-    filter_qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
     # Показывать только заявки с датой заяки (но показывать все КЗПТ)
     filter_qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
     # Для заявок на изобретения нужно чтоб существовал I_43.D
@@ -195,19 +196,22 @@ def filter_unpublished_apps(user, qs):
     # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
     filter_qs &= ~Q(
         'query_string',
-        query="NOT _exists_:TradeMark.PaymentDetails AND search_data.obj_state:1 AND Document.idObjType:4"
+        query="NOT _exists_:TradeMark.PaymentDetails "
+              "AND search_data.obj_state:1 "
+              "AND Document.idObjType:4 "
+              "AND NOT Document.MarkCurrentStatusCodeType:1000"
     )
 
-    if user.is_anonymous or not user.certificateowner:
-        # Для анонимных пользователей применяются все фильтры
-        qs &= filter_qs
-    else:
+    try:
         # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
         user_name = user.certificateowner.pszSubjFullName.strip()
         qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
+    except (get_user_model().certificateowner.RelatedObjectDoesNotExist, AttributeError):
+        # Для обычных пользователей без ЭЦП или анонимных пользователей применяются все фильтры
+        qs &= filter_qs
 
     return qs
 
@@ -1146,7 +1150,7 @@ def user_has_access_to_docs_decorator(f):
 def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
-    if user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists():
+    if not user.is_anonymous and user.is_vip():
         return True
 
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
@@ -1165,6 +1169,16 @@ def user_has_access_to_docs(user, hit):
                 pass
 
     return False
+
+
+def user_has_access_to_tm_app(user, hit):
+    """Возвращает признак доступности заявки на знак для товаров и услуг пользователю."""
+    try:
+        return hit['Document']['MarkCurrentStatusCodeType'] != '1000' \
+               or user_has_access_to_docs(user, hit) \
+               or user in IpcAppList.objects.get(id=hit['meta']['id']).users_with_access.all()
+    except IpcAppList.DoesNotExist:
+        return False
 
 
 def create_search_res_doc(data):

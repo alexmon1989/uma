@@ -313,7 +313,7 @@ class Command(BaseCommand):
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
                 'app_number': res['Design']['DesignDetails'].get('DesignApplicationNumber'),
-                'app_date': res['Design']['DesignDetails'].get('DesignApplicationDate'),
+                'app_date': res['Design']['DesignDetails'].get('DesignApplicationDate', doc['app_date']),
                 'protective_doc_number': res['Design']['DesignDetails'].get('RegistrationNumber'),
                 'rights_date': res['Design']['DesignDetails'].get('RecordEffectiveDate'),
                 'applicant': applicant,
@@ -445,7 +445,8 @@ class Command(BaseCommand):
             'files_path',
             'obj_type_id',
             'registration_number',
-            'app_number'
+            'app_number',
+            'app_date',
         )
         # Фильтрация по параметрам командной строки
         if options['id']:

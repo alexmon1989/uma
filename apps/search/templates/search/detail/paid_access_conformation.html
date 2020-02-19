@@ -1,0 +1,34 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<section
+    class="gradient g-bg-size-cover g-bg-pos-center g-bg-cover g-bg-black-opacity-0_1--after g-color-white g-min-height-160"
+    style="background-image: url({% static 'img/bg/bg-1.jpg' %});">
+    <div class="container g-bg-cover__inner"></div>
+</section>
+
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <div class="col-12">
+            <p class="g-font-size-16 text-danger">
+                {% blocktrans with app_number=hit.search_data.app_number %}
+                    Увага! Доступ до даних заявки <b>{{ app_number }}</b> обмежено.
+                {% endblocktrans %}
+            </p>
+
+            {% if user.is_authenticated %}
+                <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="#">балансу рахунку</a> буде списано <b>10 грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
+                <p>Ваш поточний баланс рахунку: <b>{{ request.user.balance.value }} грн</b></p>
+                <p><a class="btn btn-sm u-btn-purple " href=""><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a></p>
+                <div class="d-flex g-mt-15 flex-column align-items-center">
+                    <a href="{% url 'search:get-access-app' hit.meta.id %}"
+                       class="btn btn-lg u-btn-primary {% if request.user.balance.value < 10.00 %}disabled{% endif %}"><i class="fa fa-check g-mr-5"></i>Я згоден та хочу продовжити перегляд</a>
+                    {% if request.user.balance.value < 10 %}<small class="text-muted">для продовження поповніть рахунок</small>{% endif %}
+                </div>
+            {% else %}
+                <p>Доступ до даних заявки надається на платній основі. Вартість перегляду даних однієї заявки складає <b>10 грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
+                <p>Для продовження роботи необхідно <a href="{% url 'auth:login' %}">авторизуватися</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
