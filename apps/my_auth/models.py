@@ -83,6 +83,17 @@ def get_username_full(self):
         return self.certificateowner.pszSubjFullName
     return self.get_full_name()
 
+
+def get_email(self):
+    """Возвращает эл. адр. пользователя."""
+    if self.email:
+        return self.email
+    if hasattr(self, 'certificateowner'):
+        return self.certificateowner.pszSubjEMail
+    return ''
+
+
 User.add_to_class('is_vip', is_vip)
 User.add_to_class('get_username_short', get_username_short)
 User.add_to_class('get_username_full', get_username_full)
+User.add_to_class('get_email', get_email)

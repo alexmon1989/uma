@@ -2,9 +2,11 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from .models import BalanceOperation
-from .forms import DepositForm
+from django.utils.translation import gettext as _
+from .models import BalanceOperation, License
+from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
 
 
@@ -22,7 +24,7 @@ class AccountBalanceView(LoginRequiredMixin, ListView):
         return self.request.user.balance.balanceoperation_set.all().order_by('-created_at')
 
 
-class DepositView(FormView):
+class DepositView(LoginRequiredMixin, FormView):
     """Пополнение счёта."""
     template_name = 'accounts/account_balance_deposit/index.html'
     form_class = DepositForm
@@ -49,6 +51,32 @@ class MessagesListView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/messages/list.html"
 
 
-class SettingsView(LoginRequiredMixin, TemplateView):
+class SettingsView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     """Отображает страницу настроек кабинета."""
     template_name = "accounts/settings/index.html"
+    form_class = SettingsForm
+    success_url = reverse_lazy('account:settings')
+    success_message = _('Дані успішно збережено')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['email'] = self.request.user.get_email()
+        lic, created = License.objects.get_or_create()
+        initial['license_confirmed'] = self.request.user in lic.users.all()
+        return initial
+
+    def form_valid(self, form):
+        self.request.user.email = form.cleaned_data['email']
+        self.request.user.save()
+        lic, created = License.objects.get_or_create()
+        if form.cleaned_data['license_confirmed']:
+            if self.request.user not in lic.users.all():
+                lic.users.add(self.request.user)
+        else:
+            lic.users.remove(self.request.user)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['license'], created = License.objects.get_or_create()
+        return context

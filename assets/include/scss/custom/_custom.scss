@@ -153,3 +153,9 @@
 .bg-lightred {
   background-color: rgb(255, 99, 80) !important;
 }
+
+#account-settings-form {
+  label:not(.form-check-label) {
+    font-weight: 600;
+  }
+}
