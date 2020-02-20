@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import DashboardView, AccountBalanceView, MessagesListView, SettingsView, ViewsHistoryView
+from .views import DashboardView, AccountBalanceView, MessagesListView, SettingsView, ViewsHistoryView, DepositView
 
 app_name = 'account'
 urlpatterns = [
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
     path('account-balance/', AccountBalanceView.as_view(), name="account_balance"),
+    path('account-balance-deposit/', DepositView.as_view(), name="account_balance_deposit"),
     path('messages-list/', MessagesListView.as_view(), name="messages_list"),
     path('settings/', SettingsView.as_view(), name="settings"),
     path('views-history/', ViewsHistoryView.as_view(), name="views_history"),

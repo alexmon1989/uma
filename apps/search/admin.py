@@ -2,11 +2,12 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from singlemodeladmin import SingleModelAdmin
 from .models import (IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule, SortParameter, AdvancedSearchPage,
-                     SimpleSearchPage)
+                     SimpleSearchPage, PaidServicesSettings)
 
 
 admin.site.register(SimpleSearchPage, SingleModelAdmin)
 admin.site.register(AdvancedSearchPage, SingleModelAdmin)
+admin.site.register(PaidServicesSettings, SingleModelAdmin)
 
 
 @admin.register(IpcCode)

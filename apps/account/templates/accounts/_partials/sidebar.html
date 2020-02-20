@@ -6,7 +6,7 @@
         <span><i class="icon-cursor g-pos-rel g-top-1 g-mr-8"></i> {% trans "Загальна інформація" %}</span>
     </a>
     <a href="{% url 'account:account_balance' %}"
-       class="list-group-item list-group-item-action justify-content-between {% if request.resolver_match.url_name == 'account_balance' %}active{% endif %}">
+       class="list-group-item list-group-item-action justify-content-between {% if request.resolver_match.url_name == 'account_balance' or request.resolver_match.url_name == 'account_balance_deposit' %}active{% endif %}">
         <span><i class="icon-credit-card g-pos-rel g-top-1 g-mr-8"></i> {% trans "Мій рахунок (баланс)" %}</span>
     </a>
     <a href="{% url 'account:views_history' %}"

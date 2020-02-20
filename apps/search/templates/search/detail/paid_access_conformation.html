@@ -17,12 +17,12 @@
             </p>
 
             {% if user.is_authenticated %}
-                <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="#">балансу рахунку</a> буде списано <b>10 грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
+                <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="#">балансу рахунку</a> буде списано <b class="g-font-size-16">{{ paid_service_settings.tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
                 <p>Ваш поточний баланс рахунку: <b>{{ request.user.balance.value }} грн</b></p>
                 <p><a class="btn btn-sm u-btn-purple " href=""><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a></p>
                 <div class="d-flex g-mt-15 flex-column align-items-center">
                     <a href="{% url 'search:get-access-app' hit.meta.id %}"
-                       class="btn btn-lg u-btn-primary {% if request.user.balance.value < 10.00 %}disabled{% endif %}"><i class="fa fa-check g-mr-5"></i>Я згоден та хочу продовжити перегляд</a>
+                       class="btn btn-lg u-btn-primary {% if request.user.balance.value < paid_service_settings.tm_app_access_price %}disabled{% endif %}"><i class="fa fa-check g-mr-5"></i>Я згоден та хочу продовжити перегляд</a>
                     {% if request.user.balance.value < 10 %}<small class="text-muted">для продовження поповніть рахунок</small>{% endif %}
                 </div>
             {% else %}

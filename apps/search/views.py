@@ -13,7 +13,7 @@ from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
-                     SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit)
+                     SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import (get_client_ip, paginate_results, user_has_access_to_tm_app)
 from urllib.parse import parse_qs, urlparse
@@ -245,6 +245,7 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] == 4:
                     if not user_has_access_to_tm_app(request.user, context['hit']):
                         # Шаблон подтверждения получения доступа к заявке с платным доступом
+                        context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
                         template = 'search/detail/paid_access_conformation.html'
                     else:
                         template = 'search/detail/tm/detail.html'
@@ -412,14 +413,16 @@ class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
         app = get_object_or_404(IpcAppList, pk=kwargs['pk'])
 
         # Создание записи о доступе пользователя к заявке
-        if self.request.user not in app.users_with_access.all() and self.request.user.balance.value >= 10:
-            self.request.user.balance.value -= 10
+        paid_service_settings, created = PaidServicesSettings.objects.get_or_create()
+        if self.request.user not in app.users_with_access.all() \
+                and self.request.user.balance.value >= paid_service_settings.tm_app_access_price:
+            self.request.user.balance.value -= paid_service_settings.tm_app_access_price
             self.request.user.balance.save()
             AppUserAccess.objects.create(user=self.request.user, app=app)
             BalanceOperation.objects.create(
                 balance=self.request.user.balance,
-                value=10,
-                type=2,
+                value=paid_service_settings.tm_app_access_price,
+                type=1,
                 app=app
             )
             messages.success(

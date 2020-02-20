@@ -137,16 +137,16 @@
                                     <ul class="g-pos-abs hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-10 g-mt-20--md g-mt-10--lg--scrolling"
                                         id="nav-submenu-1" aria-labelledby="nav-link-1">
                                         <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="#">Мій рахунок (баланс)</a>
+                                            <a class="nav-link g-px-0" href="{% url 'account:account_balance' %}">Мій рахунок (баланс)</a>
                                         </li>
                                         <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="#">Історія переглядів</a>
+                                            <a class="nav-link g-px-0" href="{% url 'account:views_history' %}">Історія переглядів</a>
                                         </li>
                                         <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="#">Повідомлення</a>
+                                            <a class="nav-link g-px-0" href="{% url 'account:messages_list' %}">Повідомлення</a>
                                         </li>
                                         <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="#">Налаштування</a>
+                                            <a class="nav-link g-px-0" href="{% url 'account:settings' %}">Налаштування</a>
                                         </li>
                                         <li class="dropdown-item g-bg-gray-light-v5">
                                             <a class="nav-link g-px-0 g-font-weight-600" href="{% url 'auth:logout' %}"><i class="fa fa-sign-out g-pr-5" aria-hidden="true"></i>{% trans "Вихід" %}</a>

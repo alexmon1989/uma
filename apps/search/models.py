@@ -380,3 +380,17 @@ class AppVisit(TimeStampedModel):
         indexes = [
             models.Index(fields=['created_at']),
         ]
+
+
+class PaidServicesSettings(models.Model):
+    """Модель настроек платных услуг."""
+    tm_app_access_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        verbose_name='Вартість доступу до заявки на ТМ, грн',
+        default=120
+    )
+
+    class Meta:
+        verbose_name = 'Налаштування платних послуг'
+        verbose_name_plural = 'Налаштування платних послуг'

@@ -1174,7 +1174,7 @@ def user_has_access_to_docs(user, hit):
 def user_has_access_to_tm_app(user, hit):
     """Возвращает признак доступности заявки на знак для товаров и услуг пользователю."""
     try:
-        return hit['Document']['MarkCurrentStatusCodeType'] != '1000' \
+        return hit['Document'].get('MarkCurrentStatusCodeType') != '1000' \
                or user_has_access_to_docs(user, hit) \
                or user in IpcAppList.objects.get(id=hit['meta']['id']).users_with_access.all()
     except IpcAppList.DoesNotExist:

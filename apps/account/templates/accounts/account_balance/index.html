@@ -17,54 +17,48 @@
 
             <div class="col-md-9 g-mb-60">
                 <div class="d-md-flex justify-content-between align-items-center g-mb-20">
-                    <p class="lead g-font-weight-400 g-pr-10">Поточний баланс рахунку: <span class="g-font-weight-600">200 грн</span></p>
-                    <a href="#!" class="btn btn-md u-btn-purple g-mr-10 g-mb-15"><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a>
+                    <p class="lead g-font-weight-400 g-pr-10">Поточний баланс рахунку: <span class="g-font-weight-600">{{ request.user.balance.value }} грн</span></p>
+                    <a href="{% url 'account:account_balance_deposit' %}" class="btn btn-md u-btn-purple g-mr-10 g-mb-15"><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a>
                 </div>
 
+                {% if balanceoperation_list %}
+                    <!-- Basic Table -->
+                    <div class="card g-brd-primary rounded-0">
+                        <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                            <i class="fa fa-tasks g-mr-5"></i>
+                            {% trans "Операції" %}
+                        </h3>
 
-                <!-- Basic Table -->
-                <div class="card g-brd-primary rounded-0">
-                    <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
-                        <i class="fa fa-tasks g-mr-5"></i>
-                        {% trans "Операції" %}
-                    </h3>
 
-                    <div class="card-block table-responsive g-pa-15">
-                        <table class="table table-striped table-bordered u-table--v1 mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Значення</th>
-                                    <th>Опис</th>
-                                </tr>
-                            </thead>
+                        <div class="card-block table-responsive g-pa-15">
+                            <table class="table table-striped table-bordered u-table--v1 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Значення</th>
+                                        <th>Опис</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
-                            <tr>
-                                <td>11.02.2020</td>
-                                <td class="text-danger">-200 грн</td>
-                                <td>Отримання доступу до даних заявки <a title="Відкрити у новій вкладці" href="http://127.0.0.1:9000/uk/search/detail/1388912/" target="_blank">m201913894<i class="g-ml-5 fa fa-external-link"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td>06.02.2020</td>
-                                <td class="text-danger">-200 грн</td>
-                                <td>Отримання доступу до даних заявки <a title="Відкрити у новій вкладці" href="http://127.0.0.1:9000/uk/search/detail/1388913/" target="_blank">m201914697<i class="g-ml-5 fa fa-external-link"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td>05.02.2020</td>
-                                <td class="text-danger">-200 грн</td>
-                                <td>Отримання доступу до даних заявки <a title="Відкрити у новій вкладці" href="http://127.0.0.1:9000/uk/search/detail/1388914/" target="_blank">m201914700<i class="g-ml-5 fa fa-external-link"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td>01.02.2020</td>
-                                <td class="text-success">+1000 грн</td>
-                                <td>Поповнення балансу</td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                <tbody>
+                                {% for operation in balanceoperation_list %}
+                                    <tr>
+                                        <td>{{ operation.created_at|date:'d.m.Y H:i:s' }}</td>
+                                        {% if operation.type == 1 %}
+                                            <td class="text-danger">-{{ operation.value }} грн</td>
+                                            <td>Отримання доступу до даних заявки <a title="Відкрити у новій вкладці" href="{% url 'search:detail' operation.app.id %}" target="_blank">{{ operation.app.app_number }}<i class="g-ml-5 fa fa-external-link"></i></a></td>
+                                        {% else %}
+                                            <td class="text-success">+{{ operation.value }} грн</td>
+                                            <td>Поповнення балансу</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <!-- End Basic Table -->
+                    <!-- End Basic Table -->
+                {% endif %}
             </div>
         </div>
     </section>

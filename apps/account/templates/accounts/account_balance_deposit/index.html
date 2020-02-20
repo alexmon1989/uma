@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Баланс рахунку" %} - {% trans "Мій кабінет" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'accounts/account_balance/_partials/breadcrumbs.html' %}
+
+    <section class="container g-pt-70 g-pb-20">
+        <div class="row justify-content-between">
+            <div class="col-lg-3 g-mb-50 g-mb-0--lg">
+                <!-- Sidebar Navigation -->
+                {% include 'accounts/_partials/sidebar.html' %}
+                <!-- End Sidebar Navigation -->
+            </div>
+
+            <div class="col-md-9 g-mb-60">
+                <form method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary">Поповнити</button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

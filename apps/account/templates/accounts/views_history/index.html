@@ -16,7 +16,39 @@
             </div>
 
             <div class="col-md-9 g-mb-60">
-                Історія переглядів заявок
+                {% if appvisit_list %}
+                    <!-- Basic Table -->
+                    <div class="card g-brd-primary rounded-0">
+                        <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                            <i class="fa fa-tasks g-mr-5"></i>
+                            {% trans "Історія переглядів заявок" %}
+                        </h3>
+
+
+                        <div class="card-block table-responsive g-pa-15">
+                            <table class="table table-striped table-bordered u-table--v1 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>№ заявки</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for visit in appvisit_list %}
+                                    <tr>
+                                        <td>{{ visit.created_at|date:'d.m.Y H:i:s' }}</td>
+                                        <td><a href="{% url 'search:detail' visit.app.id %}">{{ visit.app.app_number }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Basic Table -->
+                {% else %}
+                    <p>{% trans 'Історія переглядів поки що пуста.' %}</p>
+                {% endif %}
             </div>
         </div>
     </section>
