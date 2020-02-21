@@ -24,7 +24,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
                     create_selection, create_simple_search_results_file, create_advanced_search_results_file,
                     create_transactions_search_results_file, create_shared_docs_archive)
-from ..account.models import BalanceOperation
+from ..account.models import BalanceOperation, License
 
 
 class SimpleListView(TemplateView):
@@ -246,6 +246,8 @@ def get_data_app_html(request):
                     if not user_has_access_to_tm_app(request.user, context['hit']):
                         # Шаблон подтверждения получения доступа к заявке с платным доступом
                         context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
+                        if not request.user.has_confirmed_license():
+                            context['license'], created = License.objects.get_or_create()
                         template = 'search/detail/paid_access_conformation.html'
                     else:
                         template = 'search/detail/tm/detail.html'

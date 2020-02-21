@@ -19,15 +19,19 @@
             <div class="col-md-9 g-mb-60">
                 <p class="lead g-font-weight-400 g-pr-10 g-mb-20">Поточний баланс рахунку: <span class="g-font-weight-600">{{ request.user.balance.value }} грн</span></p>
 
-                <form method="post" class="form" id="account-balance-deposit-form">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    {% buttons %}
-                        <div class="text-sm-right">
-                        <button type="submit" class="btn u-btn-primary rounded-0 g-py-12 g-px-25"><i class="fa fa-dollar g-mr-5"></i>Поповнити</button>
-                        </div>
-                    {% endbuttons %}
-                </form>
+                {% if not user.has_confirmed_license %}
+                    {% include 'accounts/account_balance_deposit/_partials/license_confirmation.html' %}
+                {% else %}
+                    <form method="post" class="form" id="account-balance-deposit-form">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        {% buttons %}
+                            <div class="text-sm-right">
+                            <button type="submit" class="btn u-btn-primary rounded-0 g-py-12 g-px-25"><i class="fa fa-dollar g-mr-5"></i>Поповнити</button>
+                            </div>
+                        {% endbuttons %}
+                    </form>
+                {% endif %}
             </div>
         </div>
     </section>

@@ -9,7 +9,7 @@
 
 <div class="container g-min-height-200 g-py-20 g-py-70--lg">
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 text-justify">
             <p class="g-font-size-16 text-danger">
                 {% blocktrans with app_number=hit.search_data.app_number %}
                     Увага! Доступ до даних заявки <b>{{ app_number }}</b> обмежено.
@@ -20,9 +20,14 @@
                 <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="#">балансу рахунку</a> буде списано <b class="g-font-size-16">{{ paid_service_settings.tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
                 <p>Ваш поточний баланс рахунку: <b>{{ request.user.balance.value }} грн</b></p>
                 <p><a class="btn btn-sm u-btn-purple " href="{% url 'account:account_balance_deposit' %}"><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a></p>
+
+                {% if not user.has_confirmed_license %}
+                    {% include 'search/detail/_partials/license_confirmation.html' %}
+                {% endif %}
+
                 <div class="d-flex g-mt-15 flex-column align-items-center">
                     <a href="{% url 'search:get-access-app' hit.meta.id %}"
-                       class="btn btn-lg u-btn-primary {% if request.user.balance.value < paid_service_settings.tm_app_access_price %}disabled{% endif %}"><i class="fa fa-check g-mr-5"></i>Я згоден та хочу продовжити перегляд</a>
+                       class="btn btn-md u-btn-primary {% if not user.has_confirmed_license or request.user.balance.value < paid_service_settings.tm_app_access_price %}disabled{% endif %}"><i class="fa fa-check g-mr-5"></i>Я згоден та хочу продовжити перегляд</a>
                     {% if request.user.balance.value < paid_service_settings.tm_app_access_price %}<small class="text-muted">для продовження <a href="{% url 'account:account_balance_deposit' %}">поповніть рахунок</a></small>{% endif %}
                 </div>
             {% else %}

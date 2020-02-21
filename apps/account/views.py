@@ -39,6 +39,12 @@ class DepositView(LoginRequiredMixin, FormView):
         BalanceOperation.objects.create(balance=self.request.user.balance, type=2, value=form.cleaned_data['value'])
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not self.request.user.has_confirmed_license():
+            context['license'], created = License.objects.get_or_create()
+        return context
+
 
 class ViewsHistoryView(LoginRequiredMixin, ListView):
     """Отображает страницу истории просмотров заявок."""
@@ -82,22 +88,38 @@ class SettingsView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     def get_initial(self):
         initial = super().get_initial()
         initial['email'] = self.request.user.get_email()
-        lic, created = License.objects.get_or_create()
+        lic = License.objects.first()
         initial['license_confirmed'] = self.request.user in lic.users.all()
         return initial
 
     def form_valid(self, form):
         self.request.user.email = form.cleaned_data['email']
         self.request.user.save()
-        lic, created = License.objects.get_or_create()
+        lic = License.objects.first()
         if form.cleaned_data['license_confirmed']:
             if self.request.user not in lic.users.all():
                 lic.users.add(self.request.user)
-        else:
-            lic.users.remove(self.request.user)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['license'], created = License.objects.get_or_create()
+        if self.request.user in context['license'].users.all():
+            context['form'].fields['license_confirmed'].disabled = True
         return context
+
+
+class ConfirmLicenseView(LoginRequiredMixin, RedirectView):
+    """Согласие пользователя с условиями лицензии."""
+
+    def get_redirect_url(self, *args, **kwargs):
+        lic = License.objects.first()
+
+        if self.request.user not in lic.users.all():
+            lic.users.add(self.request.user)
+            messages.success(
+                self.request,
+                _('Ви погодилися з умовами ліцензії')
+            )
+
+        return self.request.META.get('HTTP_REFERER')
