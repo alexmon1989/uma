@@ -37,6 +37,10 @@ class DepositView(LoginRequiredMixin, FormView):
         self.request.user.balance.value += form.cleaned_data['value']
         self.request.user.balance.save()
         BalanceOperation.objects.create(balance=self.request.user.balance, type=2, value=form.cleaned_data['value'])
+        messages.success(
+            self.request,
+            f"Ваш рахунок було поповнено на {form.cleaned_data['value']} грн"
+        )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
