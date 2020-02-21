@@ -16,7 +16,17 @@
             </div>
 
             <div class="col-md-9 g-mb-60">
-                Загальна інформація
+                <h2 class="h3 g-mb-25 g-font-weight-300">{% trans 'Загальна інформація' %}</h2>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Користувач' %}</dt>
+                    <dd class="col-sm-9">{{ request.user.get_username_full }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Баланс рахунку' %}</dt>
+                    <dd class="col-sm-9">{{ request.user.balance.value }} {% trans 'грн' %}.</dd>
+                </dl>
             </div>
         </div>
     </section>
