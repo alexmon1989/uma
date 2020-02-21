@@ -46,3 +46,18 @@ class BalanceOperation(TimeStampedModel):
     class Meta:
         verbose_name = 'Операція з балансом рахунку'
         verbose_name_plural = 'Операції з балансом рахунків'
+
+
+class Message(TimeStampedModel):
+    """Модель для системного сообщения пользователям."""
+    subject = models.CharField('Тема', max_length=255)
+    text = RichTextUploadingField('Текст')
+    is_published = models.BooleanField('Опубліковано', default=True)
+    users = models.ManyToManyField(get_user_model())  # Пользователи, которые прочли сообщение
+
+    def __str__(self):
+        return self.subject
+
+    class Meta:
+        verbose_name = 'Системне повідомлення'
+        verbose_name_plural = 'Системні повідомлення'

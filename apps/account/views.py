@@ -2,10 +2,13 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.base import RedirectView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, reverse
 from django.utils.translation import gettext as _
-from .models import BalanceOperation, License
+from django.contrib import messages
+from .models import BalanceOperation, License, Message
 from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
 
@@ -46,9 +49,27 @@ class ViewsHistoryView(LoginRequiredMixin, ListView):
         return AppVisit.objects.filter(user=self.request.user).order_by('-created_at')
 
 
-class MessagesListView(LoginRequiredMixin, TemplateView):
+class MessagesListView(LoginRequiredMixin, ListView):
     """Отображает страницу списка системных сообщений."""
     template_name = "accounts/messages/list.html"
+    model = Message
+    queryset = Message.objects.filter(is_published=True).order_by('-created_at')
+
+
+class MarkMessageReadView(LoginRequiredMixin, RedirectView):
+    """Отмечает сообщение как прочитанное пользователем."""
+
+    def get_redirect_url(self, *args, **kwargs):
+        message = get_object_or_404(Message, pk=kwargs['pk'])
+
+        if self.request.user not in message.users.all():
+            message.users.add(self.request.user)
+            messages.success(
+                self.request,
+                _('Повідомлення відмічене як прочитане')
+            )
+
+        return reverse('account:messages_list')
 
 
 class SettingsView(LoginRequiredMixin, SuccessMessageMixin, FormView):

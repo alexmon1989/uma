@@ -3,6 +3,7 @@ import string
 from django.db import models
 from django.contrib.auth.models import User
 from uma.abstract_models import TimeStampedModel
+from ..account.models import Message
 
 
 class CertificateOwner(TimeStampedModel):
@@ -93,7 +94,13 @@ def get_email(self):
     return ''
 
 
+def get_unread_messages_count(self):
+    """Возвращает количество непрочитанных сообщений."""
+    return Message.objects.count() - Message.objects.filter(users__id=self.pk).count()
+
+
 User.add_to_class('is_vip', is_vip)
 User.add_to_class('get_username_short', get_username_short)
 User.add_to_class('get_username_full', get_username_full)
 User.add_to_class('get_email', get_email)
+User.add_to_class('get_unread_messages_count', get_unread_messages_count)

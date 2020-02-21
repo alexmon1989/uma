@@ -11,11 +11,11 @@
     </a>
     <a href="{% url 'account:views_history' %}"
        class="list-group-item list-group-item-action justify-content-between {% if request.resolver_match.url_name == 'views_history' %}active{% endif %}">
-        <span><i class="icon-eye g-pos-rel g-top-1 g-mr-8"></i> {% trans "Історія переглядів" %}</span>
+        <span><i class="icon-eye g-pos-rel g-top-1 g-mr-8"></i> {% trans "Історія переглядів заявок" %}</span>
     </a>
     <a href="{% url 'account:messages_list' %}"
        class="list-group-item list-group-item-action justify-content-between {% if request.resolver_match.url_name == 'messages_list' %}active{% endif %}">
-        <span><i class="icon-envelope g-pos-rel g-top-1 g-mr-8"></i> {% trans "Повідомлення" %}</span>
+        <span><i class="icon-envelope g-pos-rel g-top-1 g-mr-8"></i> {% trans "Повідомлення" %}{% if request.user.get_unread_messages_count > 0 %}<span class="g-ml-5 g-font-weight-600 text-danger">({{ request.user.get_unread_messages_count }}){% endif %}</span>
     </a>
     <a href="{% url 'account:settings' %}"
        class="list-group-item list-group-item-action justify-content-between {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
