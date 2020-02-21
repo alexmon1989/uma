@@ -56,7 +56,7 @@ class ViewsHistoryView(LoginRequiredMixin, ListView):
     model = AppVisit
 
     def get_queryset(self):
-        return AppVisit.objects.filter(user=self.request.user).order_by('-created_at')
+        return AppVisit.objects.filter(user=self.request.user).order_by('-created_at').values('pk', 'app__id', 'app__app_number', 'created_at')
 
 
 class MessagesListView(LoginRequiredMixin, ListView):

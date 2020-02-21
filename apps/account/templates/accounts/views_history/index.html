@@ -38,7 +38,7 @@
                                 {% for visit in appvisit_list %}
                                     <tr>
                                         <td>{{ visit.created_at|date:'d.m.Y H:i:s' }}</td>
-                                        <td><a href="{% url 'search:detail' visit.app.id %}">{{ visit.app.app_number }}</a></td>
+                                        <td><a href="{% url 'search:detail' visit.app__id %}">{{ visit.app__app_number }}</a></td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
