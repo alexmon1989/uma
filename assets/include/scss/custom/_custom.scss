@@ -154,7 +154,7 @@
   background-color: rgb(255, 99, 80) !important;
 }
 
-#account-settings-form {
+#account-settings-form, #account-balance-deposit-form {
   label:not(.form-check-label) {
     font-weight: 600;
   }
