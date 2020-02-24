@@ -6,11 +6,11 @@
         <i class="fa fa-minus-circle"></i>
         {% trans 'Помилка' %}
     </h4>
-    <p class="g-mb-10">Перегляд даних заявки можливий лише після погодження з умовами <a
-            href="#" data-toggle="modal" data-target="#modal1">ліцензійної угоди</a>.</p>
+    <p class="g-mb-10">{% trans "Перегляд даних заявки можливий лише після погодження з умовами" %} <a
+            href="#" data-toggle="modal" data-target="#modal1">{% trans "ліцензійної угоди" %}</a>.</p>
     <a href="{% url 'account:confirm_license' %}" class="btn u-btn-outline-bluegray btn-xs g-brd-2 rounded-0">
         <i class="fa fa-check-circle g-mr-2"></i>
-        Погоджуюсь
+        {% trans "Погоджуюсь" %}
     </a>
 </div>
 <!-- Danger Alert -->

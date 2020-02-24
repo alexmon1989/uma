@@ -1,9 +1,9 @@
 from django import forms
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext_lazy as _
 
 
 class DepositForm(forms.Form):
-    value = forms.DecimalField(label='Сума поповнення', min_value=1, initial=0)
+    value = forms.DecimalField(label=_('Сума поповнення'), min_value=1, initial=0)
 
 
 class SettingsForm(forms.Form):

@@ -51,7 +51,7 @@ class DepositView(LoginRequiredMixin, FormView):
         BalanceOperation.objects.create(balance=self.request.user.balance, type=2, value=form.cleaned_data['value'])
         messages.success(
             self.request,
-            f"Ваш рахунок було поповнено на {form.cleaned_data['value']} грн"
+            _('Ваш рахунок було поповнено на {value} грн') % {'value': form.cleaned_data['value']}
         )
         return super().form_valid(form)
 
