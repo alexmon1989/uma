@@ -87,6 +87,7 @@ class MessagesListView(LoginRequiredMixin, ListView):
     template_name = "accounts/messages/list.html"
     model = Message
     queryset = Message.objects.filter(is_published=True).order_by('-created_at')
+    paginate_by = 5
 
 
 class MarkMessageReadView(LoginRequiredMixin, RedirectView):
