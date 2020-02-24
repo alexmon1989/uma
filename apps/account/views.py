@@ -65,6 +65,7 @@ class ViewsHistoryView(LoginRequiredMixin, ListView):
     """Отображает страницу истории просмотров заявок."""
     template_name = "accounts/views_history/index.html"
     model = AppVisit
+    paginate_by = 10
 
     def get_queryset(self):
         qs = AppVisit.objects.filter(user=self.request.user).order_by('-created_at').values('pk', 'app__id', 'app__app_number', 'created_at')
