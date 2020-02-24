@@ -64,7 +64,17 @@ class ViewsHistoryView(LoginRequiredMixin, ListView):
     model = AppVisit
 
     def get_queryset(self):
-        return AppVisit.objects.filter(user=self.request.user).order_by('-created_at').values('pk', 'app__id', 'app__app_number', 'created_at')
+        qs = AppVisit.objects.filter(user=self.request.user).order_by('-created_at').values('pk', 'app__id', 'app__app_number', 'created_at')
+        if self.request.GET.get('date_range'):
+            try:
+                date_from, date_to = self.request.GET['date_range'].split(' ~ ')
+                qs = qs.filter(
+                    created_at__gte=datetime.strptime(f"{date_from} 00:00:00", '%d.%m.%Y %H:%M:%S'),
+                    created_at__lte=datetime.strptime(f"{date_to} 23:59:59", '%d.%m.%Y %H:%M:%S'),
+                )
+            except ValueError:
+                pass
+        return qs
 
 
 class MessagesListView(LoginRequiredMixin, ListView):
