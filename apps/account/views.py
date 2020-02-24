@@ -27,11 +27,14 @@ class AccountBalanceView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = self.request.user.balance.balanceoperation_set.all().order_by('-created_at')
         if self.request.GET.get('date_range'):
-            date_from, date_to = self.request.GET['date_range'].split(' ~ ')
-            qs = qs.filter(
-                created_at__gte=datetime.strptime(date_from, '%d.%m.%Y'),
-                created_at__lte=datetime.strptime(date_to, '%d.%m.%Y'),
-            )
+            try:
+                date_from, date_to = self.request.GET['date_range'].split(' ~ ')
+                qs = qs.filter(
+                    created_at__gte=datetime.strptime(f"{date_from} 00:00:00", '%d.%m.%Y %H:%M:%S'),
+                    created_at__lte=datetime.strptime(f"{date_to} 23:59:59", '%d.%m.%Y %H:%M:%S'),
+                )
+            except ValueError:
+                pass
         return qs
 
 
