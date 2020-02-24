@@ -21,16 +21,18 @@
                     <a href="{% url 'account:account_balance_deposit' %}" class="btn btn-md u-btn-purple g-mr-10 g-mb-15"><i class="fa fa-plus g-mr-5"></i>Поповнити рахунок</a>
                 </div>
 
-                {% if balanceoperation_list %}
-                    <!-- Basic Table -->
-                    <div class="card g-brd-primary rounded-0">
-                        <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
-                            <i class="fa fa-tasks g-mr-5"></i>
-                            {% trans "Операції" %}
-                        </h3>
 
+                <date-filter-form :initial-date-range="'{{ request.GET.date_range }}'"></date-filter-form>
 
-                        <div class="card-block table-responsive g-pa-15">
+                <!-- Basic Table -->
+                <div class="card g-brd-primary rounded-0">
+                    <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                        <i class="fa fa-tasks g-mr-5"></i>
+                        {% trans "Операції" %}
+                    </h3>
+
+                    <div class="card-block table-responsive g-pa-15">
+                        {% if balanceoperation_list %}
                             <table class="table table-striped table-bordered u-table--v1 mb-0">
                                 <thead>
                                     <tr>
@@ -55,10 +57,12 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
+                        {% else %}
+                            <p>{% trans 'Операції відсутні' %}</p>
+                        {% endif %}
                     </div>
-                    <!-- End Basic Table -->
-                {% endif %}
+                </div>
+                <!-- End Basic Table -->
             </div>
         </div>
     </section>

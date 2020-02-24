@@ -11,6 +11,7 @@ from django.contrib import messages
 from .models import BalanceOperation, License, Message
 from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
+from datetime import datetime
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -24,7 +25,14 @@ class AccountBalanceView(LoginRequiredMixin, ListView):
     template_name = "accounts/account_balance/index.html"
 
     def get_queryset(self):
-        return self.request.user.balance.balanceoperation_set.all().order_by('-created_at')
+        qs = self.request.user.balance.balanceoperation_set.all().order_by('-created_at')
+        if self.request.GET.get('date_range'):
+            date_from, date_to = self.request.GET['date_range'].split(' ~ ')
+            qs = qs.filter(
+                created_at__gte=datetime.strptime(date_from, '%d.%m.%Y'),
+                created_at__lte=datetime.strptime(date_to, '%d.%m.%Y'),
+            )
+        return qs
 
 
 class DepositView(LoginRequiredMixin, FormView):
