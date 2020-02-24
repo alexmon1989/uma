@@ -23,6 +23,7 @@ class AccountBalanceView(LoginRequiredMixin, ListView):
     """Отображает страницу состояния баланса пользователя, а также операции с балансом."""
     model = BalanceOperation
     template_name = "accounts/account_balance/index.html"
+    paginate_by = 10
 
     def get_queryset(self):
         qs = self.request.user.balance.balanceoperation_set.all().order_by('-created_at')

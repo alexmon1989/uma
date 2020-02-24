@@ -57,6 +57,8 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
+
+                            {% include 'accounts/account_balance/_partials/pagination.html' %}
                         {% else %}
                             <p>{% trans 'Операції відсутні' %}</p>
                         {% endif %}
