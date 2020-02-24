@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 15:15+0200\n"
+"POT-Creation-Date: 2020-02-24 15:43+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -252,9 +252,8 @@ msgid "Перегляди заявок відсутні"
 msgstr "There are no payments"
 
 #: apps/account/views.py:54
-#, python-brace-format
-msgid "Ваш рахунок було поповнено на {value} грн"
-msgstr "Your account has been credited with {value} uah"
+msgid "Ваш рахунок було поповнено на %(value)s грн"
+msgstr "Your account has been credited with %(value)s uah"
 
 #: apps/account/views.py:103
 msgid "Повідомлення відмічене як прочитане"
@@ -728,7 +727,8 @@ msgstr "Print bibliographic data"
 
 #: apps/search/templates/search/detail/_partials/license_confirmation.html:9
 msgid "Перегляд даних заявки можливий лише після погодження з умовами"
-msgstr "Viewing the application data is only possible after agreeing to the terms"
+msgstr ""
+"Viewing the application data is only possible after agreeing to the terms"
 
 #: apps/search/templates/search/detail/detail.html:5
 msgid "Детальна інформація по об'єкту"
@@ -1052,7 +1052,8 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Warning! Accessing application data <b>%(app_number)s</b> is limited.\n"
+"                    Warning! Accessing application data <b>%(app_number)s</"
+"b> is limited.\n"
 "                "
 
 #: apps/search/templates/search/detail/paid_access_conformation.html:20
