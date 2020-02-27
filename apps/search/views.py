@@ -246,7 +246,7 @@ def get_data_app_html(request):
                     if not user_has_access_to_tm_app(request.user, context['hit']):
                         # Шаблон подтверждения получения доступа к заявке с платным доступом
                         context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
-                        if not request.user.has_confirmed_license():
+                        if not request.user.is_anonymous and not request.user.has_confirmed_license():
                             context['license'], created = License.objects.get_or_create()
                         template = 'search/detail/paid_access_conformation.html'
                     else:
