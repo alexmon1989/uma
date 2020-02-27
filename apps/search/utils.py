@@ -488,9 +488,10 @@ def create_selection_inv_um_ld(data_from_json, params, file_path):
                         if key_summs != 'Payments':
                             res_summs[key_summs] = value_summs
                         else:
-                            payments = value_summs[0]
-                            payments.pop('nope', None)
-                            res_summs.update(payments)
+                            if len(value_summs):
+                                payments = value_summs[0]
+                                payments.pop('nope', None)
+                                res_summs.update(payments)
                     res.update(res_summs)
 
             item_values = list(res.values())
