@@ -258,11 +258,16 @@ def filter_results(s, get_params):
             'title': 'registration_status_color',
             'field': 'search_data.registration_status_color'
         },
+        {
+            'title': 'mark_status',
+            'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        },
     ]
 
     # Агрегация без фильтрации
     for item in filters:
-        s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field']))
+        s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field'], order={"_key": "asc"}, size=1000))
+
     aggregations = s.execute().aggregations.to_dict()
     s_ = s
 

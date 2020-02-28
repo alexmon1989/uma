@@ -155,18 +155,11 @@ class AdvancedListView(TemplateView):
 def add_filter_params(request):
     """Формирует строку параметров фильтра и делает переадресацию обратно на страницу поиска."""
     get_params = parse_qs(request.POST.get('get_params'))
-    get_params['filter_obj_type'] = request.POST.getlist('filter_obj_type')
-    get_params['filter_obj_state'] = request.POST.getlist('filter_obj_state')
-    get_params['filter_registration_status_color'] = request.POST.getlist('filter_registration_status_color')
-
-    if not get_params['filter_obj_type']:
-        del get_params['filter_obj_type']
-
-    if not get_params['filter_obj_state']:
-        del get_params['filter_obj_state']
-
-    if not get_params['filter_registration_status_color']:
-        del get_params['filter_registration_status_color']
+    filters = ['filter_obj_type', 'filter_obj_state', 'filter_registration_status_color', 'filter_mark_status']
+    for f in filters:
+        get_params[f] = request.POST.getlist(f)
+        if not get_params[f]:
+            del get_params[f]
 
     if get_params.get('page'):
         del get_params['page']  # Для переадресации на 1 страницу
