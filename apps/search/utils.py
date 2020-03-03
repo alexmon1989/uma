@@ -1178,6 +1178,10 @@ def user_has_access_to_docs(user, hit):
 
 def user_has_access_to_tm_app(user, hit):
     """Возвращает признак доступности заявки на знак для товаров и услуг пользователю."""
+    if not type(hit) is dict:
+        item = hit.to_dict()
+        item['meta'] = hit.meta.to_dict()
+        hit = item
     try:
         return hit['Document'].get('MarkCurrentStatusCodeType') != '1000' \
                or user_has_access_to_docs(user, hit) \
@@ -1218,45 +1222,60 @@ def create_search_res_doc(data):
     return workbook
 
 
-def prepare_data_for_search_report(s, lang_code):
+def prepare_data_for_search_report(s, lang_code, user=None):
     """Подготавливает данные для файла Excel."""
     obj_states = [_('Заявка'), _('Охоронний документ')]
     obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
-        obj_type = obj_types[h.Document.idObjType - 1]
-        obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
-            if h.search_data.app_date else ''
-        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
-            '%d.%m.%Y') if h.search_data.rights_date else ''
-        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        if hasattr(h.search_data, 'inventor'):
-            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                h.search_data.applicant) else h.search_data.applicant
-        else:
-            applicant = ''
-        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-        if hasattr(h.search_data, 'inventor'):
-            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                h.search_data.inventor) else h.search_data.inventor
-        else:
-            inventor = ''
-        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+        if h.Document.idObjType == 4 and h.search_data.obj_state == 1 and user and user_has_access_to_tm_app(user, h):
+            obj_type = obj_types[h.Document.idObjType - 1]
+            obj_state = obj_states[h.search_data.obj_state - 1]
+            app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
+                if h.search_data.app_date else ''
+            rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+                '%d.%m.%Y') if h.search_data.rights_date else ''
+            title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+            if hasattr(h.search_data, 'inventor'):
+                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                    h.search_data.applicant) else h.search_data.applicant
+            else:
+                applicant = ''
+            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+            if hasattr(h.search_data, 'inventor'):
+                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                    h.search_data.inventor) else h.search_data.inventor
+            else:
+                inventor = ''
+            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-        data.append([
-            obj_type,
-            obj_state,
-            h.search_data.app_number,
-            app_date,
-            h.search_data.protective_doc_number,
-            rights_date,
-            title,
-            applicant,
-            owner,
-            inventor,
-            agent,
-        ])
+            data.append([
+                obj_type,
+                obj_state,
+                h.search_data.app_number,
+                app_date,
+                h.search_data.protective_doc_number,
+                rights_date,
+                title,
+                applicant,
+                owner,
+                inventor,
+                agent,
+            ])
+        else:
+            data.append([
+                obj_types[h.Document.idObjType - 1],
+                obj_states[h.search_data.obj_state - 1],
+                h.search_data.app_number,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+            ])
 
     return data
 
@@ -1460,3 +1479,17 @@ def get_registration_status_color(hit):
                 status = 'red'
 
     return status
+
+
+def filter_app_data(app_data, user):
+    """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
+    if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
+        res = {}
+        res.update({'meta': app_data['meta']})
+        res.update({'Document': app_data['Document']})
+        res.update({'search_data': {
+            'app_number': app_data['search_data']['app_number'],
+            'obj_state': app_data['search_data']['obj_state'],
+        }})
+        return res
+    return app_data
