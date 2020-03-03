@@ -96,7 +96,11 @@ def get_email(self):
 
 def get_unread_messages_count(self):
     """Возвращает количество непрочитанных сообщений."""
-    return Message.objects.count() - Message.objects.filter(users__id=self.pk).count()
+    return Message.objects.filter(
+        created_at__gte=self.joined_at
+    ).count() - Message.objects.filter(
+        users__id=self.pk
+    ).count()
 
 
 def has_confirmed_license(self):

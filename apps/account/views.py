@@ -86,8 +86,13 @@ class MessagesListView(LoginRequiredMixin, ListView):
     """Отображает страницу списка системных сообщений."""
     template_name = "accounts/messages/list.html"
     model = Message
-    queryset = Message.objects.filter(is_published=True).order_by('-created_at')
     paginate_by = 5
+
+    def get_queryset(self):
+        return Message.objects.filter(
+            is_published=True,
+            created_at__gte=self.request.user.date_joined
+        ).order_by('-created_at')
 
 
 class MarkMessageReadView(LoginRequiredMixin, RedirectView):
