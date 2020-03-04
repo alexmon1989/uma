@@ -17,8 +17,10 @@
             </p>
 
             {% if user.is_authenticated %}
-                {% blocktrans with tm_app_access_price=paid_service_settings.tm_app_access_price %}
-                    <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="#">балансу рахунку</a> буде списано <b class="g-font-size-16">{{ tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
+                {% url 'account:account_balance' as account_balance_url %}
+                {% url 'help:help' as help_url %}
+                {% blocktrans with tm_app_access_price=paid_service_settings.tm_app_access_price account_balance_url=account_balance_url help_url=help_url %}
+                    <p>Доступ до даних заявки надається на платній основі. Якщо ви бажаєте продовжити перегляд, з вашого <a href="{{ account_balance_url }}">балансу рахунку</a> буде списано <b class="g-font-size-16">{{ tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="{{ help_url }}">"Допомога"</a>.</p>
                 {% endblocktrans %}
 
                 <p>{% trans "Ваш поточний баланс рахунку" %}: <b>{{ request.user.balance.value }} {% trans "грн" %}</b></p>
@@ -34,8 +36,9 @@
                     {% if request.user.balance.value < paid_service_settings.tm_app_access_price %}<small class="text-muted">{% trans "для продовження" %} <a href="{% url 'account:account_balance_deposit' %}">{% trans "поповніть рахунок" %}</a></small>{% endif %}
                 </div>
             {% else %}
+                {% url 'help:help' as help_url %}
                 {% blocktrans with tm_app_access_price=paid_service_settings.tm_app_access_price %}
-                    <p>Доступ до даних заявки надається на платній основі. Вартість перегляду даних однієї заявки складає <b>{{ tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="">"Допомога"</a>.</p>
+                    <p>Доступ до даних заявки надається на платній основі. Вартість перегляду даних однієї заявки складає <b>{{ tm_app_access_price }} грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="{{ help_url }}">"Допомога"</a>.</p>
                 {% endblocktrans %}
 
                 <p>{% trans "Для продовження роботи необхідно" %} <a href="{% url 'auth:login' %}">{% trans "авторизуватися" %}</a>.</p>

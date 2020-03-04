@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-28 14:34+0200\n"
+"POT-Creation-Date: 2020-03-04 11:18+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -149,12 +149,12 @@ msgstr "Current balance"
 #: apps/account/templates/accounts/account_balance/index.html:53
 #: apps/account/templates/accounts/account_balance_deposit/index.html:20
 #: apps/account/templates/accounts/dashboard/index.html:28
-#: apps/search/templates/search/detail/paid_access_conformation.html:24
+#: apps/search/templates/search/detail/paid_access_conformation.html:26
 msgid "грн"
 msgstr "uah"
 
 #: apps/account/templates/accounts/account_balance/index.html:21
-#: apps/search/templates/search/detail/paid_access_conformation.html:25
+#: apps/search/templates/search/detail/paid_access_conformation.html:27
 msgid "Поповнити рахунок"
 msgstr "Deposit balance"
 
@@ -256,15 +256,15 @@ msgstr "There are no payments"
 msgid "Ваш рахунок було поповнено на %(value)s грн"
 msgstr "Your account has been credited with %(value)s uah"
 
-#: apps/account/views.py:103
+#: apps/account/views.py:108
 msgid "Повідомлення відмічене як прочитане"
 msgstr "The message has been marked as read"
 
-#: apps/account/views.py:114
+#: apps/account/views.py:119
 msgid "Дані успішно збережено"
 msgstr "Data has been successfully saved"
 
-#: apps/account/views.py:150
+#: apps/account/views.py:155
 msgid "Ви погодилися з умовами ліцензії"
 msgstr "You have agreed with license terms"
 
@@ -434,14 +434,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1223
+#: apps/search/utils.py:1227
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:40 apps/search/admin.py:99
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1223
+#: apps/search/utils.py:1227
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -457,7 +457,7 @@ msgstr "Object type"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/tasks.py:43 apps/search/tasks.py:195 apps/search/tasks.py:252
+#: apps/search/tasks.py:43 apps/search/tasks.py:200 apps/search/tasks.py:260
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -497,13 +497,13 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/utils.py:1199
+#: apps/search/utils.py:1203
 msgid "Номер заявки"
 msgstr "Application number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
-#: apps/search/utils.py:1200
+#: apps/search/utils.py:1204
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1067,50 +1067,50 @@ msgstr ""
 "b> is limited.\n"
 "                "
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:20
+#: apps/search/templates/search/detail/paid_access_conformation.html:22
 #, python-format
 msgid ""
 "\n"
 "                    <p>Доступ до даних заявки надається на платній основі. "
-"Якщо ви бажаєте продовжити перегляд, з вашого <a href=\"#\">балансу рахунку</"
-"a> буде списано <b class=\"g-font-size-16\">%(tm_app_access_price)s грн</b>. "
-"Більш детальну інформацію ви можете отримати у розділі <a href=\"\">"
-"\"Допомога\"</a>.</p>\n"
+"Якщо ви бажаєте продовжити перегляд, з вашого <a href="
+"\"%(account_balance_url)s\">балансу рахунку</a> буде списано <b class=\"g-"
+"font-size-16\">%(tm_app_access_price)s грн</b>. Більш детальну інформацію ви "
+"можете отримати у розділі <a href=\"%(help_url)s\">\"Допомога\"</a>.</p>\n"
 "                "
 msgstr ""
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:24
+#: apps/search/templates/search/detail/paid_access_conformation.html:26
 msgid "Ваш поточний баланс рахунку"
 msgstr "Your current account balance state"
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:33
+#: apps/search/templates/search/detail/paid_access_conformation.html:35
 msgid "Я згоден та хочу продовжити перегляд"
 msgstr "I agree and want continue viewing"
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:34
+#: apps/search/templates/search/detail/paid_access_conformation.html:36
 msgid "для продовження"
 msgstr "to continue"
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:34
+#: apps/search/templates/search/detail/paid_access_conformation.html:36
 msgid "поповніть рахунок"
 msgstr "deposit the account balance"
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:37
+#: apps/search/templates/search/detail/paid_access_conformation.html:40
 #, python-format
 msgid ""
 "\n"
 "                    <p>Доступ до даних заявки надається на платній основі. "
 "Вартість перегляду даних однієї заявки складає <b>%(tm_app_access_price)s "
-"грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href=\"\">"
-"\"Допомога\"</a>.</p>\n"
+"грн</b>. Більш детальну інформацію ви можете отримати у розділі <a href="
+"\"%(help_url)s\">\"Допомога\"</a>.</p>\n"
 "                "
 msgstr ""
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:41
+#: apps/search/templates/search/detail/paid_access_conformation.html:44
 msgid "Для продовження роботи необхідно"
 msgstr "To continue the work is necessary"
 
-#: apps/search/templates/search/detail/paid_access_conformation.html:41
+#: apps/search/templates/search/detail/paid_access_conformation.html:44
 msgid "авторизуватися"
 msgstr "to authorize"
 
@@ -1196,39 +1196,39 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1197
+#: apps/search/utils.py:1201
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1198
+#: apps/search/utils.py:1202
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1201
+#: apps/search/utils.py:1205
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1202
+#: apps/search/utils.py:1206
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1203
+#: apps/search/utils.py:1207
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1204
+#: apps/search/utils.py:1208
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1205
+#: apps/search/utils.py:1209
 msgid "Власник"
 msgstr "Owner(s)"
 
-#: apps/search/utils.py:1206
+#: apps/search/utils.py:1210
 msgid "Винахідник"
 msgstr "Inventor"
 
-#: apps/search/utils.py:1207
+#: apps/search/utils.py:1211
 msgid "Представник"
 msgstr "Presenter"
 
