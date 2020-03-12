@@ -5,7 +5,7 @@ from uma.abstract_models import TimeStampedModel
 
 class Payment(TimeStampedModel):
     """Модель платежа ПриватБанка."""
-    value = models.PositiveIntegerField('Сума')
+    value = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Сума')
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
     paid = models.BooleanField('Оплачено', default=False)
 
