@@ -1,5 +1,8 @@
 from django.contrib import admin
 from apps.my_auth.models import KeyCenter, CertificateOwner
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
 
 @admin.register(KeyCenter)
 class KeyCenterAdmin(admin.ModelAdmin):
@@ -14,6 +17,7 @@ class KeyCenterAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at',
     )
+
 
 @admin.register(CertificateOwner)
 class CertificateOwnerAdmin(admin.ModelAdmin):
@@ -42,3 +46,9 @@ class CertificateOwnerAdmin(admin.ModelAdmin):
         'pszSubjLocality',
     )
     search_fields = ('user__username', 'pszSerial', 'pszSubjFullName')
+
+
+UserAdmin.search_fields = ('username', 'first_name', 'last_name', 'email', 'certificateowner__pszSubjFullName')
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

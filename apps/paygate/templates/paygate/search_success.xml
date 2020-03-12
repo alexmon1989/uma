@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Transfer xmlns="http://debt.privatbank.ua/Transfer" interface="Debt" action="Search">
+    <Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="DebtPack">
+        <PayerInfo billIdentifier="{{ billIdentifier }}">
+            <Fio>{{ username }}</Fio>
+        </PayerInfo>
+        <ServiceGroup>
+            <DebtService serviceCode="5.7">
+                <DebtInfo amountToPay="{{ amountToPay }}" debt="0.00"/>
+                <ServiceName>Надання доступу до інформації, зазначеної заявником у кодах ІНІД 210, 511, 540, 731, 740 для заявки на знак для товарів і послуг, за якою не встановлена дата подачі</ServiceName>
+                <Destination>Оплата за услугу "Надання доступу до інформації, зазначеної заявником у кодах ІНІД 210, 511, 540, 731, 740 для заявки на знак для товарів і послуг, за якою не встановлена дата подачі"</Destination>
+                <CompanyInfo mfo="320478" okpo="31032378" account="UA 09 320478 0000000026008268812">
+                    <CompanyCode>31032378</CompanyCode>
+                    <CompanyName>ДЕРЖАВНЕ ПІДПРИЄМСТВО "УКРАЇНСЬКИЙ ІНСТИТУТ ІНТЕЛЕКТУАЛЬНОЇ ВЛАСНОСТІ" УКРПАТЕНТ</CompanyName>
+                </CompanyInfo>
+                <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ ls }}">
+                    <Fio>{{ username }}</Fio>
+                </PayerInfo>
+            </DebtService>
+        </ServiceGroup>
+    </Data>
+</Transfer>
