@@ -8,8 +8,8 @@
         <ServiceGroup>
             <DebtService serviceCode="5.7">
                 <DebtInfo amountToPay="{{ amountToPay|unlocalize }}" debt="0.00"/>
-                <ServiceName>Надання доступу до інформації щодо заявок на знаки для товарів і послуг, за якими не встановлена дата подачі</ServiceName>
-                <Destination>Оплата за послугу надання доступу до інформації щодо заявок на знаки для товарів і послуг, за якими не встановлена дата подачі</Destination>
+                <ServiceName>Доступ до інформації щодо заявок, за якими не встановлена дата подачі</ServiceName>
+                <Destination>Оплата за послугу надання доступу до інформації щодо заявок</Destination>
                 <CompanyInfo mfo="320478" okpo="31032378" account="UA093204780000000026008268812">
                     <CompanyCode>31032378</CompanyCode>
                     <CompanyName>ДЕРЖАВНЕ ПІДПРИЄМСТВО "УКРАЇНСЬКИЙ ІНСТИТУТ ІНТЕЛЕКТУАЛЬНОЇ ВЛАСНОСТІ" УКРПАТЕНТ</CompanyName>
