@@ -43,6 +43,7 @@ urlpatterns += [
     path('search/validate-query/', validate_query, name="validate_query"),
     path('search/get-task-info/', get_task_info, name="get_task_info"),
     path('api/', include('apps.api.urls')),
+    path('paygate/', include('apps.paygate.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

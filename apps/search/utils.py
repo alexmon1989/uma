@@ -497,9 +497,10 @@ def create_selection_inv_um_ld(data_from_json, params, file_path):
                         if key_summs != 'Payments':
                             res_summs[key_summs] = value_summs
                         else:
-                            payments = value_summs[0]
-                            payments.pop('nope', None)
-                            res_summs.update(payments)
+                            if len(value_summs):
+                                payments = value_summs[0]
+                                payments.pop('nope', None)
+                                res_summs.update(payments)
                     res.update(res_summs)
 
             item_values = list(res.values())
@@ -779,8 +780,8 @@ def get_data_for_selection_tm(hit):
         pass
 
     data['signer'] = {
-        'post': 'Державний секретар Міністерства економічного розвитку і торгівлі України',
-        'name': 'О.Ю.Перевезенцев'
+        'post': 'Заступник Міністра розвитку економіки, торгівлі та сільського господарства України',
+        'name': 'Д.О.Романович'
     }
 
     return data

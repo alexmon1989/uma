@@ -73,6 +73,7 @@ def is_vip(self):
     """Возвращает значение (boolean) того является ли юзер суперадмином или членом группы 'Посадовці (чиновники)'"""
     return self.is_superuser or self.groups.filter(name='Посадовці (чиновники)').exists()
 
+
 def get_username_short(self):
     if hasattr(self, 'certificateowner'):
         return self.certificateowner.pszSubjFullName
@@ -109,6 +110,14 @@ def has_confirmed_license(self):
     return self in lic.users.all()
 
 
+def user_str(self):
+    full_name = self.get_username_full()
+    if full_name.strip():
+        return f"{full_name} (дата реєстрації: {self.date_joined.strftime('%d.%m.%Y %H:%M:%S')})"
+    return self.username
+
+
+User.add_to_class('__str__', user_str)
 User.add_to_class('is_vip', is_vip)
 User.add_to_class('get_username_short', get_username_short)
 User.add_to_class('get_username_full', get_username_full)
