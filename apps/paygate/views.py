@@ -44,11 +44,13 @@ def pb(request):
         except Payment.DoesNotExist:
             response = render_to_response('paygate/pay_error.xml')
         else:
-            if payment.pk != 1:
+            data = dom.getElementsByTagName("Transfer")[0].getElementsByTagName("Data")[0]
+            if payment.pk != 1:  # 1 - тестовый идентификатор
                 payment.paid = True
+                payment.value_paid = data.getElementsByTagName("TotalSum")[0].firstChild.nodeValue  # Оплаченная сумма
+                payment.pay_request_pb_xml = request.body.decode()
                 payment.save()
-            reference = dom.getElementsByTagName("Transfer")[0].getElementsByTagName("Data")[0].getAttribute("id")
-            response = render_to_response('paygate/pay_success.xml', {'reference': reference})
+            response = render_to_response('paygate/pay_success.xml', {'reference': data.getAttribute("id")})
 
     else:
         response = render_to_response('paygate/error_type.xml', {'action': action})

@@ -8,7 +8,9 @@ class IPCCodeAdmin(admin.ModelAdmin):
         'value',
         'user',
         'paid',
+        'value_paid',
         'created_at',
         'updated_at',
     )
     autocomplete_fields = ('user',)
+    readonly_fields = ('pay_request_pb_xml',)
