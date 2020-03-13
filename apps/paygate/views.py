@@ -47,7 +47,8 @@ def pb(request):
             if payment.pk != 1:
                 payment.paid = True
                 payment.save()
-            response = render_to_response('paygate/pay_success.xml', {'reference': bill_identifier})
+            reference = dom.getElementsByTagName("Transfer")[0].getElementsByTagName("Data")[0].getAttribute("id")
+            response = render_to_response('paygate/pay_success.xml', {'reference': reference})
 
     else:
         response = render_to_response('paygate/error_type.xml', {'action': action})
