@@ -12,6 +12,7 @@ import TransactionsSearchForm from "./vue-components/TransactionsSearchForm/Tran
 import LoadingDots from "./vue-components/LoadingDots.vue";
 import ContactForm from "./vue-components/ContactForm.vue";
 import GetOriginalDoc from "./vue-components/GetOriginalDoc.vue";
+import DateFilterForm from "./vue-components/DateFilterForm/DateFilterForm.vue";
 
 import VeeValidate from 'vee-validate';
 import * as Toastr from "toastr";
@@ -29,5 +30,6 @@ const app = new Vue({
         LoadingDots,
         ContactForm,
         GetOriginalDoc,
+        DateFilterForm,
     }
 });

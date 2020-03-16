@@ -1,0 +1,33 @@
+{% load i18n %}
+
+<!-- Danger Alert -->
+<div class="alert alert-danger alert-dismissible fade show g-my-30" role="alert">
+    <h4 class="h5">
+        <i class="fa fa-minus-circle"></i>
+        {% trans 'Помилка' %}
+    </h4>
+    <p class="g-mb-10">{% trans "Перегляд даних заявки можливий лише після погодження з умовами" %} <a
+            href="#" data-toggle="modal" data-target="#modal1">{% trans "ліцензійної угоди" %}</a>.</p>
+    <a href="{% url 'account:confirm_license' %}" class="btn u-btn-outline-bluegray btn-xs g-brd-2 rounded-0">
+        <i class="fa fa-check-circle g-mr-2"></i>
+        {% trans "Погоджуюсь" %}
+    </a>
+</div>
+<!-- Danger Alert -->
+
+<div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{% trans 'Текст ліцензії' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ license.text|safe }}
+            </div>
+        </div>
+    </div>
+</div>

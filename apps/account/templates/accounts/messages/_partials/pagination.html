@@ -1,0 +1,71 @@
+{% load uma_extras %}
+
+{% if page_obj.has_other_pages %}
+<nav class="text-center g-mt-30" aria-label="Page Navigation">
+    <ul class="list-inline">
+        {% if page_obj.has_previous %}
+            <li class="list-inline-item g-hidden-sm-down">
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13"
+                   href="?{% url_replace request 'page' page_obj.previous_page_number %}">
+                    <span aria-hidden="true">
+                        <i class="fa fa-chevron-left"></i>
+                    </span>
+                </a>
+            </li>
+        {% else %}
+            <li class="list-inline-item g-hidden-sm-down">
+                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13 text-muted g-brd-gray-dark-v5">
+                    <i class="fa fa-chevron-left"></i>
+                </span>
+            </li>
+        {% endif %}
+
+        {% if page_obj.number|add:'-4' > 1 %}
+            <li class="list-inline-item">
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
+                   href="?{% url_replace request 'page' page_obj.number|add:'-5' %}">&hellip;</a>
+            </li>
+        {% endif %}
+
+        {% spaceless %}
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item u-pagination-v1-2 u-pagination-v1-4--active g-pa-4-11"
+                               href="?{% url_replace request 'page' i %}">{{ i }}</a>
+                    </li>
+                {% elif i > page_obj.number|add:'-5' and i < page_obj.number|add:'5' %}
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
+                           href="?{% url_replace request 'page' i %}">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endspaceless %}
+
+        {% if page_obj.paginator.num_pages > page_obj.number|add:'4' %}
+            <li class="list-inline-item">
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-11"
+                   href="?{% url_replace request 'page' page_obj.number|add:'5' %}">&hellip;</a>
+            </li>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <li class="list-inline-item">
+                <a class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13"
+                   href="?{% url_replace request 'page' page_obj.next_page_number %}">
+                    <span aria-hidden="true">
+                        <i class="fa fa-chevron-right"></i>
+                    </span>
+                </a>
+            </li>
+        {% else %}
+            <li class="list-inline-item g-hidden-sm-down">
+                <span aria-hidden="true" class="u-pagination-v1__item u-pagination-v1-2 g-pa-4-13 text-muted g-brd-gray-dark-v5">
+                    <i class="fa fa-chevron-right"></i>
+                </span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

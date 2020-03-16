@@ -2,7 +2,8 @@ from django import template
 from django.conf import settings
 from django.db.models import F
 from ..models import ObjType, SortParameter, IndexationProcess
-from ..utils import user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color
+from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
+                     user_has_access_to_tm_app)
 
 register = template.Library()
 
@@ -31,9 +32,9 @@ def ld_item(hit, item_num):
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
 
 
-@register.inclusion_tag('search/advanced/_partials/tm_item.html')
-def tm_item(hit, item_num):
-    return {'hit': hit, 'item_num': item_num}
+@register.inclusion_tag('search/advanced/_partials/tm_item.html', takes_context=True)
+def tm_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'user': context['request'].user}
 
 
 @register.inclusion_tag('search/advanced/_partials/id_item.html')
@@ -152,3 +153,9 @@ def user_has_access_to_docs(user, id_app_number):
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
     return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents))
+
+
+@register.simple_tag
+def user_has_access_to_app(user, hit):
+    """Возвращает признак того, что пользователю доступна платная заявка."""
+    return user_has_access_to_tm_app(user, hit)

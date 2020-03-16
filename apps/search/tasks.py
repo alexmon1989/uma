@@ -13,7 +13,7 @@ from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sor
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
                     create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs,
-                    sort_doc_flow)
+                    sort_doc_flow, filter_app_data)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
@@ -21,7 +21,7 @@ import json
 import time
 from zipfile import ZipFile
 from pathlib import Path
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 
 @shared_task
@@ -46,6 +46,10 @@ def perform_simple_search(user_id, get_params):
 
     # Формирование поискового запроса ElasticSearch
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+
+    # Пользователь
+    user = get_user_or_anonymous(user_id)
+
     qs = None
     for s in formset.cleaned_data:
         if s:
@@ -81,7 +85,7 @@ def perform_simple_search(user_id, get_params):
         qs = filter_bad_apps(qs)
 
         # Не показывать неопубликованные заявки
-        qs = filter_unpublished_apps(get_user_or_anonymous(user_id), qs)
+        qs = filter_unpublished_apps(user, qs)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -105,7 +109,7 @@ def perform_simple_search(user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        items.append(item)
+        items.append(filter_app_data(item, user))
     results = {
         'items': items,
         'total': s.count()
@@ -138,6 +142,7 @@ def validate_query(get_params):
 @shared_task
 def get_app_details(id_app_number, user_id):
     """Задача для получения деталей по заявке."""
+    user = get_user_or_anonymous(user_id)
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
@@ -145,7 +150,7 @@ def get_app_details(id_app_number, user_id):
     )
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     # Фильтр заявок, которые не положено публиковать в интернет
-    q = filter_unpublished_apps(get_user_or_anonymous(user_id), q)
+    q = filter_unpublished_apps(user, q)
 
     s = Search().using(client).query(q).execute()
     if not s:
@@ -171,9 +176,9 @@ def get_app_details(id_app_number, user_id):
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
 
-    hit['id_app_number'] = id_app_number
+    hit['meta'] = {'id': id_app_number}
 
-    return hit
+    return filter_app_data(hit, user)
 
 
 @shared_task
@@ -199,8 +204,11 @@ def perform_advanced_search(user_id, get_params):
     # Разбивка поисковых данных на поисковые группы
     search_groups = get_search_groups(formset.cleaned_data)
 
+    # Пользователь
+    user = get_user_or_anonymous(user_id)
+
     # Поиск в ElasticSearch по каждой группе
-    s = get_elastic_results(search_groups, get_user_or_anonymous(user_id))
+    s = get_elastic_results(search_groups, user)
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -223,7 +231,7 @@ def perform_advanced_search(user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        items.append(item)
+        items.append(filter_app_data(item, user))
     results = {
         'items': items,
         'total': s.count()
@@ -441,6 +449,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
     # Валидация запроса
     if formset.is_valid():
         client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+        user = get_user_or_anonymous(user_id)
         qs = None
         for s in formset.cleaned_data:
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
@@ -475,7 +484,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             qs = filter_bad_apps(qs)
 
             # Не показывать неопубликованные заявки
-            qs = filter_unpublished_apps(get_user_or_anonymous(user_id), qs)
+            qs = filter_unpublished_apps(user, qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -500,6 +509,10 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 'title': 'registration_status_color',
                 'field': 'search_data.registration_status_color'
             },
+            {
+                'title': 'mark_status',
+                'field': 'Document.MarkCurrentStatusCodeType.keyword'
+            },
         ]
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
@@ -510,7 +523,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             s = s.source(['search_data', 'Document'])
 
             # Данные для Excel-файла
-            data = prepare_data_for_search_report(s, lang_code)
+            data = prepare_data_for_search_report(s, lang_code, user)
 
             # Формировние Excel-файла
             workbook = create_search_res_doc(data)
@@ -546,7 +559,8 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
         search_groups = get_search_groups(formset.cleaned_data)
 
         # Поиск в ElasticSearch по каждой группе
-        s = get_elastic_results(search_groups, get_user_or_anonymous(user_id))
+        user = get_user_or_anonymous(user_id)
+        s = get_elastic_results(search_groups, user)
 
         # Фильтрация
         # Возможные фильтры
@@ -562,6 +576,10 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
             {
                 'title': 'registration_status_color',
                 'field': 'search_data.registration_status_color'
+            },
+            {
+                'title': 'mark_status',
+                'field': 'Document.MarkCurrentStatusCodeType.keyword'
             },
         ]
         for item in filters:
@@ -579,7 +597,7 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
                 s = s.sort('_score')
 
             # Данные для Excel-файла
-            data = prepare_data_for_search_report(s, lang_code)
+            data = prepare_data_for_search_report(s, lang_code, user)
 
             # Формировние Excel-файла
             workbook = create_search_res_doc(data)
