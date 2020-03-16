@@ -3,6 +3,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import RedirectView
+from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, reverse
@@ -11,6 +12,7 @@ from django.contrib import messages
 from .models import BalanceOperation, License, Message
 from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
+from ..paygate.models import Payment
 from datetime import datetime
 
 
@@ -43,16 +45,10 @@ class DepositView(LoginRequiredMixin, FormView):
     """Пополнение счёта."""
     template_name = 'accounts/account_balance_deposit/index.html'
     form_class = DepositForm
-    success_url = reverse_lazy('account:account_balance')
+    payment = None
 
     def form_valid(self, form):
-        self.request.user.balance.value += form.cleaned_data['value']
-        self.request.user.balance.save()
-        BalanceOperation.objects.create(balance=self.request.user.balance, type=2, value=form.cleaned_data['value'])
-        messages.success(
-            self.request,
-            _('Ваш рахунок було поповнено на %(value)s грн') % {'value': form.cleaned_data['value']}
-        )
+        self.payment = Payment.objects.create(value=form.cleaned_data['value'], user=self.request.user)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -60,6 +56,17 @@ class DepositView(LoginRequiredMixin, FormView):
         if not self.request.user.has_confirmed_license():
             context['license'], created = License.objects.get_or_create()
         return context
+
+    def get_success_url(self):
+        return reverse('account:order', kwargs={'pk': self.payment.pk})
+
+
+class OrderDetailView(DetailView):
+    model = Payment
+    template_name = "accounts/orders/detail/index.html"
+
+    def get_queryset(self):
+        return Payment.objects.filter(paid=False, user=self.request.user)
 
 
 class ViewsHistoryView(LoginRequiredMixin, ListView):
