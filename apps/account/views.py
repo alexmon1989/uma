@@ -61,7 +61,7 @@ class DepositView(LoginRequiredMixin, FormView):
         return reverse('account:order', kwargs={'pk': self.payment.pk})
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Payment
     template_name = "accounts/orders/detail/index.html"
 
