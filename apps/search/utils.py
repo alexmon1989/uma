@@ -56,7 +56,17 @@ def prepare_query(query, field_type):
         # его необходимо преобразовать запрос ElasticSearch
         query = f">={query.replace(' ~ ', ' AND <=')}"
 
-    query = query.replace("ТА", "AND").replace("АБО", "OR").replace("НЕ", "NOT").replace("/", "\\/").replace(":", "\\:")
+    query = query.replace(
+        " ТА ", " AND "
+    ).replace(
+        " АБО ", " OR "
+    ).replace(
+        " НЕ ", " NOT "
+    ).replace(
+        "/", "\\/"
+    ).replace(
+        ":", "\\:"
+    )
     return query
 
 
