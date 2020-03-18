@@ -201,7 +201,8 @@ class Command(BaseCommand):
                     'rights_date': biblio_data.get('I_24') if biblio_data.get('I_24') != '1899-12-30' else None,
                     'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
                     'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
-                    'owner': [list(x.values())[0] for x in biblio_data.get('I_73', [])],
+                    'owner': [list(x.values())[0] if list(x.keys())[0] != 'EDRPOU'
+                              else list(x.values())[1] for x in biblio_data.get('I_73', [])],
                     'agent': biblio_data.get('I_74'),
                     'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
