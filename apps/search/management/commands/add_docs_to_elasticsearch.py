@@ -257,7 +257,7 @@ class Command(BaseCommand):
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
                 'app_number': res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
-                'app_date': res['TradeMark']['TrademarkDetails'].get('ApplicationDate'),
+                'app_date': res['TradeMark']['TrademarkDetails'].get('ApplicationDate', doc['app_date']),
                 'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                 'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
                 'applicant': applicant,
