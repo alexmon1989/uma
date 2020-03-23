@@ -11,7 +11,8 @@ import '../vendor/animate.css';
 import '../vendor/chosen/chosen.css';
 import '../vendor/fancybox/jquery.fancybox.min.css';
 import '../../node_modules/toastr/build/toastr.css';
-import '../include/scss/unify.scss'
+import '../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+import '../include/scss/unify.scss';
 
 // Scripts
 import '../vendor/jquery/jquery.min.js';
