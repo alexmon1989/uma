@@ -6,14 +6,19 @@
                 <div class="col-md-3 g-mb-15 g-pr-7--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_type') }">
 
+                    <select :name="'form-' + index + '-obj_type'"
+                            class="d-none">
+                        <option v-for="option in objTypes" :value="option.id" :selected="objType.id === option.id"></option>
+                    </select>
+
                     <multiselect v-model="objType"
-                                 :name="'form-' + index + '-obj_type'"
                                  :options="objTypes"
                                  :placeholder="translations.objType"
                                  :showLabels="false"
                                  :allowEmpty="false"
                                  label="value"
                                  track-by="id"
+                                 :data-vv-name="'form-' + index + '-obj_type'"
                                  v-validate="'required'"
                     ></multiselect>
 
@@ -25,6 +30,12 @@
                 <div class="col-md-3 g-mb-15 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_state') }">
 
+                    <select multiple="multiple"
+                            :name="'form-' + index + '-obj_state'"
+                            class="d-none">
+                        <option v-for="option in objStates" :value="option.id" :selected="objState.includes(option)"></option>
+                    </select>
+
                     <multiselect v-model="objState"
                                  :options="objStates"
                                  :placeholder="translations.objState"
@@ -35,8 +46,8 @@
                                  :multiple="true"
                                  v-validate="'required'"
                                  :searchable="false"
-                                 :name="'form-' + index + '-obj_state'"
                                  label="value"
+                                 :data-vv-name="'form-' + index + '-obj_state'"
                                  track-by="id">
                     </multiselect>
 
@@ -48,13 +59,18 @@
                 <div class="col-md-3 g-mb-15 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-ipc_code') }">
 
+                    <select :name="'form-' + index + '-ipc_code'"
+                            class="d-none">
+                        <option v-for="option in ipcCodesFiltered" :value="option.id" :selected="option.id === ipcCode.id"></option>
+                    </select>
+
                     <multiselect v-model="ipcCode"
-                                 :name="'form-' + index + '-ipc_code'"
                                  :options="ipcCodesFiltered"
                                  :placeholder="translations.ipcCode"
                                  :showLabels="false"
                                  label="value"
                                  track-by="id"
+                                 :data-vv-name="'form-' + index + '-ipc_code'"
                                  v-validate="'required'"
                     ></multiselect>
 
@@ -67,7 +83,7 @@
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
                     <div v-if="dataType !== 'date'">
                         <input type="text"
-                               class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
+                               class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8"
                                :name="'form-' + index + '-value'"
                                v-model="value"
                                ref="value"
@@ -189,14 +205,14 @@
         },
         mounted() {
             if (this.initialData['form-' + this.index + '-obj_type']) {
-                this.objType = this.initialData['form-' + this.index + '-obj_type'];
+                this.objType = this.objTypes.find(x => x.id === parseInt(this.initialData['form-' + this.index + '-obj_type'][0]));
             }
             if (this.initialData['form-' + this.index + '-obj_state']) {
-                this.objState = this.initialData['form-' + this.index + '-obj_state'];
+                this.objState = this.objStates.filter(x => this.initialData['form-' + this.index + '-obj_state'].map(y => parseInt(y)).includes(x.id));
             }
             this.$nextTick(function () {
                 if (this.initialData['form-' + this.index + '-ipc_code']) {
-                    this.ipcCode = this.initialData['form-' + this.index + '-ipc_code'];
+                    this.ipcCode = this.ipcCodesFiltered.find(x => x.id === parseInt(this.initialData['form-' + this.index + '-ipc_code'][0]));
 
                     if (this.initialData['form-' + this.index + '-value']) {
                         if (this.dataType === "date") {
@@ -292,6 +308,10 @@
                 if (oldVal && val !== oldVal && (val === "date" || oldVal === "date")) {
                     this.value = '';
                 }
+            },
+
+            ipcCodesFiltered: function (val) {
+                this.ipcCode = '';
             }
         }
     }
