@@ -154,14 +154,13 @@
 </template>
 
 <script>
-    import ChosenSelect from "../ChosenSelect.vue";
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
     import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
 
     export default {
         name: "ipcCode",
-        components: {ChosenSelect, DatePicker},
+        components: {DatePicker},
         inject: ['$validator'],
         mixins: [translations, datePickerMixin],
         props: {
