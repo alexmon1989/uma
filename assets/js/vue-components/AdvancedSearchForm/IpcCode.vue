@@ -42,7 +42,6 @@
                                  selectLabel=""
                                  deselectLabel="⨯"
                                  selectedLabel="✓"
-                                 :closeOnSelect="false"
                                  :multiple="true"
                                  v-validate="'required'"
                                  :searchable="false"
@@ -70,8 +69,10 @@
                                  :showLabels="false"
                                  label="value"
                                  track-by="id"
+                                 :disabled="objType === '' || objState.length === 0"
                                  :data-vv-name="'form-' + index + '-ipc_code'"
                                  v-validate="'required'"
+                                 ref="multiselect"
                     ></multiselect>
 
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-ipc_code')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-ipc_code')] }}</small>
@@ -313,6 +314,9 @@
 
             ipcCodesFiltered: function (val) {
                 this.ipcCode = '';
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
+                }
             }
         }
     }
