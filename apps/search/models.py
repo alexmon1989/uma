@@ -384,6 +384,7 @@ class AppVisit(TimeStampedModel):
 
 class PaidServicesSettings(models.Model):
     """Модель настроек платных услуг."""
+    enabled = models.BooleanField('Увімкнено', default=False)
     tm_app_access_price = models.DecimalField(
         max_digits=8,
         decimal_places=2,

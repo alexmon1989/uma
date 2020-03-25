@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 from django.db.models import F
-from ..models import ObjType, SortParameter, IndexationProcess
+from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
 
@@ -159,3 +159,10 @@ def filter_bad_documents(documents):
 def user_has_access_to_app(user, hit):
     """Возвращает признак того, что пользователю доступна платная заявка."""
     return user_has_access_to_tm_app(user, hit)
+
+
+@register.simple_tag
+def is_paid_services_enabled():
+    """Возвращает значения того включены ли платные услуги."""
+    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    return paid_services_settings.enabled

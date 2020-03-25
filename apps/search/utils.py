@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.aggs import Terms, Nested
-from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList, PaidServicesSettings
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -195,10 +195,14 @@ def filter_unpublished_apps(user, qs):
         return qs
 
     """Фильтры для обычных пользователей."""
-    # Не показывать заявки на знаки со статусом 1000
-    # filter_qs = ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
     # Не показывать заявки по пром. образцам и полезным моделям
     filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+
+    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    if not paid_services_settings.enabled:
+        # Не показывать заявки на знаки со статусом 1000
+        filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+
     # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
     filter_qs &= Q(
         'query_string',
@@ -272,11 +276,15 @@ def filter_results(s, get_params):
             'title': 'registration_status_color',
             'field': 'search_data.registration_status_color'
         },
-        {
+    ]
+
+    # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
+    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    if paid_services_settings.enabled:
+        filters.append({
             'title': 'mark_status',
             'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        },
-    ]
+        })
 
     # Агрегация без фильтрации
     for item in filters:

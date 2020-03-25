@@ -13,15 +13,16 @@ from .models import BalanceOperation, License, Message
 from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
 from ..paygate.models import Payment
+from .mixins import PaidServicesEnabledMixin
 from datetime import datetime
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(PaidServicesEnabledMixin, LoginRequiredMixin, TemplateView):
     """Отображает стартовую страницу кабинета пользователя."""
     template_name = "accounts/dashboard/index.html"
 
 
-class AccountBalanceView(LoginRequiredMixin, ListView):
+class AccountBalanceView(PaidServicesEnabledMixin, LoginRequiredMixin, ListView):
     """Отображает страницу состояния баланса пользователя, а также операции с балансом."""
     model = BalanceOperation
     template_name = "accounts/account_balance/index.html"
@@ -41,7 +42,7 @@ class AccountBalanceView(LoginRequiredMixin, ListView):
         return qs
 
 
-class DepositView(LoginRequiredMixin, FormView):
+class DepositView(PaidServicesEnabledMixin, LoginRequiredMixin, FormView):
     """Пополнение счёта."""
     template_name = 'accounts/account_balance_deposit/index.html'
     form_class = DepositForm
@@ -61,7 +62,7 @@ class DepositView(LoginRequiredMixin, FormView):
         return reverse('account:order', kwargs={'pk': self.payment.pk})
 
 
-class OrderDetailView(LoginRequiredMixin, DetailView):
+class OrderDetailView(PaidServicesEnabledMixin, LoginRequiredMixin, DetailView):
     model = Payment
     template_name = "accounts/orders/detail/index.html"
 
@@ -69,7 +70,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return Payment.objects.filter(paid=False, user=self.request.user)
 
 
-class ViewsHistoryView(LoginRequiredMixin, ListView):
+class ViewsHistoryView(PaidServicesEnabledMixin, LoginRequiredMixin, ListView):
     """Отображает страницу истории просмотров заявок."""
     template_name = "accounts/views_history/index.html"
     model = AppVisit
@@ -89,7 +90,7 @@ class ViewsHistoryView(LoginRequiredMixin, ListView):
         return qs
 
 
-class MessagesListView(LoginRequiredMixin, ListView):
+class MessagesListView(PaidServicesEnabledMixin, LoginRequiredMixin, ListView):
     """Отображает страницу списка системных сообщений."""
     template_name = "accounts/messages/list.html"
     model = Message
@@ -102,7 +103,7 @@ class MessagesListView(LoginRequiredMixin, ListView):
         ).order_by('-created_at')
 
 
-class MarkMessageReadView(LoginRequiredMixin, RedirectView):
+class MarkMessageReadView(PaidServicesEnabledMixin, LoginRequiredMixin, RedirectView):
     """Отмечает сообщение как прочитанное пользователем."""
 
     def get_redirect_url(self, *args, **kwargs):
@@ -118,7 +119,7 @@ class MarkMessageReadView(LoginRequiredMixin, RedirectView):
         return reverse('account:messages_list')
 
 
-class SettingsView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class SettingsView(PaidServicesEnabledMixin, LoginRequiredMixin, SuccessMessageMixin, FormView):
     """Отображает страницу настроек кабинета."""
     template_name = "accounts/settings/index.html"
     form_class = SettingsForm
@@ -149,7 +150,7 @@ class SettingsView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         return context
 
 
-class ConfirmLicenseView(LoginRequiredMixin, RedirectView):
+class ConfirmLicenseView(PaidServicesEnabledMixin, LoginRequiredMixin, RedirectView):
     """Согласие пользователя с условиями лицензии."""
 
     def get_redirect_url(self, *args, **kwargs):

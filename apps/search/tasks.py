@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings
 from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
                     extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
                     get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
@@ -509,11 +509,16 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 'title': 'registration_status_color',
                 'field': 'search_data.registration_status_color'
             },
-            {
+        ]
+
+        # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
+        paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+        if paid_services_settings.enabled:
+            filters.append({
                 'title': 'mark_status',
                 'field': 'Document.MarkCurrentStatusCodeType.keyword'
-            },
-        ]
+            })
+
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
                 # Фильтрация в основном запросе
@@ -577,11 +582,16 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
                 'title': 'registration_status_color',
                 'field': 'search_data.registration_status_color'
             },
-            {
+        ]
+
+        # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
+        paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+        if paid_services_settings.enabled:
+            filters.append({
                 'title': 'mark_status',
                 'field': 'Document.MarkCurrentStatusCodeType.keyword'
-            },
-        ]
+            })
+
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
                 # Фильтрация в основном запросе

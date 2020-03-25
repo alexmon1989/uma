@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load uma_extras %}
+{% load search_extras %}
 
 <header id="js-header" class="u-header u-header--static u-header--show-hide u-header--change-appearance"
         data-header-fix-moment="500" data-header-fix-effect="slide">
@@ -118,44 +119,52 @@
 
                 <div class="g-pos-rel g-pt-3--lg g-font-weight-600 g-mr-60 g-mr-0--md">
                     {% if user.is_authenticated %}
-                        <div class="js-mega-menu"
-                             id="navBar2">
-                            <ul class="navbar-nav g-font-weight-600 mx-auto">
-                                <li class="nav-item hs-has-sub-menu">
-                                    <a class="nav-link g-px-0 g-color-primary"
-                                       id="nav-link-1"
-                                       aria-haspopup="true"
-                                       aria-expanded="false"
-                                       aria-controls="nav-submenu-1"
-                                       data-toggle="tooltip"
-                                       data-placement="left"
-                                       title="{{ request.user.get_username_full }}"
-                                       href="{% url 'account:dashboard' %}">
-                                        <i class="fa fa-user g-pr-5"></i>{% trans "Мій кабінет" %}
-                                    </a>
-                                    <!-- Submenu -->
-                                    <ul class="g-pos-abs hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-10 g-mt-20--md g-mt-10--lg--scrolling"
-                                        id="nav-submenu-1" aria-labelledby="nav-link-1">
-                                        <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="{% url 'account:account_balance' %}">Мій рахунок (баланс)</a>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="{% url 'account:views_history' %}">Історія переглядів</a>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="{% url 'account:messages_list' %}">Повідомлення</a>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <a class="nav-link g-px-0" href="{% url 'account:settings' %}">Налаштування</a>
-                                        </li>
-                                        <li class="dropdown-item g-bg-gray-light-v5">
-                                            <a class="nav-link g-px-0 g-font-weight-600" href="{% url 'auth:logout' %}"><i class="fa fa-sign-out g-pr-5" aria-hidden="true"></i>{% trans "Вихід" %}</a>
-                                        </li>
-                                    </ul>
-                                    <!-- End Submenu -->
-                                </li>
-                            </ul>
-                        </div>
+                        {% is_paid_services_enabled as is_paid_services_enabled %}
+                        {% if is_paid_services_enabled %}
+                            <div class="js-mega-menu"
+                                 id="navBar2">
+                                <ul class="navbar-nav g-font-weight-600 mx-auto">
+                                    <li class="nav-item hs-has-sub-menu">
+                                        <a class="nav-link g-px-0 g-color-primary"
+                                           id="nav-link-1"
+                                           aria-haspopup="true"
+                                           aria-expanded="false"
+                                           aria-controls="nav-submenu-1"
+                                           data-toggle="tooltip"
+                                           data-placement="left"
+                                           title="{{ request.user.get_username_full }}"
+                                           href="{% url 'account:dashboard' %}">
+                                            <i class="fa fa-user g-pr-5"></i>{% trans "Мій кабінет" %}
+                                        </a>
+                                        <!-- Submenu -->
+                                        <ul class="g-pos-abs hs-sub-menu list-unstyled g-text-transform-none g-brd-top g-brd-primary g-brd-top-2 g-min-width-200 g-mt-10 g-mt-20--md g-mt-10--lg--scrolling"
+                                            id="nav-submenu-1" aria-labelledby="nav-link-1">
+                                            <li class="dropdown-item">
+                                                <a class="nav-link g-px-0" href="{% url 'account:account_balance' %}">{% trans "Мій рахунок (баланс)" %}</a>
+                                            </li>
+                                            <li class="dropdown-item">
+                                                <a class="nav-link g-px-0" href="{% url 'account:views_history' %}">{% trans "Історія переглядів" %}</a>
+                                            </li>
+                                            <li class="dropdown-item">
+                                                <a class="nav-link g-px-0" href="{% url 'account:messages_list' %}">{% trans "Повідомлення" %}</a>
+                                            </li>
+                                            <li class="dropdown-item">
+                                                <a class="nav-link g-px-0" href="{% url 'account:settings' %}">{% trans "Налаштування" %}</a>
+                                            </li>
+                                            <li class="dropdown-item g-bg-gray-light-v5">
+                                                <a class="nav-link g-px-0 g-font-weight-600"
+                                                   href="{% url 'auth:logout' %}"><i class="fa fa-sign-out g-pr-5"
+                                                                                     aria-hidden="true"></i>{% trans "Вихід" %}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <!-- End Submenu -->
+                                    </li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:20 }}</span> <a href="{% url "auth:logout" %}" title="{% trans 'Вихід' %}"><i class="fa fa-sign-out"></i></a>
+                        {% endif %}
                     {% else %}
                         <a href="{% url "auth:login" %}"><i class="fa fa-sign-in g-pr-5" aria-hidden="true"></i>{% trans 'Вхід' %}</a>
                     {% endif %}
