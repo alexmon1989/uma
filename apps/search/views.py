@@ -1,18 +1,21 @@
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.base import RedirectView
 from django.db.models import F
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
 from django.utils import six
 from django.utils.http import urlencode
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
-                     SimpleSearchPage, AdvancedSearchPage)
+                     SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import (get_client_ip, paginate_results)
+from .utils import (get_client_ip, paginate_results, user_has_access_to_tm_app)
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
@@ -21,6 +24,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
                     create_selection, create_simple_search_results_file, create_advanced_search_results_file,
                     create_transactions_search_results_file, create_shared_docs_archive)
+from ..account.models import BalanceOperation, License
 
 
 class SimpleListView(TemplateView):
@@ -151,18 +155,11 @@ class AdvancedListView(TemplateView):
 def add_filter_params(request):
     """Формирует строку параметров фильтра и делает переадресацию обратно на страницу поиска."""
     get_params = parse_qs(request.POST.get('get_params'))
-    get_params['filter_obj_type'] = request.POST.getlist('filter_obj_type')
-    get_params['filter_obj_state'] = request.POST.getlist('filter_obj_state')
-    get_params['filter_registration_status_color'] = request.POST.getlist('filter_registration_status_color')
-
-    if not get_params['filter_obj_type']:
-        del get_params['filter_obj_type']
-
-    if not get_params['filter_obj_state']:
-        del get_params['filter_obj_state']
-
-    if not get_params['filter_registration_status_color']:
-        del get_params['filter_registration_status_color']
+    filters = ['filter_obj_type', 'filter_obj_state', 'filter_registration_status_color', 'filter_mark_status']
+    for f in filters:
+        get_params[f] = request.POST.getlist(f)
+        if not get_params[f]:
+            del get_params[f]
 
     if get_params.get('page'):
         del get_params['page']  # Для переадресации на 1 страницу
@@ -193,6 +190,10 @@ class ObjectDetailView(DetailView):
 
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
+
+        # Запись в лог запроса пользователя к заявке
+        if not self.request.user.is_anonymous:
+            AppVisit.objects.create(user=self.request.user, app=self.object)
 
         return context
 
@@ -235,7 +236,14 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] == 3:
                     template = 'search/detail/ld/detail.html'
                 elif context['hit']['Document']['idObjType'] == 4:
-                    template = 'search/detail/tm/detail.html'
+                    if not user_has_access_to_tm_app(request.user, context['hit']):
+                        # Шаблон подтверждения получения доступа к заявке с платным доступом
+                        context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
+                        if not request.user.is_anonymous and not request.user.has_confirmed_license():
+                            context['license'], created = License.objects.get_or_create()
+                        template = 'search/detail/paid_access_conformation.html'
+                    else:
+                        template = 'search/detail/tm/detail.html'
                 elif context['hit']['Document']['idObjType'] == 5:
                     template = 'search/detail/qi/detail.html'
                 elif context['hit']['Document']['idObjType'] == 6:
@@ -390,3 +398,32 @@ def get_obj_types_with_transactions(request):
     lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
     task = get_obj_types_with_transactions_task.delay(lang_code)
     return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+
+class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
+    """Получает доступ к заявке и переадресовывает на страницу это заявки."""
+    pattern_name = 'search:detail'
+
+    def get_redirect_url(self, *args, **kwargs):
+        app = get_object_or_404(IpcAppList, pk=kwargs['pk'])
+
+        # Создание записи о доступе пользователя к заявке
+        paid_service_settings, created = PaidServicesSettings.objects.get_or_create()
+        if self.request.user not in app.users_with_access.all() \
+                and self.request.user.balance.value >= paid_service_settings.tm_app_access_price:
+            self.request.user.balance.value -= paid_service_settings.tm_app_access_price
+            self.request.user.balance.save()
+            AppUserAccess.objects.create(user=self.request.user, app=app)
+            BalanceOperation.objects.create(
+                balance=self.request.user.balance,
+                value=paid_service_settings.tm_app_access_price,
+                type=1,
+                app=app
+            )
+            messages.success(
+                self.request,
+                f'Надано доступ до заявки <b>{app.app_number}</b><br>'
+                f'Баланс рахунку: <b>{self.request.user.balance.value} грн</b>'
+            )
+
+        return super().get_redirect_url(*args, **kwargs)

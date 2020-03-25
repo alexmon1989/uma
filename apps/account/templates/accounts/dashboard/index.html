@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Загальна інформація" %} - {% trans "Мій кабінет" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'accounts/dashboard/_partials/breadcrumbs.html' %}
+
+    <section class="container g-pt-70 g-pb-20">
+        <div class="row justify-content-between">
+            <div class="col-lg-3 g-mb-50 g-mb-0--lg">
+                <!-- Sidebar Navigation -->
+                {% include 'accounts/_partials/sidebar.html' %}
+                <!-- End Sidebar Navigation -->
+            </div>
+
+            <div class="col-md-9 g-mb-60">
+                <h2 class="h3 g-mb-25 g-font-weight-300">{% trans 'Загальна інформація' %}</h2>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Користувач' %}</dt>
+                    <dd class="col-sm-9">{{ request.user.get_username_full }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Баланс рахунку' %}</dt>
+                    <dd class="col-sm-9">{{ request.user.balance.value }} {% trans 'грн' %}.</dd>
+                </dl>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -666,7 +666,7 @@ function() {
 				data['csrfmiddlewaretoken'] = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 				$.post( "/uk/auth/login_ds/", data, function (data) {
 					if (data.is_logged === 1) {
-						location.href = '/'
+						location.href = '/account/dashboard';
 					} else {
 						document.getElementById('DSLoginErrorsText').innerHTML = 'Авторизація неможлива!';
 						document.getElementById('DSLoginErrors').style.display = '';

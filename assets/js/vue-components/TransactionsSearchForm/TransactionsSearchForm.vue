@@ -72,7 +72,7 @@
                         if (this.initial['obj_type']) {
                             this.date = this.initial['date'][0].split(' ~ ');
                             this.$nextTick(function () {
-                                this.obj_type = this.initial['obj_type'][0].toString();
+                                this.obj_type = this.objTypes.find(e => e.id === parseInt(this.initial['obj_type'][0]));
                                 this.$nextTick(function () {
                                     this.transaction_type = this.initial['transaction_type'];
                                 });
@@ -106,7 +106,7 @@
         computed: {
             transactionTypes: function () {
                 if (this.obj_type && this.objTypes.length > 0) {
-                    return this.objTypes.find(x => x.id === parseInt(this.obj_type))['transactions_types'];
+                    return this.objTypes.find(x => x.id === this.obj_type.id)['transactions_types'];
                 } else {
                     return [];
                 }

@@ -5,6 +5,8 @@ from django.http import HttpResponseBadRequest
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 from .models import Payment
+from ..account.models import BalanceOperation
+from decimal import Decimal
 
 
 @require_POST
@@ -45,11 +47,19 @@ def pb(request):
             response = render_to_response('paygate/pay_error.xml')
         else:
             data = dom.getElementsByTagName("Transfer")[0].getElementsByTagName("Data")[0]
-            if payment.pk != 1:  # 1 - тестовый идентификатор
-                payment.paid = True
-                payment.value_paid = data.getElementsByTagName("TotalSum")[0].firstChild.nodeValue  # Оплаченная сумма
-                payment.pay_request_pb_xml = request.body.decode()
-                payment.save()
+
+            payment.paid = True
+            payment.value_paid = Decimal(data.getElementsByTagName("TotalSum")[0].firstChild.nodeValue)
+            payment.pay_request_pb_xml = request.body.decode()
+            payment.save()
+
+            # Баланс пользователя
+            payment.user.balance.value += payment.value_paid
+            payment.user.balance.save()
+
+            # Лог операций
+            BalanceOperation.objects.create(balance=payment.user.balance, type=2, value=payment.value_paid)
+
             response = render_to_response('paygate/pay_success.xml', {'reference': data.getAttribute("id")})
 
     else:

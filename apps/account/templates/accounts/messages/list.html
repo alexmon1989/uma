@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Системні повідомлення" %} - {% trans "Мій кабінет" %}{% endblock %}
+
+{% block content %}
+    {% include 'accounts/messages/_partials/breadcrumbs.html' %}
+
+    <section class="container g-pt-70 g-pb-20">
+        <div class="row justify-content-between">
+            <div class="col-lg-3 g-mb-50 g-mb-0--lg">
+                <!-- Sidebar Navigation -->
+                {% include 'accounts/_partials/sidebar.html' %}
+                <!-- End Sidebar Navigation -->
+            </div>
+
+            <div class="col-md-9 g-mb-60">
+                <h2 class="h3 g-mb-25 g-font-weight-300">{% trans 'Системні повідомлення' %}</h2>
+
+                {% for message in message_list %}
+                    <div class="g-mb-20 text-justify">
+                        <h3 class="h5">{{ message }}</h3>
+
+                        {{ message.text|safe }}
+
+                        <div class="d-inline-flex d-sm-flex flex-column flex-sm-row justify-content-sm-between">
+                            <em class="g-font-weight-600 g-mr-5">{{ message.created_at }}</em>
+                            {% if request.user not in message.users.all %}
+                                <a href="{% url 'account:mark_message_read' message.pk %}" class="btn u-btn-indigo btn-sm"><i class="fa fa-eye g-mr-5"></i>{% trans 'Відмітити як прочитане' %}</a>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                    </div>
+                {% endfor %}
+
+                {% include 'accounts/messages/_partials/pagination.html' %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

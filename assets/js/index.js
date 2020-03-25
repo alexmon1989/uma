@@ -6,16 +6,21 @@ import './template.js';
 
 import Vue from 'vue';
 
+import Multiselect from 'vue-multiselect';
+
 import SimpleSearchForm from "./vue-components/SimpleSearchForm/SimpleSearchForm.vue";
 import AdvancedSearchForm from "./vue-components/AdvancedSearchForm/AdvancedSearchForm.vue";
 import TransactionsSearchForm from "./vue-components/TransactionsSearchForm/TransactionsSearchForm.vue";
 import LoadingDots from "./vue-components/LoadingDots.vue";
 import ContactForm from "./vue-components/ContactForm.vue";
 import GetOriginalDoc from "./vue-components/GetOriginalDoc.vue";
+import DateFilterForm from "./vue-components/DateFilterForm/DateFilterForm.vue";
 
 import VeeValidate from 'vee-validate';
 import * as Toastr from "toastr";
 Vue.use(VeeValidate);
+
+Vue.component('multiselect', Multiselect);
 
 window.$ = window.jQuery = require('jquery');
 window.toastr = Toastr;
@@ -29,5 +34,6 @@ const app = new Vue({
         LoadingDots,
         ContactForm,
         GetOriginalDoc,
+        DateFilterForm,
     }
 });

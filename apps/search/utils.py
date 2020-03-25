@@ -2,10 +2,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.aggs import Terms, Nested
-from .models import ObjType, InidCodeSchedule, OrderService, SortParameter
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList, PaidServicesSettings
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -194,30 +195,41 @@ def filter_unpublished_apps(user, qs):
         return qs
 
     """Фильтры для обычных пользователей."""
-    # Не показывать заявки на знаки со статусом 1000
-    filter_qs = ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
     # Не показывать заявки по пром. образцам и полезным моделям
-    filter_qs &= ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
-    # Показывать только заявки с датой заяки (но показывать все КЗПТ)
-    filter_qs &= Q('query_string', query="_exists_:search_data.app_date OR Document.idObjType:5")
+    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+
+    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    if not paid_services_settings.enabled:
+        # Не показывать заявки на знаки со статусом 1000
+        filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+
+    # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
+    filter_qs &= Q(
+        'query_string',
+        query="_exists_:search_data.app_date OR Document.idObjType:5 "
+              "OR (NOT _exists_:search_data.app_date AND Document.MarkCurrentStatusCodeType:1000)"
+    )
     # Для заявок на изобретения нужно чтоб существовал I_43.D
     filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
     # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
     filter_qs &= ~Q(
         'query_string',
-        query="NOT _exists_:TradeMark.PaymentDetails AND search_data.obj_state:1 AND Document.idObjType:4"
+        query="NOT _exists_:TradeMark.PaymentDetails "
+              "AND search_data.obj_state:1 "
+              "AND Document.idObjType:4 "
+              "AND NOT Document.MarkCurrentStatusCodeType:1000"
     )
 
-    if user.is_anonymous or not user.certificateowner:
-        # Для анонимных пользователей применяются все фильтры
-        qs &= filter_qs
-    else:
+    try:
         # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
         user_name = user.certificateowner.pszSubjFullName.strip()
         qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
               | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
+    except (get_user_model().certificateowner.RelatedObjectDoesNotExist, AttributeError):
+        # Для обычных пользователей без ЭЦП или анонимных пользователей применяются все фильтры
+        qs &= filter_qs
 
     return qs
 
@@ -266,9 +278,18 @@ def filter_results(s, get_params):
         },
     ]
 
+    # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
+    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    if paid_services_settings.enabled:
+        filters.append({
+            'title': 'mark_status',
+            'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        })
+
     # Агрегация без фильтрации
     for item in filters:
-        s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field']))
+        s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field'], order={"_key": "asc"}, size=1000))
+
     aggregations = s.execute().aggregations.to_dict()
     s_ = s
 
@@ -1157,7 +1178,7 @@ def user_has_access_to_docs_decorator(f):
 def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
-    if user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists():
+    if not user.is_anonymous and user.is_vip():
         return True
 
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
@@ -1176,6 +1197,20 @@ def user_has_access_to_docs(user, hit):
                 pass
 
     return False
+
+
+def user_has_access_to_tm_app(user, hit):
+    """Возвращает признак доступности заявки на знак для товаров и услуг пользователю."""
+    if not type(hit) is dict:
+        item = hit.to_dict()
+        item['meta'] = hit.meta.to_dict()
+        hit = item
+    try:
+        return hit['Document'].get('MarkCurrentStatusCodeType') != '1000' \
+               or user_has_access_to_docs(user, hit) \
+               or user in IpcAppList.objects.get(id=hit['meta']['id']).users_with_access.all()
+    except IpcAppList.DoesNotExist:
+        return False
 
 
 def create_search_res_doc(data):
@@ -1210,45 +1245,60 @@ def create_search_res_doc(data):
     return workbook
 
 
-def prepare_data_for_search_report(s, lang_code):
+def prepare_data_for_search_report(s, lang_code, user=None):
     """Подготавливает данные для файла Excel."""
     obj_states = [_('Заявка'), _('Охоронний документ')]
     obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
-        obj_type = obj_types[h.Document.idObjType - 1]
-        obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
-            if h.search_data.app_date else ''
-        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
-            '%d.%m.%Y') if h.search_data.rights_date else ''
-        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        if hasattr(h.search_data, 'inventor'):
-            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                h.search_data.applicant) else h.search_data.applicant
-        else:
-            applicant = ''
-        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-        if hasattr(h.search_data, 'inventor'):
-            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                h.search_data.inventor) else h.search_data.inventor
-        else:
-            inventor = ''
-        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+        if h.Document.idObjType == 4 and h.search_data.obj_state == 1 and user and user_has_access_to_tm_app(user, h):
+            obj_type = obj_types[h.Document.idObjType - 1]
+            obj_state = obj_states[h.search_data.obj_state - 1]
+            app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
+                if h.search_data.app_date else ''
+            rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+                '%d.%m.%Y') if h.search_data.rights_date else ''
+            title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+            if hasattr(h.search_data, 'inventor'):
+                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                    h.search_data.applicant) else h.search_data.applicant
+            else:
+                applicant = ''
+            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+            if hasattr(h.search_data, 'inventor'):
+                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                    h.search_data.inventor) else h.search_data.inventor
+            else:
+                inventor = ''
+            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-        data.append([
-            obj_type,
-            obj_state,
-            h.search_data.app_number,
-            app_date,
-            h.search_data.protective_doc_number,
-            rights_date,
-            title,
-            applicant,
-            owner,
-            inventor,
-            agent,
-        ])
+            data.append([
+                obj_type,
+                obj_state,
+                h.search_data.app_number,
+                app_date,
+                h.search_data.protective_doc_number,
+                rights_date,
+                title,
+                applicant,
+                owner,
+                inventor,
+                agent,
+            ])
+        else:
+            data.append([
+                obj_types[h.Document.idObjType - 1],
+                obj_states[h.search_data.obj_state - 1],
+                h.search_data.app_number,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+            ])
 
     return data
 
@@ -1452,3 +1502,17 @@ def get_registration_status_color(hit):
                 status = 'red'
 
     return status
+
+
+def filter_app_data(app_data, user):
+    """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
+    if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
+        res = {}
+        res.update({'meta': app_data['meta']})
+        res.update({'Document': app_data['Document']})
+        res.update({'search_data': {
+            'app_number': app_data['search_data']['app_number'],
+            'obj_state': app_data['search_data']['obj_state'],
+        }})
+        return res
+    return app_data

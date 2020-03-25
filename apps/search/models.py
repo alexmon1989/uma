@@ -1,6 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
+from uma.abstract_models import TimeStampedModel
 
 
 class IpcAppList(models.Model):
@@ -19,6 +21,7 @@ class IpcAppList(models.Model):
     app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
     elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
     notification_date = models.DateField(db_column='NotificationDate', blank=True, null=True)
+    users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
 
     class Meta:
         managed = False
@@ -352,3 +355,43 @@ class AdvancedSearchPage(models.Model):
     class Meta:
         verbose_name = 'Сторінка розширенного пошуку'
         verbose_name_plural = 'Сторінка розширенного пошуку'
+
+
+class AppUserAccess(TimeStampedModel):
+    """Связующая модель между заявками на объекты ИС и пользователями."""
+    user = models.ForeignKey(get_user_model(), verbose_name='Користувач', on_delete=models.CASCADE)
+    app = models.ForeignKey(IpcAppList, verbose_name='Заявка', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Доступ користувача {self.user.get_username_full()} до заявки {self.app.app_number}"
+
+
+class AppVisit(TimeStampedModel):
+    """Модель для истории просмотра заявок пользователем."""
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='Користувач')
+    app = models.ForeignKey(IpcAppList, on_delete=models.CASCADE, verbose_name='Заявка')
+
+    def __str__(self):
+        return f"Користувач {self.user.get_username_full()}, заявка {self.app.app_number}"
+
+    class Meta:
+        verbose_name = 'Перегляд заявки користувачем'
+        verbose_name_plural = 'Перегляди заявок користувачами'
+        indexes = [
+            models.Index(fields=['created_at']),
+        ]
+
+
+class PaidServicesSettings(models.Model):
+    """Модель настроек платных услуг."""
+    enabled = models.BooleanField('Увімкнено', default=False)
+    tm_app_access_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        verbose_name='Вартість доступу до заявки на ТМ, грн',
+        default=120
+    )
+
+    class Meta:
+        verbose_name = 'Налаштування платних послуг'
+        verbose_name_plural = 'Налаштування платних послуг'

@@ -3,7 +3,7 @@
 {% load search_extras %}
 {% load humanize %}
 
-<div class="g-pr-40--lg g-mb-50 g-mb-0--lg sticky-top g-z-index-99">
+<div class="g-pr-40--lg g-mb-50 g-mb-0--lg sticky-top g-z-index-1">
 
     <form action="{% url 'search:add_filter_params' %}" method="post" id="filter-form">
         {% csrf_token %}
@@ -63,38 +63,66 @@
             {% endfor %}
         </div>
 
-        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус охоронного документа" %}</h2>
-        <hr class="g-brd-gray-light-v4 g-my-15">
-        <div class="g-mb-20">
-            {% for color in aggregations.registration_status_color_terms.buckets|dictsort:"key" %}
-                <div class="form-group g-mb-5">
-                    <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
-                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                               type="checkbox"
-                               name="filter_registration_status_color"
-                               value="{{ color.key }}"
-                               {% if color.doc_count == 0 %}onclick="return false;"{% endif %}
-                               {% if color.key in get_params.filter_registration_status_color %}checked{% endif %}
-                        >
-                        <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
-                            <i class="fa" data-check-icon=""></i>
+        {% if aggregations.registration_status_color_terms.buckets %}
+            <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус охоронного документа" %}</h2>
+            <hr class="g-brd-gray-light-v4 g-my-15">
+            <div class="g-mb-40">
+                {% for color in aggregations.registration_status_color_terms.buckets|dictsort:"key" %}
+                    <div class="form-group g-mb-5">
+                        <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
+                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                   type="checkbox"
+                                   name="filter_registration_status_color"
+                                   value="{{ color.key }}"
+                                   {% if color.doc_count == 0 %}onclick="return false;"{% endif %}
+                                   {% if color.key in get_params.filter_registration_status_color %}checked{% endif %}
+                            >
+                            <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                                <i class="fa" data-check-icon=""></i>
+                            </div>
+                            <i class="fa fa-circle g-color-{{ color.key }} {% if color.doc_count == 0 %}g-opacity-0_3{% endif %} g-mr-5"></i>
+                            {% if color.key == 'red' %}
+                                {% trans "Не діє" %}
+                            {% elif color.key == 'green' %}
+                                {% trans "Діє" %}
+                            {% elif color.key == 'yellow' %}
+                                {% trans "Дію припинено" %}
+                            {% endif %}
+                            {% if color.doc_count > 0 and color.key not in get_params.filter_registration_status_color %}
+                                <span class="g-color-gray-light-v1">
+                                    ({% if get_params.filter_registration_status_color %}+{% endif %}{{ color.doc_count|intcomma }})
+                                </span>
+                            {% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% is_paid_services_enabled as is_paid_services_enabled %}
+        {% if is_paid_services_enabled %}
+            {% for status in aggregations.mark_status_terms.buckets|dictsort:"key"|slice:":1" %}
+                {% if status.doc_count > 0 %}
+                    <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус заявки" %}</h2>
+                    <hr class="g-brd-gray-light-v4 g-my-15">
+                    <div class="g-mb-20">
+                        <div class="form-group g-mb-5">
+                            <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                       type="checkbox"
+                                       name="filter_mark_status"
+                                       value="1000"
+                                       {% if '1000' in get_params.filter_mark_status %}checked{% endif %}
+                                >
+                                <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                                {% trans "Лише заявки з обмеженим доступом" %}
+                            </label>
                         </div>
-                        <i class="fa fa-circle g-color-{{ color.key }} {% if color.doc_count == 0 %}g-opacity-0_3{% endif %} g-mr-5"></i>
-                        {% if color.key == 'red' %}
-                            {% trans "Не діє" %}
-                        {% elif color.key == 'green' %}
-                            {% trans "Діє" %}
-                        {% elif color.key == 'yellow' %}
-                            {% trans "Дію припинено" %}
-                        {% endif %}
-                        {% if color.doc_count > 0 and color.key not in get_params.filter_registration_status_color %}
-                            <span class="g-color-gray-light-v1">
-                                ({% if get_params.filter_registration_status_color %}+{% endif %}{{ color.doc_count|intcomma }})
-                            </span>
-                        {% endif %}
-                    </label>
-                </div>
+                    </div>
+                {% endif %}
             {% endfor %}
-        </div>
+        {% endif %}
     </form>
 </div>

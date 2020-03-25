@@ -52,9 +52,11 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "custombox": "^4.0.3",
     "es6-promise": "^4.2.6",
     "file-saver": "^2.0.2",
     "toastr": "^2.1.4",
+    "vue-multiselect": "^2.1.6",
     "vue2-datepicker": "^2.11.2"
   }
 }

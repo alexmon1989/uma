@@ -5,21 +5,23 @@
                 <!-- Об'єкт промислової власності -->
                 <div class="col-md-3 g-mb-15 g-pr-7--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_type') }">
-                    <chosen-select
-                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            :data-placeholder="translations.objType"
-                            :name="'form-' + index + '-obj_type'"
-                            v-model="objType"
-                            v-validate="'required'"
-                    >
-                        <option value=""></option>
-                        <option v-for="objType in objTypes"
-                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
-                                :value="objType.id"
-                                :key="objType.id"
-                        >{{ objType.value }}
-                        </option>
-                    </chosen-select>
+
+                    <select :name="'form-' + index + '-obj_type'"
+                            class="d-none">
+                        <option v-for="option in objTypes" :value="option.id" :selected="objType.id === option.id"></option>
+                    </select>
+
+                    <multiselect v-model="objType"
+                                 :options="objTypes"
+                                 :placeholder="translations.objType"
+                                 :showLabels="false"
+                                 :allowEmpty="false"
+                                 label="value"
+                                 track-by="id"
+                                 :data-vv-name="'form-' + index + '-obj_type'"
+                                 v-validate="'required'"
+                    ></multiselect>
+
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_type')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_type')] }}</small>
                 </div>
                 <!-- END Об'єкт промислової власності -->
@@ -27,21 +29,27 @@
                 <!-- Стан об'єкта -->
                 <div class="col-md-3 g-mb-15 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_state') }">
-                    <chosen-select
-                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            :data-placeholder="translations.objState"
-                            multiple
+
+                    <select multiple="multiple"
                             :name="'form-' + index + '-obj_state'"
-                            v-model="objState"
-                            v-validate="'required'"
-                    >
-                        <option v-for="objState in objStates"
-                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
-                                :value="objState.id"
-                                :key="objState.id"
-                        >{{ objState.value }}
-                        </option>
-                    </chosen-select>
+                            class="d-none">
+                        <option v-for="option in objStates" :value="option.id" :selected="objState.includes(option)"></option>
+                    </select>
+
+                    <multiselect v-model="objState"
+                                 :options="objStates"
+                                 :placeholder="translations.objState"
+                                 selectLabel=""
+                                 deselectLabel="⨯"
+                                 selectedLabel="✓"
+                                 :multiple="true"
+                                 v-validate="'required'"
+                                 :searchable="false"
+                                 label="value"
+                                 :data-vv-name="'form-' + index + '-obj_state'"
+                                 track-by="id">
+                    </multiselect>
+
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_state')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_state')] }}</small>
                 </div>
                 <!-- END Стан об'єкта -->
@@ -49,24 +57,24 @@
                 <!-- Код ІНІД -->
                 <div class="col-md-3 g-mb-15 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-ipc_code') }">
-                    <chosen-select
-                            ref="ipc_code"
-                            class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                            :data-placeholder="translations.ipcCode"
-                            id="obj_status"
-                            :name="'form-' + index + '-ipc_code'"
-                            v-model="ipcCode"
-                            :disabled="objType === '' || objState.length === 0"
-                            v-validate="'required'"
-                    >
-                        <option value=""></option>
-                        <option v-for="ipcCode in ipcCodesFiltered"
-                                class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
-                                :value="ipcCode.id"
-                                :key="ipcCode.id"
-                        >{{ ipcCode.value }}
-                        </option>
-                    </chosen-select>
+
+                    <select :name="'form-' + index + '-ipc_code'"
+                            class="d-none">
+                        <option v-for="option in ipcCodesFiltered" :value="option.id" :selected="option.id === ipcCode.id"></option>
+                    </select>
+
+                    <multiselect v-model="ipcCode"
+                                 :options="ipcCodesFiltered"
+                                 :placeholder="translations.ipcCode"
+                                 :showLabels="false"
+                                 label="value"
+                                 track-by="id"
+                                 :disabled="objType === '' || objState.length === 0"
+                                 :data-vv-name="'form-' + index + '-ipc_code'"
+                                 v-validate="'required'"
+                                 ref="multiselect"
+                    ></multiselect>
+
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-ipc_code')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-ipc_code')] }}</small>
                 </div>
                 <!-- END Код ІНІД -->
@@ -76,7 +84,7 @@
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
                     <div v-if="dataType !== 'date'">
                         <input type="text"
-                               class="form-control form-control-md g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-9"
+                               class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8"
                                :name="'form-' + index + '-value'"
                                v-model="value"
                                ref="value"
@@ -85,6 +93,7 @@
                                :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
                                autocomplete="off"
                                :placeholder="translations.value"
+                               data-vv-delay="500"
                                v-validate="{
                                 required: true,
                                 validQuery: [ipcCode, objType, objState]
@@ -120,6 +129,7 @@
                                   required: true,
                                   validQuery: [ipcCode, objType, objState]
                              }"
+                             data-vv-delay="500"
                              placeholder="Оберіть діапазон дат"
                              confirm
                              :shortcuts="false"
@@ -145,14 +155,13 @@
 </template>
 
 <script>
-    import ChosenSelect from "../ChosenSelect.vue";
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
     import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
 
     export default {
         name: "ipcCode",
-        components: {ChosenSelect, DatePicker},
+        components: {DatePicker},
         inject: ['$validator'],
         mixins: [translations, datePickerMixin],
         props: {
@@ -198,14 +207,14 @@
         },
         mounted() {
             if (this.initialData['form-' + this.index + '-obj_type']) {
-                this.objType = this.initialData['form-' + this.index + '-obj_type'];
+                this.objType = this.objTypes.find(x => x.id === parseInt(this.initialData['form-' + this.index + '-obj_type'][0]));
             }
             if (this.initialData['form-' + this.index + '-obj_state']) {
-                this.objState = this.initialData['form-' + this.index + '-obj_state'];
+                this.objState = this.objStates.filter(x => this.initialData['form-' + this.index + '-obj_state'].map(y => parseInt(y)).includes(x.id));
             }
             this.$nextTick(function () {
                 if (this.initialData['form-' + this.index + '-ipc_code']) {
-                    this.ipcCode = this.initialData['form-' + this.index + '-ipc_code'];
+                    this.ipcCode = this.ipcCodesFiltered.find(x => x.id === parseInt(this.initialData['form-' + this.index + '-ipc_code'][0]));
 
                     if (this.initialData['form-' + this.index + '-value']) {
                         if (this.dataType === "date") {
@@ -276,20 +285,19 @@
             // Тип данных выбранного поля ИНИД
             dataType: function () {
                 if (this.ipcCode) {
-                    return this.ipcCodes.find(x => x.id === parseInt(this.ipcCode)).data_type;
+                    return this.ipcCodes.find(x => x.id === this.ipcCode.id).data_type;
                 }
                 return '';
             },
 
             ipcCodesFiltered: function () {
                 // Фильтр по объекту пром. собств.
-                let ipcCodes = this.ipcCodes.filter(item => item.obj_type_id === parseInt(this.objType));
+                let ipcCodes = this.ipcCodes.filter(item => item.obj_type_id === this.objType.id);
 
                 // Получение реестров (заявки, охр. документы)
                 let selectedScheduleTypes = [];
                 this.objState.forEach(item => {
-                    let schedule_types = this.objStates.find(x => x.id === parseInt(item)).schedule_types;
-                    selectedScheduleTypes.push(...schedule_types);
+                    selectedScheduleTypes.push(...item.schedule_types);
                 });
 
                 // Фильтр по реестрам
@@ -298,15 +306,16 @@
             },
         },
         watch: {
-            ipcCodesFiltered: function (val) {
-                this.$nextTick(function () {
-                    $(this.$refs.ipc_code.$el).trigger('chosen:updated');
-                });
-            },
-
             dataType: function (val, oldVal) {
                 if (oldVal && val !== oldVal && (val === "date" || oldVal === "date")) {
                     this.value = '';
+                }
+            },
+
+            ipcCodesFiltered: function (val) {
+                this.ipcCode = '';
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
                 }
             }
         }
@@ -314,27 +323,5 @@
 </script>
 
 <style lang="scss">
-    .dropdown-header {
-        font-weight: 600;
-        font-size: 1.1rem !important;
-        span.text {
-            color: #0a0a0a;
-        }
-    }
 
-    .dropdown-menu.show {
-        max-width: 700px !important;
-    }
-
-    .dropdown-item {
-        span.text-muted {
-            display: none !important;
-        }
-    }
-
-    .u-has-error-v1 {
-        .chosen-choices {
-            background-color: #fff0f0;
-        }
-    }
 </style>
