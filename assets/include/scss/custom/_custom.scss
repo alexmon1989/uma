@@ -166,6 +166,22 @@
     }
 }
 
+.multiselect__option--highlight {
+    background: $g-color-primary;
+}
+
+.multiselect__option--highlight::after {
+    background: $g-color-primary;
+}
+
+.multiselect__option--selected.multiselect__option--highlight::after {
+    background: $g-color-primary;
+}
+
+.multiselect__option--selected.multiselect__option--highlight {
+    background: $g-color-primary;
+}
+
 .multiselect__input, .multiselect__single {
     padding-top: 2px;
     overflow: hidden;
@@ -192,6 +208,17 @@
 
 .multiselect__tag {
     margin-bottom: 0;
+    background: $g-color-primary-light-v2;
+}
+
+.multiselect__tag-icon {
+    &:after {
+      color: #3e466d;
+    }
+
+    &:hover {
+      background: $g-color-primary-light-v2;
+    }
 }
 
 .multiselect__tags {
