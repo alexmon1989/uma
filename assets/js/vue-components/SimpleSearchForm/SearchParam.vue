@@ -4,19 +4,22 @@
         <div class="col-md-5 g-pr-7--md">
             <div class="form-group g-mb-15"
                  :class="{ 'u-has-error-v1': errors.has('form-' + index + '-param_type') }">
-                <chosen-select
-                        class="w-100 h-100 u-select-v1 g-rounded-4 g-color-main g-color-primary--hover g-pt-8 g-pb-9"
-                        :name="'form-' + index + '-param_type'"
-                        v-validate="'required'"
-                        v-model="paramType"
-                        :data-placeholder="translations.selectParameter">
-                    <option></option>
-                    <option v-for="(type, key) in searchParameterTypes"
-                            :key="key"
-                            class="g-brd-none g-color-black g-color-white--hover g-color-white--active g-bg-primary--hover g-bg-primary--active"
-                            :value="type.id">{{ type.field_label }}
-                    </option>
-                </chosen-select>
+
+                <select :name="'form-' + index + '-param_type'"
+                        class="d-none">
+                    <option v-for="option in searchParameterTypes" :value="option.id" :selected="paramType.id === option.id"></option>
+                </select>
+
+                <multiselect v-model="paramType"
+                             :options="searchParameterTypes"
+                             :placeholder="translations.selectParameter"
+                             :showLabels="false"
+                             :allowEmpty="false"
+                             label="field_label"
+                             track-by="id"
+                             :data-vv-name="'form-' + index + '-param_type'"
+                             v-validate="'required'"
+                ></multiselect>
                 <small class="form-control-feedback" v-if="errors.has('form-' + index + '-param_type')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-param_type')] }}</small>
             </div>
         </div>
@@ -74,7 +77,6 @@
 </template>
 
 <script>
-    import ChosenSelect from "../ChosenSelect.vue";
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
     import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
@@ -82,7 +84,7 @@
     export default {
         name: "SearchParam",
         mixins: [translations, datePickerMixin],
-        components: {ChosenSelect, DatePicker},
+        components: {DatePicker},
         inject: ['$validator'],
         props: {
             searchParameterTypes: Array,
@@ -101,9 +103,7 @@
             // Тип параметра (text, date, integer, keyword)
             type() {
                 let self = this;
-                let element = this.searchParameterTypes.find(function (el) {
-                     return el.id === parseInt(self.paramType);
-                });
+                let element = this.searchParameterTypes.find(e => e.id === self.paramType.id);
                 if (element) {
                     return element.field_type;
                 }
@@ -112,7 +112,9 @@
         },
         mounted() {
             if (this.initialData['form-' + this.index + '-param_type']) {
-                this.paramType = this.initialData['form-' + this.index + '-param_type'];
+                this.paramType = this.searchParameterTypes.find(
+                    e => e.id === parseInt(this.initialData['form-' + this.index + '-param_type'])
+                );
             }
 
             if (this.initialData['form-' + this.index + '-value']) {
