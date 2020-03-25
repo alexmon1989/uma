@@ -92,6 +92,7 @@
                                :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
                                autocomplete="off"
                                :placeholder="translations.value"
+                               data-vv-delay="500"
                                v-validate="{
                                 required: true,
                                 validQuery: [ipcCode, objType, objState]
@@ -127,6 +128,7 @@
                                   required: true,
                                   validQuery: [ipcCode, objType, objState]
                              }"
+                             data-vv-delay="500"
                              placeholder="Оберіть діапазон дат"
                              confirm
                              :shortcuts="false"

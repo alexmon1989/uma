@@ -39,6 +39,7 @@
                                   required: true,
                                   validQuery: paramType
                              }"
+                             data-vv-delay="500"
                              placeholder="Оберіть діапазон дат"
                              confirm
                              :shortcuts="false"
