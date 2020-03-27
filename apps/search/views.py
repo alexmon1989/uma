@@ -25,6 +25,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     create_selection, create_simple_search_results_file, create_advanced_search_results_file,
                     create_transactions_search_results_file, create_shared_docs_archive)
 from ..account.models import BalanceOperation, License
+from .decorators import require_ajax
 
 
 class SimpleListView(TemplateView):
@@ -77,6 +78,7 @@ class SimpleListView(TemplateView):
         return context
 
 
+@require_ajax
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
@@ -198,6 +200,7 @@ class ObjectDetailView(DetailView):
         return context
 
 
+@require_ajax
 def get_data_app_html(request):
     """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
     task_id = request.GET.get('task_id', None)
@@ -379,6 +382,7 @@ def download_xls_transactions(request):
     return JsonResponse({'task_id': task.id})
 
 
+@require_ajax
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
     task_id = request.GET.get('task_id', None)
