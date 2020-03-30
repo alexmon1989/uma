@@ -1251,27 +1251,56 @@ def prepare_data_for_search_report(s, lang_code, user=None):
     obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
-        if h.Document.idObjType == 4 and h.search_data.obj_state == 1 and user and user_has_access_to_tm_app(user, h):
-            obj_type = obj_types[h.Document.idObjType - 1]
-            obj_state = obj_states[h.search_data.obj_state - 1]
-            app_date = datetime.datetime.strptime(h.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y') \
-                if h.search_data.app_date else ''
-            rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
-                '%d.%m.%Y') if h.search_data.rights_date else ''
-            title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-            if hasattr(h.search_data, 'inventor'):
-                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                    h.search_data.applicant) else h.search_data.applicant
-            else:
-                applicant = ''
-            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-            if hasattr(h.search_data, 'inventor'):
-                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                    h.search_data.inventor) else h.search_data.inventor
-            else:
-                inventor = ''
-            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+        obj_type = obj_types[h.Document.idObjType - 1]
+        obj_state = obj_states[h.search_data.obj_state - 1]
+        app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
+            if h.search_data.app_date else ''
+        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+            '%d.%m.%Y') if h.search_data.rights_date else ''
+        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+        if hasattr(h.search_data, 'inventor'):
+            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                h.search_data.applicant) else h.search_data.applicant
+        else:
+            applicant = ''
+        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+        if hasattr(h.search_data, 'inventor'):
+            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                h.search_data.inventor) else h.search_data.inventor
+        else:
+            inventor = ''
+        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
+        if h.Document.idObjType == 4 and h.search_data.obj_state == 1:
+            if user and user_has_access_to_tm_app(user, h):
+                data.append([
+                    obj_type,
+                    obj_state,
+                    h.search_data.app_number,
+                    app_date,
+                    h.search_data.protective_doc_number,
+                    rights_date,
+                    title,
+                    applicant,
+                    owner,
+                    inventor,
+                    agent,
+                ])
+            else:
+                data.append([
+                    obj_type,
+                    obj_state,
+                    h.search_data.app_number,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                ])
+        else:
             data.append([
                 obj_type,
                 obj_state,
@@ -1284,20 +1313,6 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                 owner,
                 inventor,
                 agent,
-            ])
-        else:
-            data.append([
-                obj_types[h.Document.idObjType - 1],
-                obj_states[h.search_data.obj_state - 1],
-                h.search_data.app_number,
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
             ])
 
     return data
