@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-26 15:14+0200\n"
+"POT-Creation-Date: 2020-03-31 16:33+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -54,13 +54,17 @@ msgid "Ваш контактний E-Mail"
 msgstr "Contact E-Mail"
 
 #: apps/account/forms.py:12
-msgid "Я погоджуюсь з умовами ліцензії"
-msgstr "I agree with license terms"
+msgid "Я погоджуюсь з умовами договору про надання інформаційних послуг"
+msgstr "I agree to the terms of the information service agreement"
 
 #: apps/account/forms.py:14
+#, fuzzy
+#| msgid ""
+#| "Перегляд матеріалів платних заявок можливий лише на умовах <a href=\"#\" "
+#| "data-toggle=\"modal\" data-target=\"#modal1\">цієї ліцензії</a>"
 msgid ""
-"Перегляд матеріалів платних заявок можливий лише на умовах <a href=\"#\" "
-"data-toggle=\"modal\" data-target=\"#modal1\">цієї ліцензії</a>"
+"Перегляд матеріалів заявок з обмеженим доступом можливий лише на умовах <a "
+"href=\"#\" data-toggle=\"modal\" data-target=\"#modal1\">цього договору</a>"
 msgstr ""
 "You can only view paid application materials under <a href=\"#\" data-toggle="
 "\"modal\" data-target=\"#modal1\">this license</a>"
@@ -207,7 +211,6 @@ msgid "Поповнення рахунку можливе лише після п
 msgstr "Replenishment is only possible after agreeing to the terms"
 
 #: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:10
-#: apps/search/templates/search/detail/_partials/license_confirmation.html:10
 msgid "ліцензійної угоди"
 msgstr "of license"
 
@@ -217,7 +220,6 @@ msgid "Погоджуюсь"
 msgstr "Agree"
 
 #: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:23
-#: apps/account/templates/accounts/settings/_partials/license.html:8
 #: apps/search/templates/search/detail/_partials/license_confirmation.html:23
 msgid "Текст ліцензії"
 msgstr "License text"
@@ -262,6 +264,10 @@ msgstr ""
 #: apps/account/templates/accounts/orders/detail/index.html:30
 msgid "Сплатити у Приват24"
 msgstr "Pay with Privat24"
+
+#: apps/account/templates/accounts/settings/_partials/license.html:8
+msgid "Текст договору про надання інформаційних послуг"
+msgstr "The text of the information service agreement"
 
 #: apps/account/templates/accounts/settings/index.html:27
 msgid "Зберегти"
@@ -763,6 +769,10 @@ msgstr "Print bibliographic data"
 msgid "Перегляд даних заявки можливий лише після погодження з умовами"
 msgstr ""
 "Viewing the application data is only possible after agreeing to the terms"
+
+#: apps/search/templates/search/detail/_partials/license_confirmation.html:10
+msgid "договору про надання інформаційних послуг"
+msgstr "information service agreement"
 
 #: apps/search/templates/search/detail/detail.html:5
 msgid "Детальна інформація по об'єкту"
@@ -1326,6 +1336,9 @@ msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 #: templates/_partials/header.html:146
 msgid "Історія переглядів"
 msgstr "Applications views history"
+
+#~ msgid "Я погоджуюсь з умовами ліцензії"
+#~ msgstr "I agree with license terms"
 
 #~ msgid "Поповнити"
 #~ msgstr "Deposit"

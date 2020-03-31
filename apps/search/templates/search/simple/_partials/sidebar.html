@@ -102,7 +102,7 @@
         {% is_paid_services_enabled as is_paid_services_enabled %}
         {% if is_paid_services_enabled %}
             {% for status in aggregations.mark_status_terms.buckets|dictsort:"key"|slice:":1" %}
-                {% if status.doc_count > 0 %}
+                {% if status.key == '1000' and status.doc_count > 0 %}
                     <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус заявки" %}</h2>
                     <hr class="g-brd-gray-light-v4 g-my-15">
                     <div class="g-mb-20">
