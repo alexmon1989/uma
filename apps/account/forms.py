@@ -9,7 +9,7 @@ class DepositForm(forms.Form):
 class SettingsForm(forms.Form):
     email = forms.EmailField(label=_('Ваш контактний E-Mail'))
     license_confirmed = forms.BooleanField(
-        label=_('Я погоджуюсь з умовами ліцензії'),
+        label=_('Я погоджуюсь з умовами договору про надання інформаційних послуг'),
         required=False,
-        help_text=_('Перегляд матеріалів платних заявок можливий лише на умовах <a href="#" data-toggle="modal" data-target="#modal1">цієї ліцензії</a>')
+        help_text=_('Перегляд матеріалів заявок з обмеженим доступом можливий лише на умовах <a href="#" data-toggle="modal" data-target="#modal1">цього договору</a>')
     )

@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
+from django.db import transaction
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
                      SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
@@ -408,6 +409,7 @@ class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
     """Получает доступ к заявке и переадресовывает на страницу это заявки."""
     pattern_name = 'search:detail'
 
+    @transaction.atomic
     def get_redirect_url(self, *args, **kwargs):
         app = get_object_or_404(IpcAppList, pk=kwargs['pk'])
 
