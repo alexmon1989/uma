@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-31 16:33+0300\n"
+"POT-Creation-Date: 2020-04-01 21:05+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -285,15 +285,15 @@ msgstr "Application number"
 msgid "Перегляди заявок відсутні"
 msgstr "There are no payments"
 
-#: apps/account/views.py:116
+#: apps/account/views.py:123
 msgid "Повідомлення відмічене як прочитане"
 msgstr "The message has been marked as read"
 
-#: apps/account/views.py:127
+#: apps/account/views.py:134
 msgid "Дані успішно збережено"
 msgstr "Data has been successfully saved"
 
-#: apps/account/views.py:163
+#: apps/account/views.py:170
 msgid "Ви погодилися з умовами ліцензії"
 msgstr "You have agreed with license terms"
 
@@ -463,14 +463,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1257
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:40 apps/search/admin.py:99
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1257
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -526,13 +526,13 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/utils.py:1226
+#: apps/search/utils.py:1233
 msgid "Номер заявки"
 msgstr "Application number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
-#: apps/search/utils.py:1227
+#: apps/search/utils.py:1234
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -715,14 +715,13 @@ msgstr "Valid"
 msgid "Дію припинено"
 msgstr "Ceased to be effective"
 
-#: apps/search/templates/search/advanced/_partials/sidebar.html:106
-#: apps/search/templates/search/simple/_partials/sidebar.html:106
+#: apps/search/templates/search/advanced/_partials/sidebar.html:107
+#: apps/search/templates/search/simple/_partials/sidebar.html:107
 msgid "Статус заявки"
 msgstr "Application state"
 
-#: apps/search/templates/search/advanced/_partials/sidebar.html:120
-#: apps/search/templates/search/simple/_partials/sidebar.html:120
-msgid "Лише заявки з обмеженим доступом"
+#: apps/search/templates/search/advanced/_partials/sidebar.html:121
+msgid "Лише заявки, за якими не встановлена дата їх подання"
 msgstr "Only applications with limited access"
 
 #: apps/search/templates/search/advanced/advanced.html:21
@@ -1182,6 +1181,12 @@ msgstr "Ukrainian Trademark certificate"
 msgid "Простий пошук"
 msgstr "Simple search"
 
+#: apps/search/templates/search/simple/_partials/sidebar.html:121
+#, fuzzy
+#| msgid "Лише заявки з обмеженим доступом"
+msgid "Лише заявки, за якими не встановлена дата їх поданняьфл"
+msgstr "Only applications with limited access"
+
 #: apps/search/templates/search/templatetags/registration_status.html:7
 msgid "Патент діє"
 msgstr "Valid"
@@ -1229,39 +1234,39 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1224
+#: apps/search/utils.py:1231
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1225
+#: apps/search/utils.py:1232
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1228
+#: apps/search/utils.py:1235
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1229
+#: apps/search/utils.py:1236
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1230
+#: apps/search/utils.py:1237
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1231
+#: apps/search/utils.py:1238
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1232
+#: apps/search/utils.py:1239
 msgid "Власник"
 msgstr "Owner(s)"
 
-#: apps/search/utils.py:1233
+#: apps/search/utils.py:1240
 msgid "Винахідник"
 msgstr "Inventor"
 
-#: apps/search/utils.py:1234
+#: apps/search/utils.py:1241
 msgid "Представник"
 msgstr "Presenter"
 
