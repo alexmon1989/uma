@@ -99,8 +99,9 @@
             </div>
         {% endif %}
 
-        {% is_paid_services_enabled as is_paid_services_enabled %}
-        {% if is_paid_services_enabled %}
+        {# ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ #}
+        {#% is_paid_services_enabled as is_paid_services_enabled %#}
+        {#% if is_paid_services_enabled %#}
             {% for status in aggregations.mark_status_terms.buckets|dictsort:"key"|slice:":1" %}
                 {% if status.key == '1000' and status.doc_count > 0 %}
                     <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус заявки" %}</h2>
@@ -123,6 +124,6 @@
                     </div>
                 {% endif %}
             {% endfor %}
-        {% endif %}
+        {#% endif %#}
     </form>
 </div>

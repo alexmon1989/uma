@@ -6,10 +6,11 @@ from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404, reverse
+from django.shortcuts import get_object_or_404, reverse, redirect
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from .models import BalanceOperation, License, Message
+from ..search.models import PaidServicesSettings
 from .forms import DepositForm, SettingsForm
 from ..search.models import AppVisit
 from ..paygate.models import Payment
@@ -17,9 +18,15 @@ from .mixins import PaidServicesEnabledMixin
 from datetime import datetime
 
 
-class DashboardView(PaidServicesEnabledMixin, LoginRequiredMixin, TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     """Отображает стартовую страницу кабинета пользователя."""
     template_name = "accounts/dashboard/index.html"
+
+    def get(self, request, *args, **kwargs):
+        paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+        if not paid_services_settings.enabled:
+            return redirect('search:simple')
+        super().get(request, *args, **kwargs)
 
 
 class AccountBalanceView(PaidServicesEnabledMixin, LoginRequiredMixin, ListView):
