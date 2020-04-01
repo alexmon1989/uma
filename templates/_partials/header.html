@@ -163,7 +163,7 @@
                                 </ul>
                             </div>
                         {% else %}
-                            <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:20 }}</span> <a href="{% url "auth:logout" %}" title="{% trans 'Вихід' %}"><i class="fa fa-sign-out"></i></a>
+                            <span data-toggle="tooltip" data-placement="bottom" title="{{ request.user.get_username_full }}">{{ request.user.get_username_short|truncatechars:15 }}</span> <a href="{% url "auth:logout" %}" title="{% trans 'Вихід' %}"><i class="fa fa-sign-out"></i></a>
                         {% endif %}
                     {% else %}
                         <a href="{% url "auth:login" %}"><i class="fa fa-sign-in g-pr-5" aria-hidden="true"></i>{% trans 'Вхід' %}</a>

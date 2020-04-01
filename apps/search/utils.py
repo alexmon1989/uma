@@ -199,9 +199,11 @@ def filter_unpublished_apps(user, qs):
     filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
 
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-    if not paid_services_settings.enabled:
-        # Не показывать заявки на знаки со статусом 1000
-        filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
+
+    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+    # if not paid_services_settings.enabled:
+    #     # Не показывать заявки на знаки со статусом 1000
+    #     filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
 
     # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
     filter_qs &= Q(
@@ -280,11 +282,16 @@ def filter_results(s, get_params):
 
     # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-    if paid_services_settings.enabled:
-        filters.append({
-            'title': 'mark_status',
-            'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        })
+    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+    # if paid_services_settings.enabled:
+    #     filters.append({
+    #         'title': 'mark_status',
+    #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
+    #     })
+    filters.append({
+        'title': 'mark_status',
+        'field': 'Document.MarkCurrentStatusCodeType.keyword'
+    })
 
     # Агрегация без фильтрации
     for item in filters:
@@ -1271,37 +1278,51 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             inventor = ''
         agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-        if h.Document.idObjType == 4 and h.search_data.obj_state == 1:
-            if user and user_has_access_to_tm_app(user, h):
-                data.append([
-                    obj_type,
-                    obj_state,
-                    h.search_data.app_number,
-                    app_date,
-                    h.search_data.protective_doc_number,
-                    rights_date,
-                    title,
-                    applicant,
-                    owner,
-                    inventor,
-                    agent,
-                ])
-            else:
-                data.append([
-                    obj_type,
-                    obj_state,
-                    h.search_data.app_number,
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                ])
-        else:
-            data.append([
+        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+        # if h.Document.idObjType == 4 and h.search_data.obj_state == 1:
+        #     if user and user_has_access_to_tm_app(user, h):
+        #         data.append([
+        #             obj_type,
+        #             obj_state,
+        #             h.search_data.app_number,
+        #             app_date,
+        #             h.search_data.protective_doc_number,
+        #             rights_date,
+        #             title,
+        #             applicant,
+        #             owner,
+        #             inventor,
+        #             agent,
+        #         ])
+        #     else:
+        #         data.append([
+        #             obj_type,
+        #             obj_state,
+        #             h.search_data.app_number,
+        #             '',
+        #             '',
+        #             '',
+        #             '',
+        #             '',
+        #             '',
+        #             '',
+        #             '',
+        #         ])
+        # else:
+        #     data.append([
+        #         obj_type,
+        #         obj_state,
+        #         h.search_data.app_number,
+        #         app_date,
+        #         h.search_data.protective_doc_number,
+        #         rights_date,
+        #         title,
+        #         applicant,
+        #         owner,
+        #         inventor,
+        #         agent,
+        #     ])
+        data.append([
                 obj_type,
                 obj_state,
                 h.search_data.app_number,
@@ -1521,13 +1542,15 @@ def get_registration_status_color(hit):
 
 def filter_app_data(app_data, user):
     """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
-    if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
-        res = {}
-        res.update({'meta': app_data['meta']})
-        res.update({'Document': app_data['Document']})
-        res.update({'search_data': {
-            'app_number': app_data['search_data']['app_number'],
-            'obj_state': app_data['search_data']['obj_state'],
-        }})
-        return res
+    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+    # if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
+    #     res = {}
+    #     res.update({'meta': app_data['meta']})
+    #     res.update({'Document': app_data['Document']})
+    #     res.update({'search_data': {
+    #         'app_number': app_data['search_data']['app_number'],
+    #         'obj_state': app_data['search_data']['obj_state'],
+    #     }})
+    #     return res
+    # return app_data
     return app_data
