@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
+from django.db import transaction
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
                      SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
@@ -239,14 +240,16 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] == 3:
                     template = 'search/detail/ld/detail.html'
                 elif context['hit']['Document']['idObjType'] == 4:
-                    if not user_has_access_to_tm_app(request.user, context['hit']):
-                        # Шаблон подтверждения получения доступа к заявке с платным доступом
-                        context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
-                        if not request.user.is_anonymous and not request.user.has_confirmed_license():
-                            context['license'], created = License.objects.get_or_create()
-                        template = 'search/detail/paid_access_conformation.html'
-                    else:
-                        template = 'search/detail/tm/detail.html'
+                    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+                    # if not user_has_access_to_tm_app(request.user, context['hit']):
+                    #     # Шаблон подтверждения получения доступа к заявке с платным доступом
+                    #     context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
+                    #     if not request.user.is_anonymous and not request.user.has_confirmed_license():
+                    #         context['license'], created = License.objects.get_or_create()
+                    #     template = 'search/detail/paid_access_conformation.html'
+                    # else:
+                    #     template = 'search/detail/tm/detail.html'
+                    template = 'search/detail/tm/detail.html'
                 elif context['hit']['Document']['idObjType'] == 5:
                     template = 'search/detail/qi/detail.html'
                 elif context['hit']['Document']['idObjType'] == 6:
@@ -408,6 +411,7 @@ class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
     """Получает доступ к заявке и переадресовывает на страницу это заявки."""
     pattern_name = 'search:detail'
 
+    @transaction.atomic
     def get_redirect_url(self, *args, **kwargs):
         app = get_object_or_404(IpcAppList, pk=kwargs['pk'])
 

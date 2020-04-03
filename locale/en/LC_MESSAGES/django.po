@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-26 15:14+0200\n"
+"POT-Creation-Date: 2020-04-01 22:12+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -54,13 +54,17 @@ msgid "Ваш контактний E-Mail"
 msgstr "Contact E-Mail"
 
 #: apps/account/forms.py:12
-msgid "Я погоджуюсь з умовами ліцензії"
-msgstr "I agree with license terms"
+msgid "Я погоджуюсь з умовами договору про надання інформаційних послуг"
+msgstr "I agree to the terms of the information service agreement"
 
 #: apps/account/forms.py:14
+#, fuzzy
+#| msgid ""
+#| "Перегляд матеріалів платних заявок можливий лише на умовах <a href=\"#\" "
+#| "data-toggle=\"modal\" data-target=\"#modal1\">цієї ліцензії</a>"
 msgid ""
-"Перегляд матеріалів платних заявок можливий лише на умовах <a href=\"#\" "
-"data-toggle=\"modal\" data-target=\"#modal1\">цієї ліцензії</a>"
+"Перегляд матеріалів заявок з обмеженим доступом можливий лише на умовах <a "
+"href=\"#\" data-toggle=\"modal\" data-target=\"#modal1\">цього договору</a>"
 msgstr ""
 "You can only view paid application materials under <a href=\"#\" data-toggle="
 "\"modal\" data-target=\"#modal1\">this license</a>"
@@ -207,7 +211,6 @@ msgid "Поповнення рахунку можливе лише після п
 msgstr "Replenishment is only possible after agreeing to the terms"
 
 #: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:10
-#: apps/search/templates/search/detail/_partials/license_confirmation.html:10
 msgid "ліцензійної угоди"
 msgstr "of license"
 
@@ -217,7 +220,6 @@ msgid "Погоджуюсь"
 msgstr "Agree"
 
 #: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:23
-#: apps/account/templates/accounts/settings/_partials/license.html:8
 #: apps/search/templates/search/detail/_partials/license_confirmation.html:23
 msgid "Текст ліцензії"
 msgstr "License text"
@@ -263,6 +265,10 @@ msgstr ""
 msgid "Сплатити у Приват24"
 msgstr "Pay with Privat24"
 
+#: apps/account/templates/accounts/settings/_partials/license.html:8
+msgid "Текст договору про надання інформаційних послуг"
+msgstr "The text of the information service agreement"
+
 #: apps/account/templates/accounts/settings/index.html:27
 msgid "Зберегти"
 msgstr "Save"
@@ -279,15 +285,15 @@ msgstr "Application number"
 msgid "Перегляди заявок відсутні"
 msgstr "There are no payments"
 
-#: apps/account/views.py:116
+#: apps/account/views.py:123
 msgid "Повідомлення відмічене як прочитане"
 msgstr "The message has been marked as read"
 
-#: apps/account/views.py:127
+#: apps/account/views.py:134
 msgid "Дані успішно збережено"
 msgstr "Data has been successfully saved"
 
-#: apps/account/views.py:163
+#: apps/account/views.py:170
 msgid "Ви погодилися з умовами ліцензії"
 msgstr "You have agreed with license terms"
 
@@ -457,14 +463,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1257
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:40 apps/search/admin.py:99
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1257
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -520,13 +526,13 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:52
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/utils.py:1226
+#: apps/search/utils.py:1233
 msgid "Номер заявки"
 msgstr "Application number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:58
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
-#: apps/search/utils.py:1227
+#: apps/search/utils.py:1234
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -709,14 +715,14 @@ msgstr "Valid"
 msgid "Дію припинено"
 msgstr "Ceased to be effective"
 
-#: apps/search/templates/search/advanced/_partials/sidebar.html:106
-#: apps/search/templates/search/simple/_partials/sidebar.html:106
+#: apps/search/templates/search/advanced/_partials/sidebar.html:107
+#: apps/search/templates/search/simple/_partials/sidebar.html:107
 msgid "Статус заявки"
 msgstr "Application state"
 
-#: apps/search/templates/search/advanced/_partials/sidebar.html:120
-#: apps/search/templates/search/simple/_partials/sidebar.html:120
-msgid "Лише заявки з обмеженим доступом"
+#: apps/search/templates/search/advanced/_partials/sidebar.html:121
+#: apps/search/templates/search/simple/_partials/sidebar.html:121
+msgid "Лише заявки, за якими не встановлена дата їх подання"
 msgstr "Only applications with limited access"
 
 #: apps/search/templates/search/advanced/advanced.html:21
@@ -763,6 +769,10 @@ msgstr "Print bibliographic data"
 msgid "Перегляд даних заявки можливий лише після погодження з умовами"
 msgstr ""
 "Viewing the application data is only possible after agreeing to the terms"
+
+#: apps/search/templates/search/detail/_partials/license_confirmation.html:10
+msgid "договору про надання інформаційних послуг"
+msgstr "information service agreement"
 
 #: apps/search/templates/search/detail/detail.html:5
 msgid "Детальна інформація по об'єкту"
@@ -1219,39 +1229,39 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1224
+#: apps/search/utils.py:1231
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1225
+#: apps/search/utils.py:1232
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1228
+#: apps/search/utils.py:1235
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1229
+#: apps/search/utils.py:1236
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1230
+#: apps/search/utils.py:1237
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1231
+#: apps/search/utils.py:1238
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1232
+#: apps/search/utils.py:1239
 msgid "Власник"
 msgstr "Owner(s)"
 
-#: apps/search/utils.py:1233
+#: apps/search/utils.py:1240
 msgid "Винахідник"
 msgstr "Inventor"
 
-#: apps/search/utils.py:1234
+#: apps/search/utils.py:1241
 msgid "Представник"
 msgstr "Presenter"
 
@@ -1326,6 +1336,9 @@ msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 #: templates/_partials/header.html:146
 msgid "Історія переглядів"
 msgstr "Applications views history"
+
+#~ msgid "Я погоджуюсь з умовами ліцензії"
+#~ msgstr "I agree with license terms"
 
 #~ msgid "Поповнити"
 #~ msgstr "Deposit"

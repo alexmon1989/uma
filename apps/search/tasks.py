@@ -513,11 +513,16 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
 
         # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
         paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-        if paid_services_settings.enabled:
-            filters.append({
-                'title': 'mark_status',
-                'field': 'Document.MarkCurrentStatusCodeType.keyword'
-            })
+        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+        # if paid_services_settings.enabled:
+        #     filters.append({
+        #         'title': 'mark_status',
+        #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        #     })
+        filters.append({
+            'title': 'mark_status',
+            'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        })
 
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
@@ -586,11 +591,16 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
 
         # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
         paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-        if paid_services_settings.enabled:
-            filters.append({
-                'title': 'mark_status',
-                'field': 'Document.MarkCurrentStatusCodeType.keyword'
-            })
+        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
+        # if paid_services_settings.enabled:
+        #     filters.append({
+        #         'title': 'mark_status',
+        #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        #     })
+        filters.append({
+            'title': 'mark_status',
+            'field': 'Document.MarkCurrentStatusCodeType.keyword'
+        })
 
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
