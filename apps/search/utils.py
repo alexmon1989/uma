@@ -214,13 +214,13 @@ def filter_unpublished_apps(user, qs):
     # Для заявок на изобретения нужно чтоб существовал I_43.D
     filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
     # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
-    filter_qs &= ~Q(
-        'query_string',
-        query="NOT _exists_:TradeMark.PaymentDetails "
-              "AND search_data.obj_state:1 "
-              "AND Document.idObjType:4 "
-              "AND NOT Document.MarkCurrentStatusCodeType:1000"
-    )
+    # filter_qs &= ~Q(
+    #     'query_string',
+    #     query="NOT _exists_:TradeMark.PaymentDetails "
+    #           "AND search_data.obj_state:1 "
+    #           "AND Document.idObjType:4 "
+    #           "AND NOT Document.MarkCurrentStatusCodeType:1000"
+    # )
 
     try:
         # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
