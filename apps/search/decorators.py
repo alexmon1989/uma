@@ -20,10 +20,13 @@ def require_ajax(view_func):
 
 def check_recaptcha(view_func):
     def wrap(request, *args, **kwargs):
-        data = {
-            'response': request.GET.get('token'),
-            'secret': settings.RECAPTCHA_SECRET_KEY
-        }
+        try:
+            data = {
+                'response': request.GET['token'],
+                'secret': settings.RECAPTCHA_SECRET_KEY
+            }
+        except KeyError:
+            return HttpResponseBadRequest()
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data, verify=settings.SSL_CERT_FILE)
         result_json = resp.json()
         if not result_json.get('success') or result_json.get('score') < settings.RECAPTCHA_MIN_SCORE:
