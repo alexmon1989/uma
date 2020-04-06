@@ -48,7 +48,7 @@ class ObjType(models.Model):
 class IpcCode(models.Model):
     """Модель кода ИНИД"""
     id = models.AutoField(db_column='idIPCCode', primary_key=True)
-    obj_type = models.ForeignKey(ObjType, models.DO_NOTHING, db_column='idObjType', verbose_name="Тип об'єкта")
+    obj_types = models.ManyToManyField(ObjType, through='IpcCodeObjType')
     code_value_ua = models.CharField(db_column='CodeValueUA', max_length=300, verbose_name='Назва (укр.)')
     code_value_en = models.CharField(db_column='CodeValueEN', max_length=300, verbose_name='Назва (англ.)', blank=True,
                                      null=True)
@@ -58,7 +58,10 @@ class IpcCode(models.Model):
                                  verbose_name='Значення коду ІНІД')
 
     def __str__(self):
-        return f"{self.code_value_ua} ({self.obj_type.obj_type_ua})"
+        return self.code_value_ua
+
+    def get_obj_types(self):
+        return ", ".join([o.obj_type_ua for o in self.obj_types.all()])
 
     class Meta:
         managed = False
@@ -66,6 +69,15 @@ class IpcCode(models.Model):
         verbose_name = 'Код ІНІД'
         verbose_name_plural = 'Коди ІНІД'
         ordering = ('code_inid',)
+
+
+class IpcCodeObjType(models.Model):
+    ipc_code = models.ForeignKey(IpcCode, on_delete=models.CASCADE, verbose_name='Код ІНІД')
+    obj_type = models.ForeignKey(ObjType, on_delete=models.CASCADE, verbose_name='Тип об\'єкту')
+
+    class Meta:
+        db_table = 'cl_ipc_codes_obj_types'
+        verbose_name_plural = 'Типи об\'єктів'
 
 
 class ScheduleType(models.Model):
