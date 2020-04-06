@@ -19,8 +19,8 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
-from django.views.i18n import JavaScriptCatalog, JSONCatalog
-from apps.search.views import validate_query, get_task_info
+from django.views.i18n import JavaScriptCatalog
+from apps.search.views import validate_query, get_task_info, get_validation_info
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,6 +42,7 @@ urlpatterns += i18n_patterns(
 urlpatterns += [
     path('search/validate-query/', validate_query, name="validate_query"),
     path('search/get-task-info/', get_task_info, name="get_task_info"),
+    path('get-validation-info/', get_validation_info, name="get_validation_info"),
     path('api/', include('apps.api.urls')),
     path('paygate/', include('apps.paygate.urls')),
 ]
