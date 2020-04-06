@@ -29,6 +29,7 @@ python-crontab==2.4.0
 python-dateutil==2.7.5
 python-docx==0.8.10
 pytz==2018.7
+requests==2.23.0
 singlemodeladmin==0.9
 six==1.11.0
 sqlparse==0.2.4
