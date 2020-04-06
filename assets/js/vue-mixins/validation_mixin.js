@@ -4,11 +4,15 @@ export default {
     methods: {
         // Получает статус и результат выполнения задачи
         getTaskInfo: function (taskId) {
-            return axios
-                .get('/search/get-task-info/?task_id=' + taskId)
-                .then(response => {
-                    return response.data['result'];
-                });
+            let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+
+            return grecaptcha.execute(siteKey, {action: 'validation'}).then(function (token) {
+                return axios
+                    .get('/search/get-task-info/', {'params': {'task_id': taskId, 'token': token}})
+                    .then(response => {
+                        return response.data['result'];
+                    });
+            });
         }
     },
 

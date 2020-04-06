@@ -34,6 +34,7 @@
 
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
     <script>
         function get_task_info(task_id, retries) {
             var $resultsDiv = $(".results");
@@ -42,35 +43,43 @@
                 $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
             };
 
-            $.ajax({
-                type: 'get',
-                url: '/{{ LANGUAGE_CODE }}/search/results/',
-                data: {'task_id': task_id, 'search_type': 'transactions'},
-                success: function (data) {
-                    if (data.state === 'SUCCESS') {
-                        $resultsDiv.html(data.result);
-                        $('[data-toggle="popover"]').popover();
-                        $.HSCore.components.HSPopup.init('.js-fancybox');
-                    } else {
-                        if (retries > 0) {
-                            setTimeout(function () {
-                                get_task_info(task_id, --retries)
-                            }, 1000);
+            grecaptcha.execute('{{ site_key }}', {action: 'transactionssearch'}).then(function (token) {
+                $.ajax({
+                    type: 'get',
+                    url: '/{{ LANGUAGE_CODE }}/search/results/',
+                    data: {'task_id': task_id, 'search_type': 'transactions'},
+                    success: function (data) {
+                        if (data.state === 'SUCCESS') {
+                            $resultsDiv.html(data.result);
+                            $('[data-toggle="popover"]').popover();
+                            $.HSCore.components.HSPopup.init('.js-fancybox');
                         } else {
-                            onError();
+                            if (retries > 0) {
+                                setTimeout(function () {
+                                    get_task_info(task_id, --retries)
+                                }, 1000);
+                            } else {
+                                onError();
+                            }
                         }
+                    },
+                    error: function (data) {
+                        onError();
                     }
-                },
-                error: function (data) {
-                    onError();
-                }
+                });
             });
         }
 
         {% if task_id %}
             $(function () {
-                get_task_info('{{ task_id }}', 20);
+                grecaptcha.ready(function () {
+                    get_task_info('{{ task_id }}', 20);
+                });
             });
         {% endif %}
     </script>
+{% endblock %}
+
+{% block extra_meta %}
+    <meta name="site-key" content="{{ site_key }}">
 {% endblock %}
