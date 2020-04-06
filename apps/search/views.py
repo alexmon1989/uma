@@ -416,6 +416,21 @@ def get_task_info(request):
         return HttpResponse('No job id given.')
 
 
+@require_ajax
+def get_validation_info(request):
+    """Возвращает JSON с результатами валидации поискового запроса."""
+    task_id = request.GET.get('task_id', None)
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        data = {
+            'state': task.state,
+            'result': bool(task.result),
+        }
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return HttpResponse('No job id given.')
+
+
 def get_obj_types_with_transactions(request):
     """Создаёт задачу на получение типов объектов их типами оповещений."""
     lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
