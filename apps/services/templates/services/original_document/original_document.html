@@ -15,3 +15,11 @@
     </section>
 
 {% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+{% endblock %}
+
+{% block extra_meta %}
+    <meta name="site-key" content="{{ site_key }}">
+{% endblock %}

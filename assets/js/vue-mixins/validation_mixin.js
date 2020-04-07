@@ -5,7 +5,7 @@ export default {
         // Получает статус и результат выполнения задачи
         getTaskInfo: function (taskId) {
             return axios
-                .get('/search/get-task-info/?task_id=' + taskId)
+                .get('/search/get-validation-info/', {'params': {'task_id': taskId}})
                 .then(response => {
                     return response.data['result'];
                 });
