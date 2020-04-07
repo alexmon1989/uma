@@ -112,7 +112,7 @@
 
                     let self = this;
 
-                    return grecaptcha.execute(siteKey, {action: 'detail'}).then(function (token) {
+                    return grecaptcha.execute(siteKey, {action: 'getoriginaldoc'}).then(function (token) {
                         return axios.get('/search/get-task-info/', {
                             params: {
                                 task_id: self.taskId,

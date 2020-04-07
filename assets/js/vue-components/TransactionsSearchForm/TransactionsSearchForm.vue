@@ -98,7 +98,7 @@
             getTaskInfo: function (taskId) {
                 let siteKey = document.querySelector('meta[name="site-key"]').content;
 
-                return grecaptcha.execute(siteKey, {action: 'detail'}).then(function (token) {
+                return grecaptcha.execute(siteKey, {action: 'gettransactiontypes'}).then(function (token) {
                     return axios
                         .get('/search/get-task-info/', {
                             params: {
