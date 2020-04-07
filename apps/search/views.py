@@ -13,6 +13,7 @@ from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.db import transaction
+from django.conf import settings
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
                      SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
@@ -26,7 +27,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     create_selection, create_simple_search_results_file, create_advanced_search_results_file,
                     create_transactions_search_results_file, create_shared_docs_archive)
 from ..account.models import BalanceOperation, License
-from .decorators import require_ajax
+from .decorators import require_ajax, check_recaptcha
 
 
 class SimpleListView(TemplateView):
@@ -44,6 +45,9 @@ class SimpleListView(TemplateView):
         # Данные страницы
         page_data, created = SimpleSearchPage.objects.get_or_create()
         context['page_description'] = getattr(page_data, f"description_{self.request.LANGUAGE_CODE}")
+
+        # Recaptcha
+        context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
@@ -80,6 +84,7 @@ class SimpleListView(TemplateView):
 
 
 @require_ajax
+@check_recaptcha
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
@@ -131,6 +136,9 @@ class AdvancedListView(TemplateView):
 
         # ИНИД-коды вместе с их реестрами
         context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(context['lang_code'])
+
+        # Recaptcha
+        context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
@@ -194,6 +202,9 @@ class ObjectDetailView(DetailView):
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
+        # Recaptcha
+        context['site_key'] = settings.RECAPTCHA_SITE_KEY
+
         # Запись в лог запроса пользователя к заявке
         if not self.request.user.is_anonymous:
             AppVisit.objects.create(user=self.request.user, app=self.object)
@@ -202,6 +213,7 @@ class ObjectDetailView(DetailView):
 
 
 @require_ajax
+@check_recaptcha
 def get_data_app_html(request):
     """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
     task_id = request.GET.get('task_id', None)
@@ -359,6 +371,9 @@ class TransactionsSearchView(TemplateView):
         # Текущий язык приложения
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
+        # Recaptcha
+        context['site_key'] = settings.RECAPTCHA_SITE_KEY
+
         context['initial_data'] = dict()
         context['is_search'] = False
         if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
@@ -386,6 +401,7 @@ def download_xls_transactions(request):
 
 
 @require_ajax
+@check_recaptcha
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
     task_id = request.GET.get('task_id', None)
@@ -394,6 +410,21 @@ def get_task_info(request):
         data = {
             'state': task.state,
             'result': task.result,
+        }
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return HttpResponse('No job id given.')
+
+
+@require_ajax
+def get_validation_info(request):
+    """Возвращает JSON с результатами валидации поискового запроса."""
+    task_id = request.GET.get('task_id', None)
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        data = {
+            'state': task.state,
+            'result': bool(task.result),
         }
         return HttpResponse(json.dumps(data), content_type='application/json')
     else:

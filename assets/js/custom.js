@@ -49,34 +49,38 @@ function updateURLParameter(url, param, paramVal)
 }
 
 function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
-    $.ajax({
-        type: 'get',
-        url: '/search/get-task-info/',
-        data: {'task_id': taskId},
-        success: function (data) {
-            if (data.state === 'SUCCESS') {
-                if (data.result === false) {
-                    toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+    let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+
+    grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
+        $.ajax({
+            type: 'get',
+            url: '/search/get-task-info/',
+            data: {'task_id': taskId, 'token': token},
+            success: function (data) {
+                if (data.state === 'SUCCESS') {
+                    if (data.result === false) {
+                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                    } else {
+                        toastr.success(gettext('Файл було сформовано.'));
+                        saveAs(data.result, data.result.split('/').pop());
+                    }
+                    onSuccess(data);
                 } else {
-                    toastr.success(gettext('Файл було сформовано.'));
-                    saveAs(data.result, data.result.split('/').pop());
+                    if (retries > 0) {
+                        setTimeout(function () {
+                            downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
+                        }, 1000);
+                    } else {
+                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                        onError();
+                    }
                 }
-                onSuccess(data);
-            } else {
-                if (retries > 0) {
-                    setTimeout(function () {
-                        downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
-                    }, 1000);
-                } else {
-                    toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                    onError();
-                }
+            },
+            error: function (data) {
+                toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                onError();
             }
-        },
-        error: function (data) {
-            toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-            onError();
-        }
+        });
     });
 }
 
