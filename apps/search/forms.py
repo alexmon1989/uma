@@ -34,7 +34,7 @@ def get_search_form(search_type, get_params):
     # Подготовка данных
     get_params_validation = get_params.copy()
     for key, value in get_params_validation.items():
-        if len(value) == 1 and 'obj_state' not in key and key != 'transaction_type':
+        if len(value) == 1 and 'obj_type' not in key and 'obj_state' not in key and key != 'transaction_type':
             get_params_validation[key] = value[0]
 
     if search_type == 'simple':
@@ -86,7 +86,7 @@ def get_ipc_code_choices():
 
 class AdvancedSearchForm(forms.Form):
     """Расширенная форма поиска."""
-    obj_type = forms.ChoiceField()
+    obj_type = forms.MultipleChoiceField()
     obj_state = forms.MultipleChoiceField(choices=((1, 1), (2, 2)))
     ipc_code = forms.ChoiceField()
     value = forms.CharField()
