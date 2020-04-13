@@ -229,7 +229,7 @@ def get_data_app_html(request):
 
                 # Видимость полей библиографических данных
                 ipc_fields = InidCodeSchedule.objects.filter(
-                    ipc_code__obj_type__id=context['hit']['Document']['idObjType']
+                    ipc_code__obj_types__id=context['hit']['Document']['idObjType']
                 ).annotate(
                     code_title=F(f"ipc_code__code_value_{context['lang_code']}"),
                     ipc_code_short=F('ipc_code__code_inid')
