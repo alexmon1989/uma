@@ -17,7 +17,7 @@ from django.conf import settings
 from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
                      SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import (get_client_ip, paginate_results, user_has_access_to_tm_app)
+from .utils import (get_client_ip, paginate_results, get_ipc_codes_with_schedules, user_has_access_to_tm_app)
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
@@ -135,7 +135,7 @@ class AdvancedListView(TemplateView):
         )
 
         # ИНИД-коды вместе с их реестрами
-        context['ipc_codes'] = InidCodeSchedule.get_ipc_codes_with_schedules(context['lang_code'])
+        context['ipc_codes'] = get_ipc_codes_with_schedules(context['lang_code'])
 
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY

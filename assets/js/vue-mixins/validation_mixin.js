@@ -48,7 +48,7 @@ export default {
                     } else {
                         validatePath = '/search/validate-query/?search_type=advanced&value='
                                             + value + '&ipc_code=' + args[0].id
-                                            + '&obj_type=' + args[1].id
+                                            + '&obj_type=' + args[1].map(a => a.id).join('&obj_type=')
                                             + '&obj_state=' + args[2].map(a => a.id).join('&obj_state=')
                     }
                     axios

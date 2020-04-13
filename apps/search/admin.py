@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from singlemodeladmin import SingleModelAdmin
 from .models import (IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule, SortParameter, AdvancedSearchPage,
-                     SimpleSearchPage, PaidServicesSettings)
+                     SimpleSearchPage, PaidServicesSettings, IpcCodeObjType)
 
 
 admin.site.register(SimpleSearchPage, SingleModelAdmin)
@@ -10,21 +10,37 @@ admin.site.register(AdvancedSearchPage, SingleModelAdmin)
 admin.site.register(PaidServicesSettings, SingleModelAdmin)
 
 
+class IpcCodeObjTypeInline(admin.TabularInline):
+    model = IpcCodeObjType
+    extra = 1
+
+
 @admin.register(IpcCode)
 class IPCCodeAdmin(admin.ModelAdmin):
+    inlines = (IpcCodeObjTypeInline,)
     list_display = (
+        'id',
         'code_value_ua',
-        'obj_type',
+        'get_obj_types',
         'code_inid',
     )
-    list_filter = (
-        'obj_type',
-    )
+
+    def get_queryset(self, request):
+        """Переопределение списка параметров (отсекаются "вторые" реестры заявок)."""
+        return IpcCode.objects.prefetch_related('obj_types').all()
+
+    def get_obj_types(self, obj):
+        return obj.get_obj_types()
+
+    get_obj_types.short_description = "Типи об'ктів"
+
+    # list_filter = (
+    #     'obj_type',
+    # )
+
     search_fields = (
         'code_value_ua',
         'code_value_en',
-        'obj_type__obj_type_ua',
-        'obj_type__obj_type_en',
         'code_inid',
     )
 
@@ -53,20 +69,14 @@ class ObjStatusFilter(admin.SimpleListFilter):
 class InidCodeScheduleAdmin(admin.ModelAdmin):
     list_display = (
         'ipc_code_title',
-        'obj_type',
+        'get_obj_types',
         'obj_status',
         'elastic_index_field',
         'enable_search',
         'enable_view'
     )
-    list_select_related = (
-        'ipc_code',
-        'ipc_code__obj_type',
-        'elastic_index_field',
-    )
     list_filter = (
-        'ipc_code__obj_type',
-        ObjStatusFilter
+        ObjStatusFilter,
     )
     list_editable = (
         'enable_search',
@@ -77,31 +87,39 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """Переопределение списка параметров (отсекаются "вторые" реестры заявок)."""
-        return InidCodeSchedule.objects.filter(schedule_type__id__lte=15)
+        return InidCodeSchedule.objects.select_related(
+            'ipc_code',
+            'elastic_index_field'
+        ).prefetch_related('ipc_code__obj_types').filter(
+            schedule_type__id__lte=15
+        ).exclude(ipc_code__obj_types=None)
 
     def ipc_code_title(self, obj):
         if obj.ipc_code:
             return obj.ipc_code.code_value_ua
         return '-'
+
     ipc_code_title.short_description = _("ІНІД-код")
     ipc_code_title.admin_order_field = 'ipc_code__code_value_ua'
-
-    def obj_type(self, obj):
-        if obj.ipc_code:
-            return obj.ipc_code.obj_type
-        return '-'
-    obj_type.short_description = _("Тип об'єкта")
-    obj_type.admin_order_field = 'ipc_code__obj_type__obj_type_ua'
 
     def obj_status(self, obj):
         # 3, 4, 5, 6, 7, 8 - id реестров охранных документов
         if obj.schedule_type_id in (3, 4, 5, 6, 7, 8):
             return _('Охоронний документ')
         return _('Заявка')
+
     obj_status.short_description = _("Статус об'єкта")
     obj_status.admin_order_field = 'schedule_type'
 
+    def get_obj_types(self, obj):
+        if obj.ipc_code:
+            return obj.ipc_code.get_obj_types()
+        return '-'
+
+    get_obj_types.short_description = "Типи об'ктів"
+
     def formfield_for_dbfield(self, db_field, request, **kwargs):
+        """Для того чтоб 'elastic_index_field' в list_editable не вызывал лишние запросы."""
         formfield = super(InidCodeScheduleAdmin, self).formfield_for_dbfield(db_field, request, **kwargs)
 
         # Кеширование вариантов выбора поля elastic_index_field
