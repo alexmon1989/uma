@@ -5,8 +5,13 @@ export default {
         // Получает статус и результат выполнения задачи
         getTaskInfo: function (taskId) {
             return axios
-                .get('/search/get-validation-info/', {'params': {'task_id': taskId}})
+                .get('/search/get-validation-info/', {'params': {'task_id': taskId}, retry: 4, retryDelay: 1000})
                 .then(response => {
+                    if (response.data['state'] === 'PENDING') {
+                        // Если здесь state всё ещё PENDING, то это значит что сервер так и не провалидировал запрос,
+                        // возвращается признак корректности запроса
+                        return true;
+                    }
                     return response.data['result'];
                 });
         }
@@ -15,13 +20,37 @@ export default {
     created() {
         // Перехватчик результата запроса для повторного запроса на статус и результат задачи.
         axios.interceptors.response.use(function (response) {
+            let config = response.config;
+
+            // If config does not exist or the retry option is not set, reject
+            if(!config || !config.retry) return Promise.reject(response);
+
+            // Set the variable for keeping track of the retry count
+            config.__retryCount = config.__retryCount || 0;
+
+            // Check if we've maxed out the total number of retries
+            if (config.__retryCount >= config.retry) {
+                // Reject
+                return response;
+            }
+
+            // Increase the retry count
+            config.__retryCount += 1;
+
+            // Create new promise to handle exponential backoff
+            let backoff = new Promise(function(resolve) {
+                setTimeout(function() {
+                    resolve();
+                }, config.retryDelay || 1);
+            });
+
             if (response && response.data && response.data.state && response.data.state === 'PENDING') {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        resolve(axios.request(response.config));
-                    }, 1000)
+                // Return the promise in which recalls axios to retry the request
+                return backoff.then(function() {
+                    return axios(config);
                 });
             }
+
             return response;
         }, function (error) {
             return Promise.reject(error);
@@ -52,7 +81,7 @@ export default {
                                             + '&obj_state=' + args[2].map(a => a.id).join('&obj_state=')
                     }
                     axios
-                        .get(validatePath)
+                        .get(validatePath, {retry: 1})
                         .then(response => {
                             return response.data['task_id'];
                         }).then(task_id => {

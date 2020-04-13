@@ -122,7 +122,7 @@ def perform_simple_search(user_id, get_params):
     }
 
 
-@shared_task
+@shared_task(expires=10)
 def validate_query(get_params):
     """Задача для выполнения валидации запрсоа на поиск средствами ElasticSearch."""
     for key, value in get_params.items():
