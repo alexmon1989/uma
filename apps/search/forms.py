@@ -44,6 +44,7 @@ def get_search_form(search_type, get_params):
         AdvancedFormSet = formset_factory(AdvancedSearchForm, min_num=1, validate_min=True)
         form = AdvancedFormSet(get_params_validation)
     elif search_type == 'transactions':
+        get_params_validation['obj_type'] = get_params_validation['obj_type'][0]
         form = TransactionsSearchForm(get_params_validation)
     else:
         raise Exception('Неизвестный тип поиска')
