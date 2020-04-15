@@ -68,6 +68,14 @@
                 </tr>
             {% endif %}
 
+            {% get_field '186' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ProlonagationExpiryDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ProlonagationExpiryDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '210' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationNumber %}
                 <tr>
