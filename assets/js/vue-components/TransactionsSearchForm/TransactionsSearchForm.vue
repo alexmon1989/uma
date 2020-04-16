@@ -127,9 +127,9 @@
             transactionTypes: function (val, oldVal) {
                 if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
                     this.transaction_type = [];
-                    if (val.length === 0) {
-                        this.$refs.multiselect.deactivate();
-                    }
+                }
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
                 }
             }
         }
