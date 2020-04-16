@@ -322,10 +322,10 @@
                 if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
                     if (!Array.isArray(this.ipcCode)) {
                         this.ipcCode = [];
-                        if (val.length === 0) {
-                            this.$refs.multiselect.deactivate();
-                        }
                     }
+                }
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
                 }
             }
         }

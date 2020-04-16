@@ -8,7 +8,9 @@
         <!-- END Об'єкт промислової власності -->
 
         <!-- Об'єкт промислової власності -->
-        <transactions-type-input :types="transactionTypes" v-model="transaction_type"></transactions-type-input>
+        <transactions-type-input :types="transactionTypes"
+                                 ref="multiselect"
+                                 v-model="transaction_type"></transactions-type-input>
         <!-- END Об'єкт промислової власності -->
 
         <!-- Дата сповіщення -->
@@ -118,6 +120,16 @@
                     return this.objTypes.find(x => x.id === this.obj_type.id)['transactions_types'];
                 } else {
                     return [];
+                }
+            }
+        },
+        watch: {
+            transactionTypes: function (val, oldVal) {
+                if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+                    this.transaction_type = [];
+                }
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
                 }
             }
         }
