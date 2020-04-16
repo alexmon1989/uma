@@ -3,10 +3,11 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
+from django.db.models import Prefetch
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.aggs import Terms, Nested
-from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList, PaidServicesSettings
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList, PaidServicesSettings, IpcCode
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -28,7 +29,7 @@ def get_search_groups(search_data):
             'obj_type': obj_type,
             'obj_state': 1,
             'search_params': list(filter(
-                lambda x: int(x['obj_type']) == obj_type.pk and '1' in x['obj_state'],
+                lambda x: str(obj_type.pk) in x['obj_type'] and '1' in x['obj_state'],
                 search_data
             ))
         })
@@ -37,7 +38,7 @@ def get_search_groups(search_data):
             'obj_type': obj_type,
             'obj_state': 2,
             'search_params': list(filter(
-                lambda x: int(x['obj_type']) == obj_type.pk and '2' in x['obj_state'],
+                lambda x: str(obj_type.pk) in x['obj_type'] and '2' in x['obj_state'],
                 search_data
             ))
         })
@@ -83,7 +84,6 @@ def get_elastic_results(search_groups, user):
                 # Поле поиска ElasticSearch
                 inid_schedule = InidCodeSchedule.objects.filter(
                     ipc_code__id=search_param['ipc_code'],
-                    schedule_type__obj_type=group['obj_type'],
                     schedule_type__id__in=schedule_type_ids
                 ).first()
 
@@ -1554,3 +1554,40 @@ def filter_app_data(app_data, user):
     #     return res
     # return app_data
     return app_data
+
+
+def get_ipc_codes_with_schedules(lang_code):
+    """Возвращает ИНИД коды с реестрами, в оторый они входят"""
+    qs = IpcCode.objects.prefetch_related(
+        'obj_types',
+        Prefetch(
+            'inidcodeschedule_set',
+            queryset=InidCodeSchedule.objects.filter(
+                schedule_type__id__lt=16,
+                enable_search=True
+            ).prefetch_related('schedule_type')
+        ),
+    ).exclude(
+        obj_types=None,
+    ).exclude(
+        inidcodeschedule__schedule_type__ipccode__isnull=True,
+        inidcodeschedule__schedule_type__id__gte=16
+    )
+
+    res = []
+    for item in qs:
+        obj_states = [
+            2 if schedule_type.schedule_type.id in range(3, 8) else 1
+            for schedule_type in item.inidcodeschedule_set.all()
+        ]
+
+        if obj_states:
+            res.append({
+                'id': item.id,
+                'value': item.code_value_ua if lang_code == 'ua' else item.code_value_en,
+                'data_type': item.code_data_type,
+                'obj_types': [obj_type.id for obj_type in item.obj_types.all()],
+                'obj_states': obj_states,
+            })
+
+    return res

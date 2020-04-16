@@ -122,11 +122,11 @@ def perform_simple_search(user_id, get_params):
     }
 
 
-@shared_task
+@shared_task(expires=10)
 def validate_query(get_params):
     """Задача для выполнения валидации запрсоа на поиск средствами ElasticSearch."""
     for key, value in get_params.items():
-        if len(value) == 1 and key != 'obj_state':
+        if len(value) == 1 and key not in ('obj_state', 'obj_type'):
             get_params[key] = value[0]
     search_type = get_params.get('search_type')
     if search_type == 'simple':

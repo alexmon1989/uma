@@ -8,7 +8,9 @@
         <!-- END Об'єкт промислової власності -->
 
         <!-- Об'єкт промислової власності -->
-        <transactions-type-input :types="transactionTypes" v-model="transaction_type"></transactions-type-input>
+        <transactions-type-input :types="transactionTypes"
+                                 ref="multiselect"
+                                 v-model="transaction_type"></transactions-type-input>
         <!-- END Об'єкт промислової власності -->
 
         <!-- Дата сповіщення -->
@@ -96,11 +98,20 @@
 
             // Получает статус и результат выполнения задачи
             getTaskInfo: function (taskId) {
-                return axios
-                    .get('/search/get-task-info/?task_id=' + taskId)
-                    .then(response => {
-                        return response.data['result'];
-                    });
+                let siteKey = document.querySelector('meta[name="site-key"]').content;
+
+                return grecaptcha.execute(siteKey, {action: 'gettransactiontypes'}).then(function (token) {
+                    return axios
+                        .get('/search/get-task-info/', {
+                            params: {
+                                task_id: taskId,
+                                token: token,
+                            }
+                        })
+                        .then(response => {
+                            return response.data['result'];
+                        });
+                });
             }
         },
         computed: {
@@ -109,6 +120,16 @@
                     return this.objTypes.find(x => x.id === this.obj_type.id)['transactions_types'];
                 } else {
                     return [];
+                }
+            }
+        },
+        watch: {
+            transactionTypes: function (val, oldVal) {
+                if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+                    this.transaction_type = [];
+                }
+                if (val.length === 0) {
+                    this.$refs.multiselect.deactivate();
                 }
             }
         }

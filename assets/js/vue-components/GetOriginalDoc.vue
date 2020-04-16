@@ -108,26 +108,33 @@
                 }
 
                 if (tries > 0) {
-                    return axios.get('/search/get-task-info/', {
-                        params: {
-                            task_id: this.taskId,
-                        }
-                    }).then((response) => {
-                        if (response.data.state === 'PENDING') {
-                            return this.getTaskResult(--tries);
-                        } else {
-                            if (response.data.result) {
-                                this.filePath = response.data.result;
-                            } else {
-                                this.notFound = true;
+                    let siteKey = document.querySelector('meta[name="site-key"]').content;
+
+                    let self = this;
+
+                    return grecaptcha.execute(siteKey, {action: 'getoriginaldoc'}).then(function (token) {
+                        return axios.get('/search/get-task-info/', {
+                            params: {
+                                task_id: self.taskId,
+                                token: token,
                             }
-                            this.processing = false
-                        }
-                    })
-                    .catch(e => {
-                        this.serverErrors.push(e);
-                        Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                        this.processing = false;
+                        }).then((response) => {
+                            if (response.data.state === 'PENDING') {
+                                return self.getTaskResult(--tries);
+                            } else {
+                                if (response.data.result) {
+                                    self.filePath = response.data.result;
+                                } else {
+                                    self.notFound = true;
+                                }
+                                self.processing = false
+                            }
+                        })
+                        .catch(e => {
+                            self.serverErrors.push(e);
+                            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                            self.processing = false;
+                        });
                     });
                 } else {
                     // Количество попыток превышено

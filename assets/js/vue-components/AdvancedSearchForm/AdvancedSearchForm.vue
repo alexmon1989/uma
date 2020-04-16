@@ -10,8 +10,7 @@
              v-for="(ipcGroup, index) in ipcGroups"
              :key="ipcGroup.id"
         >
-            <ipc-code :obj-states="objStates"
-                      :obj-types="objTypes"
+            <ipc-code :obj-types="objTypes"
                       :ipc-codes="ipcCodes"
                       :index="index"
                       :ipc-groups-count="ipcGroups.length"
@@ -61,10 +60,6 @@
         },
         data: function () {
             return {
-                objStates: [
-                    {'id': 1, 'value': gettext('Заявка'), 'schedule_types': [9, 10, 11, 12, 13, 14, 15]},
-                    {'id': 2, 'value': gettext('Охоронний документ'), 'schedule_types': [3, 4, 5, 6, 7, 8]},
-                ],
                 ipcGroups: [],
                 totalForms: 1,
                 translations: {

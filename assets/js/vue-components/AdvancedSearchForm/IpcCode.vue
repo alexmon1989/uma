@@ -6,20 +6,24 @@
                 <div class="col-md-3 g-mb-15 g-pr-7--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-obj_type') }">
 
-                    <select :name="'form-' + index + '-obj_type'"
+                    <select multiple="multiple"
+                            :name="'form-' + index + '-obj_type'"
                             class="d-none">
-                        <option v-for="option in objTypes" :value="option.id" :selected="objType.id === option.id"></option>
+                        <option v-for="option in objTypes" :value="option.id" :selected="objType.includes(option)"></option>
                     </select>
 
                     <multiselect v-model="objType"
                                  :options="objTypes"
                                  :placeholder="translations.objType"
-                                 :showLabels="false"
-                                 :allowEmpty="false"
+                                 selectLabel=""
+                                 deselectLabel="⨯"
+                                 selectedLabel="✓"
+                                 :multiple="true"
+                                 v-validate="'required'"
+                                 :searchable="false"
                                  label="value"
                                  track-by="id"
                                  :data-vv-name="'form-' + index + '-obj_type'"
-                                 v-validate="'required'"
                     ></multiselect>
 
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_type')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_type')] }}</small>
@@ -46,8 +50,8 @@
                                  v-validate="'required'"
                                  :searchable="false"
                                  label="value"
-                                 :data-vv-name="'form-' + index + '-obj_state'"
-                                 track-by="id">
+                                 track-by="id"
+                                 :data-vv-name="'form-' + index + '-obj_state'">
                     </multiselect>
 
                     <small class="form-control-feedback" v-if="errors.has('form-' + index + '-obj_state')">{{ translations.validationErrors[errors.firstRule('form-' + index + '-obj_state')] }}</small>
@@ -69,7 +73,8 @@
                                  :showLabels="false"
                                  label="value"
                                  track-by="id"
-                                 :disabled="objType === '' || objState.length === 0"
+                                 :allowEmpty="false"
+                                 :disabled="objType.length === 0 || objState.length === 0"
                                  :data-vv-name="'form-' + index + '-ipc_code'"
                                  v-validate="'required'"
                                  ref="multiselect"
@@ -90,7 +95,7 @@
                                ref="value"
                                @focus="onValueFocus"
                                @blur="onValueBlur"
-                               :disabled="ipcCode === '' || ipcCodesFiltered.length === 0"
+                               :disabled="ipcCode.length === 0 || ipcCodesFiltered.length === 0"
                                autocomplete="off"
                                :placeholder="translations.value"
                                data-vv-delay="500"
@@ -166,7 +171,6 @@
         mixins: [translations, datePickerMixin],
         props: {
             objTypes: Array,
-            objStates: Array,
             ipcCodes: Array,
             index: Number,
             ipcGroupsCount: Number,
@@ -207,7 +211,7 @@
         },
         mounted() {
             if (this.initialData['form-' + this.index + '-obj_type']) {
-                this.objType = this.objTypes.find(x => x.id === parseInt(this.initialData['form-' + this.index + '-obj_type'][0]));
+                this.objType = this.objTypes.filter(x => this.initialData['form-' + this.index + '-obj_type'].map(y => parseInt(y)).includes(x.id));
             }
             if (this.initialData['form-' + this.index + '-obj_state']) {
                 this.objState = this.objStates.filter(x => this.initialData['form-' + this.index + '-obj_state'].map(y => parseInt(y)).includes(x.id));
@@ -230,9 +234,13 @@
         },
         data: function () {
             return {
-                objType: '', // выбранный объект пром. собств.
+                objStates: [
+                    {'id': 1, 'value': gettext('Заявка')},
+                    {'id': 2, 'value': gettext('Охоронний документ')},
+                ], // состояния объектов охр. собств. 1 - заявка, 2 - охранный документ.
+                objType: [], // выбранный объект пром. собств.
                 objState: [], // выбранные состояния объектов пром. собств.
-                ipcCode: '', // выбранный код ИНИД
+                ipcCode: [], // выбранный код ИНИД
                 value: '', // введенное значение для поиска
                 valueFocused: false,
                 // Логические операторы. dataTypes определяет какие доступны для каких типов кодов ИНИД
@@ -284,24 +292,22 @@
         computed: {
             // Тип данных выбранного поля ИНИД
             dataType: function () {
-                if (this.ipcCode) {
+                if (!Array.isArray(this.ipcCode)) {
                     return this.ipcCodes.find(x => x.id === this.ipcCode.id).data_type;
                 }
                 return '';
             },
 
             ipcCodesFiltered: function () {
-                // Фильтр по объекту пром. собств.
-                let ipcCodes = this.ipcCodes.filter(item => item.obj_type_id === this.objType.id);
+                // Фильтр по типам объектов пром. собств. и их состояниям.
+                let ipcCodes = [];
 
-                // Получение реестров (заявки, охр. документы)
-                let selectedScheduleTypes = [];
-                this.objState.forEach(item => {
-                    selectedScheduleTypes.push(...item.schedule_types);
-                });
+                if (this.objType.length > 0 && this.objState.length > 0) {
+                    ipcCodes = this.ipcCodes
+                        .filter(i => this.objType.every(j => i.obj_types.includes(j.id)))
+                        .filter(i => this.objState.every(j => i.obj_states.includes(j.id)));
+                }
 
-                // Фильтр по реестрам
-                ipcCodes = ipcCodes.filter(item => item.schedule_types.some(x => selectedScheduleTypes.includes(x)));
                 return ipcCodes;
             },
         },
@@ -312,8 +318,12 @@
                 }
             },
 
-            ipcCodesFiltered: function (val) {
-                this.ipcCode = '';
+            ipcCodesFiltered: function (val, oldVal) {
+                if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+                    if (!Array.isArray(this.ipcCode)) {
+                        this.ipcCode = [];
+                    }
+                }
                 if (val.length === 0) {
                     this.$refs.multiselect.deactivate();
                 }
