@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 14:50+0200\n"
+"POT-Creation-Date: 2020-04-23 15:10+0300\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,72 +19,87 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/custom.js:59 assets/js/custom.js:71 assets/js/custom.js:77
-#: assets/js/vue-components/GetOriginalDoc.vue:129
+#: assets/js/custom.js:62 assets/js/custom.js:74 assets/js/custom.js:80
 #: assets/js/vue-components/GetOriginalDoc.vue:135
+#: assets/js/vue-components/GetOriginalDoc.vue:142
 msgid "Виникла помилка. Будь-ласка, спробуйте пізніше."
 msgstr "Error! Please try again later."
 
-#: assets/js/custom.js:61 assets/js/vue-components/GetOriginalDoc.vue:149
+#: assets/js/custom.js:64 assets/js/vue-components/GetOriginalDoc.vue:156
 msgid "Файл було сформовано."
 msgstr "File was created."
 
-#: assets/js/custom.js:238 assets/js/custom.js:311 assets/js/custom.js:348
+#: assets/js/custom.js:242 assets/js/custom.js:315 assets/js/custom.js:352
 #: assets/js/vue-components/GetOriginalDoc.vue:70
 msgid "Будь-ласка, зачекайте, відбувається формування файлу."
 msgstr "Please wait for file creating."
 
-#: assets/js/custom.js:270
+#: assets/js/custom.js:274
 msgid "Будь-ласка, зачекайте, відбувається формування документу."
 msgstr "Please wait for document creating."
 
-#: assets/js/custom.js:284
+#: assets/js/custom.js:288
 msgid "Відкрити"
 msgstr "Open"
 
-#: assets/js/custom.js:337
-#, fuzzy
-#| msgid "Охоронний документ"
+#: assets/js/custom.js:341
 msgid "Не було обрано жодного документу."
-msgstr "Protective document"
+msgstr "There is no document selected"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:65
-msgid "Заявка"
-msgstr "Claim"
+#: assets/js/custom.js:437
+msgid "Видалити зі списку вибраних документів"
+msgstr "Remove from the favorites list."
+
+#: assets/js/custom.js:438
+msgid "Документ було додано до списку вибраних документів."
+msgstr "The document was added to the favorites list."
+
+#: assets/js/custom.js:442
+msgid "Додати до списку вибраних документів"
+msgstr "Add to the favorites list."
+
+#: assets/js/custom.js:443
+#| msgid "Охоронний документ"
+msgid "Документ було видалено зі списку вибраних документів."
+msgstr "The document was removed from the favorites list."
 
 #: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:66
-msgid "Охоронний документ"
-msgstr "Protective document"
-
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:71
 #: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:9
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:9
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:6
 msgid "Показати результати"
 msgstr "Show results"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:72
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:67
 #: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:8
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:7
 msgid "Додати параметр"
 msgstr "Add parameter"
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:73
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:68
 #: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:10
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:10
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:7
 msgid "Виконуємо пошук..."
 msgstr "Performing search..."
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:232
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:238
+msgid "Заявка"
+msgstr "Claim"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:239
+msgid "Охоронний документ"
+msgstr "Protective document"
+
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:249
 msgid "ТА"
 msgstr "AND"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:236
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:253
 msgid "АБО"
 msgstr "OR"
 
-#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:240
+#: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:257
 msgid "НЕ"
 msgstr "NOT"
 
