@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Вибране" %}{% endblock %}
+
+{% block content %}
+
+    <div id="data">
+        {% include 'favorites/index/_partials/breadcrumbs.html' %}
+
+        <div class="container g-min-height-300 g-py-20 g-py-70--lg">
+            <div class="row">
+                <div class="col-12 results">
+                    {% if favorites_ids %}
+                        <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається отримання даних" %}<loading-dots></loading-dots></p>
+                    {% else %}
+                        {% url 'search:simple' as simple_search_url %}
+                        <p class="lead g-font-weight-400">{% blocktrans %}Список вибраних документів поки що порожній. Ви можете здійснити <a href="{{ simple_search_url }}">пошук</a> та додати до нього необхідні вам документи.{% endblocktrans %}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+    {% get_current_language as LANGUAGE_CODE %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    <script>
+        function get_task_info(task_id, retries) {
+            var $resultsDiv = $(".results");
+
+            var onError = function() {
+                $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
+            };
+
+            grecaptcha.execute('{{ site_key }}', {action: 'favoritessearch'}).then(function (token) {
+                $.ajax({
+                    type: 'get',
+                    url: '/{{ LANGUAGE_CODE }}/favorites/results/',
+                    data: {'task_id': task_id, 'token': token},
+                    success: function (data) {
+                        if (data.state === 'SUCCESS') {
+                            $resultsDiv.html(data.result);
+                            $('[data-toggle="popover"]').popover();
+                            $.HSCore.components.HSPopup.init('.js-fancybox');
+                        } else {
+                            if (retries > 0) {
+                                setTimeout(function () {
+                                    get_task_info(task_id, --retries)
+                                }, 1000);
+                            } else {
+                                onError();
+                            }
+                        }
+                    },
+                    error: function (data) {
+                        onError();
+                    }
+                });
+            });
+        }
+
+        {% if task_id %}
+            $(function () {
+                grecaptcha.ready(function () {
+                    get_task_info('{{ task_id }}', 20);
+                });
+            });
+        {% endif %}
+    </script>
+{% endblock %}
