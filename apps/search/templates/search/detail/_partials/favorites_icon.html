@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<div class="g-font-size-28 g-line-height-1 align-self-center g-mr-10">
+    {% if hit.meta.id|stringformat:"i" in request.session.favorites_ids %}
+        <a href="#"
+           class="add-remove-favorites is-in-favorites"
+           data-hit-id="{{ hit.meta.id }}"
+           title="{% trans 'Видалити зі списку вибраних документів' %}"><i class="fa fa-star"></i></a>
+    {% else %}
+        <a href="#"
+           class="add-remove-favorites"
+           data-hit-id="{{ hit.meta.id }}"
+           title="{% trans 'Додати до списку вибраних документів' %}"><i class="fa fa-star-o"></i></a>
+    {% endif %}
+</div>

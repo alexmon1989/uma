@@ -312,6 +312,55 @@ def get_obj_types_with_transactions(lang_code):
 
 
 @shared_task
+def perform_favorites_search(favorites_ids, user_id, get_params):
+    """Задача для выполнения простого поиска."""
+    # Формирование поискового запроса ElasticSearch
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+
+    # Пользователь
+    user = get_user_or_anonymous(user_id)
+
+    q = Q(
+        'bool',
+        must=[Q('terms', _id=favorites_ids)],
+    )
+    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
+    # Фильтр заявок, которые не положено публиковать в интернет
+    q = filter_unpublished_apps(user, q)
+
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
+
+    # Сортировка
+    if get_params.get('sort_by'):
+        s = sort_results(s, get_params['sort_by'][0])
+    else:
+        s = s.sort('_score')
+
+    # Пагинация
+    results_on_page = int(get_params.get('show', [10])[0])
+    if results_on_page > 100:
+        results_on_page = 100
+    elif results_on_page < 10:
+        results_on_page = 10
+    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_to = res_from + results_on_page
+    items = []
+    for i in s[res_from:res_to]:
+        item = i.to_dict()
+        item['meta'] = i.meta.to_dict()
+        items.append(item)
+    results = {
+        'items': items,
+        'total': s.count()
+    }
+
+    return {
+        'results': results,
+        'get_params': get_params
+    }
+
+
+@shared_task
 def get_order_documents(user_id, order_id):
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
     # Получение обработанного заказа

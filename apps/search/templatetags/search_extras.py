@@ -20,31 +20,31 @@ def get_person_country(value):
     return values[1]
 
 
-@register.inclusion_tag('search/advanced/_partials/inv_um_item.html')
-def inv_um_item(hit, item_num):
+@register.inclusion_tag('search/advanced/_partials/inv_um_item.html', takes_context=True)
+def inv_um_item(context, hit, item_num):
     biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
-    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
+    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
-@register.inclusion_tag('search/advanced/_partials/ld_item.html')
-def ld_item(hit, item_num):
+@register.inclusion_tag('search/advanced/_partials/ld_item.html', takes_context=True)
+def ld_item(context, hit, item_num):
     biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
-    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num}
+    return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
 @register.inclusion_tag('search/advanced/_partials/tm_item.html', takes_context=True)
 def tm_item(context, hit, item_num):
-    return {'hit': hit, 'item_num': item_num, 'user': context['request'].user}
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
-@register.inclusion_tag('search/advanced/_partials/id_item.html')
-def id_item(hit, item_num):
-    return {'hit': hit, 'item_num': item_num}
+@register.inclusion_tag('search/advanced/_partials/id_item.html', takes_context=True)
+def id_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
-@register.inclusion_tag('search/advanced/_partials/qi_item.html')
-def qi_item(hit, item_num):
-    return {'hit': hit, 'item_num': item_num}
+@register.inclusion_tag('search/advanced/_partials/qi_item.html', takes_context=True)
+def qi_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
 @register.filter
