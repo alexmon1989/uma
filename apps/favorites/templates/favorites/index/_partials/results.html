@@ -7,10 +7,14 @@
     {% if results %}
         <div class="row">
             <div class="col-12">
-                <div class="d-md-flex justify-content-between g-mb-20">
-                    <div class="align-self-center g-mb-30 g-mb-0--md h-100">
-                        <div class="text-uppercase g-font-weight-600 ">{% trans "Всього результатів" %}:<span
-                                class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span></div>
+                <div class="d-flex justify-content-between g-mb-30">
+                    <div class="align-self-center h-100">
+                        <div class="g-font-weight-600 text-uppercase">
+                            {% trans "Всього результатів" %}:<span class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span>
+                        </div>
+                    </div>
+                    <div class="align-self-center">
+                        <a class="btn u-btn-bluegray" href="{% url 'favorites:clear' %}"><i class="fa fa-eraser"></i> {% trans 'Очистити все' %}</a>
                     </div>
                 </div>
 

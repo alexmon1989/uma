@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 15:05+0300\n"
+"POT-Creation-Date: 2020-04-24 16:47+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -345,21 +345,25 @@ msgstr "Favorites"
 msgid "Некоректні умови пошуку!"
 msgstr "Wrong search params!"
 
-#: apps/favorites/templates/favorites/index/_partials/results.html:12
+#: apps/favorites/templates/favorites/index/_partials/results.html:13
 #: apps/search/templates/search/advanced/_partials/results.html:32
 #: apps/search/templates/search/simple/_partials/results.html:32
 #: apps/search/templates/search/transactions/_partials/results.html:12
 msgid "Всього результатів"
 msgstr "Results"
 
-#: apps/favorites/templates/favorites/index/_partials/results.html:21
+#: apps/favorites/templates/favorites/index/_partials/results.html:17
+msgid "Очистити все"
+msgstr "Clear all"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:25
 #: apps/search/templates/search/advanced/_partials/results.html:41
 #: apps/search/templates/search/simple/_partials/results.html:41
 #: apps/search/templates/search/transactions/_partials/results.html:21
 msgid "Відображати на сторінці"
 msgstr "Display on page"
 
-#: apps/favorites/templates/favorites/index/_partials/results.html:63
+#: apps/favorites/templates/favorites/index/_partials/results.html:67
 #: apps/search/templates/search/advanced/_partials/results.html:10
 #: apps/search/templates/search/advanced/_partials/results.html:24
 #: apps/search/templates/search/advanced/_partials/results.html:85
@@ -373,7 +377,7 @@ msgstr "Display on page"
 msgid "Показати умови пошуку"
 msgstr "Show search conditions"
 
-#: apps/favorites/templates/favorites/index/_partials/results.html:65
+#: apps/favorites/templates/favorites/index/_partials/results.html:69
 #: apps/search/templates/search/advanced/_partials/results.html:87
 #: apps/search/templates/search/simple/_partials/results.html:89
 #: apps/search/templates/search/transactions/_partials/results.html:67
@@ -381,8 +385,6 @@ msgid "За вашими умовами пошуку не знайдено жо�
 msgstr "No results"
 
 #: apps/favorites/templates/favorites/index/index.html:16
-#, fuzzy
-#| msgid "Зачекайте, відбувається отримання даних об'єкта"
 msgid "Зачекайте, відбувається отримання даних"
 msgstr "Please, wait for data loading"
 
@@ -393,8 +395,12 @@ msgid ""
 "\"%(simple_search_url)s\">пошук</a> та додати до нього необхідні вам "
 "документи."
 msgstr ""
-"There are no documents in the favorites list at the moment. You can do <a href="
-"\"%(simple_search_url)s\">search</a> and fill it with documents."
+"There are no documents in the favorites list at the moment. You can do <a "
+"href=\"%(simple_search_url)s\">search</a> and fill it with documents."
+
+#: apps/favorites/views.py:90
+msgid "Список вибраного успішно очищено."
+msgstr "The favorites list was cleared."
 
 #: apps/help/templates/help/index/_partials/form.html:10
 msgid "Пошук по сторінкам допомоги..."
@@ -528,14 +534,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:98
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1257
+#: apps/search/utils.py:1258
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:56 apps/search/admin.py:108
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1257
+#: apps/search/utils.py:1258
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -597,13 +603,13 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:56
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:103
-#: apps/search/utils.py:1233
+#: apps/search/utils.py:1234
 msgid "Номер заявки"
 msgstr "Application number"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:62
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:109
-#: apps/search/utils.py:1234
+#: apps/search/utils.py:1235
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1263,39 +1269,39 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1231
+#: apps/search/utils.py:1232
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1232
+#: apps/search/utils.py:1233
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1235
+#: apps/search/utils.py:1236
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1236
+#: apps/search/utils.py:1237
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1237
+#: apps/search/utils.py:1238
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1238
+#: apps/search/utils.py:1239
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1239
+#: apps/search/utils.py:1240
 msgid "Власник"
 msgstr "Owner(s)"
 
-#: apps/search/utils.py:1240
+#: apps/search/utils.py:1241
 msgid "Винахідник"
 msgstr "Inventor"
 
-#: apps/search/utils.py:1241
+#: apps/search/utils.py:1242
 msgid "Представник"
 msgstr "Presenter"
 
