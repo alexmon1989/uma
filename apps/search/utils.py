@@ -95,7 +95,8 @@ def get_elastic_results(search_groups, user):
                         'query_string',
                         query=query,
                         default_field=inid_schedule.elastic_index_field.field_name,
-                        default_operator='AND'
+                        default_operator='AND',
+                        analyze_wildcard=True
                     )
 
                     if inid_schedule.elastic_index_field.field_type == 'text' and not any(
