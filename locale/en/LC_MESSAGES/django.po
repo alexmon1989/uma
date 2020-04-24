@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 13:57+0300\n"
+"POT-Creation-Date: 2020-04-23 15:05+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,6 +27,7 @@ msgstr ""
 #: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:16
 #: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:16
 #: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
+#: apps/favorites/templates/favorites/index/_partials/breadcrumbs.html:16
 #: apps/help/templates/help/index/_partials/breadcrumbs.html:16
 #: apps/help/templates/help/question/_partials/breadcrumbs.html:22
 #: apps/help/templates/help/search/_partials/breadcrumbs.html:16
@@ -88,7 +89,7 @@ msgid "Загальна інформація"
 msgstr "Dashboard"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:10
-#: templates/_partials/header.html:143
+#: templates/_partials/header.html:155
 msgid "Мій рахунок (баланс)"
 msgstr "My account balance"
 
@@ -102,7 +103,7 @@ msgstr "Applications views history"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:18
 #: apps/contacts/templates/contacts/_partials/form.html:24
-#: templates/_partials/header.html:149
+#: templates/_partials/header.html:161
 msgid "Повідомлення"
 msgstr "Message"
 
@@ -111,12 +112,12 @@ msgstr "Message"
 #: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:24
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/settings/index.html:20
-#: templates/_partials/header.html:152
+#: templates/_partials/header.html:164
 msgid "Налаштування"
 msgstr "Settings"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:26
-#: templates/_partials/header.html:157 templates/_partials/header.html:166
+#: templates/_partials/header.html:169 templates/_partials/header.html:178
 msgid "Вихід"
 msgstr "Exit"
 
@@ -139,7 +140,7 @@ msgstr "Account balance "
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:20
 #: apps/account/templates/accounts/views_history/index.html:4
-#: templates/_partials/header.html:137
+#: templates/_partials/header.html:149
 msgid "Мій кабінет"
 msgstr "My account"
 
@@ -331,6 +332,70 @@ msgstr "Subject"
 msgid "Відправити повідомлення"
 msgstr "Send"
 
+#: apps/favorites/templates/favorites/index/_partials/breadcrumbs.html:10
+#: apps/favorites/templates/favorites/index/_partials/breadcrumbs.html:20
+#: apps/favorites/templates/favorites/index/index.html:5
+msgid "Вибране"
+msgstr "Favorites"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:5
+#: apps/search/templates/search/advanced/_partials/results.html:12
+#: apps/search/templates/search/simple/_partials/results.html:12
+#: apps/search/templates/search/transactions/_partials/results.html:5
+msgid "Некоректні умови пошуку!"
+msgstr "Wrong search params!"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:12
+#: apps/search/templates/search/advanced/_partials/results.html:32
+#: apps/search/templates/search/simple/_partials/results.html:32
+#: apps/search/templates/search/transactions/_partials/results.html:12
+msgid "Всього результатів"
+msgstr "Results"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:21
+#: apps/search/templates/search/advanced/_partials/results.html:41
+#: apps/search/templates/search/simple/_partials/results.html:41
+#: apps/search/templates/search/transactions/_partials/results.html:21
+msgid "Відображати на сторінці"
+msgstr "Display on page"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:63
+#: apps/search/templates/search/advanced/_partials/results.html:10
+#: apps/search/templates/search/advanced/_partials/results.html:24
+#: apps/search/templates/search/advanced/_partials/results.html:85
+#: apps/search/templates/search/advanced/advanced.html:41
+#: apps/search/templates/search/simple/_partials/results.html:10
+#: apps/search/templates/search/simple/_partials/results.html:24
+#: apps/search/templates/search/simple/_partials/results.html:87
+#: apps/search/templates/search/simple/simple.html:38
+#: apps/search/templates/search/transactions/_partials/results.html:65
+#: apps/search/templates/search/transactions/index.html:16
+msgid "Показати умови пошуку"
+msgstr "Show search conditions"
+
+#: apps/favorites/templates/favorites/index/_partials/results.html:65
+#: apps/search/templates/search/advanced/_partials/results.html:87
+#: apps/search/templates/search/simple/_partials/results.html:89
+#: apps/search/templates/search/transactions/_partials/results.html:67
+msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
+msgstr "No results"
+
+#: apps/favorites/templates/favorites/index/index.html:16
+#, fuzzy
+#| msgid "Зачекайте, відбувається отримання даних об'єкта"
+msgid "Зачекайте, відбувається отримання даних"
+msgstr "Please, wait for data loading"
+
+#: apps/favorites/templates/favorites/index/index.html:19
+#, python-format
+msgid ""
+"Список вибраних документів поки що порожній. Ви можете здійснити <a href="
+"\"%(simple_search_url)s\">пошук</a> та додати до нього необхідні вам "
+"документи."
+msgstr ""
+"There are no documents in the favorites list at the moment. You can do <a href="
+"\"%(simple_search_url)s\">search</a> and fill it with documents."
+
 #: apps/help/templates/help/index/_partials/form.html:10
 msgid "Пошук по сторінкам допомоги..."
 msgstr "Search help pages..."
@@ -432,7 +497,7 @@ msgstr "Remember me"
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:111
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-#: templates/_partials/header.html:169
+#: templates/_partials/header.html:181
 msgid "Вхід"
 msgstr "Enter"
 
@@ -454,35 +519,31 @@ msgstr "Password"
 msgid "Будь-ласка, авторизуйтесь зручним для вас способом"
 msgstr "Please, sign in with a convenient way"
 
-#: apps/search/admin.py:34 apps/search/admin.py:101
+#: apps/search/admin.py:50 apps/search/admin.py:111
 msgid "Статус об'єкта"
 msgstr "Object state"
 
-#: apps/search/admin.py:39 apps/search/admin.py:100
-#: apps/search/templates/search/advanced/_partials/id_item.html:47
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
+#: apps/search/admin.py:55 apps/search/admin.py:109
+#: apps/search/templates/search/advanced/_partials/id_item.html:51
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:98
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
 #: apps/search/utils.py:1257
 msgid "Заявка"
 msgstr "Application"
 
-#: apps/search/admin.py:40 apps/search/admin.py:99
+#: apps/search/admin.py:56 apps/search/admin.py:108
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
 #: apps/search/utils.py:1257
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: apps/search/admin.py:86
+#: apps/search/admin.py:102
 msgid "ІНІД-код"
 msgstr "INID code"
 
-#: apps/search/admin.py:93
-msgid "Тип об'єкта"
-msgstr "Object type"
-
-#: apps/search/forms.py:197
+#: apps/search/forms.py:198
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
@@ -504,70 +565,80 @@ msgstr "Advanced search"
 msgid "Пошук"
 msgstr "Search"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:16
+#: apps/search/templates/search/advanced/_partials/favorites_icon.html:8
+#: apps/search/templates/search/detail/_partials/favorites_icon.html:8
+msgid "Видалити зі списку вибраних документів"
+msgstr "Remove from favorites"
+
+#: apps/search/templates/search/advanced/_partials/favorites_icon.html:13
+#: apps/search/templates/search/detail/_partials/favorites_icon.html:13
+msgid "Додати до списку вибраних документів"
+msgstr "Add to favorites"
+
+#: apps/search/templates/search/advanced/_partials/id_item.html:20
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:17
 msgid "Заявка на промисловий зразок"
 msgstr "Industrial design Application"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:18
+#: apps/search/templates/search/advanced/_partials/id_item.html:22
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:19
 msgid "Патент України на промисловий зразок"
 msgstr "Patent of Ukraine for industrial design"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:29
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:59
+#: apps/search/templates/search/advanced/_partials/id_item.html:33
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:63
 msgid "Заявник(и)"
 msgstr "Applicant(s)"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:36
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:66
+#: apps/search/templates/search/advanced/_partials/id_item.html:40
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:70
 msgid "Повний список заявників"
 msgstr "Full list of applicants"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:52
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
+#: apps/search/templates/search/advanced/_partials/id_item.html:56
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:103
 #: apps/search/utils.py:1233
 msgid "Номер заявки"
 msgstr "Application number"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:58
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
+#: apps/search/templates/search/advanced/_partials/id_item.html:62
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:109
 #: apps/search/utils.py:1234
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:64
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:111
+#: apps/search/templates/search/advanced/_partials/id_item.html:68
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:115
 msgid "Патент"
 msgstr "Patent"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:69
+#: apps/search/templates/search/advanced/_partials/id_item.html:73
 msgid "Номер реєстрації, який є номером патенту"
 msgstr "Registration number, which is a patent number"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:75
+#: apps/search/templates/search/advanced/_partials/id_item.html:79
 msgid "Дата, з якої є чинними права на промисловий зразок"
 msgstr "Date from which the industrial design rights are valid"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:82
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:128
+#: apps/search/templates/search/advanced/_partials/id_item.html:86
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:132
 msgid "Власник(и)"
 msgstr "Owner(s)"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:89
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:135
+#: apps/search/templates/search/advanced/_partials/id_item.html:93
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:139
 msgid "Повний список власників"
 msgstr "Full list of owners"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:101
+#: apps/search/templates/search/advanced/_partials/id_item.html:105
 msgid "Індекси"
 msgstr "Indexes"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:101
+#: apps/search/templates/search/advanced/_partials/id_item.html:105
 msgid "Міжнародна класифікація промислових зразків"
 msgstr "International Classification for Industrial Designs"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:101
+#: apps/search/templates/search/advanced/_partials/id_item.html:105
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -588,86 +659,49 @@ msgid ""
 "або рівна 5000"
 msgstr "Downloading is possible when search result count is less or equal 5000"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:17
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:21
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:20
 msgid "Заявка на винахід"
 msgstr "Invention Application"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:19
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:23
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:22
 msgid "Заявка на корисну модель"
 msgstr "Utility Model Application"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:26
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:30
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:29
 msgid "Патент на винахід"
 msgstr "Invention Patent"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:28
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:32
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:31
 msgid "Патент на корисну модель"
 msgstr "Utility Model Patent"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:41
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:45
 msgid "Винахідник(и)"
 msgstr "Inventor(s)"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:48
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:52
 msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:77
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:81
 msgid "МПК"
 msgstr "IPC"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:84
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
 msgid "Повний список індексів МПК"
 msgstr "Full list of IPC indexes"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:116
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:120
 msgid "Номер патенту"
 msgstr "Patent number"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:123
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:127
 msgid "Дата публікації про видачу патенту"
 msgstr "Date of publication of the grant of a patent"
-
-#: apps/search/templates/search/advanced/_partials/results.html:10
-#: apps/search/templates/search/advanced/_partials/results.html:24
-#: apps/search/templates/search/advanced/_partials/results.html:85
-#: apps/search/templates/search/advanced/advanced.html:41
-#: apps/search/templates/search/simple/_partials/results.html:10
-#: apps/search/templates/search/simple/_partials/results.html:24
-#: apps/search/templates/search/simple/_partials/results.html:87
-#: apps/search/templates/search/simple/simple.html:38
-#: apps/search/templates/search/transactions/_partials/results.html:65
-#: apps/search/templates/search/transactions/index.html:16
-msgid "Показати умови пошуку"
-msgstr "Show search conditions"
-
-#: apps/search/templates/search/advanced/_partials/results.html:12
-#: apps/search/templates/search/simple/_partials/results.html:12
-#: apps/search/templates/search/transactions/_partials/results.html:5
-msgid "Некоректні умови пошуку!"
-msgstr "Wrong search params!"
-
-#: apps/search/templates/search/advanced/_partials/results.html:32
-#: apps/search/templates/search/simple/_partials/results.html:32
-#: apps/search/templates/search/transactions/_partials/results.html:12
-msgid "Всього результатів"
-msgstr "Results"
-
-#: apps/search/templates/search/advanced/_partials/results.html:41
-#: apps/search/templates/search/simple/_partials/results.html:41
-#: apps/search/templates/search/transactions/_partials/results.html:21
-msgid "Відображати на сторінці"
-msgstr "Display on page"
-
-#: apps/search/templates/search/advanced/_partials/results.html:87
-#: apps/search/templates/search/simple/_partials/results.html:89
-#: apps/search/templates/search/transactions/_partials/results.html:67
-msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
-msgstr "No results"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:12
 #: apps/search/templates/search/simple/_partials/sidebar.html:12
@@ -761,7 +795,7 @@ msgstr "Please, wait for result creating..."
 msgid "Бібліографічні дані"
 msgstr "Bibliographic data"
 
-#: apps/search/templates/search/detail/_partials/biblio_header.html:7
+#: apps/search/templates/search/detail/_partials/biblio_header.html:11
 msgid "Роздрукувати бібліографічні дані об'єкта"
 msgstr "Print bibliographic data"
 
@@ -1163,7 +1197,7 @@ msgstr ""
 msgid "Свідоцтво на кваліфіковане зазначення походження товару"
 msgstr "Certificate of qualified indication of origin of goods"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:211
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:219
 msgid "Показати"
 msgstr "Show"
 
@@ -1333,9 +1367,16 @@ msgid ""
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:146
+#: templates/_partials/header.html:96
+msgid "Перейти до списку вибраних документів"
+msgstr "Go to the favorites list"
+
+#: templates/_partials/header.html:158
 msgid "Історія переглядів"
 msgstr "Applications views history"
+
+#~ msgid "Тип об'єкта"
+#~ msgstr "Object type"
 
 #~ msgid "Я погоджуюсь з умовами ліцензії"
 #~ msgstr "I agree with license terms"

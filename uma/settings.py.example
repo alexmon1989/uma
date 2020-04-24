@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.services.apps.ServicesConfig',
     'apps.account.apps.AccountConfig',
     'apps.paygate.apps.PaygateConfig',
+    'apps.favorites.apps.FavoritesConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',

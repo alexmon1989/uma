@@ -36,11 +36,11 @@
                 <!-- End Logo -->
 
                 <!-- Navigation -->
-                <div class="js-mega-menu collapse navbar-collapse align-items-center flex-sm-row g-pt-10 g-pt-5--lg g-mr-40--sm"
+                <div class="js-mega-menu collapse navbar-collapse align-items-center flex-sm-row g-pt-10 g-pt-5--lg g-mr-30--sm"
                      id="navBar">
                     <ul class="navbar-nav text-uppercase g-font-weight-600 mx-auto">
 
-                        <li class="nav-item hs-has-sub-menu g-mx-20--lg {% if 'search' in request.path %}active{% endif %}">
+                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'search' in request.path %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
                                aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Пошук" %}
                             </a>
@@ -60,7 +60,7 @@
                             <!-- End Submenu -->
                         </li>
 
-                        <li class="nav-item hs-has-sub-menu g-mx-20--lg {% if 'services' in request.path %}active{% endif %}">
+                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'services' in request.path %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
                                aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Сервіси" %}
                             </a>
@@ -74,20 +74,32 @@
                             <!-- End Submenu -->
                         </li>
 
-                        <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'about' in request.path %}active{% endif %}">
+                        <li class="nav-item g-mx-15--lg {% if 'about' in request.path %}active{% endif %}">
                             <a href="{% url 'about:about' %}" class="nav-link g-py-7 g-px-0">{% trans "Про сервіс" %}</a>
                         </li>
 
-                        <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'help' in request.path %}active{% endif %}">
+                        <li class="nav-item g-mx-15--lg {% if 'help' in request.path %}active{% endif %}">
                             <a href="{% url 'help:help' %}" class="nav-link g-py-7 g-px-0">{% trans "Допомога" %}</a>
                         </li>
 
-                        <li class="nav-item g-mx-10--lg g-mx-15--xl {% if 'contacts' in request.path %}active{% endif %}">
+                        <li class="nav-item g-mx-15--lg {% if 'contacts' in request.path %}active{% endif %}">
                             <a href="{% url 'contacts:contacts' %}" class="nav-link g-py-7 g-px-0">{% trans "Зворотній зв'язок" %}</a>
                         </li>
                     </ul>
                 </div>
                 <!-- End Navigation -->
+
+
+                <!-- Cart -->
+                <div class="g-pos-rel g-pt-3--lg g-width-40">
+                    <a class="u-icon-v1 g-color-main g-text-underline--none--hover g-width-20 g-height-20 disabled"
+                       title="{% trans 'Перейти до списку вибраних документів' %}"
+                       href="{% url 'favorites:index' %}">
+                        <span class="u-badge-v1--xs g-color-white g-bg-primary g-rounded-50x" id="favorites-total">{{ request.session.favorites_ids|length }}</span>
+                        <i class="fa fa-star"></i>
+                    </a>
+                </div>
+                <!-- End Cart -->
 
                 <!-- Смена языков -->
                 {% get_language_info for LANGUAGE_CODE as lang %}

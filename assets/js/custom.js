@@ -414,4 +414,37 @@ $(function () {
             myWindow.close();
         }, 1000);
     });
+
+    // Добавление/удаление объектов из избранного
+    $(document).on('mouseenter', '.add-remove-favorites', function () {
+        $(this).find('i').removeClass('fa-star-o').addClass('fa-star');
+    }).on('mouseleave', '.add-remove-favorites', function () {
+        let $this = $(this);
+        if (!$this.hasClass('is-in-favorites')) {
+            $this.find('i').removeClass('fa-star').addClass('fa-star-o');
+        }
+    }).on('click', '.add-remove-favorites', function (e) {
+        e.preventDefault();
+        let $favoritesTotalElem = $("#favorites-total");
+        let favoritesTotalVal = parseInt($favoritesTotalElem.html());
+        let $this = $(this);
+
+        $this.toggleClass('is-in-favorites');
+
+        if ($this.hasClass('is-in-favorites')) {
+            favoritesTotalVal++;
+            $this.find('i').removeClass('fa-star-o').addClass('fa-star');
+            $this.attr('title', gettext('Видалити зі списку вибраних документів'));
+            toastr.success(gettext('Документ було додано до списку вибраних документів.'));
+        } else {
+            favoritesTotalVal--;
+            $this.find('i').removeClass('fa-star').addClass('fa-star-o');
+            $this.attr('title', gettext('Додати до списку вибраних документів'));
+            toastr.success(gettext('Документ було видалено зі списку вибраних документів.'));
+        }
+
+        $favoritesTotalElem.html(favoritesTotalVal);
+
+        $.post('/favorites/add-or-remove', { id: $this.data('hit-id') });
+    });
 });

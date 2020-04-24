@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 from apps.search.views import validate_query, get_task_info, get_validation_info
+from apps.favorites.views import add_or_remove
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +36,7 @@ urlpatterns += i18n_patterns(
     path('help/', include('apps.help.urls')),
     path('services/', include('apps.services.urls')),
     path('account/', include('apps.account.urls')),
+    path('favorites/', include('apps.favorites.urls')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 )
@@ -45,6 +47,7 @@ urlpatterns += [
     path('search/get-validation-info/', get_validation_info, name="get_validation_info"),
     path('api/', include('apps.api.urls')),
     path('paygate/', include('apps.paygate.urls')),
+    path('favorites/add-or-remove', add_or_remove, name='favorites-add-or-remove'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
