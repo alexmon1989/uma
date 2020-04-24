@@ -4,7 +4,10 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponse
 from django.utils import six
 from django.template.loader import render_to_string
+from django.views.generic.base import RedirectView
 from django.conf import settings
+from django.utils.translation import gettext as _
+from django.contrib import messages
 from apps.search.utils import paginate_results
 from apps.search.tasks import perform_favorites_search
 from apps.search.decorators import require_ajax
@@ -73,3 +76,17 @@ def get_results_html(request):
                 request)
         return HttpResponse(json.dumps(data), content_type='application/json')
     return HttpResponse('No job id given.')
+
+
+class ClearRedirectView(RedirectView):
+    """Очищает список избранного."""
+
+    pattern_name = 'favorites:index'
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.request.session['favorites_ids'] = []
+        messages.success(
+            self.request,
+            _('Список вибраного успішно очищено.')
+        )
+        return super().get_redirect_url(*args, **kwargs)
