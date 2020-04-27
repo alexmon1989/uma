@@ -198,6 +198,28 @@
                 </tr>
             {% endif %}
 
+            {# (85) Дата входження до національної фази #}
+            {% get_field '85' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_85 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.biblio_data.I_85|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {# (86) Номер заявки РСТ #}
+            {% get_field '86.N' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.biblio_data.I_86 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for I_86 in hit.biblio_data|get:'I_86' %}
+                            {{ I_86|get:'I_86.N' }}, {{ I_86|get:'I_86.D'|parse_date|date:"d.m.Y" }}{% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% if hit.biblio_data.i_62 %}
                 {% for i_62 in hit.biblio_data.i_62 %}
                     {% get_field '62.N' ipc_fields as ipc_field %}
