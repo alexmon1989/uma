@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 16:47+0300\n"
+"POT-Creation-Date: 2020-04-29 15:44+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -881,7 +881,7 @@ msgstr "Notifications"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:11
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:11
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:10
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:10
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
 msgid "Документи"
 msgstr "Documents"
 
@@ -892,7 +892,7 @@ msgstr "Documents"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:23
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:19
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:22
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:18
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:22
 msgid "Дата реєстрації"
 msgstr "Registration date"
 
@@ -905,7 +905,7 @@ msgstr "Registration date"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:25
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:21
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:23
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:19
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:23
 msgid "Назва документа"
 msgstr "Protective document"
 
@@ -916,7 +916,7 @@ msgstr "Protective document"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:26
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:22
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:24
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:20
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:24
 msgid "Реєстраційний номер"
 msgstr "Registration number"
 
@@ -987,9 +987,9 @@ msgstr "Open in new window"
 
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:148
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:191
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:232
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:253
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:254
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:275
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:297
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:145
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:186
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:207
@@ -1222,6 +1222,29 @@ msgstr "Ukrainian Trademark certificate"
 msgid "Простий пошук"
 msgstr "Simple search"
 
+#: apps/search/templates/search/templatetags/app_stages.html:6
+msgid "Стадії"
+msgstr "Stages"
+
+#: apps/search/templates/search/templatetags/app_stages.html:18
+msgid "Позначення"
+msgstr "Legend"
+
+#: apps/search/templates/search/templatetags/app_stages.html:23
+msgid ""
+"Стадія, на якій припинено діловодство за заявкою (вважається неподаною, "
+"відхиленою, відкликаною; відмовлено в реєстрації)"
+msgstr "The stage at which suspended the processing of the application, "
+"(it is not filed, rejected, withdrawn, refused registration)"
+
+#: apps/search/templates/search/templatetags/app_stages.html:27
+msgid "Поточна стадія"
+msgstr "Current stage"
+
+#: apps/search/templates/search/templatetags/app_stages.html:32
+msgid "Пройдена стадія"
+msgstr "Passed"
+
 #: apps/search/templates/search/templatetags/registration_status.html:7
 msgid "Патент діє"
 msgstr "Valid"
@@ -1268,6 +1291,32 @@ msgstr "Transaction search"
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:24
 msgid "По сповіщенням"
 msgstr "Transaction search"
+
+#: apps/search/templatetags/search_extras.py:197
+msgid "Знак для товарів і послуг зареєстровано"
+msgstr "Registered trade mark"
+
+#: apps/search/templatetags/search_extras.py:201
+msgid "Підготовка до державної реєстрації та публікації"
+msgstr "Preparation to state registration and publication"
+
+#: apps/search/templatetags/search_extras.py:205
+msgid "Кваліфікаційна експертиза"
+msgstr "Substantive examination"
+
+#: apps/search/templatetags/search_extras.py:209
+msgid "Формальна експертиза"
+msgstr "Formal examination"
+
+#: apps/search/templatetags/search_extras.py:213
+msgid "Встановлення дати подання"
+msgstr "According of the filling date"
+
+#: apps/search/templatetags/search_extras.py:217
+msgid ""
+"Реєстрація первинних документів, попередня експертиза та введення відомостей "
+"до бази даних"
+msgstr "Registration of primary documents, preliminary examination and entering data into database"
 
 #: apps/search/utils.py:1232
 msgid "Тип об'єкта промислової власності"

@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from django.db.models import F
+from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
@@ -166,3 +167,56 @@ def is_paid_services_enabled():
     """Возвращает значения того включены ли платные услуги."""
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
     return paid_services_settings.enabled
+
+
+@register.inclusion_tag('search/templatetags/app_stages.html')
+def app_stages(app):
+    """Отображает стадии заявки (градусник)."""
+    mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+
+    if app['search_data']['obj_state'] == 2 \
+            and app['Document']['RegistrationStatus'] == 'Знак для товарів і послуг зареєстровано':
+        stages_statuses = ['done' for _ in range(6)]
+    else:
+        stages_statuses = ['not-active' for _ in range(6)]
+
+        for i, s in enumerate(stages_statuses):
+            if mark_status_code > (i + 1) * 1000:
+                stages_statuses[i] = 'done'
+            else:
+                if is_stopped:
+                    stages_statuses[i] = 'not-active'
+                    stages_statuses[i-1] = 'stopped'
+                else:
+                    stages_statuses[i] = 'current'
+                break
+
+    stages = [
+        {
+            'title': _('Знак для товарів і послуг зареєстровано'),
+            'status': stages_statuses[5],
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': stages_statuses[4],
+        },
+        {
+            'title': _('Кваліфікаційна експертиза'),
+            'status': stages_statuses[3],
+        },
+        {
+            'title': _('Формальна експертиза'),
+            'status': stages_statuses[2],
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': stages_statuses[1],
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': stages_statuses[0],
+        },
+    ]
+
+    return {'stages': stages, 'is_stopped': is_stopped, 'obj_state': app['search_data']['obj_state']}
