@@ -348,7 +348,7 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        items.append(item)
+        items.append(filter_app_data(item, user))
     results = {
         'items': items,
         'total': s.count()

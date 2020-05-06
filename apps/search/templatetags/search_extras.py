@@ -169,20 +169,19 @@ def is_paid_services_enabled():
     return paid_services_settings.enabled
 
 
-@register.inclusion_tag('search/templatetags/app_stages.html')
-def app_stages(app):
+@register.inclusion_tag('search/templatetags/app_stages_tm.html')
+def app_stages_tm(app):
     """Отображает стадии заявки (градусник)."""
     mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
 
-    if app['search_data']['obj_state'] == 2 \
-            and app['Document']['RegistrationStatus'] == 'Знак для товарів і послуг зареєстровано':
+    if app['search_data']['obj_state'] == 2:
         stages_statuses = ['done' for _ in range(6)]
     else:
         stages_statuses = ['not-active' for _ in range(6)]
 
         for i, s in enumerate(stages_statuses):
-            if mark_status_code > (i + 1) * 1000:
+            if mark_status_code >= (i + 1) * 1000:
                 stages_statuses[i] = 'done'
             else:
                 if is_stopped:
@@ -219,4 +218,61 @@ def app_stages(app):
         },
     ]
 
-    return {'stages': stages, 'is_stopped': is_stopped, 'obj_state': app['search_data']['obj_state']}
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'obj_state': app['search_data']['obj_state']
+    }
+
+
+@register.inclusion_tag('search/templatetags/app_stages_id.html')
+def app_stages_id(app):
+    """Отображает стадии заявки (градусник)."""
+    design_status_code = int(app['Document'].get('DesignCurrentStatusCodeType', 0))
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+
+    if app['search_data']['obj_state'] == 2:
+        stages_statuses = ['done' for _ in range(5)]
+    else:
+        stages_statuses = ['not-active' for _ in range(5)]
+        marks = [1000, 2000, 4000, 5000, 5002]
+
+        for i, s in enumerate(stages_statuses):
+            if design_status_code >= marks[i]:
+                stages_statuses[i] = 'done'
+            else:
+                if is_stopped:
+                    stages_statuses[i] = 'not-active'
+                    stages_statuses[i-1] = 'stopped'
+                else:
+                    stages_statuses[i] = 'current'
+                break
+
+    stages = [
+        {
+            'title': _('Промисловий зразок зареєстровано'),
+            'status': stages_statuses[4],
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': stages_statuses[3],
+        },
+        {
+            'title': _('Експертиза заявки'),
+            'status': stages_statuses[2],
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': stages_statuses[1],
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': stages_statuses[0],
+        },
+    ]
+
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'app': app
+    }

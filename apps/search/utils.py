@@ -196,8 +196,8 @@ def filter_unpublished_apps(user, qs):
         return qs
 
     """Фильтры для обычных пользователей."""
-    # Не показывать заявки по пром. образцам и полезным моделям
-    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+    # Не показывать заявки по полезным моделям
+    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND Document.idObjType:2")
 
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
 
@@ -1554,6 +1554,25 @@ def filter_app_data(app_data, user):
     #     }})
     #     return res
     # return app_data
+
+    # Если это заявка на полезную модель или пром образец,
+    # то необходимо убрать всю "закрытую" информацию
+    # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
+    if app_data['Document']['idObjType'] == 6 and app_data['search_data']['obj_state'] == 1 \
+            and not user_has_access_to_docs(user, app_data):
+        res = {
+            'meta': app_data['meta'],
+            'Document': app_data['Document'],
+            'Design': {
+                'DocFlow': app_data['Design'].get('DocFlow')
+            },
+            'search_data': {
+                'app_number': app_data['search_data']['app_number'],
+                'obj_state': app_data['search_data']['obj_state'],
+            }
+        }
+        return res
+
     return app_data
 
 

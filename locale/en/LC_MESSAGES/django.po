@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-29 15:44+0300\n"
+"POT-Creation-Date: 2020-05-05 19:03+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -530,7 +530,7 @@ msgid "Статус об'єкта"
 msgstr "Object state"
 
 #: apps/search/admin.py:55 apps/search/admin.py:109
-#: apps/search/templates/search/advanced/_partials/id_item.html:51
+#: apps/search/templates/search/advanced/_partials/id_item.html:59
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:98
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
@@ -591,60 +591,64 @@ msgstr "Industrial design Application"
 msgid "Патент України на промисловий зразок"
 msgstr "Patent of Ukraine for industrial design"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:33
+#: apps/search/templates/search/advanced/_partials/id_item.html:36
+msgid "Для даної заявки можливий перегляд лише її стану діловодства."
+msgstr "For this application, it is possible to review only its status."
+
+#: apps/search/templates/search/advanced/_partials/id_item.html:41
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:63
 msgid "Заявник(и)"
 msgstr "Applicant(s)"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:40
+#: apps/search/templates/search/advanced/_partials/id_item.html:48
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:70
 msgid "Повний список заявників"
 msgstr "Full list of applicants"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:56
+#: apps/search/templates/search/advanced/_partials/id_item.html:64
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:103
 #: apps/search/utils.py:1234
 msgid "Номер заявки"
 msgstr "Application number"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:62
+#: apps/search/templates/search/advanced/_partials/id_item.html:70
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:109
 #: apps/search/utils.py:1235
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:68
+#: apps/search/templates/search/advanced/_partials/id_item.html:76
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:115
 msgid "Патент"
 msgstr "Patent"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:73
+#: apps/search/templates/search/advanced/_partials/id_item.html:81
 msgid "Номер реєстрації, який є номером патенту"
 msgstr "Registration number, which is a patent number"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:79
+#: apps/search/templates/search/advanced/_partials/id_item.html:87
 msgid "Дата, з якої є чинними права на промисловий зразок"
 msgstr "Date from which the industrial design rights are valid"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:86
+#: apps/search/templates/search/advanced/_partials/id_item.html:94
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:132
 msgid "Власник(и)"
 msgstr "Owner(s)"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:93
+#: apps/search/templates/search/advanced/_partials/id_item.html:101
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:139
 msgid "Повний список власників"
 msgstr "Full list of owners"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:105
+#: apps/search/templates/search/advanced/_partials/id_item.html:113
 msgid "Індекси"
 msgstr "Indexes"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:105
+#: apps/search/templates/search/advanced/_partials/id_item.html:113
 msgid "Міжнародна класифікація промислових зразків"
 msgstr "International Classification for Industrial Designs"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:105
+#: apps/search/templates/search/advanced/_partials/id_item.html:113
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -851,7 +855,7 @@ msgid "Заявка №"
 msgstr "Application"
 
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:21
-#: apps/search/templates/search/detail/id/detail.html:23
+#: apps/search/templates/search/detail/id/detail.html:24
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:64
 #: apps/search/templates/search/detail/inv_um/detail.html:71
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:64
@@ -862,7 +866,7 @@ msgid "Стан діловодства"
 msgstr "State of affairs"
 
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:28
-#: apps/search/templates/search/detail/id/detail.html:36
+#: apps/search/templates/search/detail/id/detail.html:39
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:71
 #: apps/search/templates/search/detail/inv_um/detail.html:85
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:71
@@ -870,7 +874,7 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/qi/_partials/sidebar.html:21
 #: apps/search/templates/search/detail/qi/detail.html:23
 #: apps/search/templates/search/detail/tm/_partials/sidebar.html:28
-#: apps/search/templates/search/detail/tm/detail.html:35
+#: apps/search/templates/search/detail/tm/detail.html:37
 msgid "Сповіщення"
 msgstr "Notifications"
 
@@ -881,7 +885,7 @@ msgstr "Notifications"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:11
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:11
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:10
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:10
 msgid "Документи"
 msgstr "Documents"
 
@@ -892,7 +896,7 @@ msgstr "Documents"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:23
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:19
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:22
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:22
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:18
 msgid "Дата реєстрації"
 msgstr "Registration date"
 
@@ -905,7 +909,7 @@ msgstr "Registration date"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:25
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:21
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:23
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:23
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:19
 msgid "Назва документа"
 msgstr "Protective document"
 
@@ -916,7 +920,7 @@ msgstr "Protective document"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:26
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:22
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:24
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:24
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:20
 msgid "Реєстраційний номер"
 msgstr "Registration number"
 
@@ -1197,7 +1201,7 @@ msgstr "hide"
 
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:17
 msgid "Свідоцтво на використання кваліфікованого зазначення походження товару"
-msgstr ""
+msgstr "Certificate of using of a qualified indication of origin of goods"
 
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:19
 msgid "Свідоцтво на кваліфіковане зазначення походження товару"
@@ -1222,26 +1226,32 @@ msgstr "Ukrainian Trademark certificate"
 msgid "Простий пошук"
 msgstr "Simple search"
 
-#: apps/search/templates/search/templatetags/app_stages.html:6
+#: apps/search/templates/search/templatetags/app_stages_id.html:7
+#: apps/search/templates/search/templatetags/app_stages_tm.html:6
 msgid "Стадії"
 msgstr "Stages"
 
-#: apps/search/templates/search/templatetags/app_stages.html:18
+#: apps/search/templates/search/templatetags/app_stages_id.html:19
+#: apps/search/templates/search/templatetags/app_stages_tm.html:18
 msgid "Позначення"
 msgstr "Legend"
 
-#: apps/search/templates/search/templatetags/app_stages.html:23
+#: apps/search/templates/search/templatetags/app_stages_id.html:25
+#: apps/search/templates/search/templatetags/app_stages_tm.html:24
 msgid ""
 "Стадія, на якій припинено діловодство за заявкою (вважається неподаною, "
 "відхиленою, відкликаною; відмовлено в реєстрації)"
-msgstr "The stage at which suspended the processing of the application, "
-"(it is not filed, rejected, withdrawn, refused registration)"
+msgstr ""
+"The stage at which suspended the processing of the application, (it is not "
+"filed, rejected, withdrawn, refused registration)"
 
-#: apps/search/templates/search/templatetags/app_stages.html:27
+#: apps/search/templates/search/templatetags/app_stages_id.html:29
+#: apps/search/templates/search/templatetags/app_stages_tm.html:28
 msgid "Поточна стадія"
 msgstr "Current stage"
 
-#: apps/search/templates/search/templatetags/app_stages.html:32
+#: apps/search/templates/search/templatetags/app_stages_id.html:35
+#: apps/search/templates/search/templatetags/app_stages_tm.html:34
 msgid "Пройдена стадія"
 msgstr "Passed"
 
@@ -1292,31 +1302,44 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:197
+#: apps/search/templatetags/search_extras.py:196
 msgid "Знак для товарів і послуг зареєстровано"
 msgstr "Registered trade mark"
 
-#: apps/search/templatetags/search_extras.py:201
+#: apps/search/templatetags/search_extras.py:200
+#: apps/search/templatetags/search_extras.py:257
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/templatetags/search_extras.py:205
+#: apps/search/templatetags/search_extras.py:204
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/templatetags/search_extras.py:209
+#: apps/search/templatetags/search_extras.py:208
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/templatetags/search_extras.py:213
+#: apps/search/templatetags/search_extras.py:212
+#: apps/search/templatetags/search_extras.py:265
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/templatetags/search_extras.py:217
+#: apps/search/templatetags/search_extras.py:216
+#: apps/search/templatetags/search_extras.py:269
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
-msgstr "Registration of primary documents, preliminary examination and entering data into database"
+msgstr ""
+"Registration of primary documents, preliminary examination and entering data "
+"into database"
+
+#: apps/search/templatetags/search_extras.py:253
+msgid "Промисловий зразок зареєстровано"
+msgstr "Registered industrial design"
+
+#: apps/search/templatetags/search_extras.py:261
+msgid "Експертиза заявки"
+msgstr "Examination"
 
 #: apps/search/utils.py:1232
 msgid "Тип об'єкта промислової власності"
@@ -1447,9 +1470,6 @@ msgstr "Applications views history"
 
 #~ msgid "Отримати оригінал докумнту"
 #~ msgstr "Get the original document"
-
-#~ msgid "Патент зареєстровано"
-#~ msgstr "The patent is registered"
 
 #~ msgid "Індекс (індекси) Міжнародної класифікації промислових зразків"
 #~ msgstr ""
