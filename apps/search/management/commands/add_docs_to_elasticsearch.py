@@ -501,9 +501,9 @@ class Command(BaseCommand):
         s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
         self.indexation_process.documents_in_index = s.count()
         # Количество опубликованных документов в индексе
-        qs = filter_unpublished_apps(AnonymousUser(), qs)
-        s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
-        self.indexation_process.documents_in_index_shared = s.count()
+        # qs = filter_unpublished_apps(AnonymousUser(), qs)
+        # s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
+        # self.indexation_process.documents_in_index_shared = s.count()
 
         self.indexation_process.save()
 

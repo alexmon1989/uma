@@ -95,16 +95,13 @@ def user_can_watch_docs(user):
     return user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists()
 
 
-@register.simple_tag(takes_context=True)
-def documents_count(context):
+@register.simple_tag
+def documents_count():
     """Возвращает количество документов доступных для поиска"""
-    p = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
+    record = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
     doc_count = None
-    if p.count() > 0:
-        if context['request'].user.is_anonymous or not context['request'].user.is_vip():
-            doc_count = p.first().documents_in_index_shared
-        else:
-            doc_count = p.first().documents_in_index
+    if record.count() > 0:
+        doc_count = record.first().documents_in_index_shared
     return doc_count or '-'
 
 
