@@ -23,7 +23,7 @@ def get_person_country(value):
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html', takes_context=True)
 def inv_um_item(context, hit, item_num):
-    biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
+    biblio_data = hit.get('Claim') if hit['search_data']['obj_state'] == 1 else hit.get('Patent')
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 

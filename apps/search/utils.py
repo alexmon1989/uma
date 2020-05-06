@@ -197,7 +197,7 @@ def filter_unpublished_apps(user, qs):
 
     """Фильтры для обычных пользователей."""
     # Не показывать заявки по полезным моделям
-    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND Document.idObjType:2")
+    # filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND Document.idObjType:2")
 
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
 
@@ -207,7 +207,7 @@ def filter_unpublished_apps(user, qs):
     #     filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
 
     # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
-    filter_qs &= Q(
+    filter_qs = Q(
         'query_string',
         query="_exists_:search_data.app_date OR Document.idObjType:5 "
               "OR (NOT _exists_:search_data.app_date AND Document.MarkCurrentStatusCodeType:1000)"
@@ -1558,20 +1558,32 @@ def filter_app_data(app_data, user):
     # Если это заявка на полезную модель или пром образец,
     # то необходимо убрать всю "закрытую" информацию
     # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
-    if app_data['Document']['idObjType'] == 6 and app_data['search_data']['obj_state'] == 1 \
-            and not user_has_access_to_docs(user, app_data):
-        res = {
-            'meta': app_data['meta'],
-            'Document': app_data['Document'],
-            'Design': {
-                'DocFlow': app_data['Design'].get('DocFlow')
-            },
-            'search_data': {
-                'app_number': app_data['search_data']['app_number'],
-                'obj_state': app_data['search_data']['obj_state'],
+    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+        if app_data['Document']['idObjType'] == 2:  # Полезные модели
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'DOCFLOW': app_data.get('DOCFLOW'),
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
             }
-        }
-        return res
+            return res
+
+        elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'Design': {
+                    'DocFlow': app_data['Design'].get('DocFlow')
+                },
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
+            }
+            return res
 
     return app_data
 
