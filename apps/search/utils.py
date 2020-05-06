@@ -1261,81 +1261,54 @@ def prepare_data_for_search_report(s, lang_code, user=None):
     for h in s.params(size=1000, preserve_order=True).scan():
         obj_type = obj_types[h.Document.idObjType - 1]
         obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
-            if h.search_data.app_date else ''
-        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
-            '%d.%m.%Y') if h.search_data.rights_date else ''
-        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        if hasattr(h.search_data, 'inventor'):
-            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                h.search_data.applicant) else h.search_data.applicant
-        else:
-            applicant = ''
-        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-        if hasattr(h.search_data, 'inventor'):
-            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                h.search_data.inventor) else h.search_data.inventor
-        else:
-            inventor = ''
-        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-        # if h.Document.idObjType == 4 and h.search_data.obj_state == 1:
-        #     if user and user_has_access_to_tm_app(user, h):
-        #         data.append([
-        #             obj_type,
-        #             obj_state,
-        #             h.search_data.app_number,
-        #             app_date,
-        #             h.search_data.protective_doc_number,
-        #             rights_date,
-        #             title,
-        #             applicant,
-        #             owner,
-        #             inventor,
-        #             agent,
-        #         ])
-        #     else:
-        #         data.append([
-        #             obj_type,
-        #             obj_state,
-        #             h.search_data.app_number,
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #         ])
-        # else:
-        #     data.append([
-        #         obj_type,
-        #         obj_state,
-        #         h.search_data.app_number,
-        #         app_date,
-        #         h.search_data.protective_doc_number,
-        #         rights_date,
-        #         title,
-        #         applicant,
-        #         owner,
-        #         inventor,
-        #         agent,
-        #     ])
-        data.append([
+        if is_app_limited(h.to_dict(), user):
+            # Если библиографические данные заявки не публикуются
+            data.append([
                 obj_type,
                 obj_state,
                 h.search_data.app_number,
-                app_date,
-                h.search_data.protective_doc_number,
-                rights_date,
-                title,
-                applicant,
-                owner,
-                inventor,
-                agent,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
             ])
+        else:
+            app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
+                if h.search_data.app_date else ''
+            rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+                '%d.%m.%Y') if h.search_data.rights_date else ''
+            title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+            if hasattr(h.search_data, 'inventor'):
+                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                    h.search_data.applicant) else h.search_data.applicant
+            else:
+                applicant = ''
+            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+            if hasattr(h.search_data, 'inventor'):
+                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                    h.search_data.inventor) else h.search_data.inventor
+            else:
+                inventor = ''
+            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+
+            data.append([
+                    obj_type,
+                    obj_state,
+                    h.search_data.app_number,
+                    app_date,
+                    h.search_data.protective_doc_number,
+                    rights_date,
+                    title,
+                    applicant,
+                    owner,
+                    inventor,
+                    agent,
+                ])
 
     return data
 
@@ -1599,6 +1572,18 @@ def filter_app_data(app_data, user):
             return res
 
     return app_data
+
+
+def is_app_limited(app_data, user):
+    """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
+    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+        if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
+            return True
+        elif app_data['Document']['idObjType'] == 2:  # Полезные модели
+            return True
+        elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
+            return True
+    return False
 
 
 def get_ipc_codes_with_schedules(lang_code):
