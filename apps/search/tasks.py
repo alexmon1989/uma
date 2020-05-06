@@ -85,7 +85,7 @@ def perform_simple_search(user_id, get_params):
         qs = filter_bad_apps(qs)
 
         # Не показывать неопубликованные заявки
-        qs = filter_unpublished_apps(user, qs)
+        # qs = filter_unpublished_apps(user, qs)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -150,7 +150,7 @@ def get_app_details(id_app_number, user_id):
     )
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     # Фильтр заявок, которые не положено публиковать в интернет
-    q = filter_unpublished_apps(user, q)
+    # q = filter_unpublished_apps(user, q)
 
     s = Search().using(client).query(q).execute()
     if not s:
@@ -326,7 +326,7 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
     )
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     # Фильтр заявок, которые не положено публиковать в интернет
-    q = filter_unpublished_apps(user, q)
+    # q = filter_unpublished_apps(user, q)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
@@ -375,7 +375,7 @@ def get_order_documents(user_id, order_id):
     q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     # Фильтр заявок, которые не положено публиковать в интернет
     user = get_user_or_anonymous(user_id)
-    q = filter_unpublished_apps(user, q)
+    # q = filter_unpublished_apps(user, q)
 
     s = Search().using(client).query(q).source(['search_data']).execute()
     if not s:
@@ -533,7 +533,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             qs = filter_bad_apps(qs)
 
             # Не показывать неопубликованные заявки
-            qs = filter_unpublished_apps(user, qs)
+            # qs = filter_unpublished_apps(user, qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
