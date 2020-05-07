@@ -661,7 +661,7 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
 
             # Сортировка
             if get_params.get('sort_by'):
-                s = sort_results(s, get_params['sort_by'])
+                s = sort_results(s, get_params['sort_by'][0])
             else:
                 s = s.sort('_score')
 
@@ -699,46 +699,39 @@ def create_transactions_search_results_file(get_params, lang_code):
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
-        if s:
+        if s and s.count() <= 5000:
+            s = s.source(['search_data', 'Document', 'Claim'])
+
             # Сортировка
             if get_params.get('sort_by'):
-                s = sort_results(s, get_params['sort_by'])
+                s = sort_results(s, get_params['sort_by'][0])
             else:
                 s = s.sort('_score')
 
-            if s.count() <= 5000:
-                s = s.source(['search_data', 'Document', 'Claim'])
+            # Данные для Excel-файла
+            data = prepare_data_for_search_report(s, lang_code)
 
-                # Сортировка
-                if get_params.get('sort_by'):
-                    s = sort_results(s, get_params['sort_by'])
-                else:
-                    s = s.sort('_score')
+            # Формировние Excel-файла
+            workbook = create_search_res_doc(data)
 
-                # Данные для Excel-файла
-                data = prepare_data_for_search_report(s, lang_code)
+            directory_path = os.path.join(
+                settings.MEDIA_ROOT,
+                'search_results',
+            )
+            os.makedirs(directory_path, exist_ok=True)
+            # Имя файла с результатами поиска
+            file_name = f"{get_unique_filename('transactions_search')}.xls"
+            file_path = os.path.join(directory_path, file_name)
 
-                # Формировние Excel-файла
-                workbook = create_search_res_doc(data)
+            # Сохранение файла
+            workbook.save(file_path)
 
-                directory_path = os.path.join(
-                    settings.MEDIA_ROOT,
-                    'search_results',
-                )
-                os.makedirs(directory_path, exist_ok=True)
-                # Имя файла с результатами поиска
-                file_name = f"{get_unique_filename('transactions_search')}.xls"
-                file_path = os.path.join(directory_path, file_name)
-
-                # Сохранение файла
-                workbook.save(file_path)
-
-                # Возврат url сформированного файла с результатами поиска
-                return os.path.join(
-                    settings.MEDIA_URL,
-                    'search_results',
-                    file_name
-                )
+            # Возврат url сформированного файла с результатами поиска
+            return os.path.join(
+                settings.MEDIA_URL,
+                'search_results',
+                file_name
+            )
     return False
 
 
