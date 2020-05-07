@@ -2,7 +2,7 @@ from django import template
 from django.urls import translate_url
 from datetime import datetime
 import urllib.parse
-import re
+from apps.contacts.models import ContactsPage
 
 register = template.Library()
 
@@ -71,3 +71,9 @@ def highlight(text, q):
         original_text = text[index_l:index_l + len(q)]
         return text[:index_l] + f"<em class='g-bg-yellow'>{original_text}</em>" + text[index_l + len(q):]
     return text
+
+
+@register.inclusion_tag('templatetags/footer_contacts.html', takes_context=True)
+def footer_contacts(context):
+    contacts, created = ContactsPage.objects.get_or_create()
+    return {'contacts': contacts, 'request': context['request']}

@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load search_extras %}
+{% load uma_extras %}
 
 <!-- Footer -->
 <div class="gradient g-bg-cover g-bg-pos-center g-bg-img-hero g-bg-black-opacity-0_1--after g-py-50"
@@ -92,17 +93,7 @@
 
             <!-- Footer Content -->
             <div class="col-lg-3 col-md-6">
-                <div class="u-heading-v3-1 g-brd-white-opacity-0_3 g-mb-25">
-                    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">{% trans "Зв'язок з нами" %}</h2>
-                </div>
-
-                <address class="g-bg-no-repeat g-line-height-2 g-mt-minus-4 g-color-white-opacity-0_8">
-                    <div class="g-mb-10"><strong>{% trans "Адміністратор баз даних" %}</strong></div>
-                    {% trans "Телефон" %}: <a href="tel:+380444940557" class="g-color-white">+380 (44) 494-05-57</a><br>
-                    {% trans "Режим роботи" %}: з 8.30 до 17.15<br>
-                    {% trans "Перерва" %} {% trans "з" %} 12.00 {% trans "по" %} 12.30<br>
-                    <a href="mailto:taras@ukrpatent.org" class="g-color-white">taras@ukrpatent.org</a>
-                </address>
+                {% footer_contacts %}
             </div>
             <!-- End Footer Content -->
         </div>

@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="u-heading-v3-1 g-brd-white-opacity-0_3 g-mb-25">
+    <h2 class="u-heading-v3__title h6 text-uppercase g-brd-primary">{% trans "Зв'язок з нами" %}</h2>
+</div>
+
+<address class="g-bg-no-repeat g-line-height-2 g-mt-minus-4 g-color-white-opacity-0_8">
+    <div class="g-mb-10"><strong>{% trans "Адміністратор баз даних" %}</strong></div>
+    {% trans "Телефон" %}: {% if contacts.admin_phone_1 %}<a href="tel:{{ contacts.admin_phone_1 }}" class="g-color-white">{{ contacts.admin_phone_1 }}</a><br>{% endif %}
+    {% if contacts.admin_phone_2 %}<a href="tel:{{ contacts.admin_phone_2 }}" class="g-color-white">{{ contacts.admin_phone_2 }}</a><br>{% endif %}
+    {% if contacts.admin_phone_3 %}<a href="tel:{{ contacts.admin_phone_3 }}" class="g-color-white">{{ contacts.admin_phone_3 }}</a><br>{% endif %}
+
+    {% trans "Режим роботи" %}: {% if request.LANGUAGE_CODE == 'uk' %}{{ contacts.operating_mode_uk }}{% else %}{{ contacts.operating_mode_en }}{% endif %}<br>
+
+    {% trans "Перерва" %}: {% if request.LANGUAGE_CODE == 'uk' %}{{ contacts.lunch_break_uk }}{% else %}{{ contacts.lunch_break_en }}{% endif %}<br>
+
+    {% if contacts.admin_email_1 %}
+        <a href="mailto:{{ contacts.admin_email_1 }}" class="g-color-white">{{ contacts.admin_email_1 }}</a>
+    {% endif %}
+    {% if contacts.admin_email_2 %}
+        <a href="mailto:{{ contacts.admin_email_2 }}" class="g-color-white">{{ contacts.admin_email_2 }}</a>
+    {% endif %}
+    {% if contacts.admin_email_3 %}
+        <a href="mailto:{{ contacts.admin_email_3 }}" class="g-color-white">{{ contacts.admin_email_3 }}</a>
+    {% endif %}
+</address>
