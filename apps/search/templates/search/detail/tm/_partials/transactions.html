@@ -1,4 +1,5 @@
 {% load uma_extras %}
+{% load i18n %}
 
 <div class="table-responsive">
     <table class="table table-bordered table-sm g-font-size-13">
@@ -9,20 +10,20 @@
                     {% if transaction|get:"@type" == 'ChangeOwner' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -32,74 +33,74 @@
                     {% elif transaction|get:"@type" == 'Renewal' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody %}
-                                <li><span class="g-font-weight-600">(186) Очікувана дата закінчення строку продовження дії свідоцтва:</span> {{ transaction.TransactionBody.ProlongationExpiryDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(186) {% trans "Очікувана дата закінчення строку продовження дії свідоцтва" %}:</span> {{ transaction.TransactionBody.ProlongationExpiryDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'InternationalReplacement' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalTerminationByOwner' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'PartialTerminationByOwner' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг обмежено таким:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг обмежено таким" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -113,64 +114,64 @@
                     {% elif transaction|get:"@type" == 'TerminationNoRenewalFee' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalInvalidationByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">Дата, від якої свідоцтво вважається таким, що не набрало чинності:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Дата, від якої свідоцтво вважається таким, що не набрало чинності" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'PartialInvalidationByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва частково:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва частково" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг обмежено таким:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг обмежено таким" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -182,26 +183,26 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'ChangeOwnerByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -211,20 +212,20 @@
                     {% elif transaction|get:"@type" == 'ChangesByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг обмежено таким:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг обмежено таким" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -236,48 +237,48 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalTerminationByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'PartialTerminationByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг обмежено таким:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг обмежено таким" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -289,26 +290,26 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalTransfer' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails.PreviousHolder %}
                                 <li>
-                                    <span class="g-font-weight-600">(770) Ім'я або повне найменування та адреса попереднього власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(770) {% trans "Ім'я або повне найменування та адреса попереднього власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.PreviousHolder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -317,7 +318,7 @@
 
                             {% if transaction.TransactionBody.HolderDetails.NewHolder %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span>
                                     {% for holder in transaction.TransactionBody.HolderDetails.NewHolder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -325,26 +326,26 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails.Decision.Number %}
-                                <li><span class="g-font-weight-600">Реєстраційний номер рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Реєстраційний номер рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'PartialTransfer' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                              {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -353,7 +354,7 @@
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг обмежено таким:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг обмежено таким" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -365,26 +366,26 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails.Decision.Number %}
-                                <li><span class="g-font-weight-600">Реєстраційний номер рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Реєстраційний номер рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'Licence' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.LicensorDetails.Licensor %}
                                 <li>
-                                    <span class="g-font-weight-600">Ім'я або повне найменування та адреса ліцензіара:</span>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіара" %}:</span>
                                     <br>
                                     {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
                                         {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -395,7 +396,7 @@
 
                             {% if transaction.TransactionBody.LicenseeDetails.Licensee %}
                                 <li>
-                                    <span class="g-font-weight-600">Ім'я або повне найменування та адреса ліцензіата:</span>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіата" %}:</span>
                                     <br>
                                     {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
                                         {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
@@ -405,30 +406,30 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.LicenceKind %}
-                                <li><span class="g-font-weight-600">Вид ліцензії:</span> {{ transaction.TransactionBody.LicenceKind  }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Вид ліцензії" %}:</span> {{ transaction.TransactionBody.LicenceKind  }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails.Decision.Number %}
-                                <li><span class="g-font-weight-600">Реєстраційний номер рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Реєстраційний номер рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalTransferInvalidationByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -436,7 +437,7 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'AppealsRefusalByCourt' %}
@@ -444,20 +445,20 @@
                     {% elif transaction|get:"@type" == 'Reclassification' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -470,7 +471,7 @@
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -480,27 +481,27 @@
                     {% elif transaction|get:"@type" == 'Correction' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.PublicationDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">Дата публікації та номер бюлетеня:</span>
+                                    <span class="g-font-weight-600">{% trans "Дата публікації та номер бюлетеня" %}:</span>
                                     {{ transaction.TransactionBody.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}, {{ transaction.TransactionBody.PublicationDetails.Publication.PublicationIdentifier }}
                                 </li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -510,20 +511,20 @@
                     {% elif transaction|get:"@type" == 'TotalTransferCorrection' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -533,52 +534,52 @@
                     {% elif transaction|get:"@type" == 'Duplicate' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'RestoreByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'ChangeGoodsAndServicesByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -590,7 +591,7 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'CourtDecisionCancellation' %}
@@ -600,19 +601,19 @@
                     {% elif transaction|get:"@type" == 'DuplicateByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'PartialInvalidationByAppeal' %}
@@ -620,20 +621,20 @@
                     {% elif transaction|get:"@type" == 'PartialTransferCorrection' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.GoodsServicesDetails %}
                                 <li>
-                                    <span class="g-font-weight-600">(511) Перелік товарів і/або послуг:</span><br>
+                                    <span class="g-font-weight-600">(511) {% trans "Перелік товарів і/або послуг" %}:</span><br>
 
                                     {% for class in transaction.TransactionBody.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                                         <strong>Кл. {{ class.ClassNumber }}:</strong>
@@ -647,38 +648,38 @@
                     {% elif transaction|get:"@type" == 'TotalTerminationCorrection' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.ExpiryDate %}
-                                <li><span class="g-font-weight-600">(181) Дата закінчення строку дії свідоцтва:</span> {{ transaction.TransactionBody.ExpiryDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(181) {% trans "Дата закінчення строку дії свідоцтва" %}:</span> {{ transaction.TransactionBody.ExpiryDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalTransferByCourt' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.HolderDetails.PreviousHolder %}
                                 <li>
-                                    <span class="g-font-weight-600">(770) Ім'я або повне найменування та адреса попереднього власника свідоцтва:</span><br>
+                                    <span class="g-font-weight-600">(770) {% trans "Ім'я або повне найменування та адреса попереднього власника свідоцтва" %}:</span><br>
                                     {% for holder in transaction.TransactionBody.HolderDetails.PreviousHolder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -687,7 +688,7 @@
 
                             {% if transaction.TransactionBody.HolderDetails.NewHolder %}
                                 <li>
-                                    <span class="g-font-weight-600">(732) Ім'я або повне найменування та адреса власника свідоцтва:</span>
+                                    <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span>
                                     {% for holder in transaction.TransactionBody.HolderDetails.NewHolder %}
                                         {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
                                     {% endfor %}
@@ -695,25 +696,25 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span class="g-font-weight-600">Назва суду, номер та дата прийняття рішення:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }};{{ transaction.TransactionBody.DecisionDetails.Decision.Number }};{{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }};{{ transaction.TransactionBody.DecisionDetails.Decision.Number }};{{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'TotalInvalidationByAppeal' %}
                         <ul class="g-pl-20">
                             {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">(111) Номер свідоцтва:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction|get:"@applicationNumber" %}
-                                <li><span class="g-font-weight-600">(210) Номер заявки:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.TerminationDate %}
-                                <li><span class="g-font-weight-600">(141) Дата припинення дії свідоцтва:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% else %}

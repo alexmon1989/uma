@@ -1,4 +1,5 @@
 {% load uma_extras %}
+{% load i18n %}
 
 <div class="table-responsive">
     <table class="table table-bordered table-sm g-font-size-13">
@@ -9,19 +10,19 @@
                     {% if transaction.PUBLICATIONNAME == "Припинення дії свідоцтва на топографію ІМС у зв'язку із закінченням строку дії" %}
                         <ul class="g-pl-20">
                             {% if transaction.BULLETIN %}
-                                <li><span class="g-font-weight-600">Бюлетень:</span> {{ transaction.BULLETIN }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction.BULLETIN }}</li>
                             {% endif %}
 
                             {% if transaction.CERTIFICATENUMBER %}
-                                <li><span class="g-font-weight-600">Номер свідоцтва:</span> {{ transaction.CERTIFICATENUMBER }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Номер свідоцтва" %}:</span> {{ transaction.CERTIFICATENUMBER }}</li>
                             {% endif %}
 
                             {% if transaction.IMCINPUTNUMBER %}
-                                <li><span class="g-font-weight-600">Номер заявки:</span> {{ transaction.IMCINPUTNUMBER }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Номер заявки" %}:</span> {{ transaction.IMCINPUTNUMBER }}</li>
                             {% endif %}
 
                             {% if transaction.IMCDATEFACTSTOP %}
-                                <li><span class="g-font-weight-600">Дата припинення дії:</span> {{ transaction.IMCDATEFACTSTOP|parse_date|date:"d.m.Y" }}</li>
+                                <li><span class="g-font-weight-600">{% trans "Дата припинення дії" %}:</span> {{ transaction.IMCDATEFACTSTOP|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
                     {% else %}
