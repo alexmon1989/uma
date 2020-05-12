@@ -3,7 +3,7 @@ from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
 import os
-from ..search.utils import (filter_bad_apps, sort_results, prepare_data_for_search_report, create_search_res_doc)
+from ..search.utils import sort_results, prepare_data_for_search_report, create_search_res_doc
 from uma.utils import get_unique_filename, get_user_or_anonymous
 
 
@@ -15,7 +15,6 @@ def create_favorites_results_file(user_id, favorites_ids, get_params, lang_code)
         'bool',
         must=[Q('terms', _id=favorites_ids)],
     )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
     if s.count() <= 5000:

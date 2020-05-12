@@ -101,7 +101,7 @@ def documents_count():
     record = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
     doc_count = None
     if record.count() > 0:
-        doc_count = record.first().documents_in_index_shared
+        doc_count = record.first().documents_in_index
     return doc_count or '-'
 
 

@@ -1,11 +1,10 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
 from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
-from ...utils import filter_bad_apps, filter_unpublished_apps, get_registration_status_color
+from ...utils import get_registration_status_color
 import json
 import os.path
 import datetime
@@ -111,7 +110,8 @@ class Command(BaseCommand):
         data = self.get_data_from_json(doc)
 
         res = {}
-        if data is not None:
+        # Проверка не выдан ли патент по заявке
+        if data is not None and not (data.get('Document').get('Status') == 3 and data.get('Claim', {}).get('I_11')):
             # Секция Document
             res['Document'] = data.get('Document')
 
@@ -496,15 +496,9 @@ class Command(BaseCommand):
         self.indexation_process.finish_date = datetime.datetime.now()
 
         qs = Q('query_string', query='*')
-        qs = filter_bad_apps(qs)
         # Количество документов в индексе
         s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
         self.indexation_process.documents_in_index = s.count()
-        # Количество опубликованных документов в индексе
-        # qs = filter_unpublished_apps(AnonymousUser(), qs)
-        # s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
-        # self.indexation_process.documents_in_index_shared = s.count()
-
         self.indexation_process.save()
 
         # Заполнение поля NotificationDate в таблице IPC_AppList

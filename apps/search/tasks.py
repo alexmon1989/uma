@@ -9,11 +9,11 @@ from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings
-from .utils import (prepare_query, filter_bad_apps, filter_unpublished_apps, sort_results, filter_results,
-                    extend_doc_flow, get_search_groups, get_elastic_results, get_search_in_transactions,
-                    get_transactions_types, get_completed_order, create_selection_inv_um_ld, get_data_for_selection_tm,
-                    create_selection_tm, prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs,
-                    sort_doc_flow, filter_app_data)
+from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
+                    get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
+                    create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
+                    prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs, sort_doc_flow,
+                    filter_app_data)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
@@ -80,13 +80,6 @@ def perform_simple_search(user_id, get_params):
                 else:
                     qs = q
 
-    if qs is not None:
-        # Не показывать заявки, по которым выдан охранный документ
-        qs = filter_bad_apps(qs)
-
-        # Не показывать неопубликованные заявки
-        # qs = filter_unpublished_apps(user, qs)
-
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
     # Сортировка
@@ -148,9 +141,6 @@ def get_app_details(id_app_number, user_id):
         'bool',
         must=[Q('match', _id=id_app_number)],
     )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    # Фильтр заявок, которые не положено публиковать в интернет
-    # q = filter_unpublished_apps(user, q)
 
     s = Search().using(client).query(q).execute()
     if not s:
@@ -324,10 +314,6 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
         'bool',
         must=[Q('terms', _id=favorites_ids)],
     )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    # Фильтр заявок, которые не положено публиковать в интернет
-    # q = filter_unpublished_apps(user, q)
-
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
     # Сортировка
@@ -372,10 +358,8 @@ def get_order_documents(user_id, order_id):
         'bool',
         must=[Q('match', _id=order.app_id)],
     )
-    q = filter_bad_apps(q)  # Исключение заявок, не пригодных к отображению
-    # Фильтр заявок, которые не положено публиковать в интернет
+
     user = get_user_or_anonymous(user_id)
-    # q = filter_unpublished_apps(user, q)
 
     s = Search().using(client).query(q).source(['search_data']).execute()
     if not s:
@@ -527,13 +511,6 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                     qs &= q
                 else:
                     qs = q
-
-        if qs is not None:
-            # Не показывать заявки, по которым выдан охранный документ
-            qs = filter_bad_apps(qs)
-
-            # Не показывать неопубликованные заявки
-            # qs = filter_unpublished_apps(user, qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
