@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
-import math
 
 register = template.Library()
 
