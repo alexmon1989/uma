@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
+import math
 
 register = template.Library()
 
@@ -178,7 +179,7 @@ def app_stages_tm(app):
         stages_statuses = ['not-active' for _ in range(6)]
 
         for i, s in enumerate(stages_statuses):
-            if mark_status_code >= (i + 1) * 1000:
+            if mark_status_code >= (i + 2) * 1000:
                 stages_statuses[i] = 'done'
             else:
                 if is_stopped:
@@ -218,7 +219,8 @@ def app_stages_tm(app):
     return {
         'stages': stages,
         'is_stopped': is_stopped,
-        'obj_state': app['search_data']['obj_state']
+        'obj_state': app['search_data']['obj_state'],
+        'mark_status_code': mark_status_code,
     }
 
 
@@ -232,7 +234,7 @@ def app_stages_id(app):
         stages_statuses = ['done' for _ in range(5)]
     else:
         stages_statuses = ['not-active' for _ in range(5)]
-        marks = [1000, 2000, 4000, 5000, 5002]
+        marks = [2000, 4000, 5000, 5002, 6000]
 
         for i, s in enumerate(stages_statuses):
             if design_status_code >= marks[i]:
@@ -271,5 +273,6 @@ def app_stages_id(app):
     return {
         'stages': stages,
         'is_stopped': is_stopped,
-        'app': app
+        'app': app,
+        'design_status_code': design_status_code,
     }
