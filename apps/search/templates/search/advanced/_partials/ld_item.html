@@ -17,9 +17,9 @@
     <div class="g-py-5 d-flex justify-content-between">
         <div class="g-text-underline text-info">
             {% if hit.search_data.obj_state == 1 %}
-                Заявка на топографію (компонування) ІМС
+                {% trans 'Заявка на топографію (компонування) ІМС' %}
             {% else %}
-                Свідоцтво України на топографію (компонування) ІМС
+                {% trans 'Свідоцтво України на топографію (компонування) ІМС' %}
             {% endif %}
         </div>
 
@@ -30,14 +30,14 @@
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Винахідник(и):</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Винахідник(и)' %}:</h4>
             {% for I_72 in biblio_data.I_72|list_of_dicts_unique %}
                 {% if forloop.counter <= 2 %}
                     {{ I_72|get_person_name }} [{{ I_72|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список винахідників"
+                       data-title="{% trans 'Повний список винахідників' %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="
@@ -48,14 +48,14 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявник(и)' %}:</h4>
             {% for I_71 in biblio_data.I_71|list_of_dicts_unique %}
                 {% if forloop.counter <= 2 %}
                     {{ I_71|get_person_name }} [{{ I_71|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список заявників"
+                       data-title="{% trans 'Повний список заявників' %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="
@@ -66,46 +66,46 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявка' %}:</h4>
             <a href="#!"
                class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                data-toggle="tooltip"
                data-placement="top"
-               title="(21) Номер заявки"
+               title="(21) {% trans 'Номер заявки' %}"
             >{{ biblio_data.I_21 }}</a><br>
             <a href="#!"
                class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                data-toggle="tooltip"
                data-placement="bottom"
-               title="(22) Дата подання заявки"
+               title="(22) {% trans 'Дата подання заявки' %}"
             >{{ biblio_data.I_22|parse_date|date:"d.m.Y" }}</a>
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Свідоцтво:</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Свідоцтво' %}:</h4>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="(11) Номер свідоцтва"
+                   title="(11) {% trans 'Номер свідоцтва' %}"
                 >{{ biblio_data.I_11 }}</a><br>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
-                   title="(24) Дата, з якої набирають чинності права, що засвідчуються свідоцтвом"
+                   title="(24) {% trans 'Дата, з якої набирають чинності права, що засвідчуються свідоцтвом' %}"
                 >{{ biblio_data.I_24|parse_date|date:"d.m.Y" }}</a>
             </div>
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Власник(и)' %}:</h4>
                 {% for I_73 in biblio_data.I_73|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
                         {{ I_73|get_person_name }} [{{ I_73|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
                     {% elif forloop.counter == 3 %}
                         <a href="#!"
                            data-toggle="popover"
-                           data-title="Повний список власників"
+                           data-title="{% trans 'Повний список власників' %}"
                            data-html="true"
                            data-trigger="focus"
                            data-content="{% for I_73_ in biblio_data.I_73|list_of_dicts_unique %}{{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]<br>{% endfor %}"

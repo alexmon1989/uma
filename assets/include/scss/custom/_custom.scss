@@ -239,3 +239,166 @@
 .navbar-brand {
     margin-right: 0;
 }
+
+.app-stages {
+  .app-stages__step-list {
+    position: relative;
+    padding-left: 45px;
+    list-style: none;
+  }
+
+  .app-stages__step-list::before {
+    display: inline-block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 10px;
+    height: 100%;
+    border-left: 2px solid #CCC;
+  }
+
+  .app-stages__step-list__item {
+    position: relative;
+    counter-increment: list;
+  }
+
+  .app-stages__step-list__item:not(:last-child) {
+    padding-bottom: 20px;
+  }
+
+  .app-stages__step-list__item::before {
+    display: inline-block;
+    content: '';
+    position: absolute;
+    left: -30px;
+    height: 100%;
+    width: 10px;
+  }
+
+  .app-stages__step-list__item::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: -41px;
+    width: 25px;
+    height: 25px;
+    border: 4px solid #CCC;
+    border-radius: 50%;
+    background-color: #FFF;
+  }
+
+  .app-stages__step-list__item_done::before {
+    border-left: 2px solid $g-color-success;
+  }
+
+  .app-stages__step-list__item_done::after {
+    content: "✔";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-success;
+    background-color: $g-color-success;
+  }
+
+  .app-stages__step-list__item_stopped::before {
+    border-left: 2px solid $g-color-danger;
+  }
+
+  .app-stages__step-list__item_stopped::after {
+    content: "✖";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-danger;
+    background-color: $g-color-danger;
+  }
+
+  .app-stages__step-list__item_current::before {
+    border-left: 2px solid $g-color-primary;
+  }
+
+  .app-stages__step-list__item_current::after {
+    content: "◉";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-primary;
+    background-color: $g-color-primary;
+  }
+
+  .app-stages__step-list-explain {
+    position: relative;
+    padding-left: 45px;
+    list-style: none;
+  }
+
+  .app-stages__step-list-explain::before {
+    display: inline-block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 10px;
+    height: 100%;
+  }
+
+  .app-stages__step-list-explain__item {
+    position: relative;
+    counter-increment: list;
+  }
+
+  .app-stages__step-list-explain__item:not(:last-child) {
+    padding-bottom: 20px;
+  }
+
+  .app-stages__step-list-explain__item::before {
+    display: inline-block;
+    content: '';
+    position: absolute;
+    left: -30px;
+    height: 100%;
+    width: 10px;
+  }
+
+  .app-stages__step-list-explain__item::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: -41px;
+    width: 25px;
+    height: 25px;
+    border: 4px solid #CCC;
+    border-radius: 50%;
+    background-color: #FFF;
+  }
+
+  .app-stages__step-list-explain__item_done::after {
+    content: "✔";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-success;
+    background-color: $g-color-success;
+  }
+
+  .app-stages__step-list-explain__item_stopped::after {
+    content: "✖";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-danger;
+    background-color: $g-color-danger;
+  }
+
+  .app-stages__step-list-explain__item_current::after {
+    content: "◉";
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    border: 4px solid $g-color-primary;
+    background-color: $g-color-primary;
+  }
+}

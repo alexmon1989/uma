@@ -1,6 +1,5 @@
 {% load staticfiles %}
 {% load i18n %}
-{% load uma_extras %}
 
 <section
         class="gradient g-bg-size-cover g-bg-pos-center g-bg-cover g-bg-black-opacity-0_1--after g-color-white g-py-50"
@@ -9,8 +8,10 @@
         <div class="d-sm-flex">
             <div class="align-self-center">
                 <h1 class="h3 g-font-weight-300 w-100 g-mb-10 g-mb-0--md">
-                    {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
-                        {{ hit.biblio_data.I_54.0|get:"I_54.U" }}
+                    {% if hit.search_data.title %}
+                        {{ hit.search_data.title.0 }}
+                    {% else %}
+                        {{ hit.search_data.app_number }}
                     {% endif %}
                 </h1>
 

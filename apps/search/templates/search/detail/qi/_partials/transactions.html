@@ -1,4 +1,5 @@
 {% load uma_extras %}
+{% load i18n %}
 
 <div class="table-responsive">
     <table class="table table-bordered table-sm g-font-size-13">
@@ -7,7 +8,7 @@
                 <th class="g-px-10" width="20%">{{ transaction|get:"@name"|capfirst }}</th>
                 <td>
                     {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                        <span class="g-font-weight-600">Дата публікації та номер бюлетеня:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
+                        <span class="g-font-weight-600">{% trans "Дата публікації та номер бюлетеня" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
                     {% endif %}
                 </td>
             </tr>

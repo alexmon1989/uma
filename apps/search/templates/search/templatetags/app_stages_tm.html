@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div class="app-stages g-brd-around g-brd-gray-light-v4 g-pa-30 g-mb-30">
+    <div class="row">
+        <div class="col-md-7">
+            <p class="g-font-weight-600 g-font-size-16">{% trans 'Стадії' %}</p>
+
+            <ul class="app-stages__step-list g-mb-0">
+                {% for stage in stages %}
+                    <li class="app-stages__step-list__item {% if stage.status == 'done' %}app-stages__step-list__item_done{% elif stage.status == 'current' %}app-stages__step-list__item_current{% elif stage.status == 'stopped' %}app-stages__step-list__item_stopped{% endif %}">
+                        {{ stage.title }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-5">
+            <p class="g-font-weight-600 g-font-size-16 g-mt-30 g-mt-0--md">{% trans 'Позначення' %}</p>
+
+            <ul class="app-stages__step-list-explain g-mb-0">
+                {% if obj_state == 1 %}
+                    {% if is_stopped %}
+                        <li class="app-stages__step-list-explain__item app-stages__step-list-explain__item_stopped">
+                            {% trans 'Стадія, на якій припинено діловодство за заявкою (вважається неподаною, відхиленою, відкликаною; відмовлено в реєстрації)' %}
+                        </li>
+                    {% else %}
+                        <li class="app-stages__step-list-explain__item app-stages__step-list-explain__item_current">
+                            {% trans 'Поточна стадія' %}
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                {% if mark_status_code >= 2000 %}
+                    <li class="app-stages__step-list-explain__item app-stages__step-list-explain__item_done">
+                        {% trans 'Пройдена стадія' %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

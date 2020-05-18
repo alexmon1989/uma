@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from django.db.models import F
+from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
@@ -22,7 +23,7 @@ def get_person_country(value):
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html', takes_context=True)
 def inv_um_item(context, hit, item_num):
-    biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
+    biblio_data = hit.get('Claim') if hit['search_data']['obj_state'] == 1 else hit.get('Patent')
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
@@ -94,16 +95,13 @@ def user_can_watch_docs(user):
     return user.is_superuser or user.groups.filter(name='Посадовці (чиновники)').exists()
 
 
-@register.simple_tag(takes_context=True)
-def documents_count(context):
+@register.simple_tag
+def documents_count():
     """Возвращает количество документов доступных для поиска"""
-    p = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
+    record = IndexationProcess.objects.order_by('-pk').filter(finish_date__isnull=False)
     doc_count = None
-    if p.count() > 0:
-        if context['request'].user.is_anonymous or not context['request'].user.is_vip():
-            doc_count = p.first().documents_in_index_shared
-        else:
-            doc_count = p.first().documents_in_index
+    if record.count() > 0:
+        doc_count = record.first().documents_in_index
     return doc_count or '-'
 
 
@@ -166,3 +164,114 @@ def is_paid_services_enabled():
     """Возвращает значения того включены ли платные услуги."""
     paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
     return paid_services_settings.enabled
+
+
+@register.inclusion_tag('search/templatetags/app_stages_tm.html')
+def app_stages_tm(app):
+    """Отображает стадии заявки (градусник)."""
+    mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+
+    if app['search_data']['obj_state'] == 2:
+        stages_statuses = ['done' for _ in range(6)]
+    else:
+        stages_statuses = ['not-active' for _ in range(6)]
+
+        for i, s in enumerate(stages_statuses):
+            if mark_status_code >= (i + 2) * 1000:
+                stages_statuses[i] = 'done'
+            else:
+                if is_stopped:
+                    stages_statuses[i] = 'not-active'
+                    stages_statuses[i-1] = 'stopped'
+                else:
+                    stages_statuses[i] = 'current'
+                break
+
+    stages = [
+        {
+            'title': _('Знак для товарів і послуг зареєстровано'),
+            'status': stages_statuses[5],
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': stages_statuses[4],
+        },
+        {
+            'title': _('Кваліфікаційна експертиза'),
+            'status': stages_statuses[3],
+        },
+        {
+            'title': _('Формальна експертиза'),
+            'status': stages_statuses[2],
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': stages_statuses[1],
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': stages_statuses[0],
+        },
+    ]
+
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'obj_state': app['search_data']['obj_state'],
+        'mark_status_code': mark_status_code,
+    }
+
+
+@register.inclusion_tag('search/templatetags/app_stages_id.html')
+def app_stages_id(app):
+    """Отображает стадии заявки (градусник)."""
+    design_status_code = int(app['Document'].get('DesignCurrentStatusCodeType', 0))
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+
+    if app['search_data']['obj_state'] == 2:
+        stages_statuses = ['done' for _ in range(5)]
+    else:
+        stages_statuses = ['not-active' for _ in range(5)]
+        marks = [2000, 4000, 5000, 5002, 6000]
+
+        for i, s in enumerate(stages_statuses):
+            if design_status_code >= marks[i]:
+                stages_statuses[i] = 'done'
+            else:
+                if is_stopped:
+                    stages_statuses[i] = 'not-active'
+                    stages_statuses[i-1] = 'stopped'
+                else:
+                    stages_statuses[i] = 'current'
+                break
+
+    stages = [
+        {
+            'title': _('Промисловий зразок зареєстровано'),
+            'status': stages_statuses[4],
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': stages_statuses[3],
+        },
+        {
+            'title': _('Експертиза заявки'),
+            'status': stages_statuses[2],
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': stages_statuses[1],
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': stages_statuses[0],
+        },
+    ]
+
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'app': app,
+        'design_status_code': design_status_code,
+    }

@@ -16,7 +16,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-html="true"
-                   data-content="Заявка на знак для товарів і послуг, за якою не встановлена дата її подання"
+                   data-content="{% trans "Заявка на знак для товарів і послуг, за якою не встановлена дата її подання" %}"
                 ><i class="fa fa-question-circle"></i></a>
             {% endif %}
         </div>
@@ -27,9 +27,9 @@
     <div class="g-py-5 d-flex justify-content-between">
         <div class="g-text-underline text-info">
             {% if hit.search_data.obj_state == 1 %}
-                Заявка на знак для товарів та послуг
+                {% trans "Заявка на знак для товарів та послуг" %}
             {% else %}
-                Свідоцтво України на знак для товарів та послуг
+                {% trans "Свідоцтво України на знак для товарів та послуг" %}
             {% endif %}
         </div>
 
@@ -40,14 +40,14 @@
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявник(и):</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
             {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                 {% if forloop.counter <= 2 %}
                     {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
                 {% elif forloop.counter == 3 %}
                     <a href="#!"
                        data-toggle="popover"
-                       data-title="Повний список заявників"
+                       data-title="{% trans "Повний список заявників" %}"
                        data-html="true"
                        data-trigger="focus"
                        data-content="
@@ -58,51 +58,51 @@
         </div>
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Заявка:</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявка" %}:</h4>
             <a href="#!"
                class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                data-toggle="tooltip"
                data-placement="top"
-               title="(210) Номер заявки"
+               title="(210) {% trans "Номер заявки" %}"
             >{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</a><br>
             {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
-                   title="(220) Дата подання заявки"
+                   title="(220) {% trans "Дата подання заявки" %}"
                 >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
             {% endif %}
         </div>
 
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Свідоцтво:</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Свідоцтво" %}:</h4>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="(111) Номер реєстрації знака, який є номером свідоцтва"
+                   title="(111) {% trans "Номер реєстрації знака, який є номером свідоцтва" %}"
                 >{{ hit.TradeMark.TrademarkDetails.RegistrationNumber }}</a><br>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
-                   title="(151) Дата реєстрації знака"
+                   title="(151) {% trans "Дата реєстрації знака" %}"
                 >{{ hit.TradeMark.TrademarkDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</a>
             </div>
         {% endif %}
 
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Власник(и):</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
                 {% for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
                     {% if forloop.counter <= 2 %}
                         {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
                     {% elif forloop.counter == 3 %}
                         <a href="#!"
                            data-toggle="popover"
-                           data-title="Повний список власників"
+                           data-title="{% trans "Повний список власників" %}"
                            data-html="true"
                            data-trigger="focus"
                            data-content="
@@ -114,7 +114,7 @@
         {% endif %}
 
         <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">Індекси <abbr title="Міжнародної класифікації товарів і послуг для реєстрації знаків та перелік товарів і послуг">МКТП</abbr>:</h4>
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0"><abbr title="{% trans "Міжнародна класифікація товарів і послуг для реєстрації знаків та перелік товарів і послуг" %}">{% trans "МКТП" %}</abbr>:</h4>
             {% for index in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                 {{ index.ClassNumber }}{% if not forloop.last %}, {% endif %}
             {% endfor %}

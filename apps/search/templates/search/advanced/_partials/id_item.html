@@ -8,7 +8,7 @@
             {{ item_num }}.
             <a href="{% url 'search:detail' pk=hit.meta.id %}"
                class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
-            >{{ hit.search_data.title }}</a>
+            >{% if hit.search_data.title %}{{ hit.search_data.title }}{% else %}{{ hit.search_data.app_number }}{% endif %}</a>
         </div>
 
         {% include 'search/advanced/_partials/favorites_icon.html' %}
@@ -29,99 +29,108 @@
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
-        <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявник(и)' %}:</h4>
-            {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
-                {% if forloop.counter <= 2 %}
-                    {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
-                {% elif forloop.counter == 3 %}
-                    <a href="#!"
-                       data-toggle="popover"
-                       data-title="{% trans 'Повний список заявників' %}"
-                       data-html="true"
-                       data-trigger="focus"
-                       data-content="
-                               {% for applicant_ in hit.Design.DesignDetails.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
-                    >(+{{ hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
-                {% endif %}
-            {% endfor %}
-        </div>
 
-        <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявка' %}:</h4>
-            <a href="#!"
-               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
-               data-toggle="tooltip"
-               data-placement="top"
-               title="(21) {% trans 'Номер заявки' %}"
-            >{{ hit.Design.DesignDetails.DesignApplicationNumber }}</a><br>
-            <a href="#!"
-               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
-               data-toggle="tooltip"
-               data-placement="bottom"
-               title="(22) {% trans 'Дата подання заявки' %}"
-            >{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</a>
-        </div>
-
-        {% if hit.search_data.obj_state == 2 %}
+        {% if not hit.Design.DesignDetails %}
+        {# Заявка без права просмотра библиографических данных #}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Патент' %}:</h4>
+                <p class="g-font-weight-600 g-mb-0 text-danger">{% trans "Для даної заявки можливий перегляд лише її стану діловодства." %}</p>
+            </div>
+
+        {% else %}
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявник(и)' %}:</h4>
+                {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+                    {% if forloop.counter <= 2 %}
+                        {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                    {% elif forloop.counter == 3 %}
+                        <a href="#!"
+                           data-toggle="popover"
+                           data-title="{% trans 'Повний список заявників' %}"
+                           data-html="true"
+                           data-trigger="focus"
+                           data-content="
+                                   {% for applicant_ in hit.Design.DesignDetails.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                        >(+{{ hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявка' %}:</h4>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="(11) {% trans 'Номер реєстрації, який є номером патенту' %}"
-                >{{ hit.Design.DesignDetails.RegistrationNumber }}</a><br>
+                   title="(21) {% trans 'Номер заявки' %}"
+                >{{ hit.Design.DesignDetails.DesignApplicationNumber }}</a><br>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
-                   title="(24) {% trans 'Дата, з якої є чинними права на промисловий зразок' %}"
-                >{{ hit.Design.DesignDetails.RecordEffectiveDate|parse_date|date:"d.m.Y" }}</a>
+                   title="(22) {% trans 'Дата подання заявки' %}"
+                >{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</a>
             </div>
-        {% endif %}
 
-        {% if hit.search_data.obj_state == 2 %}
+            {% if hit.search_data.obj_state == 2 %}
+                <div class="col-md">
+                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Патент' %}:</h4>
+                    <a href="#!"
+                       class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       title="(11) {% trans 'Номер реєстрації, який є номером патенту' %}"
+                    >{{ hit.Design.DesignDetails.RegistrationNumber }}</a><br>
+                    <a href="#!"
+                       class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                       data-toggle="tooltip"
+                       data-placement="bottom"
+                       title="(24) {% trans 'Дата, з якої є чинними права на промисловий зразок' %}"
+                    >{{ hit.Design.DesignDetails.RecordEffectiveDate|parse_date|date:"d.m.Y" }}</a>
+                </div>
+            {% endif %}
+
+            {% if hit.search_data.obj_state == 2 %}
+                <div class="col-md">
+                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Власник(и)' %}:</h4>
+                    {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
+                        {% if forloop.counter <= 2 %}
+                            {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                        {% elif forloop.counter == 3 %}
+                            <a href="#!"
+                               data-toggle="popover"
+                               data-title="{% trans 'Повний список власників' %}"
+                               data-html="true"
+                               data-trigger="focus"
+                               data-content="
+                                       {% for holder_ in hit.Design.DesignDetails.HolderDetails.Holder %}{{ holder_.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder_.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                            >(+{{ hit.TradeMark.TrademarkDetails.HolderDetails.Holder|length|add:"-2" }})</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Власник(и)' %}:</h4>
-                {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
-                    {% if forloop.counter <= 2 %}
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
-                    {% elif forloop.counter == 3 %}
-                        <a href="#!"
-                           data-toggle="popover"
-                           data-title="{% trans 'Повний список власників' %}"
-                           data-html="true"
-                           data-trigger="focus"
-                           data-content="
-                                   {% for holder_ in hit.Design.DesignDetails.HolderDetails.Holder %}{{ holder_.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder_.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
-                        >(+{{ hit.TradeMark.TrademarkDetails.HolderDetails.Holder|length|add:"-2" }})</a>
-                    {% endif %}
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Індекси' %} <abbr title="{% trans 'Міжнародна класифікація промислових зразків' %}">{% trans 'МКПЗ' %}</abbr>:</h4>
+                {% for index in hit.Design.DesignDetails.IndicationProductDetails %}
+                    {{ index.Class }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </div>
+
+            <div class="col-md-3">
+                <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                   href="javascript:;"
+                   data-src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}">
+                    <img class="img-fluid img-thumbnail"
+                         src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}"
+                         alt="">
+
+                    <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                        <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                    </span>
+                </a>
+                <div class="text-center">1.1</div>
+            </div>
+
         {% endif %}
-
-        <div class="col-md">
-            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Індекси' %} <abbr title="{% trans 'Міжнародна класифікація промислових зразків' %}">{% trans 'МКПЗ' %}</abbr>:</h4>
-            {% for index in hit.Design.DesignDetails.IndicationProductDetails %}
-                {{ index.Class }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </div>
-
-        <div class="col-md-3">
-            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
-               href="javascript:;"
-               data-src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}">
-                <img class="img-fluid img-thumbnail"
-                     src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}"
-                     alt="">
-
-                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
-                    <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
-                </span>
-            </a>
-            <div class="text-center">1.1</div>
-        </div>
-
     </div>
 </div>

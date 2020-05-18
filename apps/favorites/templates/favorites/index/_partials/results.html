@@ -1,72 +1,64 @@
 {% load i18n %}
 {% load search_extras %}
 
-{% if validation_errors %}
-    <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
-{% else %}
-    {% if results %}
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between g-mb-30">
-                    <div class="align-self-center h-100">
-                        <div class="g-font-weight-600 text-uppercase">
-                            {% trans "Всього результатів" %}:<span class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span>
-                        </div>
-                    </div>
-                    <div class="align-self-center">
-                        <a class="btn u-btn-bluegray" href="{% url 'favorites:clear' %}"><i class="fa fa-eraser"></i> {% trans 'Очистити все' %}</a>
+{% if results %}
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between g-mb-30">
+                <div class="align-self-center h-100">
+                    <div class="g-font-weight-600 text-uppercase">
+                        {% trans "Всього результатів" %}:<span class="g-color-gray-dark-v1">&nbsp;{{ results.paginator.count }}</span>
                     </div>
                 </div>
-
-                <div class="d-flex flex-column flex-lg-row justify-content-lg-between g-mb-20">
-                    {% sort_params %}
-
-                    <div class="d-flex justify-content-between">
-                        <div class="g-mr-10 align-self-center g-font-weight-600">{% trans "Відображати на сторінці" %}:</div>
-                        <div>
-                            <select class="custom-select rounded-0" id="show">
-                                <option value="10" {% if not get_params.show or get_params.show.0|add:"0" <= 10 %}selected=""{% endif %}>10</option>
-                                <option value="20" {% if get_params.show.0|add:"0" == 20 %}selected=""{% endif %}>20</option>
-                                <option value="50" {% if get_params.show.0|add:"0" == 50 %}selected=""{% endif %}>50</option>
-                                <option value="100" {% if get_params.show.0|add:"0" >= 100 %}selected=""{% endif %}>100</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="align-self-center">
+                    <a class="btn u-btn-bluegray" href="{% url 'favorites:clear' %}"><i class="fa fa-eraser"></i> {% trans 'Очистити все' %}</a>
                 </div>
-
-                {% include 'favorites/index/_partials/pagination.html' %}
-
-                {% for hit in results %}
-                    {# Изобретения, полезные модели #}
-                    {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
-                        {% inv_um_item hit forloop.counter0|add:results.start_index %}
-                    {# Топографии #}
-                    {% elif hit.Document.idObjType == 3 %}
-                        {% ld_item hit forloop.counter0|add:results.start_index %}
-                    {# Знаки для товаров и услуг #}
-                    {% elif hit.Document.idObjType == 4 %}
-                        {% tm_item hit forloop.counter0|add:results.start_index %}
-                    {# КЗПТ #}
-                    {% elif hit.Document.idObjType == 5 %}
-                        {% qi_item hit forloop.counter0|add:results.start_index %}
-                    {# Пром. образец #}
-                    {% elif hit.Document.idObjType == 6 %}
-                        {% id_item hit forloop.counter0|add:results.start_index %}
-                    {% endif %}
-                {% endfor %}
-
-                {% include 'favorites/index/_partials/pagination.html' %}
             </div>
+
+            <div class="d-flex flex-column flex-lg-row justify-content-lg-between g-mb-20">
+                {% sort_params %}
+
+                <div class="d-flex justify-content-between">
+                    <div class="g-mr-10 align-self-center g-font-weight-600">{% trans "Відображати на сторінці" %}:</div>
+                    <div>
+                        <select class="custom-select rounded-0" id="show">
+                            <option value="10" {% if not get_params.show or get_params.show.0|add:"0" <= 10 %}selected=""{% endif %}>10</option>
+                            <option value="20" {% if get_params.show.0|add:"0" == 20 %}selected=""{% endif %}>20</option>
+                            <option value="50" {% if get_params.show.0|add:"0" == 50 %}selected=""{% endif %}>50</option>
+                            <option value="100" {% if get_params.show.0|add:"0" >= 100 %}selected=""{% endif %}>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'favorites/index/_partials/import_results_btn.html' %}
+
+            {% include 'favorites/index/_partials/pagination.html' %}
+
+            {% for hit in results %}
+                {# Изобретения, полезные модели #}
+                {% if hit.Document.idObjType == 1 or hit.Document.idObjType == 2 %}
+                    {% inv_um_item hit forloop.counter0|add:results.start_index %}
+                {# Топографии #}
+                {% elif hit.Document.idObjType == 3 %}
+                    {% ld_item hit forloop.counter0|add:results.start_index %}
+                {# Знаки для товаров и услуг #}
+                {% elif hit.Document.idObjType == 4 %}
+                    {% tm_item hit forloop.counter0|add:results.start_index %}
+                {# КЗПТ #}
+                {% elif hit.Document.idObjType == 5 %}
+                    {% qi_item hit forloop.counter0|add:results.start_index %}
+                {# Пром. образец #}
+                {% elif hit.Document.idObjType == 6 %}
+                    {% id_item hit forloop.counter0|add:results.start_index %}
+                {% endif %}
+            {% endfor %}
+
+            {% include 'favorites/index/_partials/pagination.html' %}
         </div>
-    {% else %}
-        <div class="g-mt-10">
-            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
-                    data-target="#collapseForm"
-                    aria-expanded="false"
-                    aria-controls="collapseExample">
-                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-            </button>
-            <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
-        </div>
-    {% endif %}
+    </div>
+{% else %}
+    <div class="g-mt-10">
+        <p class="lead">{% trans "Результати відсутні" %}</p>
+    </div>
 {% endif %}

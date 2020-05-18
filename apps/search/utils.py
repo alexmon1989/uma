@@ -120,9 +120,6 @@ def get_elastic_results(search_groups, user):
             if qs is not None:
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
-                qs = filter_bad_apps(qs)
-                qs = filter_unpublished_apps(user, qs)
-
                 qs_list.append(qs)
 
     # Формирование результирующего запроса
@@ -196,10 +193,10 @@ def filter_unpublished_apps(user, qs):
         return qs
 
     """Фильтры для обычных пользователей."""
-    # Не показывать заявки по пром. образцам и полезным моделям
-    filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND (Document.idObjType:2 OR Document.idObjType:6)")
+    # Не показывать заявки по полезным моделям
+    # filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND Document.idObjType:2")
 
-    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
+    # paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
 
     """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
     # if not paid_services_settings.enabled:
@@ -207,13 +204,13 @@ def filter_unpublished_apps(user, qs):
     #     filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
 
     # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
-    filter_qs &= Q(
-        'query_string',
-        query="_exists_:search_data.app_date OR Document.idObjType:5 "
-              "OR (NOT _exists_:search_data.app_date AND Document.MarkCurrentStatusCodeType:1000)"
-    )
+    # filter_qs = Q(
+    #     'query_string',
+    #     query="_exists_:search_data.app_date OR Document.idObjType:5 "
+    #           "OR (NOT _exists_:search_data.app_date AND Document.MarkCurrentStatusCodeType:1000)"
+    # )
     # Для заявок на изобретения нужно чтоб существовал I_43.D
-    filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
+    # filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
     # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
     # filter_qs &= ~Q(
     #     'query_string',
@@ -223,16 +220,16 @@ def filter_unpublished_apps(user, qs):
     #           "AND NOT Document.MarkCurrentStatusCodeType:1000"
     # )
 
-    try:
-        # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
-        user_name = user.certificateowner.pszSubjFullName.strip()
-        qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
-              | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
-              | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
-              | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
-    except (get_user_model().certificateowner.RelatedObjectDoesNotExist, AttributeError):
-        # Для обычных пользователей без ЭЦП или анонимных пользователей применяются все фильтры
-        qs &= filter_qs
+    # try:
+    #     # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
+    #     user_name = user.certificateowner.pszSubjFullName.strip()
+    #     qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
+    #           | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
+    #           | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
+    #           | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
+    # except (get_user_model().certificateowner.RelatedObjectDoesNotExist, AttributeError):
+    #     # Для обычных пользователей без ЭЦП или анонимных пользователей применяются все фильтры
+    #     qs &= filter_qs
 
     return qs
 
@@ -1261,81 +1258,54 @@ def prepare_data_for_search_report(s, lang_code, user=None):
     for h in s.params(size=1000, preserve_order=True).scan():
         obj_type = obj_types[h.Document.idObjType - 1]
         obj_state = obj_states[h.search_data.obj_state - 1]
-        app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
-            if h.search_data.app_date else ''
-        rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
-            '%d.%m.%Y') if h.search_data.rights_date else ''
-        title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-        if hasattr(h.search_data, 'inventor'):
-            applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                h.search_data.applicant) else h.search_data.applicant
-        else:
-            applicant = ''
-        owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-        if hasattr(h.search_data, 'inventor'):
-            inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                h.search_data.inventor) else h.search_data.inventor
-        else:
-            inventor = ''
-        agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
 
-        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-        # if h.Document.idObjType == 4 and h.search_data.obj_state == 1:
-        #     if user and user_has_access_to_tm_app(user, h):
-        #         data.append([
-        #             obj_type,
-        #             obj_state,
-        #             h.search_data.app_number,
-        #             app_date,
-        #             h.search_data.protective_doc_number,
-        #             rights_date,
-        #             title,
-        #             applicant,
-        #             owner,
-        #             inventor,
-        #             agent,
-        #         ])
-        #     else:
-        #         data.append([
-        #             obj_type,
-        #             obj_state,
-        #             h.search_data.app_number,
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #             '',
-        #         ])
-        # else:
-        #     data.append([
-        #         obj_type,
-        #         obj_state,
-        #         h.search_data.app_number,
-        #         app_date,
-        #         h.search_data.protective_doc_number,
-        #         rights_date,
-        #         title,
-        #         applicant,
-        #         owner,
-        #         inventor,
-        #         agent,
-        #     ])
-        data.append([
+        if is_app_limited(h.to_dict(), user):
+            # Если библиографические данные заявки не публикуются
+            data.append([
                 obj_type,
                 obj_state,
                 h.search_data.app_number,
-                app_date,
-                h.search_data.protective_doc_number,
-                rights_date,
-                title,
-                applicant,
-                owner,
-                inventor,
-                agent,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
             ])
+        else:
+            app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
+                if h.search_data.app_date else ''
+            rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
+                '%d.%m.%Y') if h.search_data.rights_date else ''
+            title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
+            if hasattr(h.search_data, 'inventor'):
+                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
+                    h.search_data.applicant) else h.search_data.applicant
+            else:
+                applicant = ''
+            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
+            if hasattr(h.search_data, 'inventor'):
+                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
+                    h.search_data.inventor) else h.search_data.inventor
+            else:
+                inventor = ''
+            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+
+            data.append([
+                    obj_type,
+                    obj_state,
+                    h.search_data.app_number,
+                    app_date,
+                    h.search_data.protective_doc_number,
+                    rights_date,
+                    title,
+                    applicant,
+                    owner,
+                    inventor,
+                    agent,
+                ])
 
     return data
 
@@ -1554,7 +1524,63 @@ def filter_app_data(app_data, user):
     #     }})
     #     return res
     # return app_data
+
+    # Если это заявка на полезную модель или пром образец,
+    # то необходимо убрать всю "закрытую" информацию
+    # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
+    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+
+        if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'DOCFLOW': app_data.get('DOCFLOW'),
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
+            }
+            return res
+
+        elif app_data['Document']['idObjType'] == 2:  # Полезные модели
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'DOCFLOW': app_data.get('DOCFLOW'),
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
+            }
+            return res
+
+        elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'Design': {
+                    'DocFlow': app_data['Design'].get('DocFlow')
+                },
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
+            }
+            return res
+
     return app_data
+
+
+def is_app_limited(app_data, user):
+    """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
+    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+        if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
+            return True
+        elif app_data['Document']['idObjType'] == 2:  # Полезные модели
+            return True
+        elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
+            return True
+    return False
 
 
 def get_ipc_codes_with_schedules(lang_code):
