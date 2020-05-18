@@ -30,9 +30,11 @@
                     {% endif %}
                 {% endif %}
 
-                <li class="app-stages__step-list-explain__item app-stages__step-list-explain__item_done">
-                    {% trans 'Пройдена стадія' %}
-                </li>
+                {% if mark_status_code >= 2000 %}
+                    <li class="app-stages__step-list-explain__item app-stages__step-list-explain__item_done">
+                        {% trans 'Пройдена стадія' %}
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
