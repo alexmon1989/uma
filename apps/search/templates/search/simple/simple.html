@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load search_extras %}
+{% load static %}
 
 {% block title %}{% trans "Простий пошук" %}{% endblock %}
 
@@ -37,7 +38,14 @@
                             aria-controls="collapseExample">
                         <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
                     </button>
-                    <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається формування результатів" %}<loading-dots></loading-dots></p>
+
+                    <div class="g-pos-rel g-min-height-200">
+                        <div class="overlay g-bg-white" id="overlay">
+                            <div class="overlay-content">
+                                <img src="{% static 'img/preloaders/loading.svg' %}" alt="Loading..."/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}
