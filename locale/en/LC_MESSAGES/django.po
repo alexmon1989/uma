@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-08 16:55+0300\n"
+"POT-Creation-Date: 2020-05-19 14:51+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -376,11 +376,7 @@ msgstr "Display on page"
 msgid "Результати відсутні"
 msgstr "No results"
 
-#: apps/favorites/templates/favorites/index/index.html:16
-msgid "Зачекайте, відбувається отримання даних"
-msgstr "Please, wait for data loading"
-
-#: apps/favorites/templates/favorites/index/index.html:19
+#: apps/favorites/templates/favorites/index/index.html:25
 #, python-format
 msgid ""
 "Список вибраних документів поки що порожній. Ви можете здійснити <a href="
@@ -457,42 +453,42 @@ msgstr "There is no information."
 msgid "Авторизація"
 msgstr "Authorization"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:34
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:39
 msgid "Оберіть ЦСК"
 msgstr "Select key certification center"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:42
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:49
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:47
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:54
 msgid "Особистий ключ"
 msgstr "Personal key"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:53
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:74
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:58
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:79
 msgid "Огляд"
 msgstr "Browse"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:63
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:70
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:68
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:75
 msgid "Сертифікат(и)"
 msgstr "Certificate(s)"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:78
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:83
 msgid "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)"
 msgstr ""
 "Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:85
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:90
 msgid "Пароль захисту ключа"
 msgstr "Key password"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:103
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:108
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:72
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:77
 msgid "Запам'ятати"
 msgstr "Remember me"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:110
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:111
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:115
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:116
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
 #: templates/_partials/header.html:181
@@ -529,14 +525,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:61
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1255
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:56 apps/search/admin.py:108
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1255
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -548,13 +544,13 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/tasks.py:43 apps/search/tasks.py:200 apps/search/tasks.py:260
+#: apps/search/tasks.py:43 apps/search/tasks.py:190 apps/search/tasks.py:250
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/advanced/_partials/breadcrumbs.html:24
-#: apps/search/templates/search/advanced/advanced.html:6
+#: apps/search/templates/search/advanced/advanced.html:7
 #: templates/_partials/footer.html:43 templates/_partials/header.html:54
 msgid "Розширений пошук"
 msgstr "Advanced search"
@@ -677,7 +673,7 @@ msgstr "Full list of applicants"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:659
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
-#: apps/search/utils.py:1234
+#: apps/search/utils.py:1231
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -686,7 +682,7 @@ msgstr "Application number"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:73
-#: apps/search/utils.py:1235
+#: apps/search/utils.py:1232
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -895,13 +891,12 @@ msgstr "Registration date"
 #: apps/search/templates/search/advanced/_partials/results.html:10
 #: apps/search/templates/search/advanced/_partials/results.html:24
 #: apps/search/templates/search/advanced/_partials/results.html:85
-#: apps/search/templates/search/advanced/advanced.html:41
+#: apps/search/templates/search/advanced/advanced.html:42
 #: apps/search/templates/search/simple/_partials/results.html:10
 #: apps/search/templates/search/simple/_partials/results.html:24
 #: apps/search/templates/search/simple/_partials/results.html:87
-#: apps/search/templates/search/simple/simple.html:38
-#: apps/search/templates/search/transactions/_partials/results.html:65
-#: apps/search/templates/search/transactions/index.html:16
+#: apps/search/templates/search/simple/simple.html:39
+#: apps/search/templates/search/transactions/index.html:17
 msgid "Показати умови пошуку"
 msgstr "Show search conditions"
 
@@ -913,7 +908,7 @@ msgstr "Wrong search params!"
 
 #: apps/search/templates/search/advanced/_partials/results.html:87
 #: apps/search/templates/search/simple/_partials/results.html:89
-#: apps/search/templates/search/transactions/_partials/results.html:67
+#: apps/search/templates/search/transactions/_partials/results.html:61
 msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
 msgstr "No results"
 
@@ -1010,8 +1005,8 @@ msgstr ""
 msgid "МКТП"
 msgstr "ICGS"
 
-#: apps/search/templates/search/advanced/advanced.html:21
-#: apps/search/templates/search/simple/simple.html:20
+#: apps/search/templates/search/advanced/advanced.html:22
+#: apps/search/templates/search/simple/simple.html:21
 #, fuzzy, python-format
 #| msgid ""
 #| "\n"
@@ -1030,12 +1025,6 @@ msgstr ""
 "Service allows searching for <strong>%(document_count)s</strong> patent "
 "documents. Detailed information of the database scope can be obtained <a "
 "href=\"#\">here</a>"
-
-#: apps/search/templates/search/advanced/advanced.html:43
-#: apps/search/templates/search/simple/simple.html:40
-#: apps/search/templates/search/transactions/index.html:27
-msgid "Зачекайте, відбувається формування результатів"
-msgstr "Please, wait for result creating..."
 
 #: apps/search/templates/search/detail/_partials/biblio_header.html:4
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:14
@@ -1062,10 +1051,6 @@ msgstr "information service agreement"
 #: apps/search/templates/search/detail/detail.html:5
 msgid "Детальна інформація по об'єкту"
 msgstr "Object details"
-
-#: apps/search/templates/search/detail/detail.html:18
-msgid "Зачекайте, відбувається отримання даних об'єкта"
-msgstr "Please, wait for data loading"
 
 #: apps/search/templates/search/detail/document_pdf.html:13
 msgid "Ваш браузер не підтримує PDF"
@@ -1109,7 +1094,7 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:28
 #: apps/search/templates/search/detail/id/detail.html:39
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:71
-#: apps/search/templates/search/detail/inv_um/detail.html:85
+#: apps/search/templates/search/detail/inv_um/detail.html:87
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:71
 #: apps/search/templates/search/detail/ld/detail.html:85
 #: apps/search/templates/search/detail/qi/_partials/sidebar.html:21
@@ -1609,14 +1594,14 @@ msgstr "Reason"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:439
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:483
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:525
-#: apps/search/utils.py:1241
+#: apps/search/utils.py:1238
 msgid "Винахідник"
 msgstr "Inventor"
 
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1240
+#: apps/search/utils.py:1237
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -1809,22 +1794,25 @@ msgstr "Expiration date of the certificate"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
-#: apps/search/templates/search/simple/simple.html:6
+#: apps/search/templates/search/simple/simple.html:7
 #: templates/_partials/footer.html:37 templates/_partials/header.html:51
 msgid "Простий пошук"
 msgstr "Simple search"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:7
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:6
 #: apps/search/templates/search/templatetags/app_stages_tm.html:6
 msgid "Стадії"
 msgstr "Stages"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:19
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:18
 #: apps/search/templates/search/templatetags/app_stages_tm.html:18
 msgid "Позначення"
 msgstr "Legend"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:25
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:24
 #: apps/search/templates/search/templatetags/app_stages_tm.html:24
 msgid ""
 "Стадія, на якій припинено діловодство за заявкою (вважається неподаною, "
@@ -1834,14 +1822,20 @@ msgstr ""
 "filed, rejected, withdrawn, refused registration)"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:29
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:28
 #: apps/search/templates/search/templatetags/app_stages_tm.html:28
 msgid "Поточна стадія"
 msgstr "Current stage"
 
-#: apps/search/templates/search/templatetags/app_stages_id.html:35
-#: apps/search/templates/search/templatetags/app_stages_tm.html:34
+#: apps/search/templates/search/templatetags/app_stages_id.html:36
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:34
+#: apps/search/templates/search/templatetags/app_stages_tm.html:35
 msgid "Пройдена стадія"
-msgstr "Passed"
+msgstr "Passed stage"
+
+#: apps/search/templates/search/templatetags/app_stages_inv_um.html:39
+msgid "Стадія, що не використовується у діловодстві за заявкою"
+msgstr "The stage, which is not used in the prosecution of the application"
 
 #: apps/search/templates/search/templatetags/registration_status.html:7
 msgid "Патент діє"
@@ -1881,7 +1875,7 @@ msgid "Релевантністю"
 msgstr "Relevance"
 
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:10
-#: apps/search/templates/search/transactions/index.html:5
+#: apps/search/templates/search/transactions/index.html:6
 #: templates/_partials/footer.html:49 templates/_partials/header.html:57
 msgid "Пошук по сповіщенням"
 msgstr "Transaction search"
@@ -1895,25 +1889,29 @@ msgid "Знак для товарів і послуг зареєстровано
 msgstr "Registered trade mark"
 
 #: apps/search/templatetags/search_extras.py:197
-#: apps/search/templatetags/search_extras.py:254
+#: apps/search/templatetags/search_extras.py:255
+#: apps/search/templatetags/search_extras.py:322
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
 #: apps/search/templatetags/search_extras.py:201
+#: apps/search/templatetags/search_extras.py:334
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
 #: apps/search/templatetags/search_extras.py:205
+#: apps/search/templatetags/search_extras.py:345
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
 #: apps/search/templatetags/search_extras.py:209
-#: apps/search/templatetags/search_extras.py:262
+#: apps/search/templatetags/search_extras.py:263
+#: apps/search/templatetags/search_extras.py:351
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
 #: apps/search/templatetags/search_extras.py:213
-#: apps/search/templatetags/search_extras.py:266
+#: apps/search/templatetags/search_extras.py:267
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1921,39 +1919,59 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/templatetags/search_extras.py:250
+#: apps/search/templatetags/search_extras.py:251
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/templatetags/search_extras.py:258
+#: apps/search/templatetags/search_extras.py:259
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/utils.py:1232
+#: apps/search/templatetags/search_extras.py:316
+msgid "Патент зареєстровано"
+msgstr "Patent registered"
+
+#: apps/search/templatetags/search_extras.py:328
+msgid "Очікування документа про сплату державного мита"
+msgstr "Waiting for documents on the payment of the fees"
+
+#: apps/search/templatetags/search_extras.py:339
+msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
+msgstr "Waiting for request for conducting substantive examination"
+
+#: apps/search/templatetags/search_extras.py:358
+msgid ""
+"Реєстрація первинних документів, попередня експертиза та введення відомостей "
+"до бази дани"
+msgstr ""
+"Registration of primary documents, preliminary examination and entering data "
+"into database"
+
+#: apps/search/utils.py:1229
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1233
+#: apps/search/utils.py:1230
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1236
+#: apps/search/utils.py:1233
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1237
+#: apps/search/utils.py:1234
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1238
+#: apps/search/utils.py:1235
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1239
+#: apps/search/utils.py:1236
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1242
+#: apps/search/utils.py:1239
 msgid "Представник"
 msgstr "Presenter"
 
@@ -2024,6 +2042,15 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Зачекайте, відбувається отримання даних"
+#~ msgstr "Please, wait for data loading"
+
+#~ msgid "Зачекайте, відбувається формування результатів"
+#~ msgstr "Please, wait for result creating..."
+
+#~ msgid "Зачекайте, відбувається отримання даних об'єкта"
+#~ msgstr "Please, wait for data loading"
 
 #, fuzzy
 #~| msgid "Номер заявки"
