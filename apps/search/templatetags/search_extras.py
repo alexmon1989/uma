@@ -168,7 +168,7 @@ def is_paid_services_enabled():
 
 @register.inclusion_tag('search/templatetags/app_stages_tm.html')
 def app_stages_tm(app):
-    """Отображает стадии заявки (градусник)."""
+    """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
     mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
 
@@ -225,7 +225,7 @@ def app_stages_tm(app):
 
 @register.inclusion_tag('search/templatetags/app_stages_id.html')
 def app_stages_id(app):
-    """Отображает стадии заявки (градусник)."""
+    """Отображает стадии заявки (градусник) для пром. образцов."""
     design_status_code = int(app['Document'].get('DesignCurrentStatusCodeType', 0))
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
 
@@ -274,4 +274,108 @@ def app_stages_id(app):
         'is_stopped': is_stopped,
         'app': app,
         'design_status_code': design_status_code,
+    }
+
+
+@register.inclusion_tag('search/templatetags/app_stages_inv_um.html')
+def app_stages_inv_um(app):
+    """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""
+    # Состояние делопроизводства
+    is_stopped = False
+    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']]
+
+    # Признаки того что делопроизводство остановлено
+    for x in ['[В11]', '[В5]', '[В5а]', '[В5д]', '[В12]', '[В5б]', '[В16]', '[В10]']:
+        for doc_type in doc_types:
+            if x in doc_type:
+                is_stopped = True
+
+    # Признаки того что делопроизводство возобновлено
+    if is_stopped:
+        for x in ['[В21а]', '[В21]', '[В22]']:
+            for doc_type in doc_types:
+                if x in doc_type:
+                    is_stopped = False
+
+    # Пройденные стадии
+    done_stages = list()
+    for stage in app['DOCFLOW']['STAGES']:
+        # Если формальная експертиза без даты завершения, то необходимо считать это текущей стадией
+        if stage['STAGERECORD']['STAGE'] == 'Формальна експертиза заявок на винаходи і корисні моделі' \
+                and not stage['STAGERECORD'].get('ENDDATE'):
+            continue
+        else:
+            done_stages.append(stage['STAGERECORD']['STAGE'])
+
+    # Коды сборов
+    cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
+
+    # Стадии делопроизводства по заявке
+    stages = [
+        {
+            'title': _('Патент зареєстровано'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Підтримка чинності' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Підготовка заявки до реєстрації патенту' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Очікування документа про сплату державного мита'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or '19994' in cl_codes or '19996' in cl_codes
+                             else 'not-active'
+        },
+        {
+            'title': _('Кваліфікаційна експертиза'),
+            'status': 'done' if app['search_data']['obj_state'] == 2 or 'Кваліфікаційна експертиза' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Очікування клопотання про проведення кваліфікаційної експертизи'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Очікування клопотання та збору щодо КЕ' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Формальна експертиза'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Формальна експертиза заявок на винаходи і корисні моделі' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Встановлення дати подання національної заявки' in done_stages
+                                or 'Встановлення дати входження в національну фазу в Україні' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази дани'),
+            'status': 'done'
+        },
+    ]
+
+    # Неиспользуемые стадии при экспертизе заявок на полезные модели
+    stages[3]['status'] = 'not-used'
+    stages[4]['status'] = 'not-used'
+
+    # Определение текущей стадии или стадии, на которой было остановлено делопроизводство
+    for i, s in enumerate(stages):
+        if s['status'] == 'done':
+            if i != 0:
+                if is_stopped:
+                    stages[i]['status'] = 'stopped'
+                else:
+                    stages[i-1]['status'] = 'current'
+            break
+
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'app': app,
     }
