@@ -308,6 +308,12 @@ def app_stages_inv_um(app):
                     if x in doc_type:
                         done_stages.append(stage['STAGERECORD']['STAGE'])
                         break
+        elif stage['STAGERECORD']['STAGE'] == 'Формальна експертиза заявок на винаходи і корисні моделі':
+            for x in ['[В6]', '[В7]', '[В8]']:
+                for doc_type in doc_types:
+                    if x in doc_type:
+                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        break
 
     # Коды сборов
     cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
