@@ -300,12 +300,14 @@ def app_stages_inv_um(app):
     # Пройденные стадии
     done_stages = list()
     for stage in app['DOCFLOW']['STAGES']:
-        # Если формальная експертиза без даты завершения, то необходимо считать это текущей стадией
-        if stage['STAGERECORD']['STAGE'] == 'Формальна експертиза заявок на винаходи і корисні моделі' \
-                and not stage['STAGERECORD'].get('ENDDATE'):
-            continue
-        else:
+        if stage['STAGERECORD'].get('ENDDATE'):
             done_stages.append(stage['STAGERECORD']['STAGE'])
+        elif stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
+            for x in ['[В1]', '[В4]', '[В9]']:
+                for doc_type in doc_types:
+                    if x in doc_type:
+                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        break
 
     # Коды сборов
     cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
