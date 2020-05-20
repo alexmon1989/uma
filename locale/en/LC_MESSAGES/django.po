@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-19 14:51+0300\n"
+"POT-Creation-Date: 2020-05-20 12:04+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -423,20 +423,24 @@ msgstr "Search results"
 msgid "Пошук по розділам допомоги..."
 msgstr "Help search"
 
-#: apps/help/templates/help/search/search.html:20
+#: apps/help/templates/help/search/search.html:19
 msgid "Знайдено всього:"
 msgstr "Results:"
 
-#: apps/help/templates/help/search/search.html:41
+#: apps/help/templates/help/search/search.html:40
 msgid "Розділ"
 msgstr "Section"
 
-#: apps/help/templates/help/search/search.html:55
+#: apps/help/templates/help/search/search.html:54
+#, fuzzy
+#| msgid ""
+#| "Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук "
+#| "знову або перегляньте наші <a href=\"/help\">категорії довідки</a>."
 msgid ""
-"Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук знову "
-"або перегляньте наші <a href=\"/help\">категорії довідки</a>."
+"Жодна довідкова сторінка не відповідає вашому пошуковому запиту. Повторіть "
+"пошук знову або перегляньте наші <a href=\"/help\">категорії довідки</a>."
 msgstr ""
-"No Help pages matched your search. Try searching again, or browse our <a "
+"No Help pages matched your search query. Try searching again, or browse our <a "
 "href='/help'>help sections</a> instead"
 
 #: apps/help/templates/help/section/section.html:34
@@ -1890,23 +1894,23 @@ msgstr "Registered trade mark"
 
 #: apps/search/templatetags/search_extras.py:197
 #: apps/search/templatetags/search_extras.py:255
-#: apps/search/templatetags/search_extras.py:322
+#: apps/search/templatetags/search_extras.py:330
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
 #: apps/search/templatetags/search_extras.py:201
-#: apps/search/templatetags/search_extras.py:334
+#: apps/search/templatetags/search_extras.py:342
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
 #: apps/search/templatetags/search_extras.py:205
-#: apps/search/templatetags/search_extras.py:345
+#: apps/search/templatetags/search_extras.py:353
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
 #: apps/search/templatetags/search_extras.py:209
 #: apps/search/templatetags/search_extras.py:263
-#: apps/search/templatetags/search_extras.py:351
+#: apps/search/templatetags/search_extras.py:359
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
@@ -1927,19 +1931,19 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/templatetags/search_extras.py:316
+#: apps/search/templatetags/search_extras.py:324
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/templatetags/search_extras.py:328
+#: apps/search/templatetags/search_extras.py:336
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/templatetags/search_extras.py:339
+#: apps/search/templatetags/search_extras.py:347
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/templatetags/search_extras.py:358
+#: apps/search/templatetags/search_extras.py:366
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази дани"

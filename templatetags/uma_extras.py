@@ -66,11 +66,13 @@ def list_of_dicts_unique(l):
 
 @register.filter
 def highlight(text, q):
-    if text:
+    try:
         index_l = text.lower().index(q.lower())
+    except ValueError:
+        return text
+    else:
         original_text = text[index_l:index_l + len(q)]
         return text[:index_l] + f"<em class='g-bg-yellow'>{original_text}</em>" + text[index_l + len(q):]
-    return text
 
 
 @register.inclusion_tag('templatetags/footer_contacts.html', takes_context=True)
