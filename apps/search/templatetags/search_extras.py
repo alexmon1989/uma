@@ -282,7 +282,8 @@ def app_stages_inv_um(app):
     """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""
     # Состояние делопроизводства
     is_stopped = False
-    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']]
+    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']
+                 if doc['DOCRECORD'].get('DOCREGNUMBER') or doc['DOCRECORD'].get('DOCBARCODE')]
 
     # Признаки того что делопроизводство остановлено
     for x in ['[В11]', '[В5]', '[В5а]', '[В5д]', '[В12]', '[В5б]', '[В16]', '[В10]']:
