@@ -190,6 +190,14 @@ def app_stages_tm(app):
                     stages_statuses[i] = 'current'
                 break
 
+        # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
+        if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
+            for doc in app['TradeMark']['DocFlow']['Documents']:
+                if 'Т-08' in doc['DocRecord'].get('DocType', ''):
+                    stages_statuses[4] = 'current'
+                    stages_statuses[3] = 'done'
+                    break
+
     stages = [
         {
             'title': _('Знак для товарів і послуг зареєстровано'),
