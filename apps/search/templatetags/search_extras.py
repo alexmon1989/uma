@@ -150,7 +150,9 @@ def user_has_access_to_docs(user, id_app_number):
 @register.filter
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
-    return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents))
+    return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER')
+                                 or x['DOCRECORD'].get('DOCBARCODE')
+                                 or x['DOCRECORD'].get('DOCSENDINGDATE'), documents))
 
 
 @register.simple_tag
@@ -283,7 +285,9 @@ def app_stages_inv_um(app):
     # Состояние делопроизводства
     is_stopped = False
     doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']
-                 if doc['DOCRECORD'].get('DOCREGNUMBER') or doc['DOCRECORD'].get('DOCBARCODE')]
+                 if doc['DOCRECORD'].get('DOCREGNUMBER')
+                 or doc['DOCRECORD'].get('DOCBARCODE')
+                 or doc['DOCRECORD'].get('DOCSENDINGDATE')]
 
     # Признаки того что делопроизводство остановлено
     for x in ['[В11]', '[В5]', '[В5а]', '[В5д]', '[В12]', '[В5б]', '[В16]', '[В10]']:
@@ -301,9 +305,7 @@ def app_stages_inv_um(app):
     # Пройденные стадии
     done_stages = list()
     for stage in app['DOCFLOW']['STAGES']:
-        if stage['STAGERECORD'].get('ENDDATE'):
-            done_stages.append(stage['STAGERECORD']['STAGE'])
-        elif stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
+        if stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
             for x in ['[В1]', '[В4]', '[В9]']:
                 for doc_type in doc_types:
                     if x in doc_type:
@@ -315,6 +317,8 @@ def app_stages_inv_um(app):
                     if x in doc_type:
                         done_stages.append(stage['STAGERECORD']['STAGE'])
                         break
+        elif stage['STAGERECORD'].get('ENDDATE'):
+            done_stages.append(stage['STAGERECORD']['STAGE'])
 
     # Коды сборов
     cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
@@ -364,7 +368,7 @@ def app_stages_inv_um(app):
                              else 'not-active'
         },
         {
-            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази дани'),
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
             'status': 'done'
         },
     ]
@@ -379,7 +383,11 @@ def app_stages_inv_um(app):
         if s['status'] == 'done':
             if i != 0:
                 if is_stopped:
-                    stages[i]['status'] = 'stopped'
+                    if i == 7:
+                        # Поскольку стадия "Реєстрація первинних документів" всегда пройдена
+                        stages[i-1]['status'] = 'stopped'
+                    else:
+                        stages[i]['status'] = 'stopped'
                 else:
                     stages[i-1]['status'] = 'current'
             break

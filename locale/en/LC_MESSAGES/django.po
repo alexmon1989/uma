@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-20 12:04+0300\n"
+"POT-Creation-Date: 2020-05-25 10:51+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -440,8 +440,8 @@ msgid ""
 "Жодна довідкова сторінка не відповідає вашому пошуковому запиту. Повторіть "
 "пошук знову або перегляньте наші <a href=\"/help\">категорії довідки</a>."
 msgstr ""
-"No Help pages matched your search query. Try searching again, or browse our <a "
-"href='/help'>help sections</a> instead"
+"No Help pages matched your search query. Try searching again, or browse our "
+"<a href='/help'>help sections</a> instead"
 
 #: apps/help/templates/help/section/section.html:34
 msgid "Інформація поки що відсутня."
@@ -1888,34 +1888,35 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:193
+#: apps/search/templatetags/search_extras.py:195
 msgid "Знак для товарів і послуг зареєстровано"
 msgstr "Registered trade mark"
 
-#: apps/search/templatetags/search_extras.py:197
-#: apps/search/templatetags/search_extras.py:255
-#: apps/search/templatetags/search_extras.py:330
+#: apps/search/templatetags/search_extras.py:199
+#: apps/search/templatetags/search_extras.py:257
+#: apps/search/templatetags/search_extras.py:335
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/templatetags/search_extras.py:201
-#: apps/search/templatetags/search_extras.py:342
+#: apps/search/templatetags/search_extras.py:203
+#: apps/search/templatetags/search_extras.py:347
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/templatetags/search_extras.py:205
-#: apps/search/templatetags/search_extras.py:353
+#: apps/search/templatetags/search_extras.py:207
+#: apps/search/templatetags/search_extras.py:358
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/templatetags/search_extras.py:209
-#: apps/search/templatetags/search_extras.py:263
-#: apps/search/templatetags/search_extras.py:359
+#: apps/search/templatetags/search_extras.py:211
+#: apps/search/templatetags/search_extras.py:265
+#: apps/search/templatetags/search_extras.py:364
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/templatetags/search_extras.py:213
-#: apps/search/templatetags/search_extras.py:267
+#: apps/search/templatetags/search_extras.py:215
+#: apps/search/templatetags/search_extras.py:269
+#: apps/search/templatetags/search_extras.py:371
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1923,33 +1924,25 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/templatetags/search_extras.py:251
+#: apps/search/templatetags/search_extras.py:253
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/templatetags/search_extras.py:259
+#: apps/search/templatetags/search_extras.py:261
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/templatetags/search_extras.py:324
+#: apps/search/templatetags/search_extras.py:329
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/templatetags/search_extras.py:336
+#: apps/search/templatetags/search_extras.py:341
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/templatetags/search_extras.py:347
+#: apps/search/templatetags/search_extras.py:352
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
-
-#: apps/search/templatetags/search_extras.py:366
-msgid ""
-"Реєстрація первинних документів, попередня експертиза та введення відомостей "
-"до бази дани"
-msgstr ""
-"Registration of primary documents, preliminary examination and entering data "
-"into database"
 
 #: apps/search/utils.py:1229
 msgid "Тип об'єкта промислової власності"
@@ -2046,6 +2039,13 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid ""
+#~ "Реєстрація первинних документів, попередня експертиза та введення "
+#~ "відомостей до бази дани"
+#~ msgstr ""
+#~ "Registration of primary documents, preliminary examination and entering "
+#~ "data into database"
 
 #~ msgid "Зачекайте, відбувається отримання даних"
 #~ msgstr "Please, wait for data loading"
