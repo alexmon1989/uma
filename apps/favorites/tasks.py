@@ -24,7 +24,7 @@ def create_favorites_results_file(user_id, favorites_ids, get_params, lang_code)
         else:
             s = s.sort('_score')
 
-        s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design'])
+        s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
 
         # Данные для Excel-файла
         user = get_user_or_anonymous(user_id)

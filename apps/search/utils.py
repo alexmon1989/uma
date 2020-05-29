@@ -1237,6 +1237,9 @@ def create_search_res_doc(data):
         _("Власник"),
         _('Винахідник\автор'),
         _("Представник"),
+        _("МПК"),
+        _("МКТП"),
+        _("МКПЗ"),
     ]
     for i in range(len(titles)):
         sheet.write(0, i, titles[i], style)
@@ -1280,10 +1283,13 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
                 '%d.%m.%Y') if h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-            applicant = get_applicant(h)
-            owner = get_owner(h)
-            inventor = get_inventor(h)
+            applicant = get_app_applicant(h)
+            owner = get_app_owner(h)
+            inventor = get_app_inventor(h)
             agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            ipc_indexes = get_app_ipc_indexes(h)
+            nice_indexes = get_app_nice_indexes(h)
+            icid = get_app_icid(h)
 
             data.append([
                     obj_type,
@@ -1297,12 +1303,15 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     owner,
                     inventor,
                     agent,
+                    ipc_indexes,
+                    nice_indexes,
+                    icid,
                 ])
 
     return data
 
 
-def get_applicant(app):
+def get_app_applicant(app):
     """Возвращает строку с заявителями (с кодами стран)"""
     # Изобретения, полезные модели, топографии
     applicants = []
@@ -1321,24 +1330,30 @@ def get_applicant(app):
 
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
-        for item in app.TradeMark.TrademarkDetails.ApplicantDetails.Applicant:
-            applicants.append(
-                f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-            )
+        try:
+            for item in app.TradeMark.TrademarkDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
 
     # Пром. образцы
     elif app.Document.idObjType == 6:
-        for item in app.Design.DesignDetails.ApplicantDetails.Applicant:
-            applicants.append(
-                f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-            )
+        try:
+            for item in app.Design.DesignDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
 
     return ';\r\n'.join(applicants)
 
 
-def get_owner(app):
+def get_app_owner(app):
     """Возвращает строку с владельцами (с кодами стран)"""
     # Изобретения, полезные модели, топографии
     owners = []
@@ -1357,24 +1372,41 @@ def get_owner(app):
 
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
-        for item in app.TradeMark.TrademarkDetails.HolderDetails.Holder:
-            owners.append(
-                f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-            )
+        try:
+            for item in app.TradeMark.TrademarkDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # КЗПТ
+    elif app.Document.idObjType == 5:
+        try:
+            for item in app.Geo.GeoDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
 
     # Пром. образцы
     elif app.Document.idObjType == 6:
-        for item in app.Design.DesignDetails.HolderDetails.Holder:
-            owners.append(
-                f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-            )
+        try:
+            for item in app.Design.DesignDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
 
     return ';\r\n'.join(owners)
 
 
-def get_inventor(app):
+def get_app_inventor(app):
     """Возвращает строку с изобреттелями (с кодами стран)"""
     # Изобретения, полезные модели, топографии
     inventors = []
@@ -1393,13 +1425,50 @@ def get_inventor(app):
 
     # Пром. образцы
     elif app.Document.idObjType == 6:
-        for item in app.Design.DesignDetails.DesignerDetails.Designer:
-            inventors.append(
-                f"{item.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                f"[{item.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-            )
+        try:
+            for item in app.Design.DesignDetails.DesignerDetails.Designer:
+                inventors.append(
+                    f"{item.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
 
     return ';\r\n'.join(inventors)
+
+
+def get_app_ipc_indexes(app):
+    """Возвращает строку с индексами МПК заявки"""
+    if app.Document.idObjType in (1, 2):
+        ipc_indexes = []
+        if app.search_data.obj_state == 1:
+            biblio_data = app.Claim
+        else:
+            biblio_data = app.Patent
+        for IPC in biblio_data.IPC:
+            ipc_indexes.append(IPC)
+        return '; '.join(ipc_indexes)
+    return ''
+
+
+def get_app_nice_indexes(app):
+    """Возвращает строку с индексами МКТП заявки"""
+    if app.Document.idObjType == 4:
+        nice_indexes = []
+        for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
+            nice_indexes.append(str(cls.ClassNumber))
+        return '; '.join(nice_indexes)
+    return ''
+
+
+def get_app_icid(app):
+    """Возвращает строку с индексами МКПЗ заявки"""
+    if app.Document.idObjType == 6:
+        icid = []
+        for i in app.Design.DesignDetails.IndicationProductDetails:
+            icid.append(str(i.Class))
+        return '; '.join(icid)
+    return ''
 
 
 def get_transactions_types(id_obj_type):
