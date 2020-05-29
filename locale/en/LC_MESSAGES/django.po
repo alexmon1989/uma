@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-25 10:51+0300\n"
+"POT-Creation-Date: 2020-05-29 12:00+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1598,7 +1598,6 @@ msgstr "Reason"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:439
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:483
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:525
-#: apps/search/utils.py:1238
 msgid "Винахідник"
 msgstr "Inventor"
 
@@ -1888,35 +1887,35 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:195
+#: apps/search/templatetags/search_extras.py:203
 msgid "Знак для товарів і послуг зареєстровано"
 msgstr "Registered trade mark"
 
-#: apps/search/templatetags/search_extras.py:199
-#: apps/search/templatetags/search_extras.py:257
-#: apps/search/templatetags/search_extras.py:335
+#: apps/search/templatetags/search_extras.py:207
+#: apps/search/templatetags/search_extras.py:265
+#: apps/search/templatetags/search_extras.py:343
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/templatetags/search_extras.py:203
-#: apps/search/templatetags/search_extras.py:347
+#: apps/search/templatetags/search_extras.py:211
+#: apps/search/templatetags/search_extras.py:355
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/templatetags/search_extras.py:207
-#: apps/search/templatetags/search_extras.py:358
+#: apps/search/templatetags/search_extras.py:215
+#: apps/search/templatetags/search_extras.py:366
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/templatetags/search_extras.py:211
-#: apps/search/templatetags/search_extras.py:265
-#: apps/search/templatetags/search_extras.py:364
+#: apps/search/templatetags/search_extras.py:219
+#: apps/search/templatetags/search_extras.py:273
+#: apps/search/templatetags/search_extras.py:372
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/templatetags/search_extras.py:215
-#: apps/search/templatetags/search_extras.py:269
-#: apps/search/templatetags/search_extras.py:371
+#: apps/search/templatetags/search_extras.py:223
+#: apps/search/templatetags/search_extras.py:277
+#: apps/search/templatetags/search_extras.py:379
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1924,23 +1923,23 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/templatetags/search_extras.py:253
+#: apps/search/templatetags/search_extras.py:261
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/templatetags/search_extras.py:261
+#: apps/search/templatetags/search_extras.py:269
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/templatetags/search_extras.py:329
+#: apps/search/templatetags/search_extras.py:337
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/templatetags/search_extras.py:341
+#: apps/search/templatetags/search_extras.py:349
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/templatetags/search_extras.py:352
+#: apps/search/templatetags/search_extras.py:360
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
@@ -1967,6 +1966,10 @@ msgstr "Keywords"
 #: apps/search/utils.py:1236
 msgid "Заявник"
 msgstr "Applicant"
+
+#: apps/search/utils.py:1238
+msgid "Винахідник\\автор"
+msgstr "Inventor\\author"
 
 #: apps/search/utils.py:1239
 msgid "Представник"
