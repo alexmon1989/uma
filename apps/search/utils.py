@@ -1322,11 +1322,12 @@ def get_app_applicant(app):
         else:
             biblio_data = app.Patent.to_dict()
 
-        i_71 = [i for n, i in enumerate(biblio_data['I_71']) if i not in biblio_data['I_71'][n + 1:]]
-        for item in i_71:
-            item.pop('EDRPOU', '')
-            item_values = sorted(list(item.values()), key=len)
-            applicants.append(f"{item_values[1]} [{item_values[0]}]")
+        if biblio_data.get('I_71'):
+            i_71 = [i for n, i in enumerate(biblio_data['I_71']) if i not in biblio_data['I_71'][n + 1:]]
+            for item in i_71:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                applicants.append(f"{item_values[1]} [{item_values[0]}]")
 
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
@@ -1364,11 +1365,12 @@ def get_app_owner(app):
         else:
             biblio_data = app.Patent.to_dict()
 
-        i_73 = [i for n, i in enumerate(biblio_data['I_73']) if i not in biblio_data['I_73'][n + 1:]]
-        for item in i_73:
-            item.pop('EDRPOU', '')
-            item_values = sorted(list(item.values()), key=len)
-            owners.append(f"{item_values[1]} [{item_values[0]}]")
+        if biblio_data.get('I_73'):
+            i_73 = [i for n, i in enumerate(biblio_data['I_73']) if i not in biblio_data['I_73'][n + 1:]]
+            for item in i_73:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                owners.append(f"{item_values[1]} [{item_values[0]}]")
 
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
@@ -1417,11 +1419,12 @@ def get_app_inventor(app):
         else:
             biblio_data = app.Patent.to_dict()
 
-        i_73 = [i for n, i in enumerate(biblio_data['I_72']) if i not in biblio_data['I_72'][n + 1:]]
-        for item in i_73:
-            item.pop('EDRPOU', '')
-            item_values = sorted(list(item.values()), key=len)
-            inventors.append(f"{item_values[1]} [{item_values[0]}]")
+        if biblio_data.get('I_72'):
+            i_72 = [i for n, i in enumerate(biblio_data['I_72']) if i not in biblio_data['I_72'][n + 1:]]
+            for item in i_72:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                inventors.append(f"{item_values[1]} [{item_values[0]}]")
 
     # Пром. образцы
     elif app.Document.idObjType == 6:
@@ -1445,9 +1448,13 @@ def get_app_ipc_indexes(app):
             biblio_data = app.Claim
         else:
             biblio_data = app.Patent
-        for IPC in biblio_data.IPC:
-            ipc_indexes.append(IPC)
-        return '; '.join(ipc_indexes)
+        try:
+            for IPC in biblio_data.IPC:
+                ipc_indexes.append(IPC)
+        except AttributeError:
+            pass
+        else:
+            return '; '.join(ipc_indexes)
     return ''
 
 
@@ -1480,15 +1487,15 @@ def get_transactions_types(id_obj_type):
     )
     if id_obj_type in (1, 2, 3):
         # Изобретения, полезные модели, топографии
-        field='TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
+        field = 'TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
         nested = 'TRANSACTIONS.TRANSACTION'
     elif id_obj_type == 4:
         # Знаки для товаров и услуг
-        field='TradeMark.Transactions.Transaction.@name.keyword'
+        field = 'TradeMark.Transactions.Transaction.@name.keyword'
         nested = 'TradeMark.Transactions.Transaction'
     elif id_obj_type == 5:
         # КЗПТ
-        field='Geo.Transactions.Transaction.@name.keyword'
+        field = 'Geo.Transactions.Transaction.@name.keyword'
         nested = 'Geo.Transactions.Transaction'
     else:
         # Пром. образцы
