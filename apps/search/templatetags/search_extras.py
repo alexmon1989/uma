@@ -305,7 +305,7 @@ def app_stages_inv_um(app):
 
     # Признаки того что делопроизводство возобновлено
     if is_stopped:
-        for x in ['[В21а]', '[В21]', '[В22]']:
+        for x in ['[В21а]', '[В21б]', '[В21]', '[В22]']:
             for doc_type in doc_types:
                 if x in doc_type:
                     is_stopped = False

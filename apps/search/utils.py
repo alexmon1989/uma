@@ -1235,8 +1235,11 @@ def create_search_res_doc(data):
         _("Ключові слова"),
         _("Заявник"),
         _("Власник"),
-        _("Винахідник"),
+        _('Винахідник\автор'),
         _("Представник"),
+        _("МПК"),
+        _("МКТП"),
+        _("МКПЗ"),
     ]
     for i in range(len(titles)):
         sheet.write(0, i, titles[i], style)
@@ -1280,18 +1283,13 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
                 '%d.%m.%Y') if h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
-            if hasattr(h.search_data, 'inventor'):
-                applicant = ';\r\n'.join(h.search_data.applicant) if iterable(
-                    h.search_data.applicant) else h.search_data.applicant
-            else:
-                applicant = ''
-            owner = ';\r\n'.join(h.search_data.owner) if iterable(h.search_data.owner) else h.search_data.owner
-            if hasattr(h.search_data, 'inventor'):
-                inventor = ';\r\n'.join(h.search_data.inventor) if iterable(
-                    h.search_data.inventor) else h.search_data.inventor
-            else:
-                inventor = ''
+            applicant = get_app_applicant(h)
+            owner = get_app_owner(h)
+            inventor = get_app_inventor(h)
             agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            ipc_indexes = get_app_ipc_indexes(h)
+            nice_indexes = get_app_nice_indexes(h)
+            icid = get_app_icid(h)
 
             data.append([
                     obj_type,
@@ -1305,9 +1303,179 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     owner,
                     inventor,
                     agent,
+                    ipc_indexes,
+                    nice_indexes,
+                    icid,
                 ])
 
     return data
+
+
+def get_app_applicant(app):
+    """Возвращает строку с заявителями (с кодами стран)"""
+    # Изобретения, полезные модели, топографии
+    applicants = []
+
+    if app.Document.idObjType in (1, 2, 3):
+        if app.search_data.obj_state == 1:
+            biblio_data = app.Claim.to_dict()
+        else:
+            biblio_data = app.Patent.to_dict()
+
+        if biblio_data.get('I_71'):
+            i_71 = [i for n, i in enumerate(biblio_data['I_71']) if i not in biblio_data['I_71'][n + 1:]]
+            for item in i_71:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                applicants.append(f"{item_values[1]} [{item_values[0]}]")
+
+    # Знаки для товаров и услуг
+    elif app.Document.idObjType == 4:
+        try:
+            for item in app.TradeMark.TrademarkDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Пром. образцы
+    elif app.Document.idObjType == 6:
+        try:
+            for item in app.Design.DesignDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    return ';\r\n'.join(applicants)
+
+
+def get_app_owner(app):
+    """Возвращает строку с владельцами (с кодами стран)"""
+    # Изобретения, полезные модели, топографии
+    owners = []
+
+    if app.Document.idObjType in (1, 2, 3):
+        if app.search_data.obj_state == 1:
+            biblio_data = app.Claim.to_dict()
+        else:
+            biblio_data = app.Patent.to_dict()
+
+        if biblio_data.get('I_73'):
+            i_73 = [i for n, i in enumerate(biblio_data['I_73']) if i not in biblio_data['I_73'][n + 1:]]
+            for item in i_73:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                owners.append(f"{item_values[1]} [{item_values[0]}]")
+
+    # Знаки для товаров и услуг
+    elif app.Document.idObjType == 4:
+        try:
+            for item in app.TradeMark.TrademarkDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # КЗПТ
+    elif app.Document.idObjType == 5:
+        try:
+            for item in app.Geo.GeoDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Пром. образцы
+    elif app.Document.idObjType == 6:
+        try:
+            for item in app.Design.DesignDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    return ';\r\n'.join(owners)
+
+
+def get_app_inventor(app):
+    """Возвращает строку с изобреттелями (с кодами стран)"""
+    # Изобретения, полезные модели, топографии
+    inventors = []
+
+    if app.Document.idObjType in (1, 2, 3):
+        if app.search_data.obj_state == 1:
+            biblio_data = app.Claim.to_dict()
+        else:
+            biblio_data = app.Patent.to_dict()
+
+        if biblio_data.get('I_72'):
+            i_72 = [i for n, i in enumerate(biblio_data['I_72']) if i not in biblio_data['I_72'][n + 1:]]
+            for item in i_72:
+                item.pop('EDRPOU', '')
+                item_values = sorted(list(item.values()), key=len)
+                inventors.append(f"{item_values[1]} [{item_values[0]}]")
+
+    # Пром. образцы
+    elif app.Document.idObjType == 6:
+        try:
+            for item in app.Design.DesignDetails.DesignerDetails.Designer:
+                inventors.append(
+                    f"{item.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    return ';\r\n'.join(inventors)
+
+
+def get_app_ipc_indexes(app):
+    """Возвращает строку с индексами МПК заявки"""
+    if app.Document.idObjType in (1, 2):
+        ipc_indexes = []
+        if app.search_data.obj_state == 1:
+            biblio_data = app.Claim
+        else:
+            biblio_data = app.Patent
+        try:
+            for IPC in biblio_data.IPC:
+                ipc_indexes.append(IPC)
+        except AttributeError:
+            pass
+        else:
+            return '; '.join(ipc_indexes)
+    return ''
+
+
+def get_app_nice_indexes(app):
+    """Возвращает строку с индексами МКТП заявки"""
+    if app.Document.idObjType == 4:
+        nice_indexes = []
+        for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
+            nice_indexes.append(str(cls.ClassNumber))
+        return '; '.join(nice_indexes)
+    return ''
+
+
+def get_app_icid(app):
+    """Возвращает строку с индексами МКПЗ заявки"""
+    if app.Document.idObjType == 6:
+        icid = []
+        for i in app.Design.DesignDetails.IndicationProductDetails:
+            icid.append(str(i.Class))
+        return '; '.join(icid)
+    return ''
 
 
 def get_transactions_types(id_obj_type):
@@ -1319,15 +1487,15 @@ def get_transactions_types(id_obj_type):
     )
     if id_obj_type in (1, 2, 3):
         # Изобретения, полезные модели, топографии
-        field='TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
+        field = 'TRANSACTIONS.TRANSACTION.PUBLICATIONNAME.keyword'
         nested = 'TRANSACTIONS.TRANSACTION'
     elif id_obj_type == 4:
         # Знаки для товаров и услуг
-        field='TradeMark.Transactions.Transaction.@name.keyword'
+        field = 'TradeMark.Transactions.Transaction.@name.keyword'
         nested = 'TradeMark.Transactions.Transaction'
     elif id_obj_type == 5:
         # КЗПТ
-        field='Geo.Transactions.Transaction.@name.keyword'
+        field = 'Geo.Transactions.Transaction.@name.keyword'
         nested = 'Geo.Transactions.Transaction'
     else:
         # Пром. образцы
@@ -1604,7 +1772,7 @@ def get_ipc_codes_with_schedules(lang_code):
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in range(3, 8) else 1
+            2 if schedule_type.schedule_type.id in range(3, 9) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 
