@@ -1472,9 +1472,13 @@ def get_app_icid(app):
     """Возвращает строку с индексами МКПЗ заявки"""
     if app.Document.idObjType == 6:
         icid = []
-        for i in app.Design.DesignDetails.IndicationProductDetails:
-            icid.append(str(i.Class))
-        return '; '.join(icid)
+        try:
+            for i in app.Design.DesignDetails.IndicationProductDetails:
+                icid.append(str(i.Class))
+        except AttributeError:
+            pass
+        else:
+            return '; '.join(icid)
     return ''
 
 
