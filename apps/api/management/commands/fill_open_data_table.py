@@ -22,12 +22,10 @@ class Command(BaseCommand):
 
         # Получение данных всех объектов, дата обновления у которых больше max_date,
         # обновление их в таблице с данными для OpenData
-        # items = IpcAppList.objects.filter(registration_date__isnull=False, elasticindexed=1).order_by('lastupdate')
-
         items = IpcAppList.objects.filter(
             elasticindexed=1
         ).exclude(
-            registration_date__isnull=False, obj_type_id__in=(1, 2, 3, 5, 6)
+            registration_date__isnull=True, obj_type_id__in=(1, 2, 3, 5, 6)  # исключить заявки не на ТМ
         ).order_by('lastupdate')
 
         if max_date:
@@ -42,10 +40,12 @@ class Command(BaseCommand):
                 open_data_record.obj_type_id = item.obj_type_id
                 open_data_record.last_update = make_aware(item.lastupdate)
                 open_data_record.app_number = item.app_number
-                open_data_record.registration_number = item.registration_number
                 if item.registration_date:
+                    open_data_record.registration_number = item.registration_number
                     open_data_record.registration_date = make_aware(item.registration_date)
-                open_data_record.obj_state = 1 if item.registration_date is None else 2
+                    open_data_record.obj_state = 1
+                else:
+                    open_data_record.obj_state = 2
 
                 # Получение данных с ElasticSearch
                 data = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query("match", _id=item.id).execute()
