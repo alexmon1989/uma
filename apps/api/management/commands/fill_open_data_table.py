@@ -44,6 +44,7 @@ class Command(BaseCommand):
                 open_data_record.app_number = item.app_number
                 open_data_record.registration_number = item.registration_number
                 open_data_record.registration_date = make_aware(item.registration_date)
+                open_data_record.obj_state = 1 if item.registration_date is None else 2
 
                 # Получение данных с ElasticSearch
                 data = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query("match", _id=item.id).execute()
