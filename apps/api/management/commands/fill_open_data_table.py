@@ -22,7 +22,14 @@ class Command(BaseCommand):
 
         # Получение данных всех объектов, дата обновления у которых больше max_date,
         # обновление их в таблице с данными для OpenData
-        items = IpcAppList.objects.filter(registration_date__isnull=False, elasticindexed=1).order_by('lastupdate')
+        # items = IpcAppList.objects.filter(registration_date__isnull=False, elasticindexed=1).order_by('lastupdate')
+
+        items = IpcAppList.objects.filter(
+            elasticindexed=1
+        ).exclude(
+            registration_date__isnull=False, obj_type_id__in=(1, 2, 3, 5, 6)
+        ).order_by('lastupdate')
+
         if max_date:
             items = items.filter(lastupdate__gt=max_date)
 

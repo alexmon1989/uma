@@ -225,7 +225,7 @@ class OrderService(models.Model):
     user = models.ForeignKey(User, db_column='idUser', on_delete=models.DO_NOTHING, blank=True, null=True)
     ip_user = models.GenericIPAddressField(db_column='IP_User', max_length=100, blank=True, null=True)
     order_completed = models.BooleanField(db_column='OrderCompleted', default=0)
-    app = models.ForeignKey('IpcAppList', models.DO_NOTHING, db_column='idAPPNumber', blank=True, null=True)
+    app = models.ForeignKey('IpcAppList', models.CASCADE, db_column='idAPPNumber', blank=True, null=True)
     completion_datetime = models.DateTimeField(db_column='CompletionDateTime', blank=True, null=True)
     created_at = models.DateTimeField(db_column='CreateDateTime', auto_now_add=True)
     create_external_documents = models.IntegerField(default=0)
@@ -240,7 +240,7 @@ class OrderService(models.Model):
 class OrderDocument(models.Model):
     """Модель таблицы ls_OrderDocuments."""
     id = models.AutoField(db_column='idOrderDoc', primary_key=True)
-    order = models.ForeignKey('OrderService', models.DO_NOTHING, db_column='idOrder', blank=True, null=True)
+    order = models.ForeignKey('OrderService', models.CASCADE, db_column='idOrder', blank=True, null=True)
     id_cead_doc = models.IntegerField(db_column='idCEADDoc', blank=True, null=True)
     file_type = models.CharField(db_column='FileType', max_length=20, blank=True, null=True)
     file_size = models.IntegerField(db_column='FileSize', blank=True, null=True)

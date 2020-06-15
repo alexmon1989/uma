@@ -1,7 +1,7 @@
 from rest_framework import generics, exceptions
-from .serializers import OpenDataSerializer
+from .serializers import OpenDataSerializer, OpenDataSerializerV1
 from .models import OpenData
-from apps.search.models import ObjType
+from apps.search.models import ObjType, IpcAppList
 import datetime
 
 
@@ -9,7 +9,7 @@ class OpenDataListView(generics.ListAPIView):
     serializer_class = OpenDataSerializer
 
     def get_queryset(self):
-        queryset = OpenData.objects.order_by('pk').all()
+        queryset = OpenData.objects.filter(obj_state=2).order_by('pk').all()
 
         # Змінені/нові
         changed = self.request.query_params.get('changed', None)
@@ -54,6 +54,72 @@ class OpenDataListView(generics.ListAPIView):
         return queryset.values(
             'app_id',
             'obj_type__obj_type_ua',
+            'app_number',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+        )
+
+
+class OpenDataListViewV1(generics.ListAPIView):
+    serializer_class = OpenDataSerializerV1
+
+    def get_queryset(self):
+        queryset = OpenData.objects.order_by('pk').all()
+
+        # Змінені/нові
+        changed = self.request.query_params.get('changed', None)
+        try:
+            changed = int(changed)
+        except:
+            raise exceptions.ParseError("Невірне значення параметру changed")
+
+        # Дата від
+        date_from = self.request.query_params.get('date_from', None)
+        if date_from:
+            try:
+                date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y').strftime('%Y-%m-%d')
+                if changed:
+                    queryset = queryset.filter(last_update__gte=date_from)
+                else:
+                    queryset = queryset.filter(registration_date__gte=date_from)
+            except:
+                raise exceptions.ParseError("Невірне значення параметру date_from")
+
+        # Дата до
+        date_to = self.request.query_params.get('date_to', None)
+        if date_to:
+            try:
+                date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y').strftime('%Y-%m-%d')
+                if changed:
+                    queryset = queryset.filter(last_update__lte=date_to)
+                else:
+                    queryset = queryset.filter(registration_date__lte=date_to)
+            except:
+                raise exceptions.ParseError("Невірне значення параметру date_to")
+
+        # Тип об'єкта
+        obj_type = self.request.query_params.get('obj_type', None)
+        if obj_type:
+            try:
+                obj_type = ObjType.objects.get(id=obj_type)
+                queryset = queryset.filter(obj_type=obj_type)
+            except ObjType.DoesNotExist:
+                raise exceptions.ParseError("Невірне значення параметру obj_type")
+
+        # Тип об'єкта
+        obj_state = self.request.query_params.get('obj_state', None)
+        if obj_state:
+            try:
+                queryset = queryset.filter(obj_state=obj_state)
+            except ObjType.DoesNotExist:
+                raise exceptions.ParseError("Невірне значення параметру obj_state")
+
+        return queryset.values(
+            'app_id',
+            'obj_type__obj_type_ua',
+            'obj_state',
             'app_number',
             'registration_number',
             'registration_date',

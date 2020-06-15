@@ -46,3 +46,18 @@ class OpenDataSerializer(serializers.ModelSerializer):
             'last_update',
             'data',
         )
+
+
+class OpenDataSerializerV1(OpenDataSerializer):
+    class Meta:
+        model = OpenData
+        fields = (
+            'id',
+            'obj_type',
+            'obj_state',
+            'app_number',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+        )
