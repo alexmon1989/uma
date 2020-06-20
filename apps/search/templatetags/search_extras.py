@@ -173,7 +173,8 @@ def is_paid_services_enabled():
 def app_stages_tm(app):
     """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
     mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
-    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
+                 or mark_status_code == 8000
 
     if app['search_data']['obj_state'] == 2:
         stages_statuses = ['done' for _ in range(6)]
@@ -190,6 +191,9 @@ def app_stages_tm(app):
                 else:
                     stages_statuses[i] = 'current'
                 break
+
+        if mark_status_code == 8000:
+            stages_statuses[5] = 'stopped'
 
         # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
         if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
