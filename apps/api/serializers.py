@@ -56,6 +56,7 @@ class OpenDataSerializerV1(OpenDataSerializer):
             'obj_type',
             'obj_state',
             'app_number',
+            'app_date',
             'registration_number',
             'registration_date',
             'last_update',

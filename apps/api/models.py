@@ -11,6 +11,7 @@ class OpenData(models.Model):
     obj_state = models.PositiveSmallIntegerField(default=2, db_index=True)
     last_update = models.DateTimeField(blank=True, null=True, default=None, db_index=True)
     app_number = models.CharField(max_length=100, blank=True, null=True, default=None, db_index=True)
+    app_date = models.DateTimeField(blank=True, null=True, default=None, db_index=True)
     registration_number = models.CharField(blank=True, null=True, default=None, db_index=True, max_length=32)
     registration_date = models.DateTimeField(blank=True, null=True, default=None, db_index=True)
 
