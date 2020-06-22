@@ -150,9 +150,10 @@ def user_has_access_to_docs(user, id_app_number):
 @register.filter
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
-    return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER')
-                                 or x['DOCRECORD'].get('DOCBARCODE')
-                                 or x['DOCRECORD'].get('DOCSENDINGDATE'), documents))
+    if documents:
+        return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER')
+                                     or x['DOCRECORD'].get('DOCBARCODE')
+                                     or x['DOCRECORD'].get('DOCSENDINGDATE'), documents))
 
 
 @register.simple_tag
@@ -172,7 +173,8 @@ def is_paid_services_enabled():
 def app_stages_tm(app):
     """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
     mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
-    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
+                 or mark_status_code == 8000
 
     if app['search_data']['obj_state'] == 2:
         stages_statuses = ['done' for _ in range(6)]
@@ -189,6 +191,9 @@ def app_stages_tm(app):
                 else:
                     stages_statuses[i] = 'current'
                 break
+
+        if mark_status_code == 8000:
+            stages_statuses[5] = 'stopped'
 
         # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
         if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':

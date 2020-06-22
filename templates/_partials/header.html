@@ -70,6 +70,9 @@
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'services:original_document'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'services:original_document' %}">{% trans "Отримати оригінал документу" %}</a>
                                 </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'services:api_description'%}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'services:api_description' %}">API</a>
+                                </li>
                             </ul>
                             <!-- End Submenu -->
                         </li>
