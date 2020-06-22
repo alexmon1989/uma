@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 open_data_record.obj_type_id = item.obj_type_id
                 open_data_record.last_update = make_aware(item.lastupdate)
                 open_data_record.app_number = item.app_number
-                open_data_record.app_date = make_aware(item.app_date)
+                open_data_record.app_date = item.app_date
                 if item.registration_date:
                     open_data_record.registration_number = item.registration_number
                     open_data_record.registration_date = make_aware(item.registration_date)
