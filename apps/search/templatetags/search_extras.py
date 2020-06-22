@@ -187,10 +187,10 @@ def app_stages_tm(app):
             else:
                 if is_stopped:
                     stages_statuses[i] = 'not-active'
-                    if i != 0:
+                    if i > 1:
                         stages_statuses[i-1] = 'stopped'
                     else:
-                        stages_statuses[0] = 'stopped'
+                        stages_statuses[i] = 'stopped'
                 else:
                     stages_statuses[i] = 'current'
                 break
