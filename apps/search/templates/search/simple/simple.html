@@ -65,7 +65,7 @@
                 $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
             };
 
-            /*grecaptcha.execute('{{ site_key }}', {action: 'simplesearch'}).then(function (token) {*/
+            grecaptcha.execute('{{ site_key }}', {action: 'simplesearch'}).then(function (token) {
                 $.ajax({
                     type: 'get',
                     url: '/{{ LANGUAGE_CODE }}/search/results/',
@@ -89,14 +89,14 @@
                         onError();
                     }
                 });
-            /*});*/
+            });
         }
 
         {% if task_id %}
             $(function () {
-                /*grecaptcha.ready(function () {*/
+                grecaptcha.ready(function () {
                     get_task_info('{{ task_id }}', 20);
-                /*});*/
+                });
             });
         {% endif %}
     </script>

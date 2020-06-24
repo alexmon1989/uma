@@ -51,11 +51,11 @@ function updateURLParameter(url, param, paramVal)
 function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
     let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
 
-    /*grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {*/
+    grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
         $.ajax({
             type: 'get',
             url: '/search/get-task-info/',
-            data: {'task_id': taskId/*, 'token': token*/},
+            data: {'task_id': taskId, 'token': token},
             success: function (data) {
                 if (data.state === 'SUCCESS') {
                     if (data.result === false) {
@@ -81,7 +81,7 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
                 onError();
             }
         });
-    /*});*/
+    });
 }
 
 /**

@@ -84,7 +84,7 @@ class SimpleListView(TemplateView):
 
 
 @require_ajax
-#@check_recaptcha
+@check_recaptcha
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
@@ -213,7 +213,7 @@ class ObjectDetailView(DetailView):
 
 
 @require_ajax
-#@check_recaptcha
+@check_recaptcha
 def get_data_app_html(request):
     """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
     task_id = request.GET.get('task_id', None)
@@ -401,7 +401,7 @@ def download_xls_transactions(request):
 
 
 @require_ajax
-#@check_recaptcha
+@check_recaptcha
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
     task_id = request.GET.get('task_id', None)
