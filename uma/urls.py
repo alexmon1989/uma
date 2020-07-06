@@ -46,7 +46,7 @@ urlpatterns += [
     path('search/get-task-info/', get_task_info, name="get_task_info"),
     path('search/get-validation-info/', get_validation_info, name="get_validation_info"),
     path('api/', include('apps.api.urls')),
-    path('paygate/', include('apps.paygate.urls')),
+    # path('paygate/', include('apps.paygate.urls')),
     path('favorites/add-or-remove', add_or_remove, name='favorites-add-or-remove'),
 ]
 
