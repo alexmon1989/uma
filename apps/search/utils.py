@@ -1460,7 +1460,7 @@ def get_app_ipc_indexes(app):
 
 def get_app_nice_indexes(app):
     """Возвращает строку с индексами МКТП заявки"""
-    if app.Document.idObjType == 4:
+    if app.Document.idObjType == 4 and hasattr(app.TradeMark.TrademarkDetails, 'GoodsServicesDetails'):
         nice_indexes = []
         for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
             nice_indexes.append(str(cls.ClassNumber))
