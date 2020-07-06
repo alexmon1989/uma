@@ -150,7 +150,10 @@ def user_has_access_to_docs(user, id_app_number):
 @register.filter
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
-    return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCBARCODE'), documents))
+    if documents:
+        return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER')
+                                     or x['DOCRECORD'].get('DOCBARCODE')
+                                     or x['DOCRECORD'].get('DOCSENDINGDATE'), documents))
 
 
 @register.simple_tag
@@ -168,9 +171,10 @@ def is_paid_services_enabled():
 
 @register.inclusion_tag('search/templatetags/app_stages_tm.html')
 def app_stages_tm(app):
-    """Отображает стадии заявки (градусник)."""
+    """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
     mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
-    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+    is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
+                 or mark_status_code == 8000
 
     if app['search_data']['obj_state'] == 2:
         stages_statuses = ['done' for _ in range(6)]
@@ -183,10 +187,24 @@ def app_stages_tm(app):
             else:
                 if is_stopped:
                     stages_statuses[i] = 'not-active'
-                    stages_statuses[i-1] = 'stopped'
+                    if i > 1:
+                        stages_statuses[i-1] = 'stopped'
+                    else:
+                        stages_statuses[i] = 'stopped'
                 else:
                     stages_statuses[i] = 'current'
                 break
+
+        if mark_status_code == 8000:
+            stages_statuses[5] = 'stopped'
+
+        # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
+        if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
+            for doc in app['TradeMark']['DocFlow']['Documents']:
+                if 'Т-08' in doc['DocRecord'].get('DocType', ''):
+                    stages_statuses[4] = 'current'
+                    stages_statuses[3] = 'done'
+                    break
 
     stages = [
         {
@@ -225,7 +243,7 @@ def app_stages_tm(app):
 
 @register.inclusion_tag('search/templatetags/app_stages_id.html')
 def app_stages_id(app):
-    """Отображает стадии заявки (градусник)."""
+    """Отображает стадии заявки (градусник) для пром. образцов."""
     design_status_code = int(app['Document'].get('DesignCurrentStatusCodeType', 0))
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
 
@@ -274,4 +292,124 @@ def app_stages_id(app):
         'is_stopped': is_stopped,
         'app': app,
         'design_status_code': design_status_code,
+    }
+
+
+@register.inclusion_tag('search/templatetags/app_stages_inv_um.html')
+def app_stages_inv_um(app):
+    """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""
+    # Состояние делопроизводства
+    is_stopped = False
+    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']
+                 if doc['DOCRECORD'].get('DOCREGNUMBER')
+                 or doc['DOCRECORD'].get('DOCBARCODE')
+                 or doc['DOCRECORD'].get('DOCSENDINGDATE')]
+
+    # Признаки того что делопроизводство остановлено
+    for x in ['[В11]', '[В5]', '[В5а]', '[В5д]', '[В12]', '[В5б]', '[В16]', '[В10]']:
+        for doc_type in doc_types:
+            if x in doc_type:
+                is_stopped = True
+
+    # Признаки того что делопроизводство возобновлено
+    if is_stopped:
+        for x in ['[В21а]', '[В21б]', '[В21]', '[В22]']:
+            for doc_type in doc_types:
+                if x in doc_type:
+                    is_stopped = False
+
+    # Пройденные стадии
+    done_stages = list()
+    for stage in app['DOCFLOW']['STAGES']:
+        if stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
+            for x in ['[В1]', '[В4]', '[В9]']:
+                for doc_type in doc_types:
+                    if x in doc_type:
+                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        break
+        elif stage['STAGERECORD']['STAGE'] == 'Формальна експертиза заявок на винаходи і корисні моделі':
+            for x in ['[В6]', '[В7]', '[В8]']:
+                for doc_type in doc_types:
+                    if x in doc_type:
+                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        break
+        elif stage['STAGERECORD'].get('ENDDATE'):
+            done_stages.append(stage['STAGERECORD']['STAGE'])
+
+    # Коды сборов
+    cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
+
+    # Стадии делопроизводства по заявке
+    stages = [
+        {
+            'title': _('Патент зареєстровано'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Підтримка чинності' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Підготовка заявки до реєстрації патенту' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Очікування документа про сплату державного мита'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or '19994' in cl_codes or '19996' in cl_codes
+                             else 'not-active'
+        },
+        {
+            'title': _('Кваліфікаційна експертиза'),
+            'status': 'done' if app['search_data']['obj_state'] == 2 or 'Кваліфікаційна експертиза' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Очікування клопотання про проведення кваліфікаційної експертизи'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Очікування клопотання та збору щодо КЕ' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Формальна експертиза'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Формальна експертиза заявок на винаходи і корисні моделі' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': 'done' if app['search_data']['obj_state'] == 2
+                                or 'Встановлення дати подання національної заявки' in done_stages
+                                or 'Встановлення дати входження в національну фазу в Україні' in done_stages
+                             else 'not-active'
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': 'done'
+        },
+    ]
+
+    # Неиспользуемые стадии при экспертизе заявок на полезные модели
+    if app['Document']['idObjType'] == 2:
+        stages[3]['status'] = 'not-used'
+        stages[4]['status'] = 'not-used'
+
+    # Определение текущей стадии или стадии, на которой было остановлено делопроизводство
+    for i, s in enumerate(stages):
+        if s['status'] == 'done':
+            if i != 0:
+                if is_stopped:
+                    if i == 7:
+                        # Поскольку стадия "Реєстрація первинних документів" всегда пройдена
+                        stages[i-1]['status'] = 'stopped'
+                    else:
+                        stages[i]['status'] = 'stopped'
+                else:
+                    stages[i-1]['status'] = 'current'
+            break
+
+    return {
+        'stages': stages,
+        'is_stopped': is_stopped,
+        'app': app,
     }

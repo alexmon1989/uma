@@ -614,6 +614,8 @@ function() {
 			}
 
 			var PKeyReadButton = document.getElementById('PKeyReadButton');
+			var overLay = document.getElementById('overlay');
+			overLay.style.display = 'none';
 			PKeyReadButton.disabled = false;
 			PKeyReadButton.innerHTML = 'Вхід';
 		};
@@ -671,6 +673,8 @@ function() {
 						document.getElementById('DSLoginErrorsText').innerHTML = 'Авторизація неможлива!';
 						document.getElementById('DSLoginErrors').style.display = '';
 						var PKeyReadButton = document.getElementById('PKeyReadButton');
+                        var overLay = document.getElementById('overlay');
+                        overLay.style.display = 'none';
 						PKeyReadButton.disabled = false;
 						PKeyReadButton.innerHTML = 'Вхід';
 					}
@@ -730,7 +734,9 @@ function() {
 		return;
 	},
 	readPrivateKeyButtonClick: function() {
+		var overLay = document.getElementById('overlay');
 		var PKeyReadButton = document.getElementById('PKeyReadButton');
+		overLay.style.display = '';
 		PKeyReadButton.disabled = true;
 		PKeyReadButton.innerHTML = 'Зачекайте...';
 
@@ -742,6 +748,7 @@ function() {
 			// alert(e);
 			document.getElementById('DSLoginErrorsText').innerHTML = e;
 			document.getElementById('DSLoginErrors').style.display = '';
+			overLay.style.display = 'none';
 			PKeyReadButton.disabled = false;
 			PKeyReadButton.innerHTML = 'Вхід';
 		};

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load search_extras %}
+{% load static %}
 
 {% block title %}{% trans "Пошук по сповіщенням" %}{% endblock %}
 
@@ -23,8 +24,14 @@
 
         {% if is_search %}
             <div class="results">
-                <div class="g-mt-10">
-                    <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається формування результатів" %}<loading-dots></loading-dots></p>
+                <div class="row">
+                    <div class="col-12 g-pos-rel g-min-height-200">
+                        <div class="overlay g-bg-white" id="overlay">
+                            <div class="overlay-content">
+                                <img src="{% static 'img/preloaders/loading.svg' %}" alt="Loading..."/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}

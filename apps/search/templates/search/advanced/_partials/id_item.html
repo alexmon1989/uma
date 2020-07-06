@@ -116,20 +116,22 @@
                 {% endfor %}
             </div>
 
-            <div class="col-md-3">
-                <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
-                   href="javascript:;"
-                   data-src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}">
-                    <img class="img-fluid img-thumbnail"
-                         src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}"
-                         alt="">
+            {% if hit.Design.DesignDetails.DesignSpecimenDetails %}
+                <div class="col-md-3">
+                    <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                       href="javascript:;"
+                       data-src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}">
+                        <img class="img-fluid img-thumbnail"
+                             src="{{ hit.Document.filesPath|get_image_url:hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenFilename }}"
+                             alt="">
 
-                    <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
-                        <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
-                    </span>
-                </a>
-                <div class="text-center">1.1</div>
-            </div>
+                        <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                            <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                        </span>
+                    </a>
+                    <div class="text-center">1.1</div>
+                </div>
+            {% endif %}
 
         {% endif %}
     </div>

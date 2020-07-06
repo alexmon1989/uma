@@ -15,7 +15,13 @@
 
         <div class="container g-min-height-200 g-py-20 g-py-70--lg">
             <div class="row">
-                <p class="lead g-font-weight-400">{% trans "Зачекайте, відбувається отримання даних об'єкта" %}<loading-dots></loading-dots></p>
+                <div class="col-12 g-pos-rel g-min-height-200">
+                    <div class="overlay g-bg-white" id="overlay">
+                        <div class="overlay-content">
+                            <img src="{% static 'img/preloaders/loading.svg' %}" alt="Loading..."/>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

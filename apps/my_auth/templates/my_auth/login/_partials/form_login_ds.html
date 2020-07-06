@@ -1,7 +1,12 @@
 {% load i18n %}
+{% load static %}
 
 <div class="row justify-content-center g-mt-40">
-    <div class="col-sm-8 col-lg-5">
+    <div class="col-sm-8 col-lg-5 g-pos-rel">
+        <div class="overlay" id="overlay" style="display: none">
+            <div class="overlay-content"><img src="{% static 'img/preloaders/loading.svg' %}" alt="Loading..."/></div>
+        </div>
+
         <div class="g-brd-around g-brd-gray-light-v2 rounded g-py-20 g-px-30">
             {% csrf_token %}
 

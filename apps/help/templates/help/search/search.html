@@ -15,48 +15,45 @@
                 {% include 'help/search/_partials/form.html' %}
             </div>
 
-            {% if results != None %}
-                <div class="col-md-12">
-                    <p class="lead g-font-weight-600">{% trans "Знайдено всього:" %} {{ results|length }}</p>
-                    <hr>
+            <div class="col-md-12">
+                <p class="lead g-font-weight-600">{% trans "Знайдено всього:" %} {{ results|length }}</p>
+                <hr>
 
-                    {% if results|length > 0 %}
-                        {% for question in results %}
-                            <div class="g-font-size-16 text-justify">
-                                <p><a href="{% url 'help:question-detail' slug=question.slug %}">
-                                    {% if lang == 'uk' %}
-                                        {{ question.title_uk|highlight:q|safe }}
-                                    {% elif lang == 'en' %}
-                                        {{ question.title_en|highlight:q|safe }}
-                                    {% endif %}
-                                </a></p>
-
+                {% if results|length > 0 %}
+                    {% for question in results %}
+                        <div class="g-font-size-16 text-justify">
+                            <p><a href="{% url 'help:question-detail' slug=question.slug %}">
                                 {% if lang == 'uk' %}
-                                    {{ question.content_uk|highlight:q|truncatechars_html:300|safe }}
+                                    {{ question.title_uk|highlight:q|safe }}
                                 {% elif lang == 'en' %}
-                                    {{ question.content_en|highlight:q|truncatechars_html:300|safe }}
+                                    {{ question.title_en|highlight:q|safe }}
                                 {% endif %}
+                            </a></p>
 
-                                <div class="d-flex justify-content-end">
-                                    {% trans 'Розділ' %}&nbsp;
-                                    <a href="{% url 'help:section-detail' slug=question.section.slug %}">
-                                        {% if lang == 'uk' %}
-                                            {{ question.section.title_uk }}
-                                        {% elif lang == 'en' %}
-                                            {{ question.section.title_en }}
-                                        {% endif %}
-                                    </a>
-                                </div>
+                            {% if lang == 'uk' %}
+                                {{ question.content_uk|highlight:q|truncatechars_html:300|safe }}
+                            {% elif lang == 'en' %}
+                                {{ question.content_en|highlight:q|truncatechars_html:300|safe }}
+                            {% endif %}
 
-                                <hr>
+                            <div class="d-flex justify-content-end">
+                                {% trans 'Розділ' %}&nbsp;
+                                <a href="{% url 'help:section-detail' slug=question.section.slug %}">
+                                    {% if lang == 'uk' %}
+                                        {{ question.section.title_uk }}
+                                    {% elif lang == 'en' %}
+                                        {{ question.section.title_en }}
+                                    {% endif %}
+                                </a>
                             </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>{% trans 'Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук знову або перегляньте наші <a href="/help">категорії довідки</a>.' %}</p>
-                    {% endif %}
-                </div>
-            {% endif %}
+
+                            <hr>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>{% trans 'Жодна довідкова сторінка не відповідає вашому пошуковому запиту. Повторіть пошук знову або перегляньте наші <a href="/help">категорії довідки</a>.' %}</p>
+                {% endif %}
+            </div>
         </div>
     </section>
-
 {% endblock %}
