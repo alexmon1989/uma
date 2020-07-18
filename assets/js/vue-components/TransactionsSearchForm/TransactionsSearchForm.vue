@@ -64,25 +64,29 @@
                 return Promise.reject(error);
             });
 
-            axios
-                .get('/' + this.langCode + '/search/get_obj_types_with_transactions/')
-                .then(response => {
-                    return response.data['task_id'];
-                }).then(task_id => {
-                    this.getTaskInfo(task_id).then(result => {
-                        this.objTypes = result;
-                        if (this.initial['obj_type']) {
-                            this.date = this.initial['date'][0].split(' ~ ');
-                            this.$nextTick(function () {
-                                this.obj_type = this.objTypes.find(e => e.id === parseInt(this.initial['obj_type'][0]));
-                                this.$nextTick(function () {
-                                    this.transaction_type = this.initial['transaction_type'];
-                                });
-                            });
-                        }
-                    }
-                );
-            });
+            document.onreadystatechange = () => {
+                if (document.readyState === "complete") {
+                    axios
+                        .get('/' + this.langCode + '/search/get_obj_types_with_transactions/')
+                        .then(response => {
+                            return response.data['task_id'];
+                        }).then(task_id => {
+                            this.getTaskInfo(task_id).then(result => {
+                                    this.objTypes = result;
+                                    if (this.initial['obj_type']) {
+                                        this.date = this.initial['date'][0].split(' ~ ');
+                                        this.$nextTick(function () {
+                                            this.obj_type = this.objTypes.find(e => e.id === parseInt(this.initial['obj_type'][0]));
+                                            this.$nextTick(function () {
+                                                this.transaction_type = this.initial['transaction_type'];
+                                            });
+                                        });
+                                    }
+                                }
+                        );
+                    });
+                }
+            }
         },
         methods: {
             handleSubmit: function () {
