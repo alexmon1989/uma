@@ -111,7 +111,8 @@ class Command(BaseCommand):
 
         res = {}
         # Проверка не выдан ли патент по заявке
-        if data is not None and not (data.get('Document').get('Status') == 3 and data.get('Claim', {}).get('I_11')):
+        # if data is not None and not (data.get('Document').get('Status') == 3 and data.get('Claim', {}).get('I_11')):
+        if data is not None:
             # Секция Document
             res['Document'] = data.get('Document')
 
