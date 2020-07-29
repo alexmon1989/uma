@@ -13,7 +13,7 @@ from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
                     prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs, sort_doc_flow,
-                    filter_app_data)
+                    filter_app_data, filter_bad_apps)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import os
@@ -79,6 +79,9 @@ def perform_simple_search(user_id, get_params):
                     qs &= q
                 else:
                     qs = q
+
+    # Не включать в список результатов заявки, по которым выдан патент
+    qs = filter_bad_apps(qs)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
