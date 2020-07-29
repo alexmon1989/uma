@@ -120,6 +120,10 @@ def get_elastic_results(search_groups, user):
             if qs is not None:
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
                 qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
+
+                # Не включать в список результатов заявки, по которым выдан патент
+                qs = filter_bad_apps(qs)
+
                 qs_list.append(qs)
 
     # Формирование результирующего запроса
