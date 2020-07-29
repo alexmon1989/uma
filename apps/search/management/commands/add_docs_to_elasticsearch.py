@@ -4,7 +4,7 @@ from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
-from ...utils import get_registration_status_color
+from ...utils import get_registration_status_color, filter_bad_apps
 import json
 import os.path
 import datetime
@@ -497,6 +497,10 @@ class Command(BaseCommand):
         self.indexation_process.finish_date = datetime.datetime.now()
 
         qs = Q('query_string', query='*')
+
+        # Не включать в список результатов заявки, по которым выдан патент
+        qs = filter_bad_apps(qs)
+        
         # Количество документов в индексе
         s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
         self.indexation_process.documents_in_index = s.count()
