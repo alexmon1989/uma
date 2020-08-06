@@ -17,7 +17,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
         try:
             image_name = ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename']
             year = datetime.fromisoformat(ret['app_date']).year
-            file_path = f"{settings.MEDIA_URL}TRADE_MARKS/{year}/{ret['app_number']}/{image_name}"
+            file_path = f"{settings.MEDIA_URL}TRADE_MARKS/{year}/{ret['app_number'].replace('/SU', '_SU')}/{image_name}"
             ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename'] = file_path
         except KeyError:
             pass
