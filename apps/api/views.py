@@ -60,6 +60,7 @@ class OpenDataListView(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'app__files_path',
         )
 
 
@@ -67,7 +68,7 @@ class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
     def get_queryset(self):
-        queryset = OpenData.objects.order_by('pk').all()
+        queryset = OpenData.objects.select_related('app', 'obj_type').order_by('pk').all()
 
         # Стан об'єкта
         obj_state = self.request.query_params.get('obj_state', None)
@@ -153,4 +154,5 @@ class OpenDataListViewV1(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'app__files_path',
         )
