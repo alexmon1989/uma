@@ -2,7 +2,6 @@ from django.conf import settings
 from rest_framework import serializers
 from .models import OpenData
 import json
-from datetime import datetime
 
 
 class OpenDataSerializer(serializers.ModelSerializer):
@@ -13,12 +12,12 @@ class OpenDataSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['data'] = json.loads(ret['data'])
 
+        files_dir = instance['app__files_path'].replace('\\\\bear\share\\', settings.MEDIA_URL).replace('\\', '/')
+
         # Если это знак для товаров, то необходимо указывать полные пути к изображениям
         try:
             image_name = ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename']
-            year = datetime.fromisoformat(ret['app_date']).year
-            file_path = f"{settings.MEDIA_URL}TRADE_MARKS/{year}/{ret['app_number'].replace('/SU', '_SU')}/{image_name}"
-            ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename'] = file_path
+            ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f"{files_dir}{image_name}"
         except KeyError:
             pass
 
@@ -26,10 +25,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
         try:
             images = ret['data']['DesignSpecimenDetails'][0]['DesignSpecimen']
             for image in images:
-                image_name = image['SpecimenFilename']
-                year = datetime.fromisoformat(ret['app_date']).year
-                file_path = f"{settings.MEDIA_URL}INDUSTRIAL_DES/{year}/{ret['app_number']}/{image_name}"
-                image['SpecimenFilename'] = file_path
+                image['SpecimenFilename'] = f"{files_dir}{image['SpecimenFilename']}"
         except KeyError:
             pass
 
