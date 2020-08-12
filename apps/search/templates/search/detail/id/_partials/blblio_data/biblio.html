@@ -67,6 +67,22 @@
                 </tr>
             {% endif %}
 
+            {% get_field '23.D' ipc_fields as ipc_field_23_d %}
+            {% get_field '23.N' ipc_fields as ipc_field_23_n %}
+            {% if ipc_field_23_d.enable_view or ipc_field_23_n.enable_view %}
+                <tr>
+                    <th>{{ ipc_field_23_d.code_title }}</th>
+                    <td class="g-font-weight-600">
+                        {% if ipc_field_23_d.enable_view and hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionDate %}
+                            {{ hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionDate|parse_date|date:"d.m.Y" }};
+                        {% endif %}
+                        {% if ipc_field_23_n.enable_view and hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionCountryCode %}
+                            {{ hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionCountryCode }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% get_field '31' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.0.PriorityNumber %}
                 <tr>
