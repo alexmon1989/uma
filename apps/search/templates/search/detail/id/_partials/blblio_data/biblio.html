@@ -68,26 +68,26 @@
             {% endif %}
 
             {% get_field '31' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityNumber %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.0.PriorityNumber %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityNumber }}</td>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.0.PriorityNumber }}</td>
                 </tr>
             {% endif %}
 
             {% get_field '32' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityDate %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.0.PriorityDate %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityDate|parse_date|date:"d.m.Y" }}</td>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.0.PriorityDate|parse_date|date:"d.m.Y" }}</td>
                 </tr>
             {% endif %}
 
             {% get_field '33' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.PriorityDetails.0.PriorityCountryCode %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.PriorityCountryCode }}</td>
+                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.PriorityDetails.0.PriorityCountryCode }}</td>
                 </tr>
             {% endif %}
 
