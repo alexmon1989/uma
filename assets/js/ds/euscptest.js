@@ -4,8 +4,8 @@ var URL_EMAIL_PARAM = "@EMAIL_PARAM";
 var URL_GET_KEP_CERTIFICATE_BY_EMAIL = "http://ca.iit.com.ua/services-cmp-getcert?eUserEMail=" + 
 		URL_EMAIL_PARAM + "&certType=2&respType=2";
 
-var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.22";
-var URL_CAS = "/static/my_auth/CAs.json?version=1.0.22";
+var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.23";
+var URL_CAS = "/static/my_auth/CAs.json?version=1.0.23";
 var URL_XML_HTTP_PROXY_SERVICE = "/proxy_handler/ProxyHandlerCURL.php";
 
 //=============================================================================
@@ -55,7 +55,7 @@ var EUSignCPTest = NewClass({
 	"PrivateKeyPasswordSessionStorageName": "PrivateKeyPassword",
 	"PrivateKeyCertificatesSessionStorageName": "PrivateKeyCertificates",
 	"PrivateKeyCertificatesChainSessionStorageName": "PrivateKeyCertificatesChain",
-	"CACertificatesSessionStorageName" : "CACertificates",
+	"CACertificatesSessionStorageName" : null,
 	"CAServerIndexSessionStorageName": "CAServerIndex",
 	"CAsServers": null,
 	"CAServer": null,
@@ -193,8 +193,11 @@ function() {
 		}
 	},
 	loadCertsFromServer: function() {
-		var certificates = utils.GetSessionStorageItem(
-			euSignTest.CACertificatesSessionStorageName, true, false);
+        var certificates = null;
+        if (euSignTest.CACertificatesSessionStorageName != null) {
+            var certificates = utils.GetSessionStorageItem(
+                euSignTest.CACertificatesSessionStorageName, true, false);
+        }
 		if (certificates != null) {
 			try {
 				euSign.SaveCertificates(certificates);
