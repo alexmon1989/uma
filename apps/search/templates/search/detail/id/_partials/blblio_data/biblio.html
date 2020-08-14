@@ -115,6 +115,21 @@
                 </tr>
             {% endif %}
 
+            {% get_field '55' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignSpecimenDetails %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.Design.DesignDetails.DesignSpecimenDetails %}
+                            {% if item.Colors %}
+                                {{ forloop.counter }}-й варіант -
+                                {% for color in item.Colors %}{{ color.Color }}{% if not forloop.last %};&nbsp;{% endif %}{% endfor %}{% if not forloop.last %};{% endif %}<br>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% get_field '71' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Design.DesignDetails.ApplicantDetails.Applicant %}
                 <tr>
