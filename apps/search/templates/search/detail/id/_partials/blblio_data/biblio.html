@@ -70,6 +70,7 @@
             {% get_field '23.D' ipc_fields as ipc_field_23_d %}
             {% get_field '23.N' ipc_fields as ipc_field_23_n %}
             {% if ipc_field_23_d.enable_view or ipc_field_23_n.enable_view %}
+                {% if hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionDate or hit.Design.DesignDetails.ExhibitionPriorityDetails.0.ExhibitionCountryCode %}
                 <tr>
                     <th>{{ ipc_field_23_d.code_title }}</th>
                     <td class="g-font-weight-600">
@@ -81,6 +82,7 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '31' ipc_fields as ipc_field %}
@@ -116,18 +118,21 @@
             {% endif %}
 
             {% get_field '55' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignSpecimenDetails %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>
-                        {% for item in hit.Design.DesignDetails.DesignSpecimenDetails %}
-                            {% if item.Colors %}
-                                {{ forloop.counter }}-й варіант -
-                                {% for color in item.Colors %}{{ color.Color }}{% if not forloop.last %};&nbsp;{% endif %}{% endfor %}{% if not forloop.last %};{% endif %}<br>
-                            {% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% id_has_colors hit as hit_has_colors %}
+                {% if hit_has_colors %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% for item in hit.Design.DesignDetails.DesignSpecimenDetails %}
+                                {% if item.Colors %}
+                                    {{ forloop.counter }}-й варіант -
+                                    {% for color in item.Colors %}{{ color.Color }}{% if not forloop.last %};&nbsp;{% endif %}{% endfor %}{% if not forloop.last %};{% endif %}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '71' ipc_fields as ipc_field %}
