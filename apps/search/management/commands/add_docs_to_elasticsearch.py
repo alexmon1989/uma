@@ -297,6 +297,15 @@ class Command(BaseCommand):
             # Секция Design
             res['Design'] = data.get('Design')
 
+            # Формат МКПЗ
+            for item in res['Design']['DesignDetails'].get('IndicationProductDetails', {}):
+                cl = item.get('Class')
+                if cl:
+                    cl_l = cl.split('-')
+                    if len(cl_l[1]) == 1:
+                        cl_l[1] = f"0{cl_l[1]}"
+                    item['Class'] = '-'.join(cl_l)
+
             # Случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию Design
             if data.get('PaymentDetails'):
                 res['Design']['PaymentDetails'] = data.get('PaymentDetails')
