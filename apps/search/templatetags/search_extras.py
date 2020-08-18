@@ -418,7 +418,7 @@ def app_stages_inv_um(app):
 @register.simple_tag
 def id_has_colors(hit):
     """Возвращает признак наличия заявленных цветов у пром. образца."""
-    for item in hit['Design']['DesignDetails'].get('DesignSpecimenDetails', {}):
+    for item in hit['Design'].get('DesignDetails', {}).get('DesignSpecimenDetails', {}):
         if item.get('Colors'):
             return True
     return False
