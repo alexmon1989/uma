@@ -37,6 +37,7 @@ urlpatterns += i18n_patterns(
     path('services/', include('apps.services.urls')),
     path('account/', include('apps.account.urls')),
     path('favorites/', include('apps.favorites.urls')),
+    path('bulletin/', include('apps.bulletin.urls')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 )

@@ -1,10 +1,12 @@
 import 'es6-promise/auto';
 import 'babel-polyfill';
 
+
+import Vue from 'vue';
 // Шаблон
 import './template.js';
 
-import Vue from 'vue';
+import vuetify from './plugins/vuetify'
 
 import Multiselect from 'vue-multiselect';
 
@@ -15,6 +17,7 @@ import LoadingDots from "./vue-components/LoadingDots.vue";
 import ContactForm from "./vue-components/ContactForm.vue";
 import GetOriginalDoc from "./vue-components/GetOriginalDoc.vue";
 import DateFilterForm from "./vue-components/DateFilterForm/DateFilterForm.vue";
+import Bulletin from "./vue-components/Bulletin/Bulletin.vue";
 
 import VeeValidate from 'vee-validate';
 import * as Toastr from "toastr";
@@ -26,6 +29,7 @@ window.$ = window.jQuery = require('jquery');
 window.toastr = Toastr;
 
 const app = new Vue({
+    vuetify,
     el: '#app',
     components: {
         SimpleSearchForm,
@@ -35,5 +39,6 @@ const app = new Vue({
         ContactForm,
         GetOriginalDoc,
         DateFilterForm,
+        Bulletin,
     }
 });

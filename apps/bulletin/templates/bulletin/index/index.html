@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Бюлетень" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'bulletin/index/_partials/breadcrumbs.html' %}
+
+    <div class="container g-min-height-200 g-py-70">
+        <bulletin></bulletin>
+    </div>
+{% endblock %}
