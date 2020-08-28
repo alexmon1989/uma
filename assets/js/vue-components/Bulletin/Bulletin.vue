@@ -8,9 +8,9 @@
                     class="g-pa-10"
                     justify="space-between"
             >
-                <v-col cols="5">
+                <v-col cols="6" md="5" style="overflow: auto; max-height: 75vh;">
                     <v-treeview
-                            style="overflow-y: auto; max-height: 600px"
+                            style="display: inline-block;"
                             :active.sync="active"
                             :items="tree"
                             :load-children="fetchItems"
@@ -36,7 +36,7 @@
                 <v-divider vertical></v-divider>
 
                 <v-col class="d-flex text-center"
-                       style="overflow-y: auto; max-height: 600px">
+                       style="overflow-y: auto; max-height: 75vh;">
                     <v-scroll-y-transition mode="out-in">
                         <div
                                 class="title grey--text text--lighten-1 font-weight-light"

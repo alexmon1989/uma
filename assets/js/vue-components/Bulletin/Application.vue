@@ -12,9 +12,10 @@
                    tag="v-card-text"
             >
                 <v-col v-if="app_data[code].value"
+                       cols="12"
+                       md="5"
                        class="mr-4 g-pa-5"
                        tag="strong"
-                       cols="5"
                 >{{ app_data[code].title }}:</v-col>
                 <v-col v-if="app_data[code].value && code === 'code_540'"
                        class="g-pa-5"
