@@ -337,7 +337,10 @@ def app_stages_inv_um(app):
             done_stages.append(stage['STAGERECORD']['STAGE'])
 
     # Коды сборов
-    cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
+    cl_codes = []
+    for stage in app['DOCFLOW']['COLLECTIONS']:
+        if stage['CLRECORD'].get('CLCODE'):
+            cl_codes.append(stage['CLRECORD']['CLCODE'])
 
     # Стадии делопроизводства по заявке
     stages = [
