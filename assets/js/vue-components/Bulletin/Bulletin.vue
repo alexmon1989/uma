@@ -10,7 +10,7 @@
             >
                 <v-col cols="6" md="5" style="overflow: auto; max-height: 75vh;">
                     <v-treeview
-                            style="display: inline-block;"
+                            style="display: inline-block; min-width: 100%"
                             :active.sync="active"
                             :items="tree"
                             :load-children="fetchItems"
