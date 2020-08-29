@@ -208,7 +208,7 @@ def app_stages_tm(app):
 
     stages = [
         {
-            'title': _('Знак для товарів і послуг зареєстровано'),
+            'title': _('Торговельну марку зареєстровано'),
             'status': stages_statuses[5],
         },
         {

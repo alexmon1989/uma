@@ -54,8 +54,6 @@
 <script>
     import Application from "./Application.vue";
 
-    const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-
     export default {
         data: () => ({
             active: [],
@@ -85,8 +83,6 @@
 
         methods: {
             async fetchItems(item) {
-                await pause(1);
-
                 let url = '';
 
                 if (item.type === 'bulletin') {

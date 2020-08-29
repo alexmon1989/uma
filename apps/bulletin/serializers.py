@@ -16,8 +16,6 @@ class ObjTypeSerializer(serializers.ModelSerializer):
         ret['type'] = 'obj_type'
         ret['children'] = []
 
-        if ret['name'] == 'Знаки для товарів і послуг':
-            ret['name'] = 'Торговельні марки'
         return ret
 
     class Meta:
