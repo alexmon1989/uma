@@ -12,12 +12,11 @@ class Command(BaseCommand):
         # Инициализация клиента ElasticSearch
         es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
-        c = EBulletinData.objects.count()
-        i = 0
         for app in EBulletinData.objects.all():
             query = Q(
                 'query_string',
-                query=f"search_data.app_number:{app.app_number} AND search_data.obj_state:1"
+                query=f"search_data.app_number:{app.app_number} AND Document.idObjType:4 "
+                      f"AND NOT _exists_:TradeMark.TrademarkDetails.Code_441"
             )
             s = Search().using(es).query(query).execute()
             if s:
@@ -28,7 +27,5 @@ class Command(BaseCommand):
                          id=s[0].meta.id,
                          body=hit,
                          request_timeout=30)
-            i += 1
-            print(f"{i}/{c}")
 
         self.stdout.write(self.style.SUCCESS('Finished'))
