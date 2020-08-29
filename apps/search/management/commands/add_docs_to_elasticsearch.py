@@ -4,6 +4,7 @@ from django.db.models import Max
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
+from apps.bulletin.models import EBulletinData
 from ...utils import get_registration_status_color, filter_bad_apps
 import json
 import os.path
@@ -253,6 +254,16 @@ class Command(BaseCommand):
                 applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                                  'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
+
+            # Поле 441 (дата опублікования заявки)
+            try:
+                e_bulletin_app = EBulletinData.objects.get(
+                    app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
+                )
+            except EBulletinData.DoesNotExist:
+                pass
+            else:
+                res['TradeMark']['TrademarkDetails']['Code_441'] = e_bulletin_app.publication_date
 
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
