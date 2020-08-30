@@ -16,7 +16,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-html="true"
-                   data-content="{% trans "Заявка на знак для товарів і послуг, за якою не встановлена дата її подання" %}"
+                   data-content="{% trans "Заявка на торговельну марку, за якою не встановлена дата її подання" %}"
                 ><i class="fa fa-question-circle"></i></a>
             {% endif %}
         </div>
@@ -27,9 +27,9 @@
     <div class="g-py-5 d-flex justify-content-between">
         <div class="g-text-underline text-info">
             {% if hit.search_data.obj_state == 1 %}
-                {% trans "Заявка на знак для товарів та послуг" %}
+                {% trans "Заявка на торговельну марку" %}
             {% else %}
-                {% trans "Свідоцтво України на знак для товарів та послуг" %}
+                {% trans "Свідоцтво України на торговельну марку" %}
             {% endif %}
         </div>
 

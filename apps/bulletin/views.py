@@ -4,12 +4,26 @@ from celery.result import AsyncResult
 from rest_framework import generics
 from .serializers import (ObjTypeSerializer, UnitTypeSerializer, YearSerializer, MonthSerializer, DateSerializer,
                           ApplicationSerializer)
-from .models import EBulletinUnits, EBulletinData
+from .models import EBulletinUnits, EBulletinData, Page
 from .tasks import get_app_details
 
 
 def index(request):
-    return render(request, 'bulletin/index/index.html')
+    """ОТображает страницу бюлетня."""
+    # Текущий язык приложения
+    lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+
+    # Данные страницы
+    page_data, created = Page.objects.get_or_create()
+
+    return render(
+        request,
+        'bulletin/index/index.html',
+        {
+            'lang_code': lang_code,
+            'page_description': getattr(page_data, f"description_{request.LANGUAGE_CODE}"),
+        }
+    )
 
 
 def app_details_task(request):

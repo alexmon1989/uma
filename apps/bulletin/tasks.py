@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from celery import shared_task
 from django.conf import settings
+from django.urls import reverse
 import datetime
 from .models import EBulletinData
 
@@ -27,10 +28,12 @@ def get_app_details(app_number):
         data = hit['TradeMark']['TrademarkDetails']
 
         # (210) Номер заявки
+        url = reverse("search:detail", args=(s[0].meta.id,))
         biblio_data['code_210'] = {
             'title': '(210) Номер заявки',
-            'value': data['ApplicationNumber']
+            'value': f"<a href=\"{url}\" target=\"_blank\">{data['ApplicationNumber']}</a>"
         }
+
         # 220 - Дата подання заявки
         biblio_data['code_220'] = {
             'title': '(220) Дата подання заявки',

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-29 12:00+0300\n"
+"POT-Creation-Date: 2020-08-29 20:48+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -26,6 +26,7 @@ msgstr ""
 #: apps/account/templates/accounts/orders/detail/_partials/breadcrumbs.html:16
 #: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:16
 #: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:16
+#: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:16
 #: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
 #: apps/favorites/templates/favorites/index/_partials/breadcrumbs.html:16
 #: apps/help/templates/help/index/_partials/breadcrumbs.html:16
@@ -42,6 +43,7 @@ msgstr ""
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:16
+#: apps/services/templates/services/api/_partials/breadcrumbs.html:16
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:16
 msgid "Головна"
 msgstr "Home"
@@ -85,7 +87,7 @@ msgid "Загальна інформація"
 msgstr "Dashboard"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:10
-#: templates/_partials/header.html:155
+#: templates/_partials/header.html:158
 msgid "Мій рахунок (баланс)"
 msgstr "My account balance"
 
@@ -99,7 +101,7 @@ msgstr "Applications views history"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:18
 #: apps/contacts/templates/contacts/_partials/form.html:24
-#: templates/_partials/header.html:161
+#: templates/_partials/header.html:164
 msgid "Повідомлення"
 msgstr "Message"
 
@@ -108,12 +110,12 @@ msgstr "Message"
 #: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:24
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/settings/index.html:20
-#: templates/_partials/header.html:164
+#: templates/_partials/header.html:167
 msgid "Налаштування"
 msgstr "Settings"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:26
-#: templates/_partials/header.html:169 templates/_partials/header.html:178
+#: templates/_partials/header.html:172 templates/_partials/header.html:181
 msgid "Вихід"
 msgstr "Exit"
 
@@ -136,7 +138,7 @@ msgstr "Account balance "
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:20
 #: apps/account/templates/accounts/views_history/index.html:4
-#: templates/_partials/header.html:149
+#: templates/_partials/header.html:152
 msgid "Мій кабінет"
 msgstr "My account"
 
@@ -294,6 +296,69 @@ msgstr "Data has been successfully saved"
 msgid "Ви погодилися з умовами ліцензії"
 msgstr "You have agreed with license terms"
 
+#: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:10
+#: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:20
+#: apps/bulletin/templates/bulletin/index/index.html:4
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:13
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:31
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:53
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:71
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:89
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:111
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:133
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:159
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:189
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:199
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:221
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:231
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:241
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:251
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:281
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:307
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:333
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:343
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:353
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:387
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:409
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:423
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:449
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:459
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:501
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:543
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:561
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:583
+#: apps/search/templates/search/detail/ld/_partials/transactions.html:13
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:13
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:36
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:54
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:68
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:86
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:117
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:135
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:157
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:192
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:215
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:246
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:268
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:299
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:335
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:375
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:419
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:448
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:484
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:514
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:537
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:551
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:569
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:604
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:624
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:651
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:669
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:705
+#: templates/_partials/footer.html:55 templates/_partials/header.html:81
+msgid "Бюлетень"
+msgstr "Bulletin"
+
 #: apps/contacts/templates/contacts/_partials/details.html:3
 msgid "Адміністратор бази даних"
 msgstr "Database administrator"
@@ -409,7 +474,7 @@ msgstr "Show more"
 #: apps/help/templates/help/search/search.html:6
 #: apps/help/templates/help/section/_partials/breadcrumbs.html:26
 #: apps/help/templates/help/section/section.html:11
-#: templates/_partials/footer.html:61 templates/_partials/header.html:82
+#: templates/_partials/footer.html:61 templates/_partials/header.html:85
 msgid "Допомога"
 msgstr "Help"
 
@@ -495,7 +560,7 @@ msgstr "Remember me"
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:116
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-#: templates/_partials/header.html:181
+#: templates/_partials/header.html:184
 msgid "Вхід"
 msgstr "Enter"
 
@@ -529,14 +594,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:61
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1255
+#: apps/search/utils.py:1262
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:56 apps/search/admin.py:108
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1255
+#: apps/search/utils.py:1262
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -548,7 +613,7 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/tasks.py:43 apps/search/tasks.py:190 apps/search/tasks.py:250
+#: apps/search/tasks.py:43 apps/search/tasks.py:193 apps/search/tasks.py:253
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -677,7 +742,7 @@ msgstr "Full list of applicants"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:659
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
-#: apps/search/utils.py:1231
+#: apps/search/utils.py:1235
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -686,7 +751,7 @@ msgstr "Application number"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:73
-#: apps/search/utils.py:1232
+#: apps/search/utils.py:1236
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -728,6 +793,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
+#: apps/search/utils.py:1246
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -770,6 +836,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
+#: apps/search/utils.py:1244
 msgid "МПК"
 msgstr "IPC"
 
@@ -973,21 +1040,20 @@ msgid "Лише заявки, за якими не встановлена дат
 msgstr "Only applications with limited access"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:19
-msgid ""
-"Заявка на знак для товарів і послуг, за якою не встановлена дата її подання"
+msgid "Заявка на торговельну марку, за якою не встановлена дата її подання"
 msgstr ""
-"Application for a mark for goods and services, for which the date of its "
+"Application for a trademark mark for goods and services, for which the date of its "
 "submission is not set"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:30
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:17
-msgid "Заявка на знак для товарів та послуг"
-msgstr "Trademark Application"
+msgid "Заявка на торговельну марку"
+msgstr "Trademark application"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:32
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:19
-msgid "Свідоцтво України на знак для товарів та послуг"
-msgstr "Ukrainian Trademark certificate"
+msgid "Свідоцтво України на торговельну марку"
+msgstr "Trademark certificate of Ukraine"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:85
 msgid "Номер реєстрації знака, який є номером свідоцтва"
@@ -1006,6 +1072,7 @@ msgstr ""
 "Registration of Marks"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:117
+#: apps/search/utils.py:1245
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1459,65 +1526,6 @@ msgstr "Receipt date"
 msgid "Назва платежу"
 msgstr "Payment title"
 
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:13
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:31
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:53
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:71
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:89
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:111
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:133
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:159
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:189
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:199
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:221
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:231
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:241
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:251
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:281
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:307
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:333
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:343
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:353
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:387
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:409
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:423
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:449
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:459
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:501
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:543
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:561
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:583
-#: apps/search/templates/search/detail/ld/_partials/transactions.html:13
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:13
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:36
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:54
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:68
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:86
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:117
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:135
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:157
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:192
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:215
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:246
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:268
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:299
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:335
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:375
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:419
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:448
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:484
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:514
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:537
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:551
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:569
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:604
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:624
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:651
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:669
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:705
-msgid "Бюлетень"
-msgstr "Bulletin"
-
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:17
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:35
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:57
@@ -1604,7 +1612,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1237
+#: apps/search/utils.py:1241
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -1887,35 +1895,35 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:203
-msgid "Знак для товарів і послуг зареєстровано"
-msgstr "Registered trade mark"
+#: apps/search/templatetags/search_extras.py:211
+msgid "Торговельну марку зареєстровано"
+msgstr "Registered trademark"
 
-#: apps/search/templatetags/search_extras.py:207
-#: apps/search/templatetags/search_extras.py:265
-#: apps/search/templatetags/search_extras.py:343
+#: apps/search/templatetags/search_extras.py:215
+#: apps/search/templatetags/search_extras.py:273
+#: apps/search/templatetags/search_extras.py:354
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/templatetags/search_extras.py:211
-#: apps/search/templatetags/search_extras.py:355
+#: apps/search/templatetags/search_extras.py:219
+#: apps/search/templatetags/search_extras.py:366
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/templatetags/search_extras.py:215
-#: apps/search/templatetags/search_extras.py:366
+#: apps/search/templatetags/search_extras.py:223
+#: apps/search/templatetags/search_extras.py:377
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/templatetags/search_extras.py:219
-#: apps/search/templatetags/search_extras.py:273
-#: apps/search/templatetags/search_extras.py:372
+#: apps/search/templatetags/search_extras.py:227
+#: apps/search/templatetags/search_extras.py:281
+#: apps/search/templatetags/search_extras.py:383
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/templatetags/search_extras.py:223
-#: apps/search/templatetags/search_extras.py:277
-#: apps/search/templatetags/search_extras.py:379
+#: apps/search/templatetags/search_extras.py:231
+#: apps/search/templatetags/search_extras.py:285
+#: apps/search/templatetags/search_extras.py:390
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1923,68 +1931,69 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/templatetags/search_extras.py:261
+#: apps/search/templatetags/search_extras.py:269
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/templatetags/search_extras.py:269
+#: apps/search/templatetags/search_extras.py:277
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/templatetags/search_extras.py:337
+#: apps/search/templatetags/search_extras.py:348
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/templatetags/search_extras.py:349
+#: apps/search/templatetags/search_extras.py:360
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/templatetags/search_extras.py:360
+#: apps/search/templatetags/search_extras.py:371
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/utils.py:1229
+#: apps/search/utils.py:1233
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1230
+#: apps/search/utils.py:1234
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1233
+#: apps/search/utils.py:1237
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1234
+#: apps/search/utils.py:1238
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1235
+#: apps/search/utils.py:1239
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1236
+#: apps/search/utils.py:1240
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1238
+#: apps/search/utils.py:1242
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1239
+#: apps/search/utils.py:1243
 msgid "Представник"
 msgstr "Presenter"
+
+#: apps/services/templates/services/api/_partials/breadcrumbs.html:20
+#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:20
+#: templates/_partials/header.html:65
+msgid "Сервіси"
+msgstr "Services"
 
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:10
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:24
 #: templates/_partials/header.html:71
 msgid "Отримати оригінал документу"
 msgstr "Get the original document"
-
-#: apps/services/templates/services/original_document/_partials/breadcrumbs.html:20
-#: templates/_partials/header.html:65
-msgid "Сервіси"
-msgstr "Services"
 
 #: templates/_partials/footer.html:22
 msgid "Спеціальна інформаційна система Укрпатенту (СІС)."
@@ -2001,11 +2010,7 @@ msgstr ""
 msgid "Меню"
 msgstr "Menu"
 
-#: templates/_partials/footer.html:55 templates/_partials/header.html:78
-msgid "Про сервіс"
-msgstr "About"
-
-#: templates/_partials/footer.html:67 templates/_partials/header.html:86
+#: templates/_partials/footer.html:67 templates/_partials/header.html:89
 msgid "Зворотній зв'язок"
 msgstr "Contacts"
 
@@ -2027,11 +2032,11 @@ msgid ""
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:96
+#: templates/_partials/header.html:99
 msgid "Перейти до списку вибраних документів"
 msgstr "Go to the favorites list"
 
-#: templates/_partials/header.html:158
+#: templates/_partials/header.html:161
 msgid "Історія переглядів"
 msgstr "Applications views history"
 
@@ -2042,6 +2047,18 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Заявка на знак для товарів та послуг"
+#~ msgstr "Trademark Application"
+
+#~ msgid "Свідоцтво України на знак для товарів та послуг"
+#~ msgstr "Ukrainian Trademark certificate"
+
+#~ msgid "Знак для товарів і послуг зареєстровано"
+#~ msgstr "Registered trade mark"
+
+#~ msgid "Про сервіс"
+#~ msgstr "About"
 
 #~ msgid ""
 #~ "Реєстрація первинних документів, попередня експертиза та введення "
