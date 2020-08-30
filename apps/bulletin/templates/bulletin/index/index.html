@@ -8,6 +8,10 @@
     {% include 'bulletin/index/_partials/breadcrumbs.html' %}
 
     <div class="container g-min-height-200 g-py-70">
+        {% if page_description %}
+            <div class="g-mb-20">{{ page_description|safe }}</div>
+        {% endif %}
+
         <bulletin></bulletin>
     </div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from ckeditor_uploader.fields import RichTextUploadingField
 from ..search.models import ObjType
 
 
@@ -22,3 +23,16 @@ class EBulletinData(models.Model):
     class Meta:
         managed = False
         db_table = 'ls_SIS_ebulletin_data'
+
+
+class Page(models.Model):
+    """Модель страниці простого поиска."""
+    description_uk = RichTextUploadingField('Опис сторінки (укр.)', blank=True)
+    description_en = RichTextUploadingField('Опис сторінки (англ.)', blank=True)
+
+    def __str__(self):
+        return 'Сторінка простого пошуку'
+
+    class Meta:
+        verbose_name = 'Дані сторінки'
+        verbose_name_plural = 'Дані сторінки'
