@@ -65,13 +65,13 @@
                data-placement="top"
                title="(210) {% trans "Номер заявки" %}"
             >{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</a><br>
-            {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
+            {% if hit.search_data.app_date %}
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
                    title="(220) {% trans "Дата подання заявки" %}"
-                >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+                >{{ hit.search_data.app_date|parse_date|date:"d.m.Y" }}</a>
             {% endif %}
         </div>
 

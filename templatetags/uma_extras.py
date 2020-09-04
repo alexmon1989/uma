@@ -42,7 +42,7 @@ def get(mapping, key):
 @register.filter
 def parse_date(value):
     try:
-        return datetime.strptime(value, '%Y-%m-%d')
+        return datetime.strptime(value[:10], '%Y-%m-%d')
     except ValueError:
         return value
 

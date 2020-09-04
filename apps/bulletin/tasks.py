@@ -37,7 +37,7 @@ def get_app_details(app_number):
         # 220 - Дата подання заявки
         biblio_data['code_220'] = {
             'title': '(220) Дата подання заявки',
-            'value': datetime.datetime.strptime(data['ApplicationDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            'value': datetime.datetime.strptime(hit['search_data']['app_date'][:10], '%Y-%m-%d').strftime('%d.%m.%Y')
         }
 
         # 230 - Дата виставкового пріорітету
