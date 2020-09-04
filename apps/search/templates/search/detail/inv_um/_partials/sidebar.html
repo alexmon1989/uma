@@ -57,7 +57,7 @@
         >{% trans "Реферат" %} (EN)</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link g-text-underline--hover {% if not hit.biblio_data %}active{% endif %}"
+        <a class="nav-link g-text-underline--hover {% if not hit.biblio_data %}active{% endif %} {% if not hit.DOCFLOW %}disabled{% endif %}"
            data-toggle="tab"
            href="#nav-docs"
            role="tab"
