@@ -4,7 +4,7 @@ from celery import shared_task
 from django.conf import settings
 from django.urls import reverse
 import datetime
-from .models import EBulletinData
+from .models import EBulletinData, ClListOfficialBulletinsIp
 
 
 @shared_task
@@ -85,9 +85,11 @@ def get_app_details(app_number):
             biblio_data['code_330']['value'] = '; '.join(countries)
 
         # 441 - Дата публікації заявки
+        date_441 = EBulletinData.objects.filter(app_number=app_number).first().publication_date
+        bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
         biblio_data['code_441'] = {
-            'title': '(441) Дата публікації заявки',
-            'value': EBulletinData.objects.filter(app_number=app_number).first().publication_date.strftime('%d.%m.%Y')
+            'title': '(441) Дата публікації відомостей про заявку та номер бюлетня',
+            'value': f"{date_441.strftime('%d.%m.%Y')}, бюл. № {bul_num_441.bul_number}"
         }
 
         # 511 - індекс (індекси) МКТП для реєстрації знаків та перелік товарів і послуг

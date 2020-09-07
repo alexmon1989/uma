@@ -167,7 +167,7 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">
-                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}
+                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bul_number_441_code hit.TradeMark.TrademarkDetails.Code_441 %}
                     </td>
                 </tr>
             {% endif %}

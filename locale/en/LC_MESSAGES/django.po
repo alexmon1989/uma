@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-29 20:48+0300\n"
+"POT-Creation-Date: 2020-09-08 00:48+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1042,8 +1042,7 @@ msgstr "Only applications with limited access"
 #: apps/search/templates/search/advanced/_partials/tm_item.html:19
 msgid "Заявка на торговельну марку, за якою не встановлена дата її подання"
 msgstr ""
-"Application for a trademark mark for goods and services, for which the date of its "
-"submission is not set"
+"Application for a trademark, for which the date of its submission is not set"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:30
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:17
@@ -1165,7 +1164,7 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/id/_partials/sidebar.html:28
 #: apps/search/templates/search/detail/id/detail.html:39
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:71
-#: apps/search/templates/search/detail/inv_um/detail.html:87
+#: apps/search/templates/search/detail/inv_um/detail.html:89
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:71
 #: apps/search/templates/search/detail/ld/detail.html:85
 #: apps/search/templates/search/detail/qi/_partials/sidebar.html:21
@@ -1744,7 +1743,11 @@ msgstr "show all"
 msgid "сховати"
 msgstr "hide"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:219
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:170
+msgid "бюл. №"
+msgstr "bul."
+
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:298
 msgid "Показати"
 msgstr "Show"
 
@@ -1895,35 +1898,35 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:211
+#: apps/search/templatetags/search_extras.py:212
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/templatetags/search_extras.py:215
-#: apps/search/templatetags/search_extras.py:273
-#: apps/search/templatetags/search_extras.py:354
+#: apps/search/templatetags/search_extras.py:216
+#: apps/search/templatetags/search_extras.py:274
+#: apps/search/templatetags/search_extras.py:355
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/templatetags/search_extras.py:219
-#: apps/search/templatetags/search_extras.py:366
+#: apps/search/templatetags/search_extras.py:220
+#: apps/search/templatetags/search_extras.py:367
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/templatetags/search_extras.py:223
-#: apps/search/templatetags/search_extras.py:377
+#: apps/search/templatetags/search_extras.py:224
+#: apps/search/templatetags/search_extras.py:378
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/templatetags/search_extras.py:227
-#: apps/search/templatetags/search_extras.py:281
-#: apps/search/templatetags/search_extras.py:383
+#: apps/search/templatetags/search_extras.py:228
+#: apps/search/templatetags/search_extras.py:282
+#: apps/search/templatetags/search_extras.py:384
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/templatetags/search_extras.py:231
-#: apps/search/templatetags/search_extras.py:285
-#: apps/search/templatetags/search_extras.py:390
+#: apps/search/templatetags/search_extras.py:232
+#: apps/search/templatetags/search_extras.py:286
+#: apps/search/templatetags/search_extras.py:391
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1931,23 +1934,23 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/templatetags/search_extras.py:269
+#: apps/search/templatetags/search_extras.py:270
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/templatetags/search_extras.py:277
+#: apps/search/templatetags/search_extras.py:278
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/templatetags/search_extras.py:348
+#: apps/search/templatetags/search_extras.py:349
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/templatetags/search_extras.py:360
+#: apps/search/templatetags/search_extras.py:361
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/templatetags/search_extras.py:371
+#: apps/search/templatetags/search_extras.py:372
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 

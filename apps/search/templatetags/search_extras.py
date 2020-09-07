@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app)
+from apps.bulletin.models import ClListOfficialBulletinsIp
 
 register = template.Library()
 
@@ -425,3 +426,14 @@ def id_has_colors(hit):
         if item.get('Colors'):
             return True
     return False
+
+
+@register.simple_tag
+def bul_number_441_code(code_441_date):
+    """Возвращает номер бюлетня для 441 кода."""
+    try:
+        obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441_date, date_to__gte=code_441_date)
+    except ClListOfficialBulletinsIp.DoesNotExist:
+        return False
+    else:
+        return obj.bul_number

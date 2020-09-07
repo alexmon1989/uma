@@ -25,6 +25,18 @@ class EBulletinData(models.Model):
         db_table = 'ls_SIS_ebulletin_data'
 
 
+class ClListOfficialBulletinsIp(models.Model):
+    id = models.AutoField(db_column='idBull', primary_key=True)
+    bul_date = models.DateField(db_column='Bull_Date', blank=True, null=True)
+    date_from = models.DateField(db_column='Date_from', blank=True, null=True)
+    date_to = models.DateField(db_column='Date_to', blank=True, null=True)
+    bul_number = models.IntegerField(db_column='Bull_Number', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cl_list_official_bulletins_ip'
+
+
 class Page(models.Model):
     """Модель страниці простого поиска."""
     description_uk = RichTextUploadingField('Опис сторінки (укр.)', blank=True)
