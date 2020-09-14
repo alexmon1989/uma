@@ -120,8 +120,15 @@
     }
 </script>
 
-<style>
-    .bulletin-treeview .v-icon.v-icon::after {
-        transform: scale(1.1);
+<style lang="scss">
+    .bulletin-treeview {
+        .v-icon.v-icon::after {
+            transform: scale(1.1);
+        }
+
+        .v-treeview-node__label {
+            font-size: inherit;
+            white-space: normal;
+        }
     }
 </style>
