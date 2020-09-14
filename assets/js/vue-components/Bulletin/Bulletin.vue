@@ -1,5 +1,5 @@
 <template>
-    <div class="vuetify-wrap">
+    <div class="v-application vuetify-wrap">
         <v-card>
             <v-card-title class="g-bg-primary g-color-white g-font-size-16 white--text headline">
                 Офіційний електронний бюлетень
@@ -10,6 +10,7 @@
             >
                 <v-col cols="6" md="5" style="overflow: auto; max-height: 75vh;">
                     <v-treeview
+                            class="bulletin-treeview"
                             style="display: inline-block; min-width: 100%"
                             :active.sync="active"
                             :items="tree"
@@ -35,16 +36,13 @@
 
                 <v-divider vertical></v-divider>
 
-                <v-col class="d-flex text-center"
-                       style="overflow-y: auto; max-height: 75vh;">
-                    <v-scroll-y-transition mode="out-in">
-                        <div
-                                class="title grey--text text--lighten-1 font-weight-light"
-                                v-if="!selected"
-                        >Будь-ласка, оберіть об'єкт для перегляду його даних.
-                        </div>
-                        <application :app_number="selected.name" v-else></application>
-                    </v-scroll-y-transition>
+                <v-col style="overflow-y: auto; max-height: 75vh;">
+                    <div class="d-flex justify-content-center"
+                         v-if="!selected">
+                        <p class="title grey--text text--lighten-1 font-weight-light g-pt-10 g-font-size-16"
+                        >Будь-ласка, оберіть об'єкт для перегляду його даних.</p>
+                    </div>
+                    <application :app_number="selected.name" v-else></application>
                 </v-col>
             </v-row>
         </v-card>
@@ -88,15 +86,15 @@
                 if (item.type === 'bulletin') {
                     url = '/uk/bulletin/obj-types/'
                 } else if (item.type === 'obj_type') {
-                    url = '/uk/bulletin/unit-types/?obj_type_id=' + item.obj_type_id
+                    url = '/uk/bulletin/unit-types/?obj_type=' + item.obj_type_id
                 } else if (item.type === 'unit_type') {
-                    url = '/uk/bulletin/years/?unit_type_id=' + item.unit_type_id
+                    url = '/uk/bulletin/years/?unit_type=' + item.unit_type_id
                 } else if (item.type === 'year') {
-                    url = '/uk/bulletin/months/?unit_type_id=' + item.unit_type_id + '&year=' + item.name
+                    url = '/uk/bulletin/months/?unit_type=' + item.unit_type_id + '&year=' + item.name
                 } else if (item.type === 'month') {
-                    url = '/uk/bulletin/dates/?unit_type_id=' + item.unit_type_id + '&year=' + item.year + '&month=' + item.month
+                    url = '/uk/bulletin/dates/?unit_type=' + item.unit_type_id + '&year=' + item.year + '&month=' + item.month
                 } else if (item.type === 'publication_date') {
-                    url = '/uk/bulletin/applications/?unit_type_id=' + item.unit_type_id + '&publication_date=' + item.publication_date
+                    url = '/uk/bulletin/applications/?unit_type=' + item.unit_type_id + '&publication_date=' + item.publication_date
                 }
 
                 return fetch(url)
@@ -122,6 +120,8 @@
     }
 </script>
 
-<style scoped>
-
+<style>
+    .bulletin-treeview .v-icon.v-icon::after {
+        transform: scale(1.1);
+    }
 </style>
