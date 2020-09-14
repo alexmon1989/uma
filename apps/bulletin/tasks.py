@@ -26,14 +26,9 @@ def get_app_details(app_number):
 
     biblio_data = dict()
 
-    if hit['Document']['idObjType'] in (1, 2, 3):
-        biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
-
-    elif hit['Document']['idObjType'] == 4:
+    # Формирование массива данных
+    if hit['Document']['idObjType'] == 4:
         biblio_data = prepare_tm_data(s[0])
-
-    elif hit['Document']['idObjType'] == 6:
-        biblio_data = hit['Design']['DesignDetails']
 
     elif hit['Document']['idObjType'] == 9:
         biblio_data = prepare_madrid_tm_data(s[0])

@@ -440,6 +440,7 @@ class Command(BaseCommand):
             },
             'search_data': {
                 'protective_doc_number': doc['registration_number'],
+                'obj_state': 2
             }
         }
 
@@ -560,7 +561,7 @@ class Command(BaseCommand):
             # Удаление JSON
             try:
                 os.remove(self.get_json_path(doc))
-            except FileNotFoundError:
+            except (FileNotFoundError, PermissionError):
                 pass
 
         # Время окончания процесса индексации и сохранение данных процесса индексации
