@@ -307,12 +307,8 @@ def prepare_madrid_tm_data(record):
         splitted_path[splitted_path_len - 3],
         splitted_path[splitted_path_len - 2]
     )
-    if os.path.exists(os.path.join(image_dir, f"{data['@INTREGN']}.JPG")):
-        biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN']}.JPG")
-    elif os.path.exists(os.path.join(image_dir, f"{data['@INTREGN']}.jpg")):
+    if os.path.exists(os.path.join(image_dir, f"{data['@INTREGN']}.jpg")):
         biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN']}.jpg")
-    elif os.path.exists(os.path.join(image_dir, f"{data['@INTREGN'][1:]}.JPG")):
-        biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN'][1:]}.JPG")
     elif os.path.exists(os.path.join(image_dir, f"{data['@INTREGN'][1:]}.jpg")):
         biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN'][1:]}.jpg")
 
