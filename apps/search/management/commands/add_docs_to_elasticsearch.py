@@ -451,7 +451,7 @@ class Command(BaseCommand):
         EBulletinData.objects.update_or_create(
             app_number=doc['registration_number'],
             unit_id=2,
-            defaults={'publication_date': data_from_json['ENN']['@PUBDATE']}
+            defaults={'publication_date': doc['registration_date']}
         )
 
     def write_to_es_index(self, doc, body):
