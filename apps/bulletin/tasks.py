@@ -31,6 +31,6 @@ def get_app_details(app_number):
         biblio_data = prepare_tm_data(s[0])
 
     elif hit['Document']['idObjType'] == 9:
-        biblio_data = prepare_madrid_tm_data(s[0])
+        biblio_data = prepare_madrid_tm_data(app_number, s[0])
 
     return biblio_data

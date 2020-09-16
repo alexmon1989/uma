@@ -254,7 +254,7 @@ def prepare_tm_data(record):
     return biblio_data
 
 
-def prepare_madrid_tm_data(record):
+def prepare_madrid_tm_data(app_number, record):
     """Подлготавливет данные о мадридских ТМ для отображения в бюлетне."""
     hit = record.to_dict()
     data = hit['MadridTradeMark']['TradeMarkDetails']
@@ -267,7 +267,7 @@ def prepare_madrid_tm_data(record):
     }
 
     # 441 - Дата публікації заявки
-    date_441 = EBulletinData.objects.filter(app_number=data['ApplicationNumber']).first().publication_date
+    date_441 = EBulletinData.objects.filter(app_number=app_number).first().publication_date
     bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
     biblio_data['code_441'] = {
         'title': '(441) Дата публікації відомостей про міжнародну реєстрацію торговельної марки,'
