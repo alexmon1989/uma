@@ -515,6 +515,7 @@ class Command(BaseCommand):
             'files_path',
             'obj_type_id',
             'registration_number',
+            'registration_date',
             'app_number',
             'app_date',
         )

@@ -266,6 +266,15 @@ def prepare_madrid_tm_data(record):
         'value': data['@INTREGN']
     }
 
+    # 441 - Дата публікації заявки
+    date_441 = EBulletinData.objects.filter(app_number=data['ApplicationNumber']).first().publication_date
+    bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
+    biblio_data['code_441'] = {
+        'title': '(441) Дата публікації відомостей про міжнародну реєстрацію торговельної марки,'
+                 ' що надійшла для проведення експертизи',
+        'value': f"{date_441.strftime('%d.%m.%Y')}, бюл. № {bul_num_441.bul_number}"
+    }
+
     # (450) Дата публікації відомостей про міжнародну реєстрацію та номер бюлетню Міжнародного бюро ВОІВ
     biblio_data['code_450'] = {
         'title': '(450) Дата публікації відомостей про міжнародну реєстрацію '
