@@ -411,48 +411,49 @@ class Command(BaseCommand):
         # Считывание данных из файла
         data_from_json = self.get_data_from_json(doc)
 
-        # Парсинг дат
-        date_keys = ['@EXPDATE', '@NOTDATE', '@REGEDAT', '@INTREGD']
-        for i in date_keys:
-            if data_from_json.get(i):
-                data_from_json[i] = datetime.datetime.strptime(data_from_json[i], '%Y%m%d').strftime('%Y-%m-%d')
-        if data_from_json.get('ENN', {}).get('@PUBDATE'):
-            data_from_json['ENN']['@PUBDATE'] = datetime.datetime.strptime(
-                data_from_json['ENN']['@PUBDATE'], '%Y%m%d'
-            ).strftime('%Y-%m-%d')
-        if data_from_json.get('BASGR', {}).get('BASAPPGR', {}).get('BASAPPD'):
-            data_from_json['BASGR']['BASAPPGR']['BASAPPD'] = datetime.datetime.strptime(
-                data_from_json['BASGR']['BASAPPGR']['BASAPPD'], '%Y%m%d'
-            ).strftime('%Y-%m-%d')
-        if data_from_json.get('PRIGR', {}).get('PRIAPPD', {}):
-            data_from_json['PRIGR']['PRIAPPD'] = datetime.datetime.strptime(
-                data_from_json['PRIGR']['PRIAPPD'], '%Y%m%d'
-            ).strftime('%Y-%m-%d')
+        if data_from_json is not None:
+            # Парсинг дат
+            date_keys = ['@EXPDATE', '@NOTDATE', '@REGEDAT', '@INTREGD']
+            for i in date_keys:
+                if data_from_json.get(i):
+                    data_from_json[i] = datetime.datetime.strptime(data_from_json[i], '%Y%m%d').strftime('%Y-%m-%d')
+            if data_from_json.get('ENN', {}).get('@PUBDATE'):
+                data_from_json['ENN']['@PUBDATE'] = datetime.datetime.strptime(
+                    data_from_json['ENN']['@PUBDATE'], '%Y%m%d'
+                ).strftime('%Y-%m-%d')
+            if data_from_json.get('BASGR', {}).get('BASAPPGR', {}).get('BASAPPD'):
+                data_from_json['BASGR']['BASAPPGR']['BASAPPD'] = datetime.datetime.strptime(
+                    data_from_json['BASGR']['BASAPPGR']['BASAPPD'], '%Y%m%d'
+                ).strftime('%Y-%m-%d')
+            if data_from_json.get('PRIGR', {}).get('PRIAPPD', {}):
+                data_from_json['PRIGR']['PRIAPPD'] = datetime.datetime.strptime(
+                    data_from_json['PRIGR']['PRIAPPD'], '%Y%m%d'
+                ).strftime('%Y-%m-%d')
 
-        # Данные для записи в ElasticSearch
-        data = {
-            'Document': {
-                'idObjType': 9,
-                'filesPath': doc['files_path']
-            },
-            'MadridTradeMark': {
-                'TradeMarkDetails': data_from_json
-            },
-            'search_data': {
-                'protective_doc_number': doc['registration_number'],
-                'obj_state': 2
+            # Данные для записи в ElasticSearch
+            data = {
+                'Document': {
+                    'idObjType': 9,
+                    'filesPath': doc['files_path']
+                },
+                'MadridTradeMark': {
+                    'TradeMarkDetails': data_from_json
+                },
+                'search_data': {
+                    'protective_doc_number': doc['registration_number'],
+                    'obj_state': 2
+                }
             }
-        }
 
-        # Запись в индекс
-        self.write_to_es_index(doc, data)
+            # Запись в индекс
+            self.write_to_es_index(doc, data)
 
-        # Запись в БД для бюлетня
-        EBulletinData.objects.update_or_create(
-            app_number=doc['registration_number'],
-            unit_id=2,
-            defaults={'publication_date': doc['registration_date']}
-        )
+            # Запись в БД для бюлетня
+            EBulletinData.objects.update_or_create(
+                app_number=doc['registration_number'],
+                unit_id=2,
+                defaults={'publication_date': doc['registration_date']}
+            )
 
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
