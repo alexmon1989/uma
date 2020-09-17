@@ -333,6 +333,8 @@ def prepare_madrid_tm_data(app_number, record):
             res += f"<strong>Кл. {c['@NICCLAI']}</strong>"
             if c.get('GSTERMEN'):
                 res += f"<strong>:</strong> {c['GSTERMEN']}"
+            if c.get('GSTERMFR'):
+                res += f"<strong>:</strong> {c['GSTERMFR']}"
             res += "<br>"
         biblio_data['code_511']['value'] = res
 
