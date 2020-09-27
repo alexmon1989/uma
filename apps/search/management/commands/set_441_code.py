@@ -3,6 +3,8 @@ from django.conf import settings
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from apps.bulletin.models import EBulletinData
+from apps.api.models import OpenData
+import json
 
 
 class Command(BaseCommand):
@@ -27,5 +29,17 @@ class Command(BaseCommand):
                          id=s[0].meta.id,
                          body=hit,
                          request_timeout=30)
+
+            # Добавление 441 кода в API
+            try:
+                opendata_item = OpenData.objects.get(app_number=app.app_number)
+            except OpenData.DoesNotExist:
+                pass
+            else:
+                data = json.loads(opendata_item.data)
+                if not data.get('Code_441'):
+                    data['Code_441'] = str(app.publication_date)
+                    opendata_item.data = json.dumps(data)
+                    opendata_item.save()
 
         self.stdout.write(self.style.SUCCESS('Finished'))

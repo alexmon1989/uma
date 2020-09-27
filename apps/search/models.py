@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from django.db.models import Prefetch
 from ckeditor_uploader.fields import RichTextUploadingField
 from uma.abstract_models import TimeStampedModel
 
@@ -10,14 +9,14 @@ class IpcAppList(models.Model):
     id = models.AutoField(db_column='idAPPNumber', primary_key=True)
     app_number = models.CharField(db_column='APP_Number', max_length=100, blank=True, null=True)
     registration_number = models.CharField(db_column='RegistrationNumber', max_length=32, blank=True, null=True)
-    registration_date = models.DateField(db_column='RegistrationDate', blank=True, null=True)
+    registration_date = models.DateTimeField(db_column='RegistrationDate', blank=True, null=True)
     id_shedule_type = models.IntegerField(db_column='idSheduleType')
     files_path = models.CharField(db_column='FilesPath', max_length=500, blank=True, null=True)
     id_parent = models.IntegerField(db_column='idParent', blank=True, null=True)
     id_claim = models.IntegerField(db_column='idClaim', blank=True, null=True)
     obj_type = models.ForeignKey('ObjType', db_column='idObjType', blank=True, null=True, on_delete=models.CASCADE)
     changescount = models.IntegerField(db_column='ChangesCount')
-    lastupdate = models.DateField(db_column='LastUpdate', blank=True, null=True)
+    lastupdate = models.DateTimeField(db_column='LastUpdate', blank=True, null=True)
     idstatus = models.IntegerField(db_column='idStatus', blank=True, null=True)
     app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
     elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
