@@ -564,20 +564,17 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
 
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
                 'search_results',
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('simple_search')}.xls"
+            file_name = f"{get_unique_filename('simple_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(
@@ -648,20 +645,17 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
 
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
                 'search_results',
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('advanced_search')}.xls"
+            file_name = f"{get_unique_filename('advanced_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(
@@ -691,20 +685,17 @@ def create_transactions_search_results_file(get_params, lang_code):
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code)
 
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
                 'search_results',
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('transactions_search')}.xls"
+            file_name = f"{get_unique_filename('transactions_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(

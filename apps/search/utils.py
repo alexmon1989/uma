@@ -16,8 +16,10 @@ from docx.shared import Pt, Cm
 import re
 import time
 import datetime
-import xlwt
+import os
 from uma.utils import iterable
+import xlsxwriter
+from apps.bulletin.models import ClListOfficialBulletinsIp
 
 
 def get_search_groups(search_data):
@@ -1223,13 +1225,12 @@ def user_has_access_to_tm_app(user, hit):
         return False
 
 
-def create_search_res_doc(data):
+def create_search_res_doc(data, file_path):
     """Формировние Excel-файла с результатами поиска."""
-    workbook = xlwt.Workbook()
-    sheet = workbook.add_sheet("Search results")
+    workbook = xlsxwriter.Workbook(file_path)
+    worksheet = workbook.add_worksheet()
 
     # Заголовки
-    style = xlwt.easyxf('font: bold 1')
     titles = [
         _("Тип об'єкта промислової власності"),
         _("Стан об'єкта промислової власності"),
@@ -1245,17 +1246,26 @@ def create_search_res_doc(data):
         _("МПК"),
         _("МКТП"),
         _("МКПЗ"),
+        _("(441) Дата публікації відомостей про заявку та номер бюлетня"),
+        _("Зображення ТМ"),
     ]
-    for i in range(len(titles)):
-        sheet.write(0, i, titles[i], style)
 
-    # Данные
-    style = xlwt.easyxf('align: wrap on, vert top;')
-    for i, l in enumerate(data):
-        for j, col in enumerate(l):
-            sheet.write(i + 1, j, col, style)
+    bold = workbook.add_format({'bold': True})
+    worksheet.write_row(0, 0, titles, bold)
 
-    return workbook
+    for row_num, row_data in enumerate(data):
+        for col_num, col_data in enumerate(row_data):
+            if col_num == 15 and col_data and os.path.exists(col_data):
+                worksheet.insert_image(
+                    row_num + 1,
+                    col_num,
+                    col_data,
+                    {'x_offset': 2, 'y_offset': 2, 'x_scale': 0.3, 'y_scale': 0.3}
+                )
+            else:
+                worksheet.write(row_num + 1, col_num, col_data)
+
+    workbook.close()
 
 
 def prepare_data_for_search_report(s, lang_code, user=None):
@@ -1281,6 +1291,8 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                 '',
                 '',
                 '',
+                '',
+                '',
             ])
         else:
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
@@ -1295,6 +1307,12 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             ipc_indexes = get_app_ipc_indexes(h)
             nice_indexes = get_app_nice_indexes(h)
             icid = get_app_icid(h)
+            if h.Document.idObjType == 4:
+                code_441 = get_441_code(h)
+                image = get_tm_image_path(h)
+            else:
+                code_441 = ''
+                image = ''
 
             data.append([
                     obj_type,
@@ -1311,9 +1329,44 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     ipc_indexes,
                     nice_indexes,
                     icid,
+                    code_441,
+                    image,
                 ])
 
     return data
+
+
+def get_tm_image_path(app):
+    """Возвращает путь к изображению ТМ на диске."""
+    if type(app) is not dict:
+        app = app.to_dict()
+    splitted_path = app['Document']['filesPath'].replace("\\", "/").split('/')
+    splitted_path_len = len(splitted_path)
+    image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+
+    return f"{settings.MEDIA_ROOT}/" \
+           f"{splitted_path[splitted_path_len-4]}" \
+           f"/{splitted_path[splitted_path_len-3]}/" \
+           f"{splitted_path[splitted_path_len-2]}/{image_name}"
+
+
+def get_441_code(app):
+    """Возвращает 441 код ТМ."""
+    if type(app) is not dict:
+        app = app.to_dict()
+
+    try:
+        code_441 = app['TradeMark']['TrademarkDetails']['Code_441']
+        code_441_formatted = datetime.datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
+    except KeyError:
+        return ''
+
+    try:
+        obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441, date_to__gte=code_441)
+    except ClListOfficialBulletinsIp.DoesNotExist:
+        return code_441_formatted
+    else:
+        return f"{code_441_formatted}, бюл. №{obj.bul_number}"
 
 
 def get_app_applicant(app):
