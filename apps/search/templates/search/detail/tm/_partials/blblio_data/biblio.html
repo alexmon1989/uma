@@ -290,7 +290,7 @@
                                 <div class="text-justify mktp-indexes">
                                 <span class="more hidden">
                                     {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
-                                        {{ term.ClassificationTermText }}{% if not forloop.last %}; {% endif %}
+                                        {{ term.ClassificationTermText }}{% if not forloop.last and term.ClassificationTermText|default:""|slice:"-1:" != "," %};{% endif %}
                                     {% endfor %}
                                 </span>
                                     <a href="#"
