@@ -70,10 +70,12 @@ export default {
                             value = '';
                         }
                     }
+                    value = encodeURIComponent(value);
 
                     if (this.searchType === 'simple') {
                         validatePath = '/search/validate-query/?search_type=simple&value='
                             + value + '&param_type=' + args.id;
+
                     } else {
                         validatePath = '/search/validate-query/?search_type=advanced&value='
                                             + value + '&ipc_code=' + args[0].id
