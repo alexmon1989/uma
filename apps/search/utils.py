@@ -93,26 +93,34 @@ def get_elastic_results(search_groups, user):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
 
-                    q = Q(
-                        'query_string',
-                        query=query,
-                        default_field=inid_schedule.elastic_index_field.field_name,
-                        default_operator='AND',
-                        analyze_wildcard=True
-                    )
-
-                    if inid_schedule.elastic_index_field.field_type == 'text' and not any(
-                            ext in query for ext in (' OR ', ' AND ', '*')):
-                        # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                        # и морфологического поиска
-                        q |= Q(
+                    if query[0] == '"' and query[len(query) - 1] == '"' \
+                            and not any(ext in query for ext in (' OR ', ' AND ', '*')):
+                        # Точный поиск
+                        q = Q(
+                            'match_phrase',
+                            **{inid_schedule.elastic_index_field.field_name.replace('*', ''): query}
+                        )
+                    else:
+                        q = Q(
                             'query_string',
-                            query=f"*{query}*",
+                            query=query,
                             default_field=inid_schedule.elastic_index_field.field_name,
                             default_operator='AND',
-                            analyze_wildcard=True,
-                            boost=20
+                            analyze_wildcard=True
                         )
+
+                        if inid_schedule.elastic_index_field.field_type == 'text' and not any(
+                                ext in query for ext in (' OR ', ' AND ', '*')):
+                            # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                            # и морфологического поиска
+                            q |= Q(
+                                'query_string',
+                                query=f"*{query}*",
+                                default_field=inid_schedule.elastic_index_field.field_name,
+                                default_operator='AND',
+                                analyze_wildcard=True,
+                                boost=20
+                            )
 
                     if not qs:
                         qs = q

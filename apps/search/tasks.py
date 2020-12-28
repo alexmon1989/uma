@@ -57,23 +57,31 @@ def perform_simple_search(user_id, get_params):
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
 
-                q = Q(
-                    'query_string',
-                    query=query,
-                    default_field=elastic_field.field_name,
-                    default_operator='AND'
-                )
-
-                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                    # и морфологического поиска
-                    q |= Q(
-                        'query_string',
-                        query=f"*{query}*",
-                        default_field=elastic_field.field_name,
-                        default_operator='AND',
-                        boost=20
+                if query[0] == '"' and query[len(query) - 1] == '"' \
+                        and not any(ext in query for ext in (' OR ', ' AND ', '*')):
+                    # Точный поиск
+                    q = Q(
+                        'match_phrase',
+                        **{elastic_field.field_name.replace('*', ''): query}
                     )
+                else:
+                    q = Q(
+                        'query_string',
+                        query=query,
+                        default_field=elastic_field.field_name,
+                        default_operator='AND'
+                    )
+
+                    if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
+                        # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
+                        # и морфологического поиска
+                        q |= Q(
+                            'query_string',
+                            query=f"*{query}*",
+                            default_field=elastic_field.field_name,
+                            default_operator='AND',
+                            boost=20
+                        )
 
                 if qs is not None:
                     qs &= q
