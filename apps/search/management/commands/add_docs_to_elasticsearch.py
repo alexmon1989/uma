@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import Max
+from django.utils import timezone
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
@@ -458,8 +459,10 @@ class Command(BaseCommand):
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
         try:
-            self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=body,
-                          request_timeout=30)
+            # self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=body,
+            #               request_timeout=30)
+            print('writing')
+            pass
         except elasticsearch_exceptions.RequestError as e:
             json_path = self.get_json_path(doc)
             self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
@@ -481,8 +484,11 @@ class Command(BaseCommand):
                 indexation_process=self.indexation_process
             )
         else:
-            # Пометка в БД что этот документ проиндексирован
-            IpcAppList.objects.filter(id=doc['id']).update(elasticindexed=1)
+            # Пометка в БД что этот документ проиндексирован и обновление времени индексации
+            IpcAppList.objects.filter(id=doc['id']).update(
+                elasticindexed=1,
+                last_indexation_date=timezone.now()
+            )
 
     def fill_notification_date(self):
         """Заполняет поле NotificationDate в таблице IPC_AppList."""
@@ -534,7 +540,7 @@ class Command(BaseCommand):
 
         # Создание процесса индексации в БД
         self.indexation_process = IndexationProcess.objects.create(
-            begin_date=datetime.datetime.now(),
+            begin_date=timezone.now(),
             not_indexed_count=documents.count()
         )
 
@@ -567,7 +573,7 @@ class Command(BaseCommand):
                 pass
 
         # Время окончания процесса индексации и сохранение данных процесса индексации
-        self.indexation_process.finish_date = datetime.datetime.now()
+        self.indexation_process.finish_date = timezone.now()
 
         qs = Q('query_string', query='*')
 
