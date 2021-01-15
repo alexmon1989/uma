@@ -459,10 +459,8 @@ class Command(BaseCommand):
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
         try:
-            # self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=body,
-            #               request_timeout=30)
-            print('writing')
-            pass
+            self.es.index(index=settings.ELASTIC_INDEX_NAME, doc_type='_doc', id=doc['id'], body=body,
+                          request_timeout=30)
         except elasticsearch_exceptions.RequestError as e:
             json_path = self.get_json_path(doc)
             self.stdout.write(self.style.ERROR(f"ElasticSearch RequestError: {e}: {json_path}"))
