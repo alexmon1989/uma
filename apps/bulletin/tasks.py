@@ -14,8 +14,14 @@ def get_app_details(app_number):
     q = Q(
         'bool',
         should=[
-            Q('match', search_data__app_number=app_number),
-            Q('match', search_data__protective_doc_number=app_number)
+            Q('bool', must=[
+                Q('match', search_data__app_number=app_number),
+                Q('match', Document__idObjType=4)
+            ]),
+            Q('bool', must=[
+                Q('match', search_data__protective_doc_number=app_number),
+                Q('match', Document__idObjType=9)
+            ])
         ],
         minimum_should_match=1
     )
