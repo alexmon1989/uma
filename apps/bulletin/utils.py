@@ -88,8 +88,9 @@ def prepare_tm_data(record):
         for c in classes:
             res += f"<strong>Кл. {c['ClassNumber']}:</strong> "
             terms = []
-            for term in c['ClassificationTermDetails']['ClassificationTerm']:
-                terms.append(term['ClassificationTermText'])
+            if c.get('ClassificationTermDetails'):
+                for term in c['ClassificationTermDetails']['ClassificationTerm']:
+                    terms.append(term['ClassificationTermText'])
             res += "; ".join(terms)
             res += "<br>"
         biblio_data['code_511']['value'] = res
