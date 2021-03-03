@@ -58,7 +58,7 @@ class Command(BaseCommand):
         json_path = os.path.join(doc_files_path, f"{file_name}.json")
 
         # Случай если охранные документы на ТМ имеют название заявки
-        if not os.path.exists(json_path) and doc['obj_type_id'] == 4:
+        if not os.path.exists(json_path) and doc['obj_type_id'] in (4, 6):
             file_name = doc['app_number'].replace('/', '_')
             json_path = os.path.join(doc_files_path, f"{file_name}.json")
 
