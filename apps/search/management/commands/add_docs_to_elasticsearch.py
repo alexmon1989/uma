@@ -439,7 +439,7 @@ class Command(BaseCommand):
             # Данные для записи в ElasticSearch
             data = {
                 'Document': {
-                    'idObjType': 9,
+                    'idObjType': doc['obj_type_id'],
                     'filesPath': doc['files_path']
                 },
                 'MadridTradeMark': {
@@ -447,7 +447,7 @@ class Command(BaseCommand):
                 },
                 'search_data': {
                     'protective_doc_number': doc['registration_number'],
-                    'obj_state': 2
+                    'obj_state': 1 if doc['obj_type_id'] == 14 else 2  # 14 - регистрации, 9 - заявки
                 }
             }
 
@@ -563,7 +563,7 @@ class Command(BaseCommand):
             elif doc['obj_type_id'] == 6:
                 self.process_id(doc)
             # Мадрид ТМ
-            elif doc['obj_type_id'] == 9:
+            elif doc['obj_type_id'] in (9, 14):
                 self.process_madrid_tm(doc)
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
