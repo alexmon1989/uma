@@ -207,6 +207,14 @@ def app_stages_tm(app):
                     stages_statuses[3] = 'done'
                     break
 
+        # Если есть форма Т-05, то "Формальна експертиза" пройдена (для случая если делопроизводство остановлено)
+        if is_stopped:
+            for doc in app['TradeMark']['DocFlow']['Documents']:
+                if 'Т-05' in doc['DocRecord'].get('DocType', ''):
+                    stages_statuses[2] = 'done'
+                    stages_statuses[3] = 'stopped'
+                    break
+
     stages = [
         {
             'title': _('Торговельну марку зареєстровано'),
