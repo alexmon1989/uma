@@ -21,6 +21,10 @@ def get_app_details(app_number):
             Q('bool', must=[
                 Q('match', search_data__protective_doc_number=app_number),
                 Q('match', Document__idObjType=9)
+            ]),
+            Q('bool', must=[
+                Q('match', search_data__protective_doc_number=app_number),
+                Q('match', Document__idObjType=14)
             ])
         ],
         minimum_should_match=1
@@ -31,12 +35,11 @@ def get_app_details(app_number):
     hit = s[0].to_dict()
 
     biblio_data = dict()
-
     # Формирование массива данных
     if hit['Document']['idObjType'] == 4:
         biblio_data = prepare_tm_data(s[0])
 
-    elif hit['Document']['idObjType'] == 9:
+    elif hit['Document']['idObjType'] in (9, 14):
         biblio_data = prepare_madrid_tm_data(app_number, s[0])
 
     return biblio_data

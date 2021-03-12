@@ -309,14 +309,14 @@ def prepare_madrid_tm_data(app_number, record):
         splitted_path[splitted_path_len - 4],
         splitted_path[splitted_path_len - 3],
         splitted_path[splitted_path_len - 2]
-    ).replace('madrid_tm', 'MADRID_TM')
+    ).replace('madrid_tm', 'MADRID_TM').replace('reg_ua', 'REG_UA')
     images_url = os.path.join(
         settings.MEDIA_URL,
         splitted_path[splitted_path_len - 5],
         splitted_path[splitted_path_len - 4],
         splitted_path[splitted_path_len - 3],
         splitted_path[splitted_path_len - 2]
-    ).replace('madrid_tm', 'MADRID_TM')
+    ).replace('madrid_tm', 'MADRID_TM').replace('reg_ua', 'REG_UA')
     if os.path.exists(os.path.join(image_dir, f"{data['@INTREGN']}.jpg")):
         biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN']}.jpg")
     elif os.path.exists(os.path.join(image_dir, f"{data['@INTREGN'][1:]}.jpg")):
