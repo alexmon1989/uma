@@ -395,6 +395,31 @@
         </tbody>
     </table>
 
+{% elif transaction_type.title == "Припинення дії свідоцтва у разі несплати збору за продовження строку дії" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(210) Порядковий номер заявки</th>
+            <th>(111) Номер реєстрації, що є номером свідоцтва</th>
+            <th>(141) {% trans "Дата припинення дії свідоцтва" %}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% else %}
     {% for transaction in transactions %}
         {% json_to_dict transaction.json_data as transaction_data %}

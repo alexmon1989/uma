@@ -140,6 +140,55 @@
         </tbody>
     </table>
 
+{% elif transaction_type.title == 'Передача виключних майнових прав інтелектуальної власності на промисловий зразок' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Порядковий номер заявки</th>
+            <th>(11) Номер реєстрації, що є номером свідоцтва(патенту)</th>
+            <th>(73) {% trans "Ім'я або повне найменування та адреса власника свідоцтва (патенту)" %}</th>
+            <th>{% trans "Ім'я або повне найменування та адреса право наступника власника свідоцтва" %}</th>
+            <th>{% trans "Реєстраційний номер рішення" %}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>
+                    {% if transaction_data.TransactionBody.HolderDetails.PreviousHolder %}
+                        {% for holder in transaction_data.TransactionBody.HolderDetails.PreviousHolder %}
+                            {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                            <br>{{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if transaction_data.TransactionBody.HolderDetails.NewHolder %}
+                        {% for holder in transaction_data.TransactionBody.HolderDetails.NewHolder %}
+                            {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                            <br>{{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if transaction_data.TransactionBody.DecisionDetails.Decision.Number %}
+                        {{ transaction_data.TransactionBody.DecisionDetails.Decision.Number }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% else %}
     {% for transaction in transactions %}
         {% json_to_dict transaction.json_data as transaction_data %}

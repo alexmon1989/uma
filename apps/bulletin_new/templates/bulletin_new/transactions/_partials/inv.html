@@ -204,6 +204,35 @@
         </tbody>
     </table>
 
+{% elif transaction_type.title == "Права на винахід визнані недійсними повністю в судовому порядку" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Назва суду, номер та дата прийняття рішення</th>
+            <th>Дата, від якої патент (деклараційний патент) вважається таким, що не набрав чинності</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.COURTNAME }}, {{ transaction_data.COURTDOCNUMBER }}, {{ transaction_data.COURTDOCDATE|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ transaction_data.DATEFACTSTOP|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% else %}
     {% for transaction in transactions %}
         {% json_to_dict transaction.json_data as transaction_data %}
