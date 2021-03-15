@@ -1,0 +1,148 @@
+{% load uma_extras %}
+{% load i18n %}
+
+
+{% if transaction_type.title == 'Зміна імені або повного найменування і/або адреси власника свідоцтва (патенту), чи зміна особи власника свідоцтва (патенту)' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Порядковий номер заявки</th>
+            <th>(11) Номер реєстрації, що є номером свідоцтва(патенту)</th>
+            <th>(73) {% trans "Ім'я або повне найменування та адреса власника патенту" %}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>
+                    {% if transaction_data.TransactionBody.HolderDetails %}
+                        {% for holder in transaction_data.TransactionBody.HolderDetails.Holder %}
+                            {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                            <br>{{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == 'Продовження строку чинності майнових прав на зареєстрований промисловий зразок' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Порядковий номер заявки</th>
+            <th>(11) Номер реєстрації, що є номером свідоцтва(патенту)</th>
+            <th>(18) {% trans 'Очікувана дата закінчення строку дії патенту' %}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>
+                    {% if transaction_data.TransactionBody %}
+                        {{ transaction_data.TransactionBody.ExpiryDate|parse_date|date:"d.m.Y" }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == 'Виправлення очевидних помилок в публікації про видачу свідоцтва' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Порядковий номер заявки</th>
+            <th>(11) Номер реєстрації, що є номером свідоцтва(патенту)</th>
+            <th>Дата публікації та номер бюлетня</th>
+            <th>Слід читати</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>
+                    {% if transaction_data.TransactionBody.PublicationDetails %}
+                        {{ transaction_data.TransactionBody.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}, {{ transaction.TransactionBody.PublicationDetails.Publication.PublicationIdentifier }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if transaction_data.TransactionBody %}
+                        {% if transaction_data.TransactionBody.DesignerDetails.Designer %}
+                            (72) {{ transaction_data.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                        {% endif %}
+
+                        {% for holder in transaction_data.TransactionBody.HolderDetails.Holder %}
+                            (73) {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                            {{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+
+                        {% if transaction_data.TransactionBody.DesignTitle %}
+                            (54) {{ transaction_data.TransactionBody.DesignTitle }}
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == 'Припинення дії свідоцтва на підставі заяви власника повністю' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Порядковий номер заявки</th>
+            <th>(11) Номер реєстрації, що є номером свідоцтва(патенту)</th>
+            <th>{% trans 'Дата припинення дії патенту' %}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>
+                    {% if transaction_data.TransactionBody.TerminationDate %}
+                        {{ transaction_data.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    {% for transaction in transactions %}
+        {% json_to_dict transaction.json_data as transaction_data %}
+        <pre>{{ transaction_data|pprint }}</pre>
+    {% endfor %}
+{% endif %}

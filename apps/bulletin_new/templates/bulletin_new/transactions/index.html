@@ -1,0 +1,22 @@
+{% load uma_extras %}
+
+<!-- Table Bordered -->
+<div class="table-responsive g-font-size-13">
+    <h5 class="g-mb-15">{{ transaction_type.title }}</h5>
+
+    {# Винаходи #}
+    {% if transaction_type.obj_type_id == 1 %}
+        {% include 'bulletin_new/transactions/_partials/inv.html' %}
+    {# Корисні моделі #}
+    {% elif transaction_type.obj_type_id == 2 %}
+        {% include 'bulletin_new/transactions/_partials/um.html' %}
+    {# ТМ #}
+    {% elif transaction_type.obj_type_id == 4 %}
+        {% include 'bulletin_new/transactions/_partials/tm.html' %}
+    {# Пром. зразки #}
+    {% elif transaction_type.obj_type_id == 6 %}
+        {% include 'bulletin_new/transactions/_partials/id.html' %}
+    {% endif %}
+</div>
+<!-- End Table Bordered -->
+

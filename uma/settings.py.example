@@ -50,10 +50,14 @@ INSTALLED_APPS = [
     'apps.account.apps.AccountConfig',
     'apps.paygate.apps.PaygateConfig',
     'apps.favorites.apps.FavoritesConfig',
+    'apps.bulletin.apps.BulletinConfig',
+    'apps.bulletin_new.apps.BulletinNewConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',
     'django_celery_results',
+    'django_celery_beat',
+    'annoying',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
             ],
             'libraries': {
                 'uma_extras': 'templatetags.uma_extras',
@@ -95,13 +99,23 @@ WSGI_APPLICATION = 'uma.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
         'NAME': 'UMA',
-        'USER': '',
+        'USER': 'ndcpe',
         'PASSWORD': '',
         'HOST': '',
+        # 'USER': 'sa',
+        # 'PASSWORD': 'Alex.mon@550',
+        # 'HOST': '10.5.4.222',
         'PORT': '1433',
 
         'OPTIONS': {
@@ -109,18 +123,18 @@ DATABASES = {
         },
     },
 
-    'ellav': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'UMA',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
+    # 'ellav': {
+    #     'ENGINE': 'sql_server.pyodbc',
+    #     'NAME': 'UMA',
+    #     'USER': '',
+    #     'PASSWORD': '',
+    #     'HOST': '',
+    #     'PORT': '',
+    #
+    #     'OPTIONS': {
+    #         'driver': 'ODBC Driver 17 for SQL Server',
+    #     },
+    # },
 }
 
 # Password validation
@@ -152,7 +166,7 @@ LANGUAGES = (
     ('en', 'English'),
 )
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
@@ -193,15 +207,17 @@ EUSIGN_FILESTORE_PATH = os.path.join(BASE_DIR, "certs")
 import os
 import sys
 
-os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
+#os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
 sys.path.append('lib/EUSignCP/Interface/64')
 
-INTERNAL_IPS = ('10.0.2.2',)
+INTERNAL_IPS = ('10.0.2.2', '127.0.0.1')
 
-ELASTIC_HOST = 'localhost:9200'
+ELASTIC_HOST = '10.11.11.51:9200'
+# ELASTIC_HOST = 'localhost:9200'
 ELASTIC_INDEX_NAME = 'uma'
+ELASTIC_TIMEOUT = 60
 
-DOCUMENTS_MOUNT_FOLDER = ''
+DOCUMENTS_MOUNT_FOLDER = '/mount/bear/'
 
 LOGGING = {
     'version': 1,
@@ -247,7 +263,7 @@ LOGGING = {
             'handlers': [
                 'console',
                 'console_debug_false',
-                # 'mail_admins'
+                'mail_admins'
             ],
             'level': 'INFO',
         },
@@ -263,6 +279,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 
 CKEDITOR_CONFIGS = {
     'default': {
+        'allowedContent': True,
         'skin': 'moono',
         # 'skin': 'office2013',
         'toolbar_Basic': [
@@ -326,19 +343,21 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-}
-
-CELERY_BROKER_URL = 'amqp://'
-# CELERY_RESULT_BACKEND = 'amqp://'
+#CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'amqp://:@localhost:5672/localhost'
+#CELERY_RESULT_BACKEND = 'amqp://:@localhost:5672/localhost'
 CELERY_RESULT_BACKEND = 'django-db'
+#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_EMAIL_TASK_CONFIG = {
     'ignore_result': True,
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
@@ -349,11 +368,20 @@ EMAIL_HOST_USER = ''
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 
-ADMINS = (('', ''),)
+ADMINS = (('Alex', 'a.monastyretsky@ukrpatent.org'),)
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache',
+    }
+}
 
 RECAPTCHA_SITE_KEY = ''
 RECAPTCHA_SECRET_KEY = ''
 RECAPTCHA_MIN_SCORE = 0.5
 
 SSL_CERT_FILE = ''
+
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SECURE = True

@@ -18,6 +18,7 @@ import ContactForm from "./vue-components/ContactForm.vue";
 import GetOriginalDoc from "./vue-components/GetOriginalDoc.vue";
 import DateFilterForm from "./vue-components/DateFilterForm/DateFilterForm.vue";
 import Bulletin from "./vue-components/Bulletin/Bulletin.vue";
+import BulletinNew from "./vue-components/BulletinNew/Bulletin.vue";
 
 import VeeValidate from 'vee-validate';
 import * as Toastr from "toastr";
@@ -40,5 +41,6 @@ const app = new Vue({
         GetOriginalDoc,
         DateFilterForm,
         Bulletin,
+        BulletinNew,
     }
 });

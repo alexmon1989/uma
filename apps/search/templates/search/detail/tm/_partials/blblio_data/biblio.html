@@ -180,6 +180,14 @@
                 </tr>
             {% endif %}
 
+            {% get_field '554' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '731' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                 <tr>

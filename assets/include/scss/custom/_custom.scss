@@ -447,4 +447,13 @@
 
 .vuetify-wrap {
   @import "~vuetify/dist/vuetify.min";
+
+  .v-treeview-node__label {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+}
+
+.nav-link {
+    padding: .5rem 1rem !important;
 }

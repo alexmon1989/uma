@@ -22,6 +22,8 @@ class IpcAppList(models.Model):
     elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
     notification_date = models.DateField(db_column='NotificationDate', blank=True, null=True)
     last_indexation_date = models.DateTimeField(db_column='last_indexation_date', blank=True, null=True)
+    in_electronic_bull = models.BooleanField(db_column='in_electronic_bull', blank=True, null=True)
+    publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
     users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
 
     class Meta:
