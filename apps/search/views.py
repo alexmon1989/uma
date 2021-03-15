@@ -131,7 +131,7 @@ class AdvancedListView(TemplateView):
 
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').exclude(pk=9).annotate(
+            ObjType.objects.order_by('id').exclude(pk__in=(9, 10, 11, 12, 13, 14)).annotate(
                 value=F(f"obj_type_{context['lang_code']}")
             ).values('id', 'value')
         )

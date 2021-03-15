@@ -302,7 +302,9 @@ def perform_transactions_search(get_params):
 def get_obj_types_with_transactions(lang_code):
     """Возвращает типы объектов вместе с типами оповещений."""
     obj_types = list(
-        ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value')
+        ObjType.objects.exclude(
+            pk__in=(9, 10, 11, 12, 13, 14)
+        ).order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value')
     )
 
     # Типы оповещений
