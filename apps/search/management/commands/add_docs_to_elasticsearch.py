@@ -446,10 +446,18 @@ class Command(BaseCommand):
                     'TradeMarkDetails': data_from_json
                 },
                 'search_data': {
+                    'app_number': doc['app_number'],
                     'protective_doc_number': doc['registration_number'],
-                    'obj_state': 1 if doc['obj_type_id'] == 14 else 2  # 14 - регистрации, 9 - заявки
+                    'obj_state': 2,
+                    'rights_date': data_from_json.get('@REGRDAT'),
+                    'owner': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL'),
+                    'agent': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL'),
+                    'title': data_from_json.get('IMAGE', {}).get('@TEXT'),
                 }
             }
+
+            # Статус охранного документа (цвет)
+            data['search_data']['registration_status_color'] = get_registration_status_color(data)
 
             # Запись в индекс
             self.write_to_es_index(doc, data)

@@ -195,7 +195,7 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
+    # qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
 
     return qs
 
@@ -1745,6 +1745,10 @@ def get_registration_status_color(hit):
 
             if last_transaction_type in red_transaction_types:
                 status = 'red'
+
+    # ТМ (Мадрид)
+    elif hit['Document']['idObjType'] in (9, 14):
+        status = 'green'
 
     return status
 
