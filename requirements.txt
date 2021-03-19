@@ -15,7 +15,7 @@ django-debug-toolbar==1.10.1
 django-js-asset==1.2.2
 django-pyodbc-azure==2.1.0.0
 django-timezone-field==4.0
-djangorestframework==3.10.1
+djangorestframework==3.11.2
 elasticsearch==6.3.1
 elasticsearch-dsl==6.2.1
 importlib-metadata==0.20
