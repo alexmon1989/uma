@@ -189,13 +189,18 @@ def paginate_results(s, page, paginate_by=10):
 
 
 def filter_bad_apps(qs):
-    """Исключает из результатов запроса заявки, по которым выдан патент,
-    заявки без даты подачи заявки,
-    заявки на занки для товаров и услуг без платежей"""
+    """Исключает из результатов запроса заявки, которые не положено публиковать."""
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    # qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
+    qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
+
+    # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
+    qs &= ~Q(
+        'query_string',
+        query=f">{datetime.datetime.now().strftime('%Y-%m-%d')}",
+        default_field='search_data.rights_date'
+    )
 
     return qs
 
@@ -1704,6 +1709,8 @@ def get_registration_status_color(hit):
                 status = 'red'
             elif hit['Document']['RegistrationStatus'] == 'T':
                 status = 'yellow'
+            else:
+                status = 'red'
         except KeyError:
             status = 'red'
     elif hit['Document']['idObjType'] == 4:

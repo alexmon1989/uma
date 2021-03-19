@@ -152,6 +152,8 @@ def get_app_details(id_app_number, user_id):
         'bool',
         must=[Q('match', _id=id_app_number)],
     )
+    # Фильтр заявок, которые не положено отоборажать
+    q = filter_bad_apps(q)
 
     s = Search().using(client).query(q).execute()
     if not s:
