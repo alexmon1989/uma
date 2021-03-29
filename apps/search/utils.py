@@ -1875,6 +1875,20 @@ def is_app_limited(app_data, user):
             return True
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
             return True
+        elif app_data['Document']['idObjType'] == 4:  # Заявки на ТМ
+            mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
+            if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
+                date_441 = datetime.datetime.strptime(
+                    app_data['TradeMark']['TrademarkDetails'].get('Code_441'),
+                    '%Y-%m-%d'
+                )
+            else:
+                date_441 = None
+            date_441_start = datetime.datetime.strptime('2020-07-18', '%Y-%m-%d')
+
+            # Условие, которое определяет установлена ли дата подачи заявки
+            return (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start)
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             return True
     return False
