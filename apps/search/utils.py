@@ -193,8 +193,12 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    qs &= ~Q('query_string', query="(search_data.obj_state:1 AND Document.idObjType:4) AND NOT _exists_:TradeMark.TrademarkDetails.Code_441")
-    # qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
+    qs &= ~Q(
+        'query_string',
+        query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
+              'OR (search_data.obj_state:1 AND Document.idObjType:4 '
+              'AND NOT _exists_:TradeMark.TrademarkDetails.Code_441 AND search_data.app_date:[2020-07-18 TO *})'
+    )
 
     # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
     qs &= ~Q(
