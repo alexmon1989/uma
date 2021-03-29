@@ -79,7 +79,7 @@ def get_elastic_results(search_groups, user):
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
-            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8)
+            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 30, 32)
             qs = None
 
             for search_param in group['search_params']:
@@ -193,7 +193,8 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
+    qs &= ~Q('query_string', query="(search_data.obj_state:1 AND Document.idObjType:4) AND NOT _exists_:TradeMark.TrademarkDetails.Code_441")
+    # qs &= ~Q('query_string', query="Document.idObjType:9 OR Document.idObjType:14")
 
     # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
     qs &= ~Q(
@@ -1284,10 +1285,10 @@ def create_search_res_doc(data, file_path):
 def prepare_data_for_search_report(s, lang_code, user=None):
     """Подготавливает данные для файла Excel."""
     obj_states = [_('Заявка'), _('Охоронний документ')]
-    obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
+    obj_types = ObjType.objects.order_by('id').values_list('id', f"obj_type_{lang_code}")
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
-        obj_type = obj_types[h.Document.idObjType - 1]
+        obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
         obj_state = obj_states[h.search_data.obj_state - 1]
 
         if is_app_limited(h.to_dict(), user):
@@ -1309,7 +1310,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             ])
         else:
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
-                if h.search_data.app_date else ''
+                if hasattr(h.search_data, 'app_date') else ''
             rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
                 '%d.%m.%Y') if h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
@@ -1320,7 +1321,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             ipc_indexes = get_app_ipc_indexes(h)
             nice_indexes = get_app_nice_indexes(h)
             icid = get_app_icid(h)
-            if h.Document.idObjType == 4:
+            if h.Document.idObjType in (4, 9, 14):
                 code_441 = get_441_code(h)
                 image = get_tm_image_path(h)
             else:
@@ -1345,7 +1346,6 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     code_441,
                     image,
                 ])
-
     return data
 
 
@@ -1355,12 +1355,21 @@ def get_tm_image_path(app):
         app = app.to_dict()
     splitted_path = app['Document']['filesPath'].replace("\\", "/").split('/')
     splitted_path_len = len(splitted_path)
-    image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
 
-    return f"{settings.MEDIA_ROOT}/" \
-           f"{splitted_path[splitted_path_len-4]}" \
-           f"/{splitted_path[splitted_path_len-3]}/" \
-           f"{splitted_path[splitted_path_len-2]}/{image_name}"
+    if app['Document']['idObjType'] == 4:
+        image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+        return f"{settings.MEDIA_ROOT}/" \
+               f"{splitted_path[splitted_path_len-4]}" \
+               f"/{splitted_path[splitted_path_len-3]}/" \
+               f"{splitted_path[splitted_path_len-2]}/{image_name}"
+    else:
+        # ТМ Мадрид
+        image_name = f"{app['search_data']['protective_doc_number']}.jpg"
+        return f"{settings.MEDIA_ROOT}/" \
+               f"{splitted_path[splitted_path_len-5].upper()}/" \
+               f"{splitted_path[splitted_path_len-4]}/" \
+               f"{splitted_path[splitted_path_len-3]}/" \
+               f"{splitted_path[splitted_path_len-2]}/{image_name}"
 
 
 def get_441_code(app):
@@ -1368,18 +1377,24 @@ def get_441_code(app):
     if type(app) is not dict:
         app = app.to_dict()
 
-    try:
-        code_441 = app['TradeMark']['TrademarkDetails']['Code_441']
-        code_441_formatted = datetime.datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
-    except KeyError:
-        return ''
+    if app['Document']['idObjType'] in (4, 9, 14):
+        try:
+            if app['Document']['idObjType'] == 4:
+                code_441 = app['TradeMark']['TrademarkDetails']['Code_441']
+            else:
+                code_441 = app['MadridTradeMark']['TradeMarkDetails']['Code_441']
+            code_441_formatted = datetime.datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
+        except KeyError:
+            return ''
 
-    try:
-        obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441, date_to__gte=code_441)
-    except ClListOfficialBulletinsIp.DoesNotExist:
-        return code_441_formatted
+        try:
+            obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441, date_to__gte=code_441)
+        except ClListOfficialBulletinsIp.DoesNotExist:
+            return code_441_formatted
+        else:
+            return f"{code_441_formatted}, бюл. №{obj.bul_number}"
     else:
-        return f"{code_441_formatted}, бюл. №{obj.bul_number}"
+        return ''
 
 
 def get_app_applicant(app):
@@ -1476,6 +1491,15 @@ def get_app_owner(app):
         except AttributeError:
             pass
 
+    # ТМ (Мадрид)
+    elif app.Document.idObjType in (9, 14):
+        owner = app.MadridTradeMark.TradeMarkDetails.HOLGR.NAME.NAMEL
+        for item in app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.ADDRL:
+            owner += f" {item}"
+        if app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY:
+            owner += f"[{app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY}]"
+        owners.append(owner)
+
     return ';\r\n'.join(owners)
 
 
@@ -1536,6 +1560,13 @@ def get_app_nice_indexes(app):
         for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
             nice_indexes.append(str(cls.ClassNumber))
         return '; '.join(nice_indexes)
+
+    elif app.Document.idObjType in (9, 14):
+        nice_indexes = []
+        for cls in app.MadridTradeMark.TradeMarkDetails.BASICGS.GSGR:
+            nice_indexes.append(str(cls['@NICCLAI']))
+        return '; '.join(nice_indexes)
+
     return ''
 
 
@@ -1839,21 +1870,24 @@ def get_ipc_codes_with_schedules(lang_code):
         Prefetch(
             'inidcodeschedule_set',
             queryset=InidCodeSchedule.objects.filter(
-                schedule_type__id__lt=16,
                 enable_search=True
+            ).exclude(
+                schedule_type__id__gt=16,
+                schedule_type__id__lt=30
             ).prefetch_related('schedule_type')
         ),
     ).exclude(
         obj_types=None,
     ).exclude(
+        inidcodeschedule__schedule_type__id__gt=16,
+        inidcodeschedule__schedule_type__id__lt=30,
         inidcodeschedule__schedule_type__ipccode__isnull=True,
-        inidcodeschedule__schedule_type__id__gte=16
     )
 
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in range(3, 9) else 1
+            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 30, 32) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 
@@ -1865,5 +1899,4 @@ def get_ipc_codes_with_schedules(lang_code):
                 'obj_types': [obj_type.id for obj_type in item.obj_types.all()],
                 'obj_states': obj_states,
             })
-
     return res

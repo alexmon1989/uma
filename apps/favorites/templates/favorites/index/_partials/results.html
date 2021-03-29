@@ -45,6 +45,9 @@
                 {# Знаки для товаров и услуг #}
                 {% elif hit.Document.idObjType == 4 %}
                     {% tm_item hit forloop.counter0|add:results.start_index %}
+                {# Знаки для товаров и услуг (Мадрид) #}
+                {% elif hit.Document.idObjType == 9 or hit.Document.idObjType == 14 %}
+                    {% tm_item_madrid hit forloop.counter0|add:results.start_index %}
                 {# КЗПТ #}
                 {% elif hit.Document.idObjType == 5 %}
                     {% qi_item hit forloop.counter0|add:results.start_index %}

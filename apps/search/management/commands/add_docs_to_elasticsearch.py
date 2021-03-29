@@ -5,7 +5,7 @@ from django.utils import timezone
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
-from apps.bulletin.models import EBulletinData
+from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 from ...utils import get_registration_status_color, filter_bad_apps
 import json
 import os.path
@@ -261,7 +261,7 @@ class Command(BaseCommand):
                                  'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
 
-            # Поле 441 (дата опублікования заявки)
+            # Поле 441 (дата опубликования заявки)
             try:
                 e_bulletin_app = EBulletinData.objects.get(
                     app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
@@ -419,7 +419,7 @@ class Command(BaseCommand):
 
         if data_from_json is not None:
             # Парсинг дат
-            date_keys = ['@EXPDATE', '@NOTDATE', '@REGEDAT', '@INTREGD']
+            date_keys = ['@EXPDATE', '@NOTDATE', '@REGEDAT', '@REGRDAT', '@INTREGD']
             for i in date_keys:
                 if data_from_json.get(i):
                     data_from_json[i] = datetime.datetime.strptime(data_from_json[i], '%Y%m%d').strftime('%Y-%m-%d')
@@ -449,7 +449,7 @@ class Command(BaseCommand):
                     'app_number': doc['app_number'],
                     'protective_doc_number': doc['registration_number'],
                     'obj_state': 2,
-                    'rights_date': data_from_json.get('@REGRDAT'),
+                    'rights_date': data_from_json.get('@INTREGD'),
                     'owner': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL'),
                     'agent': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL'),
                     'title': data_from_json.get('IMAGE', {}).get('@TEXT'),
@@ -459,10 +459,21 @@ class Command(BaseCommand):
             # Статус охранного документа (цвет)
             data['search_data']['registration_status_color'] = get_registration_status_color(data)
 
+            # Поле 441 (дата опубликования заявки)
+            try:
+                bulletin = ClListOfficialBulletinsIp.objects.get(
+                    date_from__lte=doc['registration_date'],
+                    date_to__gte=doc['registration_date'],
+                )
+            except ClListOfficialBulletinsIp.DoesNotExist:
+                pass
+            else:
+                data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = bulletin.bul_date.strftime('%Y-%m-%d')
+
             # Запись в индекс
             self.write_to_es_index(doc, data)
 
-            # Запись в БД для бюлетня
+            # Запись в БД для бюлетня (старого)
             EBulletinData.objects.update_or_create(
                 app_number=doc['registration_number'],
                 unit_id=2,
@@ -528,7 +539,7 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.filter(elasticindexed=0).values(
+        documents = IpcAppList.objects.filter(elasticindexed=0, obj_type_id__in=(1, 2, 3, 4, 5, 6, 9, 14)).values(
             'id',
             'files_path',
             'obj_type_id',

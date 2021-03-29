@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.base import RedirectView
-from django.db.models import F
+from django.db.models import F, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
 from django.utils import six
@@ -28,6 +28,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     create_transactions_search_results_file, create_shared_docs_archive)
 from ..account.models import BalanceOperation, License
 from .decorators import require_ajax, check_recaptcha
+from apps.bulletin_new.models import Bulletin
 
 
 class SimpleListView(TemplateView):
@@ -131,7 +132,7 @@ class AdvancedListView(TemplateView):
 
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').exclude(pk__in=(9, 10, 11, 12, 13, 14)).annotate(
+            ObjType.objects.order_by('id').exclude(pk__in=(10, 11, 12, 13)).annotate(
                 value=F(f"obj_type_{context['lang_code']}")
             ).values('id', 'value')
         )
@@ -243,8 +244,7 @@ def get_data_app_html(request):
                     )
                 else:
                     ipc_fields = ipc_fields.filter(
-                        schedule_type__id__gte=3,
-                        schedule_type__id__lte=8,
+                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(30, 32))
                     )
                 context['ipc_fields'] = ipc_fields
 
@@ -268,6 +268,13 @@ def get_data_app_html(request):
                     template = 'search/detail/qi/detail.html'
                 elif context['hit']['Document']['idObjType'] == 6:
                     template = 'search/detail/id/detail.html'
+                elif context['hit']['Document']['idObjType'] in (9, 14):
+                    bul_num_441 = Bulletin.objects.get(
+                        date_from__lte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441'],
+                        date_to__gte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441']
+                    )
+                    context['code_441_bul_number'] = bul_num_441.bul_number
+                    template = 'search/detail/tm_madrid/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:

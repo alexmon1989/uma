@@ -1,0 +1,19 @@
+{% load search_extras %}
+{% load i18n %}
+
+{% include 'search/detail/tm_madrid/_partials/breadcrumbs.html' %}
+
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Tab panes -->
+            <div id="nav-1-1-primary-ver" class="tab-content">
+                <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                    {% include 'search/detail/_partials/biblio_header.html' %}
+                    {% include 'search/detail/tm_madrid/_partials/blblio_data/biblio.html' %}
+                </div>
+            </div>
+            <!-- End Tab panes -->
+        </div>
+    </div>
+</div>
