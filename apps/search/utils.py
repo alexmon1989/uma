@@ -193,12 +193,12 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    qs &= ~Q(
-        'query_string',
-        query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
-              'OR (search_data.obj_state:1 AND Document.idObjType:4 '
-              'AND NOT _exists_:TradeMark.TrademarkDetails.Code_441 AND search_data.app_date:[2020-07-18 TO *})'
-    )
+    # qs &= ~Q(
+    #     'query_string',
+    #     query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
+    #           'OR (search_data.obj_state:1 AND Document.idObjType:4 '
+    #           'AND NOT _exists_:TradeMark.TrademarkDetails.Code_441 AND search_data.app_date:[2020-07-18 TO *})'
+    # )
 
     # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
     qs &= ~Q(
@@ -1797,19 +1797,8 @@ def get_registration_status_color(hit):
 
 def filter_app_data(app_data, user):
     """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
-    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-    # if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
-    #     res = {}
-    #     res.update({'meta': app_data['meta']})
-    #     res.update({'Document': app_data['Document']})
-    #     res.update({'search_data': {
-    #         'app_number': app_data['search_data']['app_number'],
-    #         'obj_state': app_data['search_data']['obj_state'],
-    #     }})
-    #     return res
-    # return app_data
 
-    # Если это заявка на полезную модель или пром образец,
+    # Если это заявка на полезную модель или пром образец, заявка на ТМ без установленной даты подачи
     # то необходимо убрать всю "закрытую" информацию
     # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
     if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
@@ -1837,6 +1826,30 @@ def filter_app_data(app_data, user):
                 }
             }
             return res
+
+        elif app_data['Document']['idObjType'] == 4:
+            mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
+            if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
+                date_441 = datetime.datetime.strptime(
+                    app_data['TradeMark']['TrademarkDetails'].get('Code_441'),
+                    '%Y-%m-%d'
+                )
+            else:
+                date_441 = None
+            date_441_start = datetime.datetime.strptime('2020-07-18', '%Y-%m-%d')
+
+            # Условие, которое определяет установлена ли дата подачи заявки
+            if (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start):
+                res = {}
+                res.update({'meta': app_data['meta']})
+                res.update({'Document': app_data['Document']})
+                res.update({'TradeMark': {'DocFlow': app_data['TradeMark'].get('DocFlow', {})}})
+                res.update({'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }})
+                return res
 
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             res = {
