@@ -1,12 +1,14 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import F
+from django.utils.timezone import make_aware
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
 from apps.bulletin.models import EBulletinData
 from ...models import OpenData
 import json
+from datetime import datetime
 
 
 class Command(BaseCommand):
@@ -36,6 +38,7 @@ class Command(BaseCommand):
 
         # Добавление/обновление данных
         for d in diff:
+            is_visible = True
             app = IpcAppList.objects.get(id=d[0])
 
             # Получение данных с ElasticSearch
@@ -62,13 +65,19 @@ class Command(BaseCommand):
                                 data_to_write['application_status'] = 'active'
 
                         if data_to_write.get('Code_441') is None:
-                            # Поле 441 (дата опублікования заявки)
+                            # Поле 441 (дата опубликования заявки)
                             try:
                                 e_bulletin_app = EBulletinData.objects.get(
                                     app_number=data_to_write.get('ApplicationNumber')
                                 )
                             except EBulletinData.DoesNotExist:
-                                pass
+                                # Если это заявка
+                                if data['search_data']['obj_state'] == 1:
+                                    # и её дата подачи до 18.07.2020, то публиковать её нельзя
+                                    if app.app_date > make_aware(datetime.strptime('2020-07-17', '%Y-%m-%d')):
+                                        is_visible = False
+                                    else:
+                                        is_visible = mark_status_code > 2000
                             else:
                                 data_to_write['Code_441'] = str(e_bulletin_app.publication_date)
 
@@ -94,6 +103,7 @@ class Command(BaseCommand):
                     open_data_record.last_update = app.lastupdate
                     open_data_record.app_number = app.app_number
                     open_data_record.app_date = app.app_date
+                    open_data_record.is_visible = is_visible
                     open_data_record.data = json.dumps(data_to_write)
                     if app.registration_date:
                         open_data_record.registration_number = app.registration_number

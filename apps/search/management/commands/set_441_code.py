@@ -14,7 +14,7 @@ class Command(BaseCommand):
         # Инициализация клиента ElasticSearch
         es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
-        for app in EBulletinData.objects.all():
+        for app in EBulletinData.objects.filter(unit_id=1).all():
             query = Q(
                 'query_string',
                 query=f"search_data.app_number:{app.app_number} AND Document.idObjType:4 "
