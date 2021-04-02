@@ -25,7 +25,7 @@ class Command(BaseCommand):
         ).exclude(
             obj_type_id__in=(1, 2, 3, 5, 6), registration_date__isnull=True
         ).exclude(
-            obj_type_id=9
+            obj_type_id__gt=6
         ).annotate(
             app_id=F('id'), last_update=F('lastupdate')
         ).values_list('app_id', 'last_update')
