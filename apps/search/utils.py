@@ -201,11 +201,11 @@ def filter_bad_apps(qs):
     # )
 
     # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
-    qs &= ~Q(
-        'query_string',
-        query=f">{datetime.datetime.now().strftime('%Y-%m-%d')}",
-        default_field='search_data.rights_date'
-    )
+    # qs &= ~Q(
+    #     'query_string',
+    #     query=f">{datetime.datetime.now().strftime('%Y-%m-%d')}",
+    #     default_field='search_data.rights_date'
+    # )
 
     return qs
 
