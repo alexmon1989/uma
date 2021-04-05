@@ -39,6 +39,7 @@ class Command(BaseCommand):
         # Добавление/обновление данных
         for d in diff:
             is_visible = True
+            app_date = None
             app = IpcAppList.objects.get(id=d[0])
 
             # Получение данных с ElasticSearch
@@ -54,6 +55,14 @@ class Command(BaseCommand):
                     # Свидетельства на знаки для товаров и услуг
                     elif app.obj_type_id == 4:
                         data_to_write = data['TradeMark']['TrademarkDetails']
+
+                        if data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
+                            app_date = make_aware(
+                                datetime.strptime(
+                                    data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10],
+                                    '%Y-%m-%d'
+                                )
+                            )
 
                         if data['search_data']['obj_state'] == 1:
                             # Статус заявки
@@ -73,7 +82,7 @@ class Command(BaseCommand):
                             except EBulletinData.DoesNotExist:
                                 # Если это заявка
                                 if data['search_data']['obj_state'] == 1:
-                                    # и её дата подачи до 18.07.2020, то публиковать её нельзя
+                                    # и её дата подачи после 18.07.2020, то публиковать её нельзя
                                     if app.app_date > make_aware(datetime.strptime('2020-07-17', '%Y-%m-%d')):
                                         is_visible = False
                                     else:
@@ -102,7 +111,7 @@ class Command(BaseCommand):
                     open_data_record.obj_type_id = app.obj_type_id
                     open_data_record.last_update = app.lastupdate
                     open_data_record.app_number = app.app_number
-                    open_data_record.app_date = app.app_date
+                    open_data_record.app_date = app_date or app.app_date
                     open_data_record.is_visible = is_visible
                     open_data_record.data = json.dumps(data_to_write)
                     if app.registration_date:
