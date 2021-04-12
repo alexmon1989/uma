@@ -1,0 +1,54 @@
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped g-font-size-13">
+        <thead>
+        <tr>
+            <th class="text-nowrap">
+                <abbr title="Реєстраційний номер, який одночасно є номером свідоцтва">{% trans 'Реєстраційний номер' %}</abbr>
+            </th>
+            <th class="text-nowrap">{% trans 'Дата реєстрації' %}</th>
+            <th>
+                <abbr title="Прізвище, ім’я, по батькові патентного повіреного">{% trans 'ПІБ' %}</abbr>
+            </th>
+            <th>
+                <abbr title="Дані про спеціалізацію діяльності патентного повіреного">{% trans 'Спеціалізація' %}</abbr>
+            </th>
+            <th>
+                <abbr title="Адреса для листування">{% trans 'Адреса' %}</abbr>
+            </th>
+            <th>{% trans 'Телефон' %}</th>
+            <th>E-Mail</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for item in object_list %}
+            <tr>
+                <td>{{ item.reg_num }}</td>
+                <td>{{ item.dat_reg|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ item.prizv }} {{ item.name }} {{ item.po_batk }}</td>
+                <td>{{ item.special }}</td>
+                <td>
+                    {% spaceless %}
+                        {% if item.list_index %}
+                            {{ item.list_index }},&nbsp;
+                        {% endif %}
+                        {% if item.list_oblast %}
+                            {{ item.list_oblast }},&nbsp;
+                        {% endif %}
+                        {% if item.list_misto %}
+                            {{ item.list_misto }},&nbsp;
+                        {% endif %}
+                        {% if item.list_street %}
+                            {{ item.list_street }}
+                        {% endif %}
+                    {% endspaceless %}
+                </td>
+                <td>{{ item.phones }}{% if item.fax %}<br>{% trans "Факс:" %}&nbsp;{{ item.fax }}{% endif %}</td>
+                <td>{% if item.e_mail %}{{ item.get_splitted_email|join:"<br>" }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

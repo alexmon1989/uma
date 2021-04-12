@@ -73,6 +73,9 @@
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'services:api_description'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'services:api_description' %}">API</a>
                                 </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'patent_attorneys:list'%}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'patent_attorneys:list' %}">{% trans 'Відомості з реєстру патентних повірених' %}</a>
+                                </li>
                             </ul>
                             <!-- End Submenu -->
                         </li>
