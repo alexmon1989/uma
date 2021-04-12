@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load patent_attorneys_extras %}
 
 <div class="table-responsive">
     <table class="table table-sm table-bordered table-striped g-font-size-13">
@@ -46,7 +47,12 @@
                     {% endspaceless %}
                 </td>
                 <td>{{ item.phones }}{% if item.fax %}<br>{% trans "Факс:" %}&nbsp;{{ item.fax }}{% endif %}</td>
-                <td>{% if item.e_mail %}{{ item.get_splitted_email|join:"<br>" }}{% endif %}</td>
+                <td>
+                    {% if item.e_mail %}
+                        {% get_splitted_email item as splitted_email %}
+                        {{ splitted_email|join:"<br>" }}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

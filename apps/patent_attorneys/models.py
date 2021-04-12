@@ -29,14 +29,6 @@ class PatentAttorney(models.Model):
     stupin = models.CharField(db_column='Stupin', max_length=300, blank=True, null=True)
     other = models.CharField(db_column='Other', max_length=300, blank=True, null=True)
 
-    def get_splitted_email(self):
-        if ',' in self.e_mail:
-            return self.e_mail.split(',')
-        elif ';' in self.e_mail:
-            return self.e_mail.split(';')
-        else:
-            return [self.e_mail]
-
     class Meta:
         managed = False
         db_table = 'patent_attorneys'
