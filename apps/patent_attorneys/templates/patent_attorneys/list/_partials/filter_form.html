@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load bootstrap4 %}
+
+<form class="g-brd-around g-brd-gray-light-v4 g-pa-20 g-mb-30">
+    <div class="row">
+        <div class="col-12">
+            <p class="g-font-weight-600 g-font-size-16">{% trans 'Фільтри для пошуку у списку:' %}</p>
+
+            {% bootstrap_form_errors filter_form layout='inline' %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5 form-group g-mb-10 {% if filter_form.reg_num.errors %}has-danger{% endif %}">
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Реєстраційний номер" %}:</label>
+            <input class="form-control g-brd-primary--focus rounded-3 g-pa-8 {% if filter_form.reg_num.errors %}form-control-danger{% endif %}"
+                   type="text" name="reg_num" value="{{ request.GET.reg_num }}">
+        </div>
+
+        <div class="col-md-5 form-group g-mb-10">
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "ПІБ" %}:</label>
+            <input class="form-control g-bg-white g-bg-white--focus g-brd-gray-light-v1 g-brd-primary--focus rounded-3 g-pa-8"
+                   type="text" name="name" value="{{ request.GET.name }}">
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end g-mb-10">
+            <button class="btn u-btn-primary rounded-3 g-py-6 g-px-16" type="submit" role="button">{% trans "Фільтрувати" %}</button>
+        </div>
+    </div>
+
+</form>

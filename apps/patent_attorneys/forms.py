@@ -1,7 +1,7 @@
 from django import forms
 
 
-class PatentAttorneyForm(forms.Form):
+class SortPaginationForm(forms.Form):
     sort_by = forms.ChoiceField(
         choices=(
             ('regnum_asc', 'regnum_asc'),
@@ -22,3 +22,8 @@ class PatentAttorneyForm(forms.Form):
         ),
         required=False
     )
+
+
+class FilterForm(forms.Form):
+    name = forms.CharField(required=False, max_length=255, label='ПІБ')
+    reg_num = forms.IntegerField(required=False, label='Реєстраційний номер')
