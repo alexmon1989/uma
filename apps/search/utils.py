@@ -1837,7 +1837,7 @@ def filter_app_data(app_data, user):
                 )
             else:
                 date_441 = None
-            date_441_start = datetime.datetime.strptime('2020-07-18', '%Y-%m-%d')
+            date_441_start = datetime.datetime.strptime('2020-08-18', '%Y-%m-%d')
 
             # Условие, которое определяет установлена ли дата подачи заявки
             if (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start):
@@ -1885,7 +1885,7 @@ def is_app_limited(app_data, user):
                 )
             else:
                 date_441 = None
-            date_441_start = datetime.datetime.strptime('2020-07-18', '%Y-%m-%d')
+            date_441_start = datetime.datetime.strptime('2020-08-18', '%Y-%m-%d')
 
             # Условие, которое определяет установлена ли дата подачи заявки
             return (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start)

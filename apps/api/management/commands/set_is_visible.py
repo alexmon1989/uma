@@ -15,7 +15,7 @@ class Command(BaseCommand):
             'query_string',
             query="search_data.obj_state:1 "
                   "AND Document.idObjType:4 "
-                  "AND search_data.app_date:[* TO 2020-07-18] "
+                  "AND search_data.app_date:[* TO 2020-08-18] "
                   "AND Document.MarkCurrentStatusCodeType:[* TO 2000]"
         )
         s = Search().using(es).query(query)
