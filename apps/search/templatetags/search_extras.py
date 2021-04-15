@@ -4,7 +4,7 @@ from django.db.models import F
 from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
-                     user_has_access_to_tm_app)
+                     user_has_access_to_tm_app, get_fixed_mark_status_code)
 from apps.bulletin.models import ClListOfficialBulletinsIp
 
 register = template.Library()
@@ -190,7 +190,8 @@ def is_paid_services_enabled():
 @register.inclusion_tag('search/templatetags/app_stages_tm.html')
 def app_stages_tm(app):
     """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
-    mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    # mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    mark_status_code = get_fixed_mark_status_code(app)
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
                  or mark_status_code == 8000
 

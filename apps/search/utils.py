@@ -1795,6 +1795,19 @@ def get_registration_status_color(hit):
     return status
 
 
+def get_fixed_mark_status_code(app_data):
+    """Анализирует список документов и возвращает код статуса согласно их наличию."""
+    result = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+    for doc in app_data['TradeMark']['DocFlow'].get('Documents', []):
+        if 'Форма ТM-1.1' in doc['DocRecord']['DocType'] and result < 2000:
+            result = 3000
+        if 'Форма Т-05' in doc['DocRecord']['DocType'] and result < 3000:
+            result = 3000
+        if 'Форма Т-08' in doc['DocRecord']['DocType'] and result < 4000:
+            result = 4000
+    return result
+
+
 def filter_app_data(app_data, user):
     """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
 
@@ -1828,7 +1841,8 @@ def filter_app_data(app_data, user):
             return res
 
         elif app_data['Document']['idObjType'] == 4:
-            mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            mark_status = get_fixed_mark_status_code(app_data)
             app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
             if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
                 date_441 = datetime.datetime.strptime(
@@ -1876,7 +1890,8 @@ def is_app_limited(app_data, user):
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
             return True
         elif app_data['Document']['idObjType'] == 4:  # Заявки на ТМ
-            mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            mark_status = get_fixed_mark_status_code(app_data)
             app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
             if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
                 date_441 = datetime.datetime.strptime(
