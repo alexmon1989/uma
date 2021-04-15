@@ -1798,7 +1798,7 @@ def get_registration_status_color(hit):
 def get_fixed_mark_status_code(app_data):
     """Анализирует список документов и возвращает код статуса согласно их наличию."""
     result = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
-    for doc in app_data['TradeMark']['DocFlow'].get('Documents', []):
+    for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
         if 'Форма ТM-1.1' in doc['DocRecord']['DocType'] and result < 2000:
             result = 3000
         if 'Форма Т-05' in doc['DocRecord']['DocType'] and result < 3000:
