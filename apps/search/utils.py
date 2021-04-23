@@ -1227,6 +1227,14 @@ def user_has_access_to_docs(user, hit):
             except KeyError:
                 pass
 
+        # Адреса для листування (ТМ)
+        try:
+            person = hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook']['Name']['FreeFormatNameLine']
+            if user_fullname == person.replace('i', 'і').upper():
+                return True
+        except KeyError:
+            pass
+
     return False
 
 
