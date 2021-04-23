@@ -376,7 +376,7 @@ def get_order_documents(user_id, order_id):
 
     user = get_user_or_anonymous(user_id)
 
-    s = Search().using(client).query(q).source(['search_data']).execute()
+    s = Search().using(client).query(q).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
