@@ -527,6 +527,8 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 else:
                     qs = q
 
+        qs = filter_bad_apps(qs)
+
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
         # Сортировка

@@ -193,6 +193,7 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
+    qs &= ~Q('query_string', query="Document.idObjType:10 OR Document.idObjType:13")
     # qs &= ~Q(
     #     'query_string',
     #     query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
@@ -1321,7 +1322,10 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             applicant = get_app_applicant(h)
             owner = get_app_owner(h)
             inventor = get_app_inventor(h)
-            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            if hasattr(h.search_data, 'agent'):
+                agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            else:
+                agent = ''
             ipc_indexes = get_app_ipc_indexes(h)
             nice_indexes = get_app_nice_indexes(h)
             icid = get_app_icid(h)
@@ -1671,6 +1675,8 @@ def get_search_in_transactions(search_params):
                 ]
             )
         )
+
+        qs = filter_bad_apps(qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
