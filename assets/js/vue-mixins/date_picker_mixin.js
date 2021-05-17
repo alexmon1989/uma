@@ -11,8 +11,8 @@ export default {
                     let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
                     let yyyy = today.getFullYear();
 
-                    this.$emit('input', [val[0], dd + '.' + mm + '.' + yyyy])
-                    // this.value = [val[0], dd + '.' + mm + '.' + yyyy];
+                    // this.$emit('input', [val[0], dd + '.' + mm + '.' + yyyy])
+                    this.value = [val[0], dd + '.' + mm + '.' + yyyy];
                 }
             }
         }
