@@ -49,6 +49,10 @@ class Command(BaseCommand):
             settings.DOCUMENTS_MOUNT_FOLDER
         ).replace('\\', '/')
 
+        # Если путь к файлу указан сразу (случай с авторским правом)
+        if '.json' in doc_files_path:
+            return doc_files_path
+
         # Путь к файлу JSON с данными объекта:
         file_name = doc['registration_number'] \
             if (doc['registration_number'] and doc['registration_number'] != '0') \
@@ -480,6 +484,50 @@ class Command(BaseCommand):
                 defaults={'publication_date': doc['registration_date']}
             )
 
+    def process_cr(self, doc):
+        """Добавляет документ типа "авторское право" в ElasticSearch."""
+        # Получает данные для загрузки из файла JSON
+        data = self.get_data_from_json(doc)
+        res = {}
+        if data is not None:
+            # Секция Document
+            res['Document'] = data.get('Document')
+
+            if doc['obj_type_id'] in (10, 13):  # Свидетельства
+                # Секция Certificate
+                res['Certificate'] = data.get('Certificate')
+                cr_data = res['Certificate']['CopyrightDetails']
+            else:   # Договоры
+                # Секция Decision
+                res['Decision'] = data.get('Decision')
+                cr_data = res['Decision']['DecisionDetails']
+
+            # fix PublicationDate
+            if cr_data.get('PublicationDetails', {}).get('Publication', {}).get('PublicationDate'):
+                d = cr_data['PublicationDetails']['Publication']['PublicationDate']
+                cr_data['PublicationDetails']['Publication']['PublicationDate'] = datetime.datetime.strptime(
+                    d, '%d.%m.%Y'
+                ).strftime('%Y-%m-%d')
+
+            # Поисковые данные (для сортировки и т.д.)
+            res['search_data'] = {
+                'obj_state': 2,
+                'app_number': cr_data.get('ApplicationNumber'),
+                'app_date': cr_data.get('ApplicationDate'),
+                'protective_doc_number': cr_data.get('RegistrationNumber'),
+                'rights_date': cr_data.get('RegistrationDate'),
+                'owner': [x['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                          cr_data['AuthorDetails']['Author']]
+                if cr_data.get('AuthorDetails', {}).get('Author') else None,
+
+                'title': cr_data.get('Name'),
+                'registration_status_color': 'green',
+            }
+
+            # Запись в индекс
+            self.write_to_es_index(doc, res)
+
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
         try:
@@ -539,7 +587,7 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.filter(elasticindexed=0, obj_type_id__in=(1, 2, 3, 4, 5, 6, 9, 14)).values(
+        documents = IpcAppList.objects.filter(elasticindexed=0).values(
             'id',
             'files_path',
             'obj_type_id',
@@ -584,15 +632,18 @@ class Command(BaseCommand):
             # Мадрид ТМ
             elif doc['obj_type_id'] in (9, 14):
                 self.process_madrid_tm(doc)
+            # Авторское право
+            elif doc['obj_type_id'] in (10, 11, 12, 13):
+                self.process_cr(doc)
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
             self.indexation_process.save()
 
             # Удаление JSON
-            try:
-                os.remove(self.get_json_path(doc))
-            except (FileNotFoundError, PermissionError):
-                pass
+            # try:
+            #     os.remove(self.get_json_path(doc))
+            # except (FileNotFoundError, PermissionError):
+            #     pass
 
         # Время окончания процесса индексации и сохранение данных процесса индексации
         self.indexation_process.finish_date = timezone.now()

@@ -39,6 +39,7 @@ class ObjType(models.Model):
     obj_server_folder = models.CharField(db_column='ObjServerFolder', max_length=255, blank=True, null=True)
     file_server_name = models.CharField(db_column='FileServerName', max_length=250, blank=True, null=True)
     net_share_name = models.CharField(db_column='NetShareName', max_length=500, blank=True, null=True)
+    order = models.PositiveSmallIntegerField(db_column='order', blank=True, null=True)
 
     def __str__(self):
         return self.obj_type_ua

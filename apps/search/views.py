@@ -132,7 +132,7 @@ class AdvancedListView(TemplateView):
 
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').exclude(pk__in=(10, 11, 12, 13)).annotate(
+            ObjType.objects.exclude(id__in=(11, 12)).order_by('order').annotate(
                 value=F(f"obj_type_{context['lang_code']}")
             ).values('id', 'value')
         )
@@ -244,7 +244,7 @@ def get_data_app_html(request):
                     )
                 else:
                     ipc_fields = ipc_fields.filter(
-                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(30, 32))
+                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32))
                     )
                 context['ipc_fields'] = ipc_fields
 
@@ -275,6 +275,8 @@ def get_data_app_html(request):
                     )
                     context['code_441_bul_number'] = bul_num_441.bul_number
                     template = 'search/detail/tm_madrid/detail.html'
+                elif context['hit']['Document']['idObjType'] in (10, 13):  # Авторське право
+                    template = 'search/detail/copyright/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:

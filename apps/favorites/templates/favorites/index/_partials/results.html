@@ -54,6 +54,9 @@
                 {# Пром. образец #}
                 {% elif hit.Document.idObjType == 6 %}
                     {% id_item hit forloop.counter0|add:results.start_index %}
+                {# Авторське право #}
+                {% elif hit.Document.idObjType == 10 or hit.Document.idObjType == 13 %}
+                    {% copyright_item hit forloop.counter0|add:results.start_index %}
                 {% endif %}
             {% endfor %}
 

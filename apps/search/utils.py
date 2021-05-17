@@ -79,7 +79,7 @@ def get_elastic_results(search_groups, user):
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
-            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 30, 32)
+            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32)
             qs = None
 
             for search_param in group['search_params']:
@@ -193,7 +193,7 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    qs &= ~Q('query_string', query="Document.idObjType:10 OR Document.idObjType:13")
+    # qs &= ~Q('query_string', query="Document.idObjType:10 OR Document.idObjType:13")
     # qs &= ~Q(
     #     'query_string',
     #     query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
@@ -1430,7 +1430,6 @@ def get_app_applicant(app):
                 item.pop('EDRPOU', '')
                 item_values = sorted(list(item.values()), key=len)
                 applicants.append(f"{item_values[1]} [{item_values[0]}]")
-
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
         try:
@@ -1446,6 +1445,17 @@ def get_app_applicant(app):
     elif app.Document.idObjType == 6:
         try:
             for item in app.Design.DesignDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.ApplicantDetails.Applicant:
                 applicants.append(
                     f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
                     f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
@@ -1516,6 +1526,17 @@ def get_app_owner(app):
             owner += f"[{app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY}]"
         owners.append(owner)
 
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
     return ';\r\n'.join(owners)
 
 
@@ -1544,6 +1565,17 @@ def get_app_inventor(app):
                 inventors.append(
                     f"{item.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
                     f"[{item.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.AuthorDetails.Author:
+                inventors.append(
+                    f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
                 )
         except AttributeError:
             pass
@@ -1932,14 +1964,14 @@ def get_ipc_codes_with_schedules(lang_code):
             queryset=InidCodeSchedule.objects.filter(
                 enable_search=True
             ).exclude(
-                schedule_type__id__gt=16,
+                schedule_type__id__gt=19,
                 schedule_type__id__lt=30
             ).prefetch_related('schedule_type')
         ),
     ).exclude(
         obj_types=None,
     ).exclude(
-        inidcodeschedule__schedule_type__id__gt=16,
+        inidcodeschedule__schedule_type__id__gt=19,
         inidcodeschedule__schedule_type__id__lt=30,
         inidcodeschedule__schedule_type__ipccode__isnull=True,
     )
@@ -1947,7 +1979,7 @@ def get_ipc_codes_with_schedules(lang_code):
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 30, 32) else 1
+            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 

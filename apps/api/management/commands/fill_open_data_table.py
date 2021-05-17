@@ -25,7 +25,7 @@ class Command(BaseCommand):
         ).exclude(
             obj_type_id__in=(1, 2, 3, 5, 6), registration_date__isnull=True
         ).exclude(
-            obj_type_id__gt=6
+            obj_type_id__in=(9, 11, 12, 14)
         ).annotate(
             app_id=F('id'), last_update=F('lastupdate')
         ).values_list('app_id', 'last_update')
@@ -36,8 +36,13 @@ class Command(BaseCommand):
         # Объекты, которых нет в API (или которые имеют другое значение поля last_update)
         diff = list(set(apps) - set(api_apps))
 
+        c = len(diff)
+        i = 0
+
         # Добавление/обновление данных
         for d in diff:
+            i += 1
+            print(f"{i}/{c}")
             is_visible = True
             app_date = None
             app = IpcAppList.objects.get(id=d[0])
@@ -61,7 +66,7 @@ class Command(BaseCommand):
                                 datetime.strptime(
                                     data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10],
                                     '%Y-%m-%d'
-                                )
+                                ), is_dst=True
                             )
 
                         if data['search_data']['obj_state'] == 1:
@@ -97,6 +102,9 @@ class Command(BaseCommand):
                     # Патенты на пром. образцы
                     elif app.obj_type_id == 6:
                         data_to_write = data['Design']['DesignDetails']
+
+                    elif app.obj_type_id in (10, 13):  # Авторське право
+                        data_to_write = data['Certificate']['CopyrightDetails']
 
                     if data['search_data']['obj_state'] == 2:
                         data_to_write['registration_status_color'] = data['search_data'][
