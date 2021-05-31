@@ -87,6 +87,8 @@ class OrderOperation(TimeStampedModel):
     order = models.ForeignKey('Order', on_delete=models.CASCADE, verbose_name='Замовлення')
     code = models.SmallIntegerField('Код операції', help_text='1 - успішно оплачено, 2 - помилка при оплаті',
                                     choices=ORDER_OPERATION_CODE_CHOICES)
+    value = models.PositiveIntegerField('Сума платежу', default=None, blank=True, null=True)
+    pay_request_pb_xml = models.TextField('Запит PrivatBank24', default=None, blank=True, null=True)
 
     def __str__(self):
         return f"{self.code}, {self.order}"

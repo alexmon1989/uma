@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.bulletin.apps.BulletinConfig',
     'apps.bulletin_new.apps.BulletinNewConfig',
     'apps.patent_attorneys.apps.PatentAttorneysConfig',
+    'apps.payments.apps.PaymentsConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',

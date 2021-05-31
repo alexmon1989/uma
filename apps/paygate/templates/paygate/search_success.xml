@@ -1,22 +1,12 @@
-{% load l10n %}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Transfer xmlns="http://debt.privatbank.ua/Transfer" interface="Debt" action="Search">
     <Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="DebtPack">
-        <PayerInfo billIdentifier="{{ billIdentifier }}">
-            <Fio>{{ username }}</Fio>
-        </PayerInfo>
+        <PayerInfo billIdentifier="{{ billIdentifier }}" />
         <ServiceGroup>
-            <DebtService serviceCode="5.7">
-                <DebtInfo amountToPay="{{ amountToPay|unlocalize }}" debt="0.00"/>
-                <ServiceName>Доступ до інформації щодо заявок, за якими не встановлена дата подачі</ServiceName>
-                <Destination>Оплата за послугу надання доступу до інформації щодо заявок</Destination>
-                <CompanyInfo mfo="320478" okpo="31032378" account="UA093204780000000026008268812">
-                    <CompanyCode>31032378</CompanyCode>
-                    <CompanyName>ДЕРЖАВНЕ ПІДПРИЄМСТВО "УКРАЇНСЬКИЙ ІНСТИТУТ ІНТЕЛЕКТУАЛЬНОЇ ВЛАСНОСТІ" УКРПАТЕНТ</CompanyName>
-                </CompanyInfo>
-                <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ ls }}">
-                    <Fio>{{ username }}</Fio>
-                </PayerInfo>
+            <DebtService serviceCode="{{ order.fee_type.code }}">
+                <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
+                <Destination>Послуги Укрпатенту, код послуги {{ order.fee_type.code }}, заявка {{ order.app_number }}</Destination>
+                <PayerInfo billIdentifier="{{ billIdentifier }}" />
             </DebtService>
         </ServiceGroup>
     </Data>
