@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans 'Замовлення' %} №{{ object.id }}{% endblock %}
+
+{% block content %}
+
+    {% include 'payments/order_detail/_partials/breadcrumbs.html' %}
+
+    <section class="container g-py-70">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="h2">{% trans 'Деталі замовлення' %}</h1>
+
+                <dl class="row g-mt-40">
+                    <dt class="col-sm-3">{% trans 'Номер заявки' %}</dt>
+                    <dd class="col-sm-9">{{ object.app_number }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Тип збору' %}</dt>
+                    <dd class="col-sm-9">{{ object.fee_type.code_title }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans 'Сума до оплати, грн' %}</dt>
+                    <dd class="col-sm-9">{{ object.value }}</dd>
+                </dl>
+
+                <div class="text-center g-mt-20">
+                    <a class="btn u-btn-indigo rounded-0 g-py-12 g-px-25 g-font-size-18"
+                       target="_blank"
+                       href='https://next.privat24.ua/payments/form/{"token":"41d9f80012e93f459fb60e22a7d6cfc941aaj8kf", "personalAccount":"{{ object.pk }}", "sum":"{{ object.value }}"}'>{% trans "Перейти до оплати у Приват24" %}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

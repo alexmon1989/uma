@@ -23,6 +23,7 @@ from django.views.i18n import JavaScriptCatalog
 from apps.search.views import validate_query, get_task_info, get_validation_info
 from apps.favorites.views import add_or_remove
 from apps.bulletin_new.views import get_applications
+from apps.payments.views import OrderCreateAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,6 +42,7 @@ urlpatterns += i18n_patterns(
     path('favorites/', include('apps.favorites.urls')),
     path('bulletin/', include('apps.bulletin.urls')),
     path('bulletin_new/', include('apps.bulletin_new.urls')),
+    path('payments/', include('apps.payments.urls')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 )
@@ -53,6 +55,7 @@ urlpatterns += [
     # path('paygate/', include('apps.paygate.urls')),
     path('favorites/add-or-remove', add_or_remove, name='favorites-add-or-remove'),
     path('bulletin_new/get-applications/<int:bulletin_id>/<int:unit_id>/', get_applications),
+    path('payments/api/orders', OrderCreateAPIView.as_view(), name='payments-orders')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
