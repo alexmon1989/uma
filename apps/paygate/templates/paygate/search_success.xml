@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Transfer xmlns="http://debt.privatbank.ua/Transfer" interface="Debt" action="Search">
     <Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="DebtPack">
-        <PayerInfo billIdentifier="{{ billIdentifier }}" />
+        <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
         <ServiceGroup>
             <DebtService serviceCode="{{ order.fee_type.code }}">
+                <CompanyInfo>
+                    <CompanyCode>31032378</CompanyCode>
+                </CompanyInfo>
                 <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
                 <Destination>Послуги Укрпатенту, код послуги {{ order.fee_type.code }}, заявка {{ order.app_number }}</Destination>
-                <PayerInfo billIdentifier="{{ billIdentifier }}" />
+                <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
             </DebtService>
         </ServiceGroup>
     </Data>
