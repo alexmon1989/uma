@@ -762,7 +762,8 @@ function() {
 		}
 
 		try {
-			if (document.getElementById('PKeyReadButton').title == 'Вхід') {
+		    var PKeyReadButtonTitle = document.getElementById('PKeyReadButton').title;
+			if (PKeyReadButtonTitle === 'Вхід' || PKeyReadButtonTitle === 'Enter') {
 				setStatus('зчитування ключа');
 
 				var files = document.getElementById('PKeyFileInput').files;
