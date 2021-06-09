@@ -1,5 +1,5 @@
 from rest_framework import generics, exceptions
-from .serializers import OpenDataSerializer, OpenDataSerializerV1
+from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
 from .models import OpenData
 from apps.search.models import ObjType
 import datetime
@@ -176,4 +176,17 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
             'last_update',
             'data',
             'app__files_path',
+        )
+
+
+class OpenDataDocsView(generics.RetrieveAPIView):
+    """Возвращает документы объекта по номеру заявки."""
+
+    serializer_class = OpenDataDocsSerializer
+    lookup_field = 'app_number'
+
+    def get_queryset(self):
+        queryset = OpenData.objects.filter(is_visible=1)
+        return queryset.values(
+            'data_docs',
         )

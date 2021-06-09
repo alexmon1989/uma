@@ -58,3 +58,13 @@ class OpenDataSerializerV1(OpenDataSerializer):
             'last_update',
             'data',
         )
+
+
+class OpenDataDocsSerializer(serializers.ModelSerializer):
+    documents = serializers.CharField(read_only=True, source="data_docs")
+
+    class Meta:
+        model = OpenData
+        fields = (
+            'documents',
+        )
