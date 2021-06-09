@@ -36,13 +36,8 @@ class Command(BaseCommand):
         # Объекты, которых нет в API (или которые имеют другое значение поля last_update)
         diff = list(set(apps) - set(api_apps))
 
-        c = len(diff)
-        i = 0
-
         # Добавление/обновление данных
         for d in diff:
-            i += 1
-            print(f"{i}/{c}")
             is_visible = True
             app_date = None
             app = IpcAppList.objects.get(id=d[0])
@@ -91,7 +86,7 @@ class Command(BaseCommand):
                                     if app.app_date > make_aware(datetime.strptime('2020-07-17', '%Y-%m-%d')):
                                         is_visible = False
                                     else:
-                                        is_visible = mark_status_code > 2000
+                                        is_visible = True
                             else:
                                 data_to_write['Code_441'] = str(e_bulletin_app.publication_date)
 
