@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from rest_framework import viewsets, generics
 
-from .serizalizers import GroupSerializer, FeeTypeSerializer, OrderSerializer
+from .serizalizers import GroupSerializer, FeeTypeSerializer, OrderSerializer, OrderStatusSerializer
 from .models import Group, FeeType, Order, Page
 from ..search.models import IpcAppList
 
@@ -52,11 +52,14 @@ class OrderCreateAPIView(generics.CreateAPIView):
         )
 
 
+class OrderStatusAPIView(generics.RetrieveAPIView):
+    """Возвращает JSON заказа."""
+    queryset = Order.objects.all()
+    serializer_class = OrderStatusSerializer
+
+
 class OrderDetailView(DetailView):
     """Отображает страницу сформированного заказа."""
     model = Order
     template_name = 'payments/order_detail/index.html'
 
-    def get_queryset(self):
-        # Неоплаченные заказы
-        return Order.objects.exclude(orderoperation__code=1).all()

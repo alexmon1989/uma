@@ -65,8 +65,9 @@ class Order(TimeStampedModel):
     app_number = models.CharField('Номер заявки', max_length=32)
     value = models.PositiveIntegerField('Сума платежу')
 
+    @property
     def is_paid(self):
-        return self.orderoperation_set.objects.filter(code=1).exists()
+        return self.orderoperation_set.all().filter(code=1).exists()
 
     def __str__(self):
         return f"Заявка {self.app_number}, збір {self.fee_type.title_uk}"
