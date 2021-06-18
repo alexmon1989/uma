@@ -1,6 +1,6 @@
 from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
-from .models import Group, FeeType, Page
+from .models import Group, FeeType, Page, Order, OrderOperation
 
 
 @admin.register(Group)
@@ -42,6 +42,7 @@ class FeeTypeAdmin(admin.ModelAdmin):
         'title_uk',
         'title_en',
         'group',
+        'needs_app_number',
     )
 
     search_fields = (
@@ -52,9 +53,64 @@ class FeeTypeAdmin(admin.ModelAdmin):
 
     list_filter = (
         'group',
+        'needs_app_number',
+    )
+
+    list_editable = (
+        'needs_app_number',
     )
 
     def get_queryset(self, request):
         return FeeType.objects.select_related('group').all()
 
+
 admin.site.register(Page, SingleModelAdmin)
+
+
+class OrderOperationInline(admin.StackedInline):
+    model = OrderOperation
+    fields = (
+        'code',
+        'value',
+        'pay_request_pb_xml',
+        'created_at',
+    )
+    readonly_fields = ['created_at']
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'fee_type',
+        'app_number',
+        'value',
+        'is_paid',
+        'created_at',
+    )
+
+    fields = (
+        'id',
+        'fee_type',
+        'app_number',
+        'value',
+        'is_paid',
+        'created_at',
+    )
+
+    ordering = (
+        '-created_at',
+    )
+
+    inlines = [
+        OrderOperationInline,
+    ]
+
+    def is_paid(self, obj):
+        return obj.is_paid
+
+    is_paid.short_description = "Сплачено"
+    is_paid.boolean = True
+
+    def has_change_permission(self, request, obj=None):
+        return False

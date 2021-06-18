@@ -8,8 +8,8 @@
                class="form-control g-rounded-3 g-py-9 g-px-10 g-brd-gray-light-v3--focus"
                type="text"
                name="app_number"
-               :disabled="!group"
-               v-validate="'required|validApplication'"
+               :disabled="!feeType"
+               v-validate="{ required: feeType && feeType.needs_app_number, validApplication: feeType && feeType.needs_app_number }"
                data-vv-validate-on="blur"
                :placeholder="translations.appNumberFieldPlaceholder">
         <small class="form-control-feedback"
@@ -24,7 +24,7 @@
 
     export default {
         name: "AppNumber",
-        props: ["group"],
+        props: ["group", "feeType"],
         inject: ['$validator'],
         mixins: [translations, validationMixin],
         data() {

@@ -14,7 +14,7 @@
                 <h1 class="h2">{% trans 'Деталі замовлення' %}</h1>
 
                 {% if object.is_paid %}
-                    <p class="text-success lead g-font-weight-600 g-mt-30">{% trans 'Дякуємо, замовлення було оплачено.' %}</p>
+                    <p class="text-success lead g-font-weight-600 g-mt-30">{% trans 'Дякуємо, замовлення було сплачено.' %}</p>
                 {% else %}
                     <dl class="row g-mt-40">
                         <dt class="col-sm-3">{% trans 'Номер заявки' %}</dt>
@@ -27,7 +27,7 @@
                     </dl>
 
                     <dl class="row">
-                        <dt class="col-sm-3">{% trans 'Сума до оплати, грн' %}</dt>
+                        <dt class="col-sm-3">{% trans 'Сума до сплати, грн' %}</dt>
                         <dd class="col-sm-9">{{ object.value }}</dd>
                     </dl>
 
@@ -35,7 +35,7 @@
                         <a class="btn u-btn-indigo rounded-0 g-py-12 g-px-25 g-font-size-18"
                            id="pb_pay_btn"
                            target="_blank"
-                           href='https://next.privat24.ua/payments/form/{"token":"41d9f80012e93f459fb60e22a7d6cfc941aaj8kf", "personalAccount":"{{ object.pk }}", "sum":"{{ object.value }}"}'>{% trans "Перейти до оплати у Приват24" %}</a>
+                           href='https://next.privat24.ua/payments/form/{"token":"41d9f80012e93f459fb60e22a7d6cfc941aaj8kf", "personalAccount":"{{ object.pk }}", "sum":"{{ object.value }}"}'>{% trans "Перейти до сплати у Приват24" %}</a>
                     </div>
 
                 {% endif %}

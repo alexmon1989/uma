@@ -7,7 +7,7 @@
         <fee-type-select :options="feeTypes"
                          v-model="feeType"></fee-type-select>
 
-        <app-number :group="group" v-model="appNumber"></app-number>
+        <app-number :group="group" :fee-type="feeType" v-model="appNumber"></app-number>
 
         <value v-model="value"></value>
 

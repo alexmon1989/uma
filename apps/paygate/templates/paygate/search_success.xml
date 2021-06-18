@@ -8,7 +8,7 @@
                     <CompanyCode>31032378</CompanyCode>
                 </CompanyInfo>
                 <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
-                <Destination>Послуги Укрпатенту, код послуги {{ order.fee_type.code }}, заявка {{ order.app_number }}</Destination>
+                <Destination>КМУ1716, код {{ order.fee_type.code }}{% if order.app_number %}, № об'єкту {{ order.app_number }}{% endif %}</Destination>
                 <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
             </DebtService>
         </ServiceGroup>

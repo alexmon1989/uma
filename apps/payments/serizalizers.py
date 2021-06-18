@@ -15,7 +15,7 @@ class FeeTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeeType
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'needs_app_number']
 
 
 class OrderSerializer(serializers.ModelSerializer):

@@ -43,6 +43,7 @@ class FeeType(models.Model):
     title_en = models.CharField('Назва збору (eng.)', max_length=1024, default='', blank=True, null=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Група сбору')
     code = models.CharField('Код сбору', max_length=255)
+    needs_app_number = models.BooleanField('Потребує номера заявки', default=True)
 
     def __str__(self):
         return self.title_uk
@@ -62,7 +63,7 @@ class Order(TimeStampedModel):
     """Модель заказа."""
     fee_type = models.ForeignKey('FeeType', on_delete=models.SET_NULL, default=None, blank=False, null=True,
                                  verbose_name='Вид сбору')
-    app_number = models.CharField('Номер заявки', max_length=32)
+    app_number = models.CharField('Номер заявки', max_length=32, blank=True, null=True)
     value = models.PositiveIntegerField('Сума платежу')
 
     @property
@@ -78,15 +79,15 @@ class Order(TimeStampedModel):
 
 
 ORDER_OPERATION_CODE_CHOICES = (
-    (1, 'Успішно оплачен'),
-    (2, 'Помилка при оплаті')
+    (1, 'Успішно сплачено'),
+    (2, 'Помилка при сплаті')
 )
 
 
 class OrderOperation(TimeStampedModel):
     """Модель операции с заказом."""
     order = models.ForeignKey('Order', on_delete=models.CASCADE, verbose_name='Замовлення')
-    code = models.SmallIntegerField('Код операції', help_text='1 - успішно оплачено, 2 - помилка при оплаті',
+    code = models.SmallIntegerField('Код операції', help_text='1 - успішно сплачено, 2 - помилка при сплаті',
                                     choices=ORDER_OPERATION_CODE_CHOICES)
     value = models.PositiveIntegerField('Сума платежу', default=None, blank=True, null=True)
     pay_request_pb_xml = models.TextField('Запит PrivatBank24', default=None, blank=True, null=True)

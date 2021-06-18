@@ -62,4 +62,3 @@ class OrderDetailView(DetailView):
     """Отображает страницу сформированного заказа."""
     model = Order
     template_name = 'payments/order_detail/index.html'
-
