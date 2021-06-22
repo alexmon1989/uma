@@ -364,8 +364,6 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
 @shared_task
 def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
-    # Получение обработанного заказа
-
     # Получение документа (заявки) из ElasticSearch
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
@@ -380,7 +378,28 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
         return {}
     hit = s[0].to_dict()
 
-    if user_has_access_to_docs(user, hit):
+    # Список id cead
+    hit_id_cead_list = []
+    if hit['Document']['idObjType'] in (1, 2, 3):
+        for doc in hit['DOCFLOW']['DOCUMENTS']:
+            if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
+    elif hit['Document']['idObjType'] == 4:
+        for doc in hit['TradeMark']['DocFlow']['Documents']:
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+    elif hit['Document']['idObjType'] == 6:
+        for doc in hit['Design']['DocFlow']['Documents']:
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+
+    # Входит ли id_cead_doc в список документов заявки
+    if isinstance(id_cead_doc, list):
+        is_in_list = set(list(map(int, id_cead_doc))).issubset(set(hit_id_cead_list))
+    else:
+        is_in_list = id_cead_doc in hit_id_cead_list
+
+    if is_in_list and user_has_access_to_docs(user, hit):
         # Создание заказа
         order = OrderService(
             # user=request.user,
