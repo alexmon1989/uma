@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings, OrderDocument
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
@@ -362,16 +362,15 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
 
 
 @shared_task
-def get_order_documents(user_id, order_id):
+def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
     # Получение обработанного заказа
-    order = get_completed_order(order_id)
 
     # Получение документа (заявки) из ElasticSearch
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
-        must=[Q('match', _id=order.app_id)],
+        must=[Q('match', _id=id_app_number)],
     )
 
     user = get_user_or_anonymous(user_id)
@@ -381,44 +380,60 @@ def get_order_documents(user_id, order_id):
         return {}
     hit = s[0].to_dict()
 
-    if order and user_has_access_to_docs(user, hit):
-        # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
-        if order.orderdocument_set.count() == 1:
-            doc = order.orderdocument_set.first()
-            # Путь к файлу
-            file_path = os.path.join(
-                settings.MEDIA_URL,
-                'OrderService',
-                str(order.user_id),
-                str(order.id),
-                doc.file_name
-            )
-            return file_path
+    if user_has_access_to_docs(user, hit):
+        # Создание заказа
+        order = OrderService(
+            # user=request.user,
+            user_id=user_id,
+            ip_user=ip_user,
+            app_id=id_app_number
+        )
+        order.save()
+        if isinstance(id_cead_doc, list):
+            for item in id_cead_doc:
+                OrderDocument.objects.create(order=order, id_cead_doc=item)
         else:
-            file_path_zip = os.path.join(
-                settings.ORDERS_ROOT,
-                str(order.user_id),
-                str(order.id),
-                'docs.zip'
-            )
-            with ZipFile(file_path_zip, 'w') as zip_:
-                for document in order.orderdocument_set.all():
-                    zip_.write(
-                        os.path.join(
-                            settings.DOCUMENTS_MOUNT_FOLDER,
-                            'OrderService',
-                            str(order.user_id),
-                            str(order.id),
-                            document.file_name),
-                        f"{document.file_name}"
-                    )
-            return os.path.join(
-                settings.MEDIA_URL,
-                'OrderService',
-                str(order.user_id),
-                str(order.id),
-                'docs.zip'
-            )
+            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
+        order = get_completed_order(order.id)
+
+        if order:
+            # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
+            if order.orderdocument_set.count() == 1:
+                doc = order.orderdocument_set.first()
+                # Путь к файлу
+                file_path = os.path.join(
+                    settings.MEDIA_URL,
+                    'OrderService',
+                    str(order.user_id),
+                    str(order.id),
+                    doc.file_name
+                )
+                return file_path
+            else:
+                file_path_zip = os.path.join(
+                    settings.ORDERS_ROOT,
+                    str(order.user_id),
+                    str(order.id),
+                    'docs.zip'
+                )
+                with ZipFile(file_path_zip, 'w') as zip_:
+                    for document in order.orderdocument_set.all():
+                        zip_.write(
+                            os.path.join(
+                                settings.DOCUMENTS_MOUNT_FOLDER,
+                                'OrderService',
+                                str(order.user_id),
+                                str(order.id),
+                                document.file_name),
+                            f"{document.file_name}"
+                        )
+                return os.path.join(
+                    settings.MEDIA_URL,
+                    'OrderService',
+                    str(order.user_id),
+                    str(order.id),
+                    'docs.zip'
+                )
 
     return False
 

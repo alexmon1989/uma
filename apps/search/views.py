@@ -296,19 +296,10 @@ def get_data_app_html(request):
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
     if request.POST.getlist('cead_id'):
-        # Создание заказа
-        order = OrderService(
-            # user=request.user,
-            user_id=request.user.pk,
-            ip_user=get_client_ip(request),
-            app_id=request.POST['id_app_number']
-        )
-        order.save()
-        for id_cead_doc in request.POST.getlist('cead_id'):
-            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
-
         # Создание асинхронной задачи для получения архива с документами
-        task = get_order_documents.delay(request.user.pk, order.id)
+        task = get_order_documents.delay(
+            request.user.pk, request.POST['id_app_number'], request.POST.getlist('cead_id'), get_client_ip(request)
+        )
         return JsonResponse({'task_id': task.id})
     else:
         raise Http404('Файли не було обрано!')
@@ -316,18 +307,8 @@ def download_docs_zipped(request):
 
 def download_doc(request, id_app_number, id_cead_doc):
     """Возвращает JSON с id асинхронной задачи на заказ документа."""
-    # Создание заказа
-    order = OrderService(
-        # user=request.user,
-        user_id=request.user.pk,
-        ip_user=get_client_ip(request),
-        app_id=id_app_number
-    )
-    order.save()
-    OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
-
     # Создание асинхронной задачи для получения документа
-    task = get_order_documents.delay(request.user.pk, order.id)
+    task = get_order_documents.delay(request.user.pk, id_app_number, id_cead_doc, get_client_ip(request))
     return JsonResponse({'task_id': task.id})
 
 
