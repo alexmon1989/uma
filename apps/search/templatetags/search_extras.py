@@ -225,14 +225,14 @@ def app_stages_tm(app):
         # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
         if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
             for doc in app['TradeMark']['DocFlow']['Documents']:
-                if 'Т-08' in doc['DocRecord'].get('DocType', ''):
+                if 'Т-08' in doc['DocRecord'].get('DocFlow', {}).get('Documents', []):
                     stages_statuses[4] = 'current'
                     stages_statuses[3] = 'done'
                     break
 
         # Если есть форма Т-05, то "Формальна експертиза" пройдена (для случая если делопроизводство остановлено)
         if is_stopped:
-            for doc in app['TradeMark']['DocFlow']['Documents']:
+            for doc in app['TradeMark'].get('DocFlow', {}).get('Documents', []):
                 if 'Т-05' in doc['DocRecord'].get('DocType', ''):
                     stages_statuses[2] = 'done'
                     stages_statuses[3] = 'stopped'
