@@ -57,7 +57,7 @@ class Command(BaseCommand):
                     # Свидетельства на знаки для товаров и услуг
                     elif app.obj_type_id == 4:
                         data_biblio = data['TradeMark']['TrademarkDetails']
-                        data_docs = data['TradeMark'].get('DocFlow').get('Documents')
+                        data_docs = data['TradeMark'].get('DocFlow', {}).get('Documents')
 
                         if data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
                             app_date = make_aware(
@@ -100,7 +100,7 @@ class Command(BaseCommand):
                     # Патенты на пром. образцы
                     elif app.obj_type_id == 6:
                         data_biblio = data['Design']['DesignDetails']
-                        data_docs = data['Design'].get('DocFlow').get('Documents')
+                        data_docs = data['Design'].get('DocFlow', {}).get('Documents')
 
                     elif app.obj_type_id in (10, 13):  # Авторське право
                         data_biblio = data['Certificate']['CopyrightDetails']
