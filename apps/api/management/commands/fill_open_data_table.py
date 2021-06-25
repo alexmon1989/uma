@@ -52,12 +52,12 @@ class Command(BaseCommand):
                     # Патенты на изобретения, Патенты на полезные модели, Свидетельства на топографии инт. микросхем
                     if app.obj_type_id in (1, 2, 3):
                         data_biblio = data['Patent']
-                        data_docs = data['DOCFLOW']['DOCUMENTS']
+                        data_docs = data.get('DOCFLOW', {}).get('DOCUMENTS')
 
                     # Свидетельства на знаки для товаров и услуг
                     elif app.obj_type_id == 4:
                         data_biblio = data['TradeMark']['TrademarkDetails']
-                        data_docs = data['TradeMark']['DocFlow']['Documents']
+                        data_docs = data['TradeMark'].get('DocFlow').get('Documents')
 
                         if data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
                             app_date = make_aware(
@@ -100,7 +100,7 @@ class Command(BaseCommand):
                     # Патенты на пром. образцы
                     elif app.obj_type_id == 6:
                         data_biblio = data['Design']['DesignDetails']
-                        data_docs = data['Design']['DocFlow']['Documents']
+                        data_docs = data['Design'].get('DocFlow').get('Documents')
 
                     elif app.obj_type_id in (10, 13):  # Авторське право
                         data_biblio = data['Certificate']['CopyrightDetails']
