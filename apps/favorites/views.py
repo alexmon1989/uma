@@ -26,6 +26,7 @@ class IndexView(TemplateView):
 
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
 
         if context['favorites_ids']:
             # Создание асинхронной задачи для Celery

@@ -14,7 +14,8 @@ def original_document(request):
     return render(
         request,
         'services/original_document/original_document.html',
-        {'site_key': settings.RECAPTCHA_SITE_KEY}
+        {'site_key': settings.RECAPTCHA_SITE_KEY},
+        {'RECAPTCHA_ENABLED': settings.RECAPTCHA_ENABLED},
     )
 
 

@@ -48,40 +48,56 @@ function updateURLParameter(url, param, paramVal)
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
-function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
-    let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries = 20) {
+    const recaptchaEnabled = !!JSON.parse(document.getElementById('recaptcha-enabled').textContent);
 
-    grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
-        $.ajax({
-            type: 'get',
-            url: '/search/get-task-info/',
-            data: {'task_id': taskId, 'token': token},
-            success: function (data) {
-                if (data.state === 'SUCCESS') {
-                    if (data.result === false) {
-                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                    } else {
-                        toastr.success(gettext('Файл було сформовано.'));
-                        saveAs(data.result, data.result.split('/').pop());
-                    }
-                    onSuccess(data);
-                } else {
-                    if (retries > 0) {
-                        setTimeout(function () {
-                            downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
-                        }, 1000);
-                    } else {
-                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                        onError();
-                    }
-                }
-            },
-            error: function (data) {
+    let onAjaxSuccess = function (data) {
+        if (data.state === 'SUCCESS') {
+            if (data.result === false) {
+                toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            } else {
+                toastr.success(gettext('Файл було сформовано.'));
+                saveAs(data.result, data.result.split('/').pop());
+            }
+            onSuccess(data);
+        } else {
+            if (retries > 0) {
+                setTimeout(function () {
+                    downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
+                }, 1000);
+            } else {
                 toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
                 onError();
             }
+        }
+    };
+
+    let onAjaxError = function (data) {
+        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+        onError();
+    };
+
+    if (recaptchaEnabled) {
+        let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+
+        grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
+            $.ajax({
+                type: 'get',
+                url: '/search/get-task-info/',
+                data: {'task_id': taskId, 'token': token},
+                success: onAjaxSuccess,
+                error: onAjaxError,
+            });
         });
-    });
+    } else {
+        $.ajax({
+            type: 'get',
+            url: '/search/get-task-info/',
+            data: {'task_id': taskId},
+            success: onAjaxSuccess,
+            error: onAjaxError,
+        });
+    }
 }
 
 /**

@@ -30,7 +30,9 @@
 
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
+    {% if RECAPTCHA_ENABLED %}
     <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    {% endif %}
     <script>
         var get_obj_data = function (task_id, retries) {
             var $resultsDiv = $("#data");
@@ -39,11 +41,11 @@
                 $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
             };
 
-            grecaptcha.execute('{{ site_key }}', {action: 'detail'}).then(function (token) {
+            {% if RECAPTCHA_ENABLED %}grecaptcha.execute('{{ site_key }}', {action: 'detail'}).then(function (token) {{% endif %}
                 $.ajax({
                     type: 'get',
                     url: '/{{ LANGUAGE_CODE }}/search/get-data-app/',
-                    data: {'task_id': task_id, 'token': token},
+                    data: {'task_id': task_id, {% if RECAPTCHA_ENABLED %}'token': token{% endif %}},
                     success: function (data) {
                         if (data.state === 'SUCCESS') {
                             $resultsDiv.html(data.result);
@@ -63,19 +65,27 @@
                         onError();
                     }
                 });
-            });
+            {% if RECAPTCHA_ENABLED %}});{% endif %}
         };
 
        {% if task_id %}
             $(function () {
-                grecaptcha.ready(function () {
+                {% if RECAPTCHA_ENABLED %}
+                    grecaptcha.ready(function () {
+                        get_obj_data('{{ task_id }}', 20);
+                    });
+                {% else %}
                     get_obj_data('{{ task_id }}', 20);
-                });
+                {% endif %}
             });
         {% endif %}
     </script>
+
+    {{ RECAPTCHA_ENABLED|json_script:"recaptcha-enabled" }}
 {% endblock %}
 
 {% block extra_meta %}
-    <meta name="site-key" content="{{ site_key }}">
+    {% if RECAPTCHA_ENABLED %}
+        <meta name="site-key" content="{{ site_key }}">
+    {% endif %}
 {% endblock %}

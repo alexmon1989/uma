@@ -56,7 +56,9 @@
 
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
-    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    {% if RECAPTCHA_ENABLED %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    {% endif %}
     <script>
         function get_task_info(task_id, retries) {
             var $resultsDiv = $(".results");
@@ -65,11 +67,13 @@
                 $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
             };
 
-            grecaptcha.execute('{{ site_key }}', {action: 'simplesearch'}).then(function (token) {
+            {% if RECAPTCHA_ENABLED %}
+                grecaptcha.execute('{{ site_key }}', {action: 'simplesearch'}).then(function (token) {
+            {% endif %}
                 $.ajax({
                     type: 'get',
                     url: '/{{ LANGUAGE_CODE }}/search/results/',
-                    data: {'task_id': task_id, 'search_type': 'simple', 'token': token},
+                    data: {'task_id': task_id, 'search_type': 'simple', {% if RECAPTCHA_ENABLED %}'token': token{% endif %} },
                     success: function (data) {
                         if (data.state === 'SUCCESS') {
                             $resultsDiv.html(data.result);
@@ -88,21 +92,28 @@
                     error: function (data) {
                         onError();
                     }
-                });
+                {% if RECAPTCHA_ENABLED %}});{% endif %}
             });
         }
 
         {% if task_id %}
             $(function () {
+                {% if RECAPTCHA_ENABLED %}
                 grecaptcha.ready(function () {
                     get_task_info('{{ task_id }}', 20);
                 });
+                {% else %}
+                    get_task_info('{{ task_id }}', 20);
+                {% endif %}
             });
         {% endif %}
     </script>
+
+    {{ RECAPTCHA_ENABLED|json_script:"recaptcha-enabled" }}
 {% endblock %}
 
-
 {% block extra_meta %}
-    <meta name="site-key" content="{{ site_key }}">
+    {% if RECAPTCHA_ENABLED %}
+        <meta name="site-key" content="{{ site_key }}">
+    {% endif %}
 {% endblock %}

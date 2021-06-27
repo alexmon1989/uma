@@ -312,10 +312,10 @@ def filter_results(s, get_params):
     #         'title': 'mark_status',
     #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
     #     })
-    filters.append({
-        'title': 'mark_status',
-        'field': 'Document.MarkCurrentStatusCodeType.keyword'
-    })
+    # filters.append({
+    #     'title': 'mark_status',
+    #     'field': 'Document.MarkCurrentStatusCodeType.keyword'
+    # })
 
     # Агрегация без фильтрации
     for item in filters:

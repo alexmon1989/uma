@@ -18,7 +18,7 @@
                      data-vv-name="obj_type"
                      v-validate="'required'"
                      @input="$emit('input', $event)"
-                    id="objType"
+                     id="objType"
         ></multiselect>
         <small class="form-control-feedback" v-if="errors.has('obj_type')">{{ translations.validationErrors[errors.firstRule('obj_type')] }}</small>
     </div>

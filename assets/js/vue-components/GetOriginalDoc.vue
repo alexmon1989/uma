@@ -40,6 +40,10 @@
     import * as Toastr from 'toastr';
 
     export default {
+        props: {
+            recaptchaEnabled: Boolean,
+        },
+
         data() {
             return {
                 translations: {
@@ -108,34 +112,45 @@
                 }
 
                 if (tries > 0) {
-                    let siteKey = document.querySelector('meta[name="site-key"]').content;
-
                     let self = this;
 
-                    return grecaptcha.execute(siteKey, {action: 'getoriginaldoc'}).then(function (token) {
+                    let onSuccess = (response) => {
+                        if (response.data.state === 'PENDING') {
+                            return self.getTaskResult(--tries);
+                        } else {
+                            if (response.data.result) {
+                                self.filePath = response.data.result;
+                            } else {
+                                self.notFound = true;
+                            }
+                            self.processing = false
+                        }
+                    };
+
+                    let onError = e => {
+                        self.serverErrors.push(e);
+                        Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                        self.processing = false;
+                    };
+
+                    if (this.recaptchaEnabled) {
+                        let siteKey = document.querySelector('meta[name="site-key"]').content;
+
+                        return grecaptcha.execute(siteKey, {action: 'getoriginaldoc'}).then(function (token) {
+                            return axios.get('/search/get-task-info/', {
+                                params: {
+                                    task_id: self.taskId,
+                                    token: token,
+                                }
+                            }).then(onSuccess).catch(onError);
+                        });
+                    } else {
                         return axios.get('/search/get-task-info/', {
                             params: {
                                 task_id: self.taskId,
-                                token: token,
                             }
-                        }).then((response) => {
-                            if (response.data.state === 'PENDING') {
-                                return self.getTaskResult(--tries);
-                            } else {
-                                if (response.data.result) {
-                                    self.filePath = response.data.result;
-                                } else {
-                                    self.notFound = true;
-                                }
-                                self.processing = false
-                            }
-                        })
-                        .catch(e => {
-                            self.serverErrors.push(e);
-                            Toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                            self.processing = false;
-                        });
-                    });
+                        }).then(onSuccess).catch(onError);
+                    }
                 } else {
                     // Количество попыток превышено
                     this.serverErrors.push('Количество обращения к серверу превышено.');

@@ -13,6 +13,8 @@ export default {
 
                     // this.$emit('input', [val[0], dd + '.' + mm + '.' + yyyy])
                     this.value = [val[0], dd + '.' + mm + '.' + yyyy];
+                } else {
+                    this.value = val;
                 }
             }
         }

@@ -49,6 +49,7 @@ class SimpleListView(TemplateView):
 
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
 
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
@@ -162,6 +163,8 @@ class AdvancedListView(TemplateView):
             )
             context['task_id'] = task.id
 
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
+
         return context
 
 
@@ -206,6 +209,7 @@ class ObjectDetailView(DetailView):
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Recaptcha
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         # Запись в лог запроса пользователя к заявке
@@ -364,6 +368,7 @@ class TransactionsSearchView(TemplateView):
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Recaptcha
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         context['initial_data'] = dict()
