@@ -92,7 +92,7 @@ def perform_simple_search(user_id, get_params):
     qs = filter_bad_apps(qs)
 
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs).source(
-        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
     )
 
     # Сортировка
@@ -158,7 +158,7 @@ def get_app_details(id_app_number, user_id):
     q = filter_bad_apps(q)
 
     s = Search().using(client).query(q).source(
-        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).execute()
     if not s:
         return {}
@@ -334,7 +334,7 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
         must=[Q('terms', _id=favorites_ids)],
     )
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).source(
-        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).query(q)
 
     # Сортировка

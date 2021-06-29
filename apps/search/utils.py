@@ -148,7 +148,7 @@ def get_elastic_results(search_groups, user):
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(
         qs_result
     ).source(
-        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).sort('_score')
 
     return s
@@ -371,7 +371,7 @@ def extend_doc_flow(hit):
     )
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     application = Search().using(client).query(q).source(
-        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).execute()
     if application:
         application = application[0].to_dict()
@@ -1725,7 +1725,7 @@ def get_search_in_transactions(search_params):
         qs = filter_bad_apps(qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).source(
-            excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+            excludes=["*.DocBarCode", "*.DOCBARCODE"]
         ).query(qs)
 
         return s
