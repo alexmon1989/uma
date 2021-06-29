@@ -91,7 +91,9 @@ def perform_simple_search(user_id, get_params):
     # Не включать в список результатов заявки, по которым выдан патент
     qs = filter_bad_apps(qs)
 
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs).source(
+        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+    )
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -155,7 +157,9 @@ def get_app_details(id_app_number, user_id):
     # Фильтр заявок, которые не положено отоборажать
     q = filter_bad_apps(q)
 
-    s = Search().using(client).query(q).execute()
+    s = Search().using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+    ).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
@@ -329,7 +333,9 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
         'bool',
         must=[Q('terms', _id=favorites_ids)],
     )
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).source(
+        excludes=["*.DocBarCode", "*.DocIdDocCEAD", "*.DOCBARCODE",  "*.DOCIDDOCCEAD"]
+    ).query(q)
 
     # Сортировка
     if get_params.get('sort_by'):
