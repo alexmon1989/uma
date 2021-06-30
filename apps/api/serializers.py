@@ -63,6 +63,18 @@ class OpenDataSerializerV1(OpenDataSerializer):
 class OpenDataDocsSerializer(serializers.ModelSerializer):
     documents = serializers.CharField(read_only=True, source="data_docs")
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['documents'] = json.loads(ret['documents'])
+
+        for doc in ret['documents']:
+            if doc['DocRecord'].get('DocBarCode'):
+                del doc['DocRecord']['DocBarCode']
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                del doc['DocRecord']['DocIdDocCEAD']
+
+        return ret
+
     class Meta:
         model = OpenData
         fields = (
