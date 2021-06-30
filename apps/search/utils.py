@@ -1738,19 +1738,19 @@ def sort_doc_flow(hit):
     # Изобретения, полезные модели, топографии
     if hit['Document']['idObjType'] in (1, 2, 3):
         if hit.get('DOCFLOW'):
-            hit['DOCFLOW']['DOCUMENTS'].sort(
+            hit['DOCFLOW'].get('DOCUMENTS', []).sort(
                 key=lambda document: time.strptime(document['DOCRECORD'].get(
                     'DOCREGDATE', document['DOCRECORD'].get(
                         'DOCSENDINGDATE', '1970-01-01'
                     )
                 ), "%Y-%m-%d")
             )
-            hit['DOCFLOW']['PAYMENTS'].sort(
+            hit['DOCFLOW'].get('PAYMENTS', []).sort(
                 key=lambda document: time.strptime(document['PFRECORD'].get(
                     'PFDATE', '1970-01-01'
                 ), "%Y-%m-%d")
             )
-            hit['DOCFLOW']['COLLECTIONS'].sort(
+            hit['DOCFLOW'].get('COLLECTIONS', []).sort(
                 key=lambda document: time.strptime(document['CLRECORD'].get(
                     'CLDATEBEGIN', '1970-01-01'
                 ), "%Y-%m-%d")
