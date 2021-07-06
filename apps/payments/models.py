@@ -5,6 +5,19 @@ from ..search.models import ObjType
 from uma.abstract_models import TimeStampedModel
 
 
+class ServiceGroup(models.Model):
+    """Модель платёжной группы услуг."""
+    code = models.CharField('Код платіжної групи', max_length=16)
+    title = models.CharField('Назва', max_length=255)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Платіжна група послуги'
+        verbose_name_plural = 'Платіжні групи послуг'
+
+
 OBJ_STATE_CHOICES = (
     (1, 'Заявка'),
     (2, 'Охоронний документ')
@@ -42,6 +55,7 @@ class FeeType(models.Model):
     title_uk = models.CharField('Назва збору (укр.)', max_length=1024)
     title_en = models.CharField('Назва збору (eng.)', max_length=1024, default='', blank=True, null=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Група сбору')
+    service_group = models.ForeignKey(ServiceGroup, on_delete=models.SET_NULL, null=True)
     code = models.CharField('Код сбору', max_length=255)
     needs_app_number = models.BooleanField('Потребує номера заявки', default=True)
 

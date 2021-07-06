@@ -3,13 +3,17 @@
     <Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="DebtPack">
         <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
         <ServiceGroup>
-            <DebtService serviceCode="{{ order.fee_type.code }}">
+            <DebtService serviceCode="{{ order.fee_type.service_group.code }}">
                 <CompanyInfo>
                     <CompanyCode>31032378</CompanyCode>
                 </CompanyInfo>
                 <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
                 <Destination>КМУ1716, код {{ order.fee_type.code }}{% if order.app_number %}, № об'єкту {{ order.app_number }}{% endif %}</Destination>
                 <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
+
+                <DopData>
+                    <Dop name="real_service_code" value="{{ order.fee_type.code }}" />
+                </DopData>
             </DebtService>
         </ServiceGroup>
     </Data>

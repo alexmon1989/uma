@@ -1,6 +1,6 @@
 from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
-from .models import Group, FeeType, Page, Order, OrderOperation
+from .models import Group, FeeType, Page, Order, OrderOperation, ServiceGroup
 
 
 @admin.register(Group)
@@ -123,3 +123,12 @@ class OrderAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(ServiceGroup)
+class ServiceGroupAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'code',
+        'title',
+    )
