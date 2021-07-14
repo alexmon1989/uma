@@ -67,6 +67,8 @@ class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
     def get_queryset(self):
+        OpenData._meta.db_table = 'opendata_api_view'
+
         queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
 
         # Стан об'єкта
