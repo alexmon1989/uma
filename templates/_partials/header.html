@@ -60,7 +60,7 @@
                             <!-- End Submenu -->
                         </li>
 
-                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'services' in request.path %}active{% endif %}">
+                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'services' in request.path or request.resolver_match.view_name == 'patent_attorneys:list' or request.resolver_match.view_name == 'payments:index' %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
                                aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Сервіси" %}
                             </a>
@@ -75,6 +75,9 @@
                                 </li>
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'patent_attorneys:list'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'patent_attorneys:list' %}">{% trans 'Відомості з реєстру патентних повірених' %}</a>
+                                </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'payments:index' %}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'payments:index' %}">{% trans 'Сплата зборів' %}</a>
                                 </li>
                             </ul>
                             <!-- End Submenu -->
