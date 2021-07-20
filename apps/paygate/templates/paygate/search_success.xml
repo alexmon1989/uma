@@ -8,7 +8,7 @@
                     <CompanyCode>31032378</CompanyCode>
                 </CompanyInfo>
                 <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
-                <Destination>{% if order.fee_type.service_group_id == 3 or order.fee_type.service_group_id == 4 %}Сплата держ. мита{% else %}КМУ1716{% endif %}, код {{ order.fee_type.code }}{% if order.app_number %}, № об'єкту {{ order.app_number }}{% endif %}</Destination>
+                <Destination>{% if order.fee_type.service_group_id == 3 or order.fee_type.service_group_id == 4 %}*;101; заявка №{{ order.app_number }}; 22090300{% else %}КМУ1716, код {{ order.fee_type.code }}{% if order.app_number %}, № об'єкту {{ order.app_number }}{% endif %}{% endif %}</Destination>
                 <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
 
                 <DopData>
