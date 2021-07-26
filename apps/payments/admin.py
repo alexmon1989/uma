@@ -43,6 +43,7 @@ class FeeTypeAdmin(admin.ModelAdmin):
         'title_en',
         'group',
         'needs_app_number',
+        'enabled',
     )
 
     search_fields = (
@@ -58,6 +59,7 @@ class FeeTypeAdmin(admin.ModelAdmin):
 
     list_editable = (
         'needs_app_number',
+        'enabled',
     )
 
     def get_queryset(self, request):

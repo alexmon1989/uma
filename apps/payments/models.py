@@ -58,6 +58,7 @@ class FeeType(models.Model):
     service_group = models.ForeignKey(ServiceGroup, on_delete=models.SET_NULL, null=True)
     code = models.CharField('Код сбору', max_length=255)
     needs_app_number = models.BooleanField('Потребує номера заявки', default=True)
+    enabled = models.BooleanField('Увімкнено (доступний для платежу)', default=True)
 
     def __str__(self):
         return self.title_uk

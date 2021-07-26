@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib import messages
 from rest_framework import viewsets, generics
-
+from rest_framework.exceptions import ValidationError
 from .serizalizers import GroupSerializer, FeeTypeSerializer, OrderSerializer, OrderStatusSerializer
 from .models import Group, FeeType, Order, Page
 from ..search.models import IpcAppList
@@ -29,7 +29,7 @@ class FeeTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         group_id = self.kwargs['group_id']
-        return FeeType.objects.filter(group_id=group_id).order_by('code')
+        return FeeType.objects.filter(group_id=group_id, enabled=True).order_by('code')
 
 
 def validate_application(request, group_id, app_number):
@@ -46,6 +46,10 @@ class OrderCreateAPIView(generics.CreateAPIView):
     serializer_class = OrderSerializer
 
     def perform_create(self, serializer):
+        if not self.request.data.get('fee_type') \
+                or FeeType.objects.filter(enabled=False, pk=self.request.data.get('fee_type')).exists():
+            raise ValidationError('The fee type is not enabled')
+
         serializer.save()
         messages.success(
             self.request, 'Замовлення було успішно створено.'
