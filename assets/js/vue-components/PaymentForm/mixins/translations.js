@@ -12,7 +12,7 @@ export const translations = {
                 groupFieldPlaceholder: gettext('Оберіть групу зборів'),
 
                 feeTypeFieldLabel: gettext('Вид збору'),
-                feeTypeFieldPlaceholder: gettext('Оберіть тип збору'),
+                feeTypeFieldPlaceholder: gettext('Оберіть вид збору'),
 
                 btnText: gettext('Сформувати замовлення'),
 
