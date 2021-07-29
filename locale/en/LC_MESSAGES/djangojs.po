@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-29 14:08+0300\n"
+"POT-Creation-Date: 2021-07-29 15:03+0300\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -422,7 +422,7 @@ msgid "Вид збору"
 msgstr "Fee type"
 
 #: assets/js/vue-components/PaymentForm/mixins/translations.js:15
-msgid "Оберіть тип збору"
+msgid "Оберіть вид збору"
 msgstr "Select fee type"
 
 #: assets/js/vue-components/PaymentForm/mixins/translations.js:17
