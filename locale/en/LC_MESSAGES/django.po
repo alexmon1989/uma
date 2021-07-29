@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-18 11:45+0300\n"
+"POT-Creation-Date: 2021-07-29 13:47+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -93,7 +93,7 @@ msgid "Загальна інформація"
 msgstr "Dashboard"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:10
-#: templates/_partials/header.html:161
+#: templates/_partials/header.html:164
 msgid "Мій рахунок (баланс)"
 msgstr "My account balance"
 
@@ -107,7 +107,7 @@ msgstr "Applications views history"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:18
 #: apps/contacts/templates/contacts/_partials/form.html:24
-#: templates/_partials/header.html:167
+#: templates/_partials/header.html:170
 msgid "Повідомлення"
 msgstr "Message"
 
@@ -116,12 +116,12 @@ msgstr "Message"
 #: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:24
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/settings/index.html:20
-#: templates/_partials/header.html:170
+#: templates/_partials/header.html:173
 msgid "Налаштування"
 msgstr "Settings"
 
 #: apps/account/templates/accounts/_partials/sidebar.html:26
-#: templates/_partials/header.html:175 templates/_partials/header.html:184
+#: templates/_partials/header.html:178 templates/_partials/header.html:187
 msgid "Вихід"
 msgstr "Exit"
 
@@ -144,7 +144,7 @@ msgstr "Account balance "
 #: apps/account/templates/accounts/settings/index.html:5
 #: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:20
 #: apps/account/templates/accounts/views_history/index.html:4
-#: templates/_partials/header.html:155
+#: templates/_partials/header.html:158
 msgid "Мій кабінет"
 msgstr "My account"
 
@@ -368,7 +368,7 @@ msgstr "You have agreed with license terms"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:651
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:669
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:705
-#: templates/_partials/footer.html:55 templates/_partials/header.html:84
+#: templates/_partials/footer.html:55 templates/_partials/header.html:87
 msgid "Бюлетень"
 msgstr "Bulletin"
 
@@ -648,7 +648,7 @@ msgstr ""
 "There are no documents in the favorites list at the moment. You can do <a "
 "href=\"%(simple_search_url)s\">search</a> and fill it with documents."
 
-#: apps/favorites/views.py:91
+#: apps/favorites/views.py:92
 msgid "Список вибраного успішно очищено."
 msgstr "The favorites list was cleared."
 
@@ -671,7 +671,7 @@ msgstr "Show more"
 #: apps/help/templates/help/search/search.html:6
 #: apps/help/templates/help/section/_partials/breadcrumbs.html:26
 #: apps/help/templates/help/section/section.html:11
-#: templates/_partials/footer.html:61 templates/_partials/header.html:88
+#: templates/_partials/footer.html:61 templates/_partials/header.html:91
 msgid "Допомога"
 msgstr "Help"
 
@@ -757,7 +757,7 @@ msgstr "Remember me"
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:116
 #: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
-#: templates/_partials/header.html:187
+#: templates/_partials/header.html:190
 msgid "Вхід"
 msgstr "Enter"
 
@@ -885,6 +885,7 @@ msgstr "Fax:"
 #: apps/payments/templates/payments/index/_partials/breadcrumbs.html:24
 #: apps/payments/templates/payments/index/index.html:5
 #: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:24
+#: templates/_partials/header.html:80
 msgid "Сплата зборів"
 msgstr "Fees payment"
 
@@ -966,22 +967,19 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:659
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
-#: apps/search/utils.py:1264
+#: apps/search/utils.py:1270
 msgid "Номер заявки"
 msgstr "Application number"
 
 #: apps/payments/templates/payments/order_detail/index.html:25
-#| msgid "Код збору"
-msgid "Тип збору"
-msgstr "Fee code"
+msgid "Вид збору"
+msgstr "Fee type"
 
 #: apps/payments/templates/payments/order_detail/index.html:30
-#| msgid "Сума оплати"
 msgid "Сума до сплати, грн"
 msgstr "Amount of payment"
 
 #: apps/payments/templates/payments/order_detail/index.html:38
-#| msgid "Сплатити у Приват24"
 msgid "Перейти до сплати у Приват24"
 msgstr "Pay with Privat24"
 
@@ -998,14 +996,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1300
+#: apps/search/utils.py:1306
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1300
+#: apps/search/utils.py:1306
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -1017,7 +1015,7 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/tasks.py:43 apps/search/tasks.py:203 apps/search/tasks.py:263
+#: apps/search/tasks.py:43 apps/search/tasks.py:207 apps/search/tasks.py:267
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -1067,7 +1065,7 @@ msgstr "Full list of applicants"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1265
+#: apps/search/utils.py:1271
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1084,7 +1082,6 @@ msgid "Номер свідоцтва про реєстрацію авторсь�
 msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:81
-#| msgid "Дата реєстрації, старі-нові"
 msgid "Дата реєстрації авторського права"
 msgstr "Registration date, asc"
 
@@ -1109,7 +1106,6 @@ msgid "Повний список власників"
 msgstr "Full list of owners"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:107
-#| msgid "Авторизація"
 msgid "Автор(и)"
 msgstr "Author(s)"
 
@@ -1161,7 +1157,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1275
+#: apps/search/utils.py:1281
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1204,7 +1200,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1273
+#: apps/search/utils.py:1279
 msgid "МПК"
 msgstr "IPC"
 
@@ -1416,7 +1412,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1274
+#: apps/search/utils.py:1280
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1890,7 +1886,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1270
+#: apps/search/utils.py:1276
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2112,17 +2108,14 @@ msgid "Дію свідоцтва припинено, але може бути п
 msgstr "The certificate is suspended but may be renewed"
 
 #: apps/search/templates/search/templatetags/registration_status.html:40
-#| msgid "Свідоцтво діє"
 msgid "Договір діє"
 msgstr "Valid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:42
-#| msgid "Патент не діє"
 msgid "Договір не діє"
 msgstr "Invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:44
-#| msgid "Дію патента припинено, але може бути поновлено"
 msgid "Дію договора припинено, але може бути поновлено"
 msgstr "The contract is terminated, but can be renewed"
 
@@ -2196,43 +2189,43 @@ msgstr "Waiting for documents on the payment of the fees"
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/utils.py:1262
+#: apps/search/utils.py:1268
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1263
+#: apps/search/utils.py:1269
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1266
+#: apps/search/utils.py:1272
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1267
+#: apps/search/utils.py:1273
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1268
+#: apps/search/utils.py:1274
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1269
+#: apps/search/utils.py:1275
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1271
+#: apps/search/utils.py:1277
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1272
+#: apps/search/utils.py:1278
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1276
+#: apps/search/utils.py:1282
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1277
+#: apps/search/utils.py:1283
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2257,7 +2250,7 @@ msgstr ""
 msgid "Меню"
 msgstr "Menu"
 
-#: templates/_partials/footer.html:67 templates/_partials/header.html:92
+#: templates/_partials/footer.html:67 templates/_partials/header.html:95
 msgid "Зворотній зв'язок"
 msgstr "Contacts"
 
@@ -2279,11 +2272,11 @@ msgid ""
 "власності&raquo;"
 msgstr "&laquo;Ukrainian Intellectual Property Institute&raquo; "
 
-#: templates/_partials/header.html:102
+#: templates/_partials/header.html:105
 msgid "Перейти до списку вибраних документів"
 msgstr "Go to the favorites list"
 
-#: templates/_partials/header.html:164
+#: templates/_partials/header.html:167
 msgid "Історія переглядів"
 msgstr "Applications views history"
 
@@ -2294,6 +2287,10 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~| msgid "Код збору"
+#~ msgid "Тип збору"
+#~ msgstr "Fee code"
 
 #, fuzzy
 #~| msgid "Код збору"

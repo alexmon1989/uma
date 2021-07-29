@@ -11,7 +11,7 @@ export const translations = {
                 groupFieldLabel: gettext('Група зборів'),
                 groupFieldPlaceholder: gettext('Оберіть групу зборів'),
 
-                feeTypeFieldLabel: gettext('Тип збору'),
+                feeTypeFieldLabel: gettext('Вид збору'),
                 feeTypeFieldPlaceholder: gettext('Оберіть тип збору'),
 
                 btnText: gettext('Сформувати замовлення'),
