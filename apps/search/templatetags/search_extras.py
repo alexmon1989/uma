@@ -12,14 +12,22 @@ register = template.Library()
 
 @register.filter
 def get_person_name(value):
+    try:
+        del value['EDRPOU']
+    except KeyError:
+        pass
     values = list(value.values())
-    return values[0]
+    return values[0] if len(values[0]) > len(values[1]) else values[1]
 
 
 @register.filter
 def get_person_country(value):
+    try:
+        del value['EDRPOU']
+    except KeyError:
+        pass
     values = list(value.values())
-    return values[1]
+    return values[1] if len(values[1]) < len(values[0]) else values[0]
 
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html', takes_context=True)
