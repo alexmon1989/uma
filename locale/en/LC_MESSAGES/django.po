@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 18:51+0300\n"
+"POT-Creation-Date: 2021-08-03 19:30+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -552,25 +552,42 @@ msgstr "Name of the court, number and date of the decision"
 msgid "Дата припинення дії свідоцтва частково"
 msgstr "Date of termination of the certificate in part"
 
-#: apps/contacts/templates/contacts/_partials/details.html:3
-msgid "Адміністратор бази даних"
-msgstr "Database administrator"
+#: apps/contacts/templates/contacts/_partials/details.html:4
+msgid "Технічні питання"
+msgstr "Technical questions"
 
-#: apps/contacts/templates/contacts/_partials/details.html:19
-#: apps/contacts/templates/contacts/_partials/details.html:21
-#: apps/contacts/templates/contacts/_partials/details.html:24
-#: apps/contacts/templates/contacts/_partials/details.html:27
+#: apps/contacts/templates/contacts/_partials/details.html:5
+msgid "Консультації щодо роботи пошукового сервісу"
+msgstr "Consultations on the work of the search service"
+
+#: apps/contacts/templates/contacts/_partials/details.html:8
+#: apps/contacts/templates/contacts/_partials/details.html:11
+#: apps/contacts/templates/contacts/_partials/details.html:14
+#: apps/contacts/templates/contacts/_partials/details.html:33
+#: apps/contacts/templates/contacts/_partials/details.html:36
+#: apps/contacts/templates/contacts/_partials/details.html:39
+#: apps/contacts/templates/contacts/_partials/details.html:42
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:21
 #: templates/templatetags/footer_contacts.html:9
 msgid "Телефон"
 msgstr "Phone"
 
-#: apps/contacts/templates/contacts/_partials/details.html:32
+#: apps/contacts/templates/contacts/_partials/details.html:29
+msgid "Консультації для заявників"
+msgstr "Consultations for applicants"
+
+#: apps/contacts/templates/contacts/_partials/details.html:30
+msgid ""
+"Консультації щодо строків розгляду заявок, інших юридичних та організаційних "
+"питань"
+msgstr "Consultations on the terms of expertise of applications, other legal and organizational issues"
+
+#: apps/contacts/templates/contacts/_partials/details.html:47
 #: templates/templatetags/footer_contacts.html:13
 msgid "Режим роботи"
 msgstr "Operating mode"
 
-#: apps/contacts/templates/contacts/_partials/details.html:34
+#: apps/contacts/templates/contacts/_partials/details.html:49
 #: templates/templatetags/footer_contacts.html:15
 msgid "Перерва"
 msgstr "Break"
@@ -793,7 +810,7 @@ msgstr ""
 #: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:20
 #: apps/services/templates/services/api/_partials/breadcrumbs.html:20
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:20
-#: templates/_partials/header.html:65
+#: templates/_partials/footer.html:80 templates/_partials/header.html:65
 msgid "Сервіси"
 msgstr "Services"
 
@@ -885,7 +902,7 @@ msgstr "Fax:"
 #: apps/payments/templates/payments/index/_partials/breadcrumbs.html:24
 #: apps/payments/templates/payments/index/index.html:5
 #: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:24
-#: templates/_partials/header.html:80
+#: templates/_partials/footer.html:105 templates/_partials/header.html:80
 msgid "Сплата зборів"
 msgstr "Fees payment"
 
@@ -2240,7 +2257,7 @@ msgstr "Trademark image"
 
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:10
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:24
-#: templates/_partials/header.html:71
+#: templates/_partials/footer.html:87 templates/_partials/header.html:71
 msgid "Отримати оригінал документу"
 msgstr "Get the original document"
 
@@ -2263,19 +2280,27 @@ msgstr "Menu"
 msgid "Зворотній зв'язок"
 msgstr "Contacts"
 
-#: templates/_partials/footer.html:79
+#: templates/_partials/footer.html:93
+msgid "API"
+msgstr ""
+
+#: templates/_partials/footer.html:99
+msgid "Реєстр патентних повірених"
+msgstr "Information from the register of patent attorneys"
+
+#: templates/_partials/footer.html:117
 msgid "Статистика"
 msgstr "Statistics"
 
-#: templates/_partials/footer.html:84
+#: templates/_partials/footer.html:122
 msgid "Дата актуалізації"
 msgstr "Actualization date"
 
-#: templates/_partials/footer.html:89
+#: templates/_partials/footer.html:127
 msgid "Кількість документів"
 msgstr "Count of documents"
 
-#: templates/_partials/footer.html:111
+#: templates/_partials/footer.html:143
 msgid ""
 "Державне підприємство &laquo;Український інститут інтелектуальної "
 "власності&raquo;"
@@ -2296,6 +2321,9 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Адміністратор бази даних"
+#~ msgstr "Database administrator"
 
 #~| msgid "Код збору"
 #~ msgid "Тип збору"

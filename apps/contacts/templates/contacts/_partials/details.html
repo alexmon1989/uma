@@ -2,7 +2,7 @@
 
 <div class="mb-4">
     <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">{% trans "Технічні питання" %}:</h2>
-    <p class="small text-danger g-mb-5">Консультації щодо роботи пошукового сервісу</p>
+    <p class="small text-danger g-mb-5">{% trans "Консультації щодо роботи пошукового сервісу" %}</p>
 
     {% if data.admin_phone_1 %}
         <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.admin_phone_1 }}"><span class="g-color-gray-dark-v2">{{ data.admin_phone_1 }}</span></a></p>
@@ -27,7 +27,7 @@
 
 <div class="mb-3">
     <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">{% trans "Консультації для заявників" %}:</h2>
-    <p class="small text-danger g-mb-5">Консультації щодо строків розгляду заявок, інших юридичних та організаційних питань</p>
+    <p class="small text-danger g-mb-5">{% trans "Консультації щодо строків розгляду заявок, інших юридичних та організаційних питань" %}</p>
 
     {% if data.consultations_phone_1 %}
         <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.consultations_phone_1 }}"><span class="g-color-gray-dark-v2">{{ data.consultations_phone_1 }}</span></a></p>
