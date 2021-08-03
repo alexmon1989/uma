@@ -64,7 +64,10 @@
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.TerminationDate %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.TerminationDate|parse_date|date:"d.m.Y" }}</td>
+                    <td class="g-font-weight-600">
+                        {{ hit.TradeMark.TrademarkDetails.TerminationDate|parse_date|date:"d.m.Y" }}
+                        {% if hit.search_data.registration_status_color == 'green' %}({% trans 'частково' %}){% endif %}
+                    </td>
                 </tr>
             {% endif %}
 
