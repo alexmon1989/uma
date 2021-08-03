@@ -136,6 +136,39 @@
                 {% endif %}
             {% endif %}
 
+            {% get_field '300' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                            {% if item.PriorityNumber %}{{ item.PriorityNumber }};{% endif %}
+                            {% if item.PriorityDate %}{{ item.PriorityDate }};{% endif %}
+                            {% if item.PriorityCountryCode %}{{ item.PriorityCountryCode }}{% endif %}
+
+                            {% if item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                <br>{% trans 'Кл.:' %}
+                            {% endif %}
+
+                            {% for class in item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                {{ class.ClassNumber }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+
+                            {% if item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                <br>
+                            {% endif %}
+
+                            {% for class in item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                {{ class.ClassNumber }} - {% for class_el in class.ClassificationTermDetails.ClassificationTerm %}{{ class_el.ClassificationTermText }}{% endfor %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% get_field '310' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
                 <tr>
