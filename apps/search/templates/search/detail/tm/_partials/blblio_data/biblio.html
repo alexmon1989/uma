@@ -113,6 +113,22 @@
                                     -->{% if ipc_field_230_d.enable_view %},&nbsp;{% endif %}<!--
                                     -->{{ item.ExhibitionCountryCode }}
                                    {% endif %}
+
+                                {% if item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    <br>{% trans 'Кл.:' %}
+                                {% endif %}
+
+                                {% for class in item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    {{ class.ClassNumber }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+
+                                {% if item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}<br>{% endif %}
+
+                                {% for class in item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    {{ class.ClassNumber }} - {% for class_el in class.ClassificationTermDetails.ClassificationTerm %}{{ class_el.ClassificationTermText }}{% endfor %}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+
                                 {% if not forloop.last %}<br>{% endif %}
                             {% endfor %}
                         </td>
