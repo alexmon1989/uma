@@ -16,6 +16,11 @@ class ContactsPage(models.Model):
     admin_phone_2 = models.CharField('Телефон адміністратора 2', max_length=255, blank=True, null=True)
     admin_phone_3 = models.CharField('Телефон адміністратора 3', max_length=255, blank=True, null=True)
 
+    consultations_phone_1 = models.CharField('Телефон консультанта з заявниками 1', max_length=255, blank=True, null=True)
+    consultations_phone_2 = models.CharField('Телефон консультанта з заявниками 2', max_length=255, blank=True, null=True)
+    consultations_phone_3 = models.CharField('Телефон консультанта з заявниками 3', max_length=255, blank=True, null=True)
+    consultations_phone_4 = models.CharField('Телефон консультанта з заявниками 4', max_length=255, blank=True, null=True)
+
     operating_mode_uk = models.CharField('Режим роботи (укр.)', max_length=255, blank=True, null=True)
     operating_mode_en = models.CharField('Режим роботи (en.)', max_length=255, blank=True, null=True)
     lunch_break_uk = models.CharField('Перерва (укр.)', max_length=255, blank=True, null=True)
