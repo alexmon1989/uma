@@ -464,15 +464,7 @@ class Command(BaseCommand):
             data['search_data']['registration_status_color'] = get_registration_status_color(data)
 
             # Поле 441 (дата опубликования заявки)
-            try:
-                bulletin = ClListOfficialBulletinsIp.objects.get(
-                    date_from__lte=doc['registration_date'],
-                    date_to__gte=doc['registration_date'],
-                )
-            except ClListOfficialBulletinsIp.DoesNotExist:
-                pass
-            else:
-                data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = bulletin.bul_date.strftime('%Y-%m-%d')
+            data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = doc['registration_date'].strftime('%Y-%m-%d')
 
             # Запись в индекс
             self.write_to_es_index(doc, data)
