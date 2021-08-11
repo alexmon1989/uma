@@ -79,7 +79,7 @@ def save_file_to_eu_file_store(file):
     return path
 
 
-def check_signed_data(signed_data, secret, key_center_title):
+def check_signed_data(signed_data, secret, key_center_title, key_psz_subject):
     """Вроверяет валидность ЭЦП."""
     res = False
 
@@ -102,8 +102,12 @@ def check_signed_data(signed_data, secret, key_center_title):
     # Проверка подписи
     pData = secret.encode('utf-16-le')
     signed_data = signed_data.encode()
+    sign_info = {}
     try:
-        pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), None)
+        # Верификация и получение данных из подписанных данных
+        pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), sign_info)
+        # Проверка данных человека (эта строка содержит имя, ИНН и т.д.)
+        assert sign_info['pszSubject'] == key_psz_subject
     except:
         pass
     else:

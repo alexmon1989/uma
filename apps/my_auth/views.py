@@ -47,7 +47,10 @@ def login_view(request):
 def login_ds(request):
     """Обработчик запроса на авторизацию по ЭЦП."""
     # Проверка валидности ЭЦП
-    if check_signed_data(request.POST['signed_data'], request.session['secret'], request.POST['key_center_title']):
+    if check_signed_data(request.POST['signed_data'],
+                         request.session['secret'],
+                         request.POST['key_center_title'],
+                         request.POST['subject']):
         try:
             cert = CertificateOwner.objects.get(pszSerial=request.POST['serial'])
         except CertificateOwner.DoesNotExist:
