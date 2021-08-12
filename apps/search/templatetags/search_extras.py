@@ -340,7 +340,7 @@ def app_stages_inv_um(app):
     """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""
     # Состояние делопроизводства
     is_stopped = False
-    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']
+    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW'].get('DOCUMENTS', [])
                  if doc['DOCRECORD'].get('DOCREGNUMBER')
                  or doc['DOCRECORD'].get('DOCBARCODE')
                  or doc['DOCRECORD'].get('DOCSENDINGDATE')]
@@ -360,7 +360,7 @@ def app_stages_inv_um(app):
 
     # Пройденные стадии
     done_stages = list()
-    for stage in app['DOCFLOW']['STAGES']:
+    for stage in app['DOCFLOW'].get('STAGES', []):
         if stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
             for x in ['[В1]', '[В4]', '[В9]']:
                 for doc_type in doc_types:
