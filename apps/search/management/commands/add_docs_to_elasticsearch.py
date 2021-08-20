@@ -307,16 +307,20 @@ class Command(BaseCommand):
                               'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
                           res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']]
                 if res['TradeMark']['TrademarkDetails'].get('HolderDetails') else None,
-
-                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameDetails']['FreeFormatNameLine'] for x in
-                          res['TradeMark']['TrademarkDetails']['RepresentativeDetails']['Representative']]
-                if res['TradeMark']['TrademarkDetails'].get('RepresentativeDetails') else None,
-
                 'title': ', '.join([x['#text'] for x in res['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
                     'MarkSignificantVerbalElement']])
                 if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
             }
+
+            # Представитель
+            res['search_data']['agent'] = []
+            for representer in res['TradeMark']['TrademarkDetails'].get('RepresentativeDetails', {}).get('Representative',
+                                                                                                   []):
+                name = representer['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                    'FreeFormatNameDetails']['FreeFormatNameDetails']['FreeFormatNameLine']
+                address = representer['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
+                    'FreeFormatAddress']['FreeFormatAddressLine']
+                res['search_data']['agent'].append(f"{name}, {address}")
 
             # Статус охранного документа (цвет)
             if res['search_data']['obj_state'] == 2:
@@ -380,14 +384,17 @@ class Command(BaseCommand):
                           res['Design']['DesignDetails']['HolderDetails']['Holder']]
                 if res['Design']['DesignDetails'].get('HolderDetails') else None,
 
-                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
-                          res['Design']['DesignDetails']['RepresentativeDetails']['Representative']
-                          if x.get('RepresentativeAddressBook')]
-                if res['Design']['DesignDetails'].get('RepresentativeDetails') else None,
-
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
             }
+
+            # Представитель
+            res['search_data']['agent'] = []
+            for representer in res['Design']['DesignDetails'].get('RepresentativeDetails', {}).get('Representative', []):
+                name = representer['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'FreeFormatNameDetails']['FreeFormatNameLine']
+                address = representer['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
+                    'FreeFormatAddress']['FreeFormatAddressLine']
+                res['search_data']['agent'].append(f"{name}, {address}")
 
             # Статус охранного документа (цвет)
             if res['search_data']['obj_state'] == 2:
