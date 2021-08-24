@@ -1219,9 +1219,10 @@ def user_has_access_to_docs(user, hit):
         return True
 
     # Имя пользователя
+    user_fullname = None
     if hasattr(user, 'certificateowner'):
         user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
-    else:
+    elif not user.is_anonymous:
         user_fullname = f"{user.last_name} {user.first_name}".upper().strip()
 
     # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
