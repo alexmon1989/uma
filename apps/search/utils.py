@@ -1218,10 +1218,14 @@ def user_has_access_to_docs(user, hit):
     if not user.is_anonymous and user.is_vip():
         return True
 
-    # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
+    # Имя пользователя
     if hasattr(user, 'certificateowner'):
         user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
+    else:
+        user_fullname = f"{user.last_name} {user.first_name}".upper().strip()
 
+    # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
+    if user_fullname:
         for person_type in ('applicant', 'inventor', 'owner', 'agent'):
             try:
                 persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
