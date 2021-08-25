@@ -5,7 +5,7 @@
 <div id="biblio-data">
     {% if hit.search_data.obj_state == 1 and hit.Document.idObjType == 1 %}
         <div class="g-pb-20 d-flex justify-content-between">
-            {% if hit.Claim|get:'I_43.D' %}
+            {% if hit.Claim and hit.Claim|get:'I_43.D' %}
                 <div>
                     {% trans "Опубліковано" %} <span
                         class="g-font-weight-600">{{ hit.Claim|get:'I_43.D'|last|parse_date|date:"d.m.Y" }}</span>,

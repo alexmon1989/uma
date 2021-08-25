@@ -1240,8 +1240,34 @@ def user_has_access_to_docs(user, hit):
 
         # Адреса для листування (ТМ)
         try:
-            person = hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook']['Name']['FreeFormatNameLine']
-            if user_fullname == person.replace('i', 'і').upper():
+            person = hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                'Name']['FreeFormatNameLine']
+            if user_fullname in person.replace('i', 'і').upper():
+                return True
+        except KeyError:
+            pass
+
+        # Адреса для листування (ПЗ)
+        try:
+            person = hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
+            if user_fullname in person.replace('i', 'і').upper():
+                return True
+        except KeyError:
+            pass
+
+        # Адреса для листування (заявки на винаходи, корисні моделі)
+        try:
+            person = hit['Claim']['I_98']
+            if user_fullname in person.replace('i', 'і').upper():
+                return True
+        except KeyError:
+            pass
+
+        # Адреса для листування (охоронні документи на винаходи, корисні моделі)
+        try:
+            person = hit['Patent']['I_98']
+            if user_fullname in person.replace('i', 'і').upper():
                 return True
         except KeyError:
             pass
