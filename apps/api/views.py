@@ -1,6 +1,6 @@
 from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
-from .models import OpenData
+from .models import OpenData, OpenDataViewModel
 from apps.search.models import ObjType
 import datetime
 
@@ -67,9 +67,7 @@ class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
     def get_queryset(self):
-        OpenData._meta.db_table = 'opendata_api_view'
-
-        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+        queryset = OpenDataViewModel.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
 
         # Стан об'єкта
         obj_state = self.request.query_params.get('obj_state', None)
