@@ -60,10 +60,10 @@
             {% endif %}
 
             {% get_field '22' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignApplicationDate %}
+            {% if ipc_field.enable_view and hit.search_data.app_date %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignApplicationDate|parse_date|date:"d.m.Y" }}</td>
+                    <td class="g-font-weight-600">{{ hit.search_data.app_date|parse_date|date:"d.m.Y" }}</td>
                 </tr>
             {% endif %}
 

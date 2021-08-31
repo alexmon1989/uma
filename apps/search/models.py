@@ -19,6 +19,7 @@ class IpcAppList(models.Model):
     lastupdate = models.DateTimeField(db_column='LastUpdate', blank=True, null=True)
     idstatus = models.IntegerField(db_column='idStatus', blank=True, null=True)
     app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
+    app_input_date = models.DateTimeField(db_column='app_input_date', blank=True, null=True)
     elasticindexed = models.IntegerField(db_column='ElasticIndexed', blank=True, null=True)
     notification_date = models.DateField(db_column='NotificationDate', blank=True, null=True)
     last_indexation_date = models.DateTimeField(db_column='last_indexation_date', blank=True, null=True)

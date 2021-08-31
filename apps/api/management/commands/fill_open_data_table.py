@@ -86,7 +86,7 @@ class Command(BaseCommand):
                                 # Если это заявка
                                 if data['search_data']['obj_state'] == 1:
                                     # и её дата подачи после 18.07.2020, то публиковать её нельзя
-                                    if app.app_date > make_aware(datetime.strptime('2020-07-17', '%Y-%m-%d')):
+                                    if not app.app_date or app.app_date > make_aware(datetime.strptime('2020-07-17', '%Y-%m-%d')):
                                         is_visible = False
                                     else:
                                         is_visible = True

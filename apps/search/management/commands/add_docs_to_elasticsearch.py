@@ -47,6 +47,9 @@ class Command(BaseCommand):
         doc_files_path = doc['files_path'].replace(
             '\\\\bear\\share\\',
             settings.DOCUMENTS_MOUNT_FOLDER
+        ).replace(
+            'e:\\poznach_test_sis\\bear_tmpp_sis\\',
+            settings.DOCUMENTS_MOUNT_FOLDER
         ).replace('\\', '/')
 
         # Если путь к файлу указан сразу (случай с авторским правом)
@@ -256,6 +259,14 @@ class Command(BaseCommand):
             # Секция Document
             res['Document'] = data.get('Document')
 
+            # Fix новых данных
+            res['Document']['filesPath'] = res['Document']['filesPath'].replace(
+                'e:\\poznach_test_sis\\bear_tmpp_sis',
+                '\\\\bear\\share'
+            )
+            if res['Document']['filesPath'][len(res['Document']['filesPath'])-1] != '\\':
+                res['Document']['filesPath'] = f"{res['Document']['filesPath']}\\"
+
             # Секция TradeMark
             res['TradeMark'] = data.get('TradeMark')
 
@@ -281,25 +292,30 @@ class Command(BaseCommand):
 
             applicant = None
             if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
+                # Fix новых данных
+                if isinstance(res['TradeMark']['TrademarkDetails']['ApplicantDetails'], list):
+                    res['TradeMark']['TrademarkDetails']['ApplicantDetails'] = res['TradeMark']['TrademarkDetails']['ApplicantDetails'][0]
+                    res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant'] = [res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
+
                 applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                                  'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
 
             # Поле 441 (дата опубликования заявки)
-            try:
-                e_bulletin_app = EBulletinData.objects.get(
-                    app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
-                )
-            except EBulletinData.DoesNotExist:
-                pass
-            else:
-                res['TradeMark']['TrademarkDetails']['Code_441'] = e_bulletin_app.publication_date
+            if not res['TradeMark']['TrademarkDetails'].get('Code_441'):
+                try:
+                    e_bulletin_app = EBulletinData.objects.get(
+                        app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
+                    )
+                except EBulletinData.DoesNotExist:
+                    pass
+                else:
+                    res['TradeMark']['TrademarkDetails']['Code_441'] = e_bulletin_app.publication_date
 
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
                 'app_number': res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
-                'app_date': res['TradeMark']['TrademarkDetails'].get('ApplicationDate', doc['app_date']),
                 'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                 'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
                 'applicant': applicant,
@@ -311,6 +327,14 @@ class Command(BaseCommand):
                     'MarkSignificantVerbalElement']])
                 if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
             }
+
+            if res['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
+                res['search_data']['app_date'] = res['TradeMark']['TrademarkDetails']['ApplicationDate']
+            else:
+                if doc['app_date']:
+                    res['search_data']['app_date'] = doc['app_date'].strftime('%Y-%m-%d')
+                else:
+                    res['search_data']['app_date'] = doc['app_input_date'].strftime('%Y-%m-%d')
 
             # Представитель
             res['search_data']['agent'] = []
@@ -326,6 +350,14 @@ class Command(BaseCommand):
             if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
+            # Формат даты в PaymentDate
+            if res['TradeMark'].get('PaymentDetails'):
+                for payment in res['TradeMark']['PaymentDetails'].get('Payment', []):
+                    payment['PaymentDate'] = payment['PaymentDate'][:10]
+
+            if res['TradeMark']['TrademarkDetails'].get('stages'):
+                res['TradeMark']['TrademarkDetails']['stages'] = res['TradeMark']['TrademarkDetails']['stages'][::-1]
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -338,6 +370,10 @@ class Command(BaseCommand):
         if data is not None:
             # Секция Document
             res['Document'] = data.get('Document')
+
+            # fix новых данных
+            if res['Document']['filesPath'][len(res['Document']['filesPath'])-1] != '\\':
+                res['Document']['filesPath'] = f"{res['Document']['filesPath']}\\"
 
             # Секция Design
             res['Design'] = data.get('Design')
@@ -354,8 +390,18 @@ class Command(BaseCommand):
             # Случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию Design
             if data.get('PaymentDetails'):
                 res['Design']['PaymentDetails'] = data.get('PaymentDetails')
+            if data['Design']['DesignDetails'].get('PaymentDetails'):
+                res['Design']['PaymentDetails'] = data['Design']['DesignDetails']['PaymentDetails']
+                del data['Design']['DesignDetails']['PaymentDetails']
+            # Формат даты в PaymentDate
+            if res['Design'].get('PaymentDetails'):
+                for payment in res['Design']['PaymentDetails'].get('Payment', []):
+                    payment['PaymentDate'] = payment['PaymentDate'][:10]
             if data.get('DocFlow'):
                 res['Design']['DocFlow'] = data.get('DocFlow')
+            if data['Design']['DesignDetails'].get('DocFlow'):
+                res['Design']['DocFlow'] = data['Design']['DesignDetails']['DocFlow']
+                del data['Design']['DesignDetails']['DocFlow']
             if data.get('Transactions'):
                 res['Design']['Transactions'] = data.get('Transactions')
 
@@ -369,7 +415,6 @@ class Command(BaseCommand):
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
                 'app_number': res['Design']['DesignDetails'].get('DesignApplicationNumber'),
-                'app_date': res['Design']['DesignDetails'].get('DesignApplicationDate', doc['app_date']),
                 'protective_doc_number': res['Design']['DesignDetails'].get('RegistrationNumber'),
                 'rights_date': res['Design']['DesignDetails'].get('RecordEffectiveDate'),
                 'applicant': applicant,
@@ -387,6 +432,14 @@ class Command(BaseCommand):
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
             }
 
+            if res['Design']['DesignDetails'].get('DesignApplicationDate'):
+                res['search_data']['app_date'] = res['Design']['DesignDetails']['DesignApplicationDate']
+            else:
+                if doc['app_date']:
+                    res['search_data']['app_date'] = doc['app_date'].strftime('%Y-%m-%d')
+                else:
+                    res['search_data']['app_date'] = doc['app_input_date'].strftime('%Y-%m-%d')
+
             # Представитель
             res['search_data']['agent'] = []
             for representer in res['Design']['DesignDetails'].get('RepresentativeDetails', {}).get('Representative', []):
@@ -399,6 +452,29 @@ class Command(BaseCommand):
             # Статус охранного документа (цвет)
             if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
+
+            if res['Design']['DesignDetails'].get('stages'):
+                res['Design']['DesignDetails']['stages'] = res['Design']['DesignDetails']['stages'][::-1]
+
+            # Fix новых данных
+            if res['Design']['DesignDetails'].get('IndicationProductDetails', []):
+                for item in res['Design']['DesignDetails']['IndicationProductDetails']:
+                    if item['ClassificationVersion'] == '??':
+                        del item['ClassificationVersion']
+
+            # Fix новых данных (сортировка изображений)
+            if res['Design']['DesignDetails'].get('DesignSpecimenDetails'):
+                res['Design']['DesignDetails']['DesignSpecimenDetails'].sort(
+                    key=lambda x: x.get('DesignSpecimen', [{}])[0].get('SpecimenIdentifier', 9999)
+                )
+                for item in res['Design']['DesignDetails']['DesignSpecimenDetails']:
+                    item['DesignSpecimen'].sort(key=lambda x: x.get('SpecimenIndex', 9999))
+
+            # Fix новых данных (адрес для писем)
+            if res['Design']['DesignDetails'].get('CorrespondenceAddress', {}).get('Address'):
+                res['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                    'FormattedNameAddress']['Address']['FreeFormatAddress'] = \
+                res['Design']['DesignDetails']['CorrespondenceAddress']['Address']
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -614,6 +690,7 @@ class Command(BaseCommand):
             'registration_date',
             'app_number',
             'app_date',
+            'app_input_date',
         )
         # Фильтрация по параметрам командной строки
         if options['id']:
