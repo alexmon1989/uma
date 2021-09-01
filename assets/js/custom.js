@@ -205,13 +205,14 @@ $(function () {
     // Выделитть (снять выделение) все документы
     $(document).on(
         'click',
-        '#documents-form #select-all-documents',
+        '.select-all-documents',
         function (e) {
-            var $this = $(this);
+            const $this = $(this);
+            const $input = $this.closest('form').find('input[name=cead_id]');
             if ($this.is(':checked')) {
-                $("#documents-form input[name=cead_id]").prop('checked', true);
+                $input.prop('checked', true);
             } else {
-                $("#documents-form input[name=cead_id]").prop('checked', false);
+                $input.prop('checked', false);
             }
         });
 
@@ -282,7 +283,7 @@ $(function () {
     });
 
     // Обработчтк события нажатия на кнопку формирования ссылки на документ
-    $(document).on('click', '#documents-form button.download-doc', function (e) {
+    $(document).on('click', '.documents-form button.download-doc', function (e) {
         e.preventDefault();
         let $this = $(this);
         $this.attr('disabled', true);
@@ -323,7 +324,7 @@ $(function () {
     });
 
     // Обработчик события нажатия на кнопку загрузки архива с документами
-    $(document).on('submit', '#documents-form', function (e) {
+    $(document).on('submit', '.documents-form', function (e) {
         e.preventDefault();
         let $form = $(this);
         // Проверка стоит ли галочка хотя бы на одном документе

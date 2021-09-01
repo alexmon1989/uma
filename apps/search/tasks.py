@@ -390,6 +390,20 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
         for doc in hit['DOCFLOW']['DOCUMENTS']:
             if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
                 hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
+
+        # Если это охранный документ, то нужно ещё добавить в список документы заявки
+        if hit['search_data']['obj_state'] == 2:
+            q = Q(
+                'query_string',
+                query=f"search_data.obj_state:1 AND search_data.app_number:{hit['search_data']['app_number']}",
+            )
+            s = Search().using(client).query(q).execute()
+            if s:
+                app_hit = s[0].to_dict()
+                for doc in app_hit['DOCFLOW']['DOCUMENTS']:
+                    if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                        hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
+
     elif hit['Document']['idObjType'] == 4:
         for doc in hit['TradeMark']['DocFlow']['Documents']:
             if doc['DocRecord'].get('DocIdDocCEAD'):
