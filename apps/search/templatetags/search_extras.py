@@ -203,7 +203,7 @@ def is_paid_services_enabled():
 @register.inclusion_tag('search/templatetags/app_stages_tm.html')
 def app_stages_tm(app):
     """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
-    if app['TradeMark']['TrademarkDetails'].get('stages'):  # Заявки из новой системы
+    if app['TradeMark'].get('TrademarkDetails', {}).get('stages'):  # Заявки из новой системы
         stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
                           app['TradeMark']['TrademarkDetails']['stages']))
         is_stopped = app['TradeMark']['TrademarkDetails']['application_status'] == 'stopped'
@@ -295,7 +295,7 @@ def app_stages_tm(app):
 @register.inclusion_tag('search/templatetags/app_stages_id.html')
 def app_stages_id(app):
     """Отображает стадии заявки (градусник) для пром. образцов."""
-    if app['Design']['DesignDetails'].get('stages'):  # Заявки из новой системы
+    if app['Design'].get('DesignDetails', {}).get('stages'):  # Заявки из новой системы
         stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
                           app['Design']['DesignDetails']['stages']))
         is_stopped = app['Design']['DesignDetails']['application_status'] == 'stopped'
