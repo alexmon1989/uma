@@ -39,3 +39,4 @@ class OpenDataViewModel(models.Model):
 
     class Meta:
         db_table = 'opendata_api_view'
+        managed = False

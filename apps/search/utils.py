@@ -1215,62 +1215,63 @@ def user_has_access_to_docs_decorator(f):
 def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
-    if not user.is_anonymous and user.is_vip():
-        return True
+    if not user.is_anonymous:
+        if user.is_vip():
+            return True
+        else:
+            persons_with_access = []
 
-    # Имя пользователя
-    user_fullname = None
-    if hasattr(user, 'certificateowner'):
-        user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
-    elif not user.is_anonymous:
-        user_fullname = f"{user.last_name} {user.first_name}".upper().strip()
+            for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+                try:
+                    persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
+                        hit['search_data'][person_type]
+                    if persons:
+                        persons_with_access += persons
+                except KeyError:
+                    pass
 
-    # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
-    if user_fullname:
-        for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+            # Адреса для листування (ТМ)
             try:
-                persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
-                    hit['search_data'][person_type]
-                if persons:
-                    for person in persons:
-                        if user_fullname in person.replace('i', 'і').upper():  # замена латинской i на кириллицу
-                            return True
+                persons_with_access.append(
+                    hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                        'Name']['FreeFormatNameLine']
+                )
             except KeyError:
                 pass
 
-        # Адреса для листування (ТМ)
-        try:
-            person = hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
-                'Name']['FreeFormatNameLine']
-            if user_fullname in person.replace('i', 'і').upper():
-                return True
-        except KeyError:
-            pass
+            # Адреса для листування (ПЗ)
+            try:
+                persons_with_access.append(
+                    hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                        'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
+                )
+            except KeyError:
+                pass
 
-        # Адреса для листування (ПЗ)
-        try:
-            person = hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
-                'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
-            if user_fullname in person.replace('i', 'і').upper():
-                return True
-        except KeyError:
-            pass
+            # Адреса для листування (заявки на винаходи, корисні моделі)
+            try:
+                persons_with_access.append(hit['Claim']['I_98'])
+            except KeyError:
+                pass
 
-        # Адреса для листування (заявки на винаходи, корисні моделі)
-        try:
-            person = hit['Claim']['I_98']
-            if user_fullname in person.replace('i', 'і').upper():
-                return True
-        except KeyError:
-            pass
+            # Адреса для листування (охоронні документи на винаходи, корисні моделі)
+            try:
+                persons_with_access.append(hit['Patent']['I_98'])
+            except KeyError:
+                pass
 
-        # Адреса для листування (охоронні документи на винаходи, корисні моделі)
-        try:
-            person = hit['Patent']['I_98']
-            if user_fullname in person.replace('i', 'і').upper():
-                return True
-        except KeyError:
-            pass
+            # Имена пользователя (если роль - патентный поверенный, то необходимо проверять несколько имён)
+            user_names = []
+            if hasattr(user, 'certificateowner'):
+                user_names = [user.certificateowner.pszSubjFullName.strip()]
+            elif user.is_patent_attorney():
+                user_names.append(f"{user.last_name} {user.first_name}".strip())
+                for patent_attroney in user.patentattorney_set.all():
+                    user_names.append(patent_attroney.name)
+
+            # Проверка на вхождение
+            return any([person for person in persons_with_access for user_name in user_names if
+                        user_name.upper() in person.upper()])
 
     return False
 

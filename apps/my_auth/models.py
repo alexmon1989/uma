@@ -6,6 +6,19 @@ from uma.abstract_models import TimeStampedModel
 from ..account.models import Message, License
 
 
+class PatentAttorney(TimeStampedModel):
+    """Модель патентного поверенного."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Користувач')
+    name = models.CharField('ПІБ особи', max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Патентний повірений'
+        verbose_name_plural = 'Патентні повірені'
+
+
 class CertificateOwner(TimeStampedModel):
     """Модель данных владельца сертификата ЭЦП."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Користувач')
@@ -74,6 +87,11 @@ def is_vip(self):
     return self.is_superuser or self.groups.filter(name='Посадовці (чиновники)').exists()
 
 
+def is_patent_attorney(self):
+    """Возвращает значение (boolean) того является ли юзер членом группы 'Патентні повірен'"""
+    return self.groups.filter(name='Патентні повірені').exists()
+
+
 def get_username_short(self):
     if hasattr(self, 'certificateowner'):
         return self.certificateowner.pszSubjFullName
@@ -119,6 +137,7 @@ def user_str(self):
 
 User.add_to_class('__str__', user_str)
 User.add_to_class('is_vip', is_vip)
+User.add_to_class('is_patent_attorney', is_patent_attorney)
 User.add_to_class('get_username_short', get_username_short)
 User.add_to_class('get_username_full', get_username_full)
 User.add_to_class('get_email', get_email)
