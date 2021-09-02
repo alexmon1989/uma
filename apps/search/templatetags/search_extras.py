@@ -503,4 +503,6 @@ def bul_number_441_code(code_441_date):
 @register.filter
 def filter_tm_id_docs_direction(documents, direction):
     """Возвращает только входящие/исходящие документы ТМ."""
-    return list(filter(lambda x: x.get('DocRecord', {}).get('DocDirection') == direction, documents))
+    if documents:
+        return list(filter(lambda x: x.get('DocRecord', {}).get('DocDirection') == direction, documents))
+    return list()
