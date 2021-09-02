@@ -87,7 +87,7 @@ def pb(request):
 
         try:
             order = Order.objects.exclude(orderoperation__code=1).get(pk=value)
-        except Order.DoesNotExist:
+        except (Order.DoesNotExist, ValueError):
             response = render_to_response('paygate/search_error.xml')
         else:
             data = {
