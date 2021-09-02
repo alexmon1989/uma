@@ -1,3 +1,4 @@
+from django.utils.timezone import make_aware
 from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
 from .models import OpenData, OpenDataViewModel
@@ -93,7 +94,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         app_date_from = self.request.query_params.get('app_date_from', None)
         if app_date_from:
             try:
-                app_date_from = datetime.datetime.strptime(app_date_from, '%d.%m.%Y')
+                app_date_from = make_aware(datetime.datetime.strptime(app_date_from, '%d.%m.%Y'))
                 queryset = queryset.filter(app_date__gte=app_date_from.replace(hour=0, minute=0, second=0))
             except:
                 raise exceptions.ParseError("Невірне значення параметру app_date_from")
@@ -102,7 +103,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         app_date_to = self.request.query_params.get('app_date_to', None)
         if app_date_to:
             try:
-                app_date_to = datetime.datetime.strptime(app_date_to, '%d.%m.%Y')
+                app_date_to = make_aware(datetime.datetime.strptime(app_date_to, '%d.%m.%Y'))
                 queryset = queryset.filter(app_date__lte=app_date_to.replace(hour=23, minute=59, second=59))
             except:
                 raise exceptions.ParseError("Невірне значення параметру app_date_to")
@@ -111,7 +112,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         reg_date_from = self.request.query_params.get('reg_date_from', None)
         if reg_date_from:
             try:
-                reg_date_from = datetime.datetime.strptime(reg_date_from, '%d.%m.%Y')
+                reg_date_from = make_aware(datetime.datetime.strptime(reg_date_from, '%d.%m.%Y'))
                 queryset = queryset.filter(registration_date__gte=reg_date_from.replace(hour=0, minute=0, second=0))
             except:
                 raise exceptions.ParseError("Невірне значення параметру reg_date_from")
@@ -120,7 +121,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         reg_date_to = self.request.query_params.get('reg_date_to', None)
         if reg_date_to:
             try:
-                reg_date_to = datetime.datetime.strptime(reg_date_to, '%d.%m.%Y')
+                reg_date_to = make_aware(datetime.datetime.strptime(reg_date_to, '%d.%m.%Y'))
                 queryset = queryset.filter(registration_date__lte=reg_date_to.replace(hour=23, minute=59, second=59))
             except:
                 raise exceptions.ParseError("Невірне значення параметру reg_date_to")
@@ -129,7 +130,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         last_update_from = self.request.query_params.get('last_update_from', None)
         if last_update_from:
             try:
-                last_update_from = datetime.datetime.strptime(last_update_from, '%d.%m.%Y')
+                last_update_from = make_aware(datetime.datetime.strptime(last_update_from, '%d.%m.%Y'))
                 queryset = queryset.filter(last_update__gte=last_update_from.replace(hour=0, minute=0, second=0))
             except:
                 raise exceptions.ParseError("Невірне значення параметру last_update_from")
@@ -138,7 +139,7 @@ class OpenDataListViewV1(generics.ListAPIView):
         last_update_to = self.request.query_params.get('last_update_to', None)
         if last_update_to:
             try:
-                last_update_to = datetime.datetime.strptime(last_update_to, '%d.%m.%Y')
+                last_update_to = make_aware(datetime.datetime.strptime(last_update_to, '%d.%m.%Y'))
                 queryset = queryset.filter(last_update__lte=last_update_to.replace(hour=23, minute=59, second=59))
             except:
                 raise exceptions.ParseError("Невірне значення параметру last_update_to")
