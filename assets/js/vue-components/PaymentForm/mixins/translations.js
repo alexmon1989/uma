@@ -20,6 +20,7 @@ export const translations = {
                     required: gettext('Обов\'язкове поле для заповнення'),
                     integer: gettext('Поле має містити ціле число'),
                     validApplication: gettext('Заявку в обраній групі зборів не знайдено'),
+                    min_value: gettext('Поле має містити позитивне значення'),
                 },
             },
         }

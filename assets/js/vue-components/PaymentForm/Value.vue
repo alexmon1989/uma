@@ -7,7 +7,7 @@
                id="value"
                class="form-control g-rounded-3 g-py-9 g-px-10 g-brd-gray-light-v3--focus"
                type="text"
-               v-validate="'required|integer'"
+               v-validate="'required|integer|min_value:1'"
                name="value"
                autocomplete="off"
                :placeholder="translations.valueFieldPlaceholder">
