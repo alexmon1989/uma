@@ -102,8 +102,6 @@ class YearViewSet(generics.ListAPIView):
         if unit_type:
             queryset = queryset.filter(unit=unit_type)
 
-        print(queryset.query)
-
         return queryset.distinct()
 
 
