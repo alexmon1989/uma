@@ -70,8 +70,8 @@ class OpenDataDocsSerializer(serializers.ModelSerializer):
         for doc in ret['documents']:
             if doc['DocRecord'].get('DocBarCode'):
                 del doc['DocRecord']['DocBarCode']
-            if doc['DocRecord'].get('DocIdDocCEAD'):
-                del doc['DocRecord']['DocIdDocCEAD']
+            # if doc['DocRecord'].get('DocIdDocCEAD'):
+            #     del doc['DocRecord']['DocIdDocCEAD']
 
         return ret
 
