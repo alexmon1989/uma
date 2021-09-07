@@ -206,6 +206,16 @@ def app_stages_tm(app):
     if app['TradeMark'].get('TrademarkDetails', {}).get('stages'):  # Заявки из новой системы
         stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
                           app['TradeMark']['TrademarkDetails']['stages']))
+
+        # Fix
+        prev_status = ''
+        for stage in stages[::-1]:
+            if stage["title"] == "Встановлення дати подання" and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
+                stage['status'] = 'done'
+            if stage['status'] == 'current' == prev_status:
+                stage['status'] = 'not-active'
+            prev_status = stage['status']
+
         is_stopped = app['TradeMark']['TrademarkDetails']['application_status'] == 'stopped'
         return {
             'stages': stages,
