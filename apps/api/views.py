@@ -187,7 +187,7 @@ class OpenDataDocsView(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1)
+        queryset = OpenData.objects.all()
         return queryset.values(
             'data_docs',
         )
