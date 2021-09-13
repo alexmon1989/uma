@@ -57,7 +57,11 @@ def prepare_query(query, field_type):
 
         # На вход происходит получение диапазона дат в формате "дд.мм.гггг ~ дд.мм.гггг"
         # его необходимо преобразовать запрос ElasticSearch
-        query = f">={query.replace(' ~ ', ' AND <=')}"
+        dates = query.split(' ~ ')
+        try:
+            query = f"[{dates[0]} TO {dates[1]}]"
+        except IndexError:
+            pass
 
     query = query.replace(
         " ТА ", " AND "
@@ -93,34 +97,25 @@ def get_elastic_results(search_groups, user):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
 
-                    if query[0] == '"' and query[len(query) - 1] == '"' \
-                            and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                        # Точный поиск
-                        q = Q(
-                            'match_phrase',
-                            **{inid_schedule.elastic_index_field.field_name.replace('*', ''): query}
-                        )
-                    else:
-                        q = Q(
-                            'query_string',
-                            query=query,
-                            default_field=inid_schedule.elastic_index_field.field_name,
-                            default_operator='AND',
-                            analyze_wildcard=True
-                        )
+                    q = Q(
+                        'query_string',
+                        query=query,
+                        fields=[
+                            f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.*",
+                        ],
+                        quote_field_suffix=".exact",
+                        default_operator='AND'
+                    )
 
-                        if inid_schedule.elastic_index_field.field_type == 'text' and not any(
-                                ext in query for ext in (' OR ', ' AND ', '*')):
-                            # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                            # и морфологического поиска
-                            q |= Q(
-                                'query_string',
-                                query=f"*{query}*",
-                                default_field=inid_schedule.elastic_index_field.field_name,
-                                default_operator='AND',
-                                analyze_wildcard=True,
-                                boost=20
-                            )
+                    # Nested тип
+                    if inid_schedule.elastic_index_field.parent:
+                        q = Q(
+                            'nested',
+                            path=inid_schedule.elastic_index_field.parent.field_name,
+                            query=q,
+                        )
 
                     if not qs:
                         qs = q
@@ -143,7 +138,6 @@ def get_elastic_results(search_groups, user):
             qs_result = qs
         else:
             qs_result |= qs
-
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(
         qs_result
@@ -1219,20 +1213,18 @@ def user_has_access_to_docs(user, hit):
         if user.is_vip():
             return True
         else:
-            persons_with_access = []
+            allowed_persons = []
 
             for person_type in ('applicant', 'inventor', 'owner', 'agent'):
                 try:
-                    persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
-                        hit['search_data'][person_type]
-                    if persons:
-                        persons_with_access += persons
+                    if hit['search_data'].get(person_type):
+                        allowed_persons += [x['name'] for x in hit['search_data'][person_type]]
                 except KeyError:
                     pass
 
             # Адреса для листування (ТМ)
             try:
-                persons_with_access.append(
+                allowed_persons.append(
                     hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
                         'Name']['FreeFormatNameLine']
                 )
@@ -1241,7 +1233,7 @@ def user_has_access_to_docs(user, hit):
 
             # Адреса для листування (ПЗ)
             try:
-                persons_with_access.append(
+                allowed_persons.append(
                     hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
                         'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
                 )
@@ -1250,13 +1242,13 @@ def user_has_access_to_docs(user, hit):
 
             # Адреса для листування (заявки на винаходи, корисні моделі)
             try:
-                persons_with_access.append(hit['Claim']['I_98'])
+                allowed_persons.append(hit['Claim']['I_98'])
             except KeyError:
                 pass
 
             # Адреса для листування (охоронні документи на винаходи, корисні моделі)
             try:
-                persons_with_access.append(hit['Patent']['I_98'])
+                allowed_persons.append(hit['Patent']['I_98'])
             except KeyError:
                 pass
 
@@ -1270,7 +1262,7 @@ def user_has_access_to_docs(user, hit):
                     user_names.append(patent_attroney.name)
 
             # Проверка на вхождение
-            return any([person for person in persons_with_access for user_name in user_names if
+            return any([person for person in allowed_persons for user_name in user_names if
                         user_name.upper() in person.upper()])
 
     return False
@@ -1368,8 +1360,8 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             applicant = get_app_applicant(h)
             owner = get_app_owner(h)
             inventor = get_app_inventor(h)
-            if hasattr(h.search_data, 'agent'):
-                agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            if hasattr(h.search_data, 'agent') and h.search_data.agent:
+                agent = ';\r\n'.join([x.name for x in h.search_data.agent])
             else:
                 agent = ''
             ipc_indexes = get_app_ipc_indexes(h)
@@ -1885,11 +1877,11 @@ def get_fixed_mark_status_code(app_data):
     """Анализирует список документов и возвращает код статуса согласно их наличию."""
     result = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
     for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
-        if 'Форма ТM-1.1' in doc['DocRecord']['DocType'] and result < 2000:
+        if ('ТM-1.1' in doc['DocRecord']['DocType'] or 'ТМ-1.1' in doc['DocRecord']['DocType']) and result < 2000:
             result = 3000
-        if 'Форма Т-05' in doc['DocRecord']['DocType'] and result < 3000:
+        if 'Т-05' in doc['DocRecord']['DocType'] and result < 3000:
             result = 3000
-        if 'Форма Т-08' in doc['DocRecord']['DocType'] and result < 4000:
+        if 'Т-08' in doc['DocRecord']['DocType'] and result < 4000:
             result = 4000
     return result
 
@@ -1944,7 +1936,19 @@ def filter_app_data(app_data, user):
                 res = {}
                 res.update({'meta': app_data['meta']})
                 res.update({'Document': app_data['Document']})
-                res.update({'TradeMark': {'DocFlow': app_data['TradeMark'].get('DocFlow', {})}})
+                res.update(
+                    {
+                        'TradeMark': {
+                            'TrademarkDetails': {
+                                'stages': app_data['TradeMark'].get('TrademarkDetails', {}).get('stages', []),
+                                'application_status': app_data['TradeMark'].get('TrademarkDetails', {}).get(
+                                    'application_status'
+                                )
+                            },
+                            'DocFlow': app_data['TradeMark'].get('DocFlow', {}),
+                        }
+                    }
+                )
                 res.update({'search_data': {
                     'app_number': app_data['search_data']['app_number'],
                     'obj_state': app_data['search_data']['obj_state'],
@@ -1956,6 +1960,12 @@ def filter_app_data(app_data, user):
                 'meta': app_data['meta'],
                 'Document': app_data['Document'],
                 'Design': {
+                    'DesignDetails': {
+                        'stages': app_data['Design'].get('DesignDetails', {}).get('stages', []),
+                        'application_status': app_data['Design'].get('DesignDetails', {}).get(
+                            'application_status'
+                        )
+                    },
                     'DocFlow': app_data['Design'].get('DocFlow')
                 },
                 'search_data': {

@@ -56,32 +56,25 @@ def perform_simple_search(user_id, get_params):
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
+                q = Q(
+                    'query_string',
+                    query=query,
+                    fields=[
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.lang_*",
+                    ],
+                    quote_field_suffix=".exact",
+                    default_operator='AND'
+                )
 
-                if query[0] == '"' and query[len(query) - 1] == '"' \
-                        and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                    # Точный поиск
+                # Nested тип
+                if elastic_field.parent:
                     q = Q(
-                        'match_phrase',
-                        **{elastic_field.field_name.replace('*', ''): query}
+                        'nested',
+                        path=elastic_field.parent.field_name,
+                        query=q,
                     )
-                else:
-                    q = Q(
-                        'query_string',
-                        query=query,
-                        default_field=elastic_field.field_name,
-                        default_operator='AND'
-                    )
-
-                    if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                        # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                        # и морфологического поиска
-                        q |= Q(
-                            'query_string',
-                            query=f"*{query}*",
-                            default_field=elastic_field.field_name,
-                            default_operator='AND',
-                            boost=20
-                        )
 
                 if qs is not None:
                     qs &= q
@@ -157,7 +150,7 @@ def get_app_details(id_app_number, user_id):
     # Фильтр заявок, которые не положено отоборажать
     q = filter_bad_apps(q)
 
-    s = Search().using(client).query(q).source(
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
         excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).execute()
     if not s:
@@ -561,19 +554,21 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 q = Q(
                     'query_string',
                     query=query,
-                    default_field=elastic_field.field_name,
+                    fields=[
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.lang_*",
+                    ],
+                    quote_field_suffix=".exact",
                     default_operator='AND'
                 )
 
-                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                    # и морфологического поиска
-                    q |= Q(
-                        'query_string',
-                        query=f"*{query}*",
-                        default_field=elastic_field.field_name,
-                        default_operator='AND',
-                        boost=20
+                # Nested тип
+                if elastic_field.parent:
+                    q = Q(
+                        'nested',
+                        path=elastic_field.parent.field_name,
+                        query=q,
                     )
 
                 if qs is not None:

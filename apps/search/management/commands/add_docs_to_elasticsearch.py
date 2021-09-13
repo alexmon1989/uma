@@ -234,11 +234,11 @@ class Command(BaseCommand):
                     'app_date': biblio_data.get('I_22'),
                     'protective_doc_number': biblio_data.get('I_11'),
                     'rights_date': biblio_data.get('I_24') if biblio_data.get('I_24') != '1899-12-30' else None,
-                    'applicant': [list(x.values())[0] for x in biblio_data.get('I_71', [])],
-                    'inventor': [list(x.values())[0] for x in biblio_data.get('I_72', [])],
-                    'owner': [list(x.values())[0] if list(x.keys())[0] != 'EDRPOU'
-                              else list(x.values())[1] for x in biblio_data.get('I_73', [])],
-                    'agent': biblio_data.get('I_74'),
+                    'applicant': [{'name': list(x.values())[0]} for x in biblio_data.get('I_71', [])],
+                    'inventor': [{'name': list(x.values())[0]} for x in biblio_data.get('I_72', [])],
+                    'owner': [{'name': list(x.values())[0]} if list(x.keys())[0] != 'EDRPOU'
+                              else {'name': list(x.values())[1]} for x in biblio_data.get('I_73', [])],
+                    'agent': {'name': biblio_data.get('I_74')},
                     'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
 
@@ -292,16 +292,13 @@ class Command(BaseCommand):
 
             applicant = None
             if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
-                # Fix новых данных
-                if isinstance(res['TradeMark']['TrademarkDetails']['ApplicantDetails'], list):
-                    res['TradeMark']['TrademarkDetails']['ApplicantDetails'] = res['TradeMark']['TrademarkDetails']['ApplicantDetails'][0]
-                    res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant'] = [res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
-
-                applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                                 'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                applicant = [{'name': x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                 'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                              res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
 
             # Поле 441 (дата опубликования заявки)
+            if res['TradeMark']['TrademarkDetails'].get('Code_441'):
+                del res['TradeMark']['TrademarkDetails']['Code_441']
             if not res['TradeMark']['TrademarkDetails'].get('Code_441'):
                 try:
                     e_bulletin_app = EBulletinData.objects.get(
@@ -319,8 +316,8 @@ class Command(BaseCommand):
                 'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                 'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
                 'applicant': applicant,
-                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']]
                 if res['TradeMark']['TrademarkDetails'].get('HolderDetails') else None,
                 'title': ', '.join([x['#text'] for x in res['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
@@ -344,19 +341,33 @@ class Command(BaseCommand):
                     'FreeFormatNameDetails']['FreeFormatNameDetails']['FreeFormatNameLine']
                 address = representer['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
                     'FreeFormatAddress']['FreeFormatAddressLine']
-                res['search_data']['agent'].append(f"{name}, {address}")
+                res['search_data']['agent'].append({'name': f"{name}, {address}"})
 
             # Статус охранного документа (цвет)
             if res['search_data']['obj_state'] == 2:
                 res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
-            # Формат даты в PaymentDate
-            if res['TradeMark'].get('PaymentDetails'):
-                for payment in res['TradeMark']['PaymentDetails'].get('Payment', []):
-                    payment['PaymentDate'] = payment['PaymentDate'][:10]
-
             if res['TradeMark']['TrademarkDetails'].get('stages'):
                 res['TradeMark']['TrademarkDetails']['stages'] = res['TradeMark']['TrademarkDetails']['stages'][::-1]
+
+            # Fix новых данных
+            if res['TradeMark']['TrademarkDetails'].get(
+                    'AssociatedRegistrationApplicationDetails', {}
+            ).get(
+                'AssociatedRegistrationApplication', {}
+            ).get(
+                'AssociatedRegistrationDetails', {}
+            ).get(
+                'DivisionalApplication'
+            ):
+                for app in res['TradeMark']['TrademarkDetails']['AssociatedRegistrationApplicationDetails'][
+                    'AssociatedRegistrationApplication']['AssociatedRegistrationDetails']['DivisionalApplication']:
+                    try:
+                        app['AssociatedRegistration']['AssociatedRegistrationDate'] = datetime.datetime.strptime(
+                            app['AssociatedRegistration']['AssociatedRegistrationDate'], '%d.%m.%Y'
+                        ).strftime('%Y-%m-%d')
+                    except:
+                        pass
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -390,25 +401,15 @@ class Command(BaseCommand):
             # Случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию Design
             if data.get('PaymentDetails'):
                 res['Design']['PaymentDetails'] = data.get('PaymentDetails')
-            if data['Design']['DesignDetails'].get('PaymentDetails'):
-                res['Design']['PaymentDetails'] = data['Design']['DesignDetails']['PaymentDetails']
-                del data['Design']['DesignDetails']['PaymentDetails']
-            # Формат даты в PaymentDate
-            if res['Design'].get('PaymentDetails'):
-                for payment in res['Design']['PaymentDetails'].get('Payment', []):
-                    payment['PaymentDate'] = payment['PaymentDate'][:10]
             if data.get('DocFlow'):
                 res['Design']['DocFlow'] = data.get('DocFlow')
-            if data['Design']['DesignDetails'].get('DocFlow'):
-                res['Design']['DocFlow'] = data['Design']['DesignDetails']['DocFlow']
-                del data['Design']['DesignDetails']['DocFlow']
             if data.get('Transactions'):
                 res['Design']['Transactions'] = data.get('Transactions')
 
             applicant = None
             if res['Design']['DesignDetails'].get('ApplicantDetails'):
-                applicant = [x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                                 'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                applicant = [{'name': x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                 'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                              res['Design']['DesignDetails']['ApplicantDetails']['Applicant']]
 
             # Поисковые данные (для сортировки и т.д.)
@@ -419,13 +420,13 @@ class Command(BaseCommand):
                 'rights_date': res['Design']['DesignDetails'].get('RecordEffectiveDate'),
                 'applicant': applicant,
 
-                'inventor': [x['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'inventor': [{'name': x['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Design']['DesignDetails']['DesignerDetails']['Designer']]
                 if res['Design']['DesignDetails'].get('DesignerDetails') else None,
 
-                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Design']['DesignDetails']['HolderDetails']['Holder']]
                 if res['Design']['DesignDetails'].get('HolderDetails') else None,
 
@@ -447,7 +448,7 @@ class Command(BaseCommand):
                         'FreeFormatNameDetails']['FreeFormatNameLine']
                 address = representer['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
                     'FreeFormatAddress']['FreeFormatAddressLine']
-                res['search_data']['agent'].append(f"{name}, {address}")
+                res['search_data']['agent'].append({'name': f"{name}, {address}"})
 
             # Статус охранного документа (цвет)
             if res['search_data']['obj_state'] == 2:
@@ -455,26 +456,6 @@ class Command(BaseCommand):
 
             if res['Design']['DesignDetails'].get('stages'):
                 res['Design']['DesignDetails']['stages'] = res['Design']['DesignDetails']['stages'][::-1]
-
-            # Fix новых данных
-            if res['Design']['DesignDetails'].get('IndicationProductDetails', []):
-                for item in res['Design']['DesignDetails']['IndicationProductDetails']:
-                    if item['ClassificationVersion'] == '??':
-                        del item['ClassificationVersion']
-
-            # Fix новых данных (сортировка изображений)
-            if res['Design']['DesignDetails'].get('DesignSpecimenDetails'):
-                res['Design']['DesignDetails']['DesignSpecimenDetails'].sort(
-                    key=lambda x: x.get('DesignSpecimen', [{}])[0].get('SpecimenIdentifier', 9999)
-                )
-                for item in res['Design']['DesignDetails']['DesignSpecimenDetails']:
-                    item['DesignSpecimen'].sort(key=lambda x: x.get('SpecimenIndex', 9999))
-
-            # Fix новых данных (адрес для писем)
-            if res['Design']['DesignDetails'].get('CorrespondenceAddress', {}).get('Address'):
-                res['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
-                    'FormattedNameAddress']['Address']['FreeFormatAddress'] = \
-                res['Design']['DesignDetails']['CorrespondenceAddress']['Address']
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -499,13 +480,13 @@ class Command(BaseCommand):
                 'app_date': res['Geo']['GeoDetails'].get('ApplicationDate'),
                 'protective_doc_number': res['Geo']['GeoDetails'].get('RegistrationNumber'),
                 'rights_date': res['Geo']['GeoDetails'].get('RegistrationDate'),
-                'owner': [x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Geo']['GeoDetails']['HolderDetails']['Holder']]
                 if res['Geo']['GeoDetails'].get('HolderDetails') else None,
 
-                'agent': [x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'agent': [{'name': x['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Geo']['GeoDetails']['RepresentativeDetails']['Representative']]
                 if res['Geo']['GeoDetails'].get('RepresentativeDetails') else None,
 
@@ -557,9 +538,9 @@ class Command(BaseCommand):
                     'protective_doc_number': doc['registration_number'],
                     'obj_state': 2,
                     'rights_date': data_from_json.get('@INTREGD'),
-                    'owner': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL'),
-                    'agent': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL'),
-                    'title': data_from_json.get('IMAGE', {}).get('@TEXT'),
+                    'owner': {'name': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL')},
+                    'agent': {'name': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL')},
+                    'title': {'name': data_from_json.get('IMAGE', {}).get('@TEXT')},
                 }
             }
 
@@ -611,8 +592,8 @@ class Command(BaseCommand):
                 'app_date': cr_data.get('ApplicationDate'),
                 'protective_doc_number': cr_data.get('RegistrationNumber'),
                 'rights_date': cr_data.get('RegistrationDate'),
-                'owner': [x['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine'] for x in
+                'owner': [{'name': x['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           cr_data['AuthorDetails']['Author']]
                 if cr_data.get('AuthorDetails', {}).get('Author') else None,
 
@@ -649,11 +630,12 @@ class Command(BaseCommand):
                 indexation_process=self.indexation_process
             )
         else:
+            pass
             # Пометка в БД что этот документ проиндексирован и обновление времени индексации
-            IpcAppList.objects.filter(id=doc['id']).update(
-                elasticindexed=1,
-                last_indexation_date=timezone.now()
-            )
+            # IpcAppList.objects.filter(id=doc['id']).update(
+            #     elasticindexed=1,
+            #     last_indexation_date=timezone.now()
+            # )
 
     def fill_notification_date(self):
         """Заполняет поле NotificationDate в таблице IPC_AppList."""
