@@ -30,7 +30,7 @@
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
 
-        {% if not hit.Design.DesignDetails %}
+        {% if not hit.Design.DesignDetails.DesignApplicationNumber %}
         {# Заявка без права просмотра библиографических данных #}
             <div class="col-md">
                 <p class="g-font-weight-600 g-mb-0 text-danger">{% trans "Для даної заявки можливий перегляд лише її стану діловодства." %}</p>

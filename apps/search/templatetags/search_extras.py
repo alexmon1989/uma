@@ -212,7 +212,7 @@ def app_stages_tm(app):
         for stage in stages[::-1]:
             if stage["title"] == "Встановлення дати подання" and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
                 stage['status'] = 'done'
-            if stage['status'] == 'current' == prev_status or (stage['status'] == 'done' and prev_status in ('current', 'not-active')):
+            if stage['status'] == 'current' == prev_status or (stage['status'] in ('done', 'current') and prev_status in ('current', 'not-active')):
                 stage['status'] = 'not-active'
             prev_status = stage['status']
 
@@ -309,6 +309,15 @@ def app_stages_id(app):
         stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
                           app['Design']['DesignDetails']['stages']))
         is_stopped = app['Design']['DesignDetails']['application_status'] == 'stopped'
+
+        # Fix
+        prev_status = ''
+        for stage in stages[::-1]:
+            if stage['status'] == 'current' == prev_status or (
+                    stage['status'] in ('done', 'current') and prev_status in ('current', 'not-active')):
+                stage['status'] = 'not-active'
+            prev_status = stage['status']
+
         return {
             'stages': stages,
             'is_stopped': is_stopped,

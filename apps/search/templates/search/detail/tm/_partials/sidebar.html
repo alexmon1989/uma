@@ -7,14 +7,14 @@
     data-tabs-mobile-type="slide-up-down"
     data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-primary g-mb-20">
     <li class="nav-item">
-        <a class="nav-link g-text-underline--hover {% if hit.TradeMark.TrademarkDetails %}active{% else %}disabled{% endif %}"
+        <a class="nav-link g-text-underline--hover {% if hit.TradeMark.TrademarkDetails.ApplicationNumber %}active{% else %}disabled{% endif %}"
            data-toggle="tab"
            href="#nav-1-1-primary-ver--1"
            role="tab"
         >{% trans "Бібліографічні дані" %}</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link g-text-underline--hover {% if not hit.TradeMark.TrademarkDetails %}active{% endif %}"
+        <a class="nav-link g-text-underline--hover {% if not hit.TradeMark.TrademarkDetails.ApplicationNumber %}active{% endif %}"
            data-toggle="tab"
            href="#nav-1-1-primary-ver--7"
            role="tab"
