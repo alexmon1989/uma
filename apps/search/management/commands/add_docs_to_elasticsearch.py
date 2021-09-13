@@ -630,12 +630,11 @@ class Command(BaseCommand):
                 indexation_process=self.indexation_process
             )
         else:
-            pass
             # Пометка в БД что этот документ проиндексирован и обновление времени индексации
-            # IpcAppList.objects.filter(id=doc['id']).update(
-            #     elasticindexed=1,
-            #     last_indexation_date=timezone.now()
-            # )
+            IpcAppList.objects.filter(id=doc['id']).update(
+                elasticindexed=1,
+                last_indexation_date=timezone.now()
+            )
 
     def fill_notification_date(self):
         """Заполняет поле NotificationDate в таблице IPC_AppList."""
