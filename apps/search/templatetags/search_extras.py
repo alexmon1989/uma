@@ -212,7 +212,7 @@ def app_stages_tm(app):
         for stage in stages[::-1]:
             if stage["title"] == "Встановлення дати подання" and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
                 stage['status'] = 'done'
-            if stage['status'] == 'current' == prev_status:
+            if stage['status'] == 'current' == prev_status or (stage['status'] == 'done' and prev_status in ('current', 'not-active')):
                 stage['status'] = 'not-active'
             prev_status = stage['status']
 
