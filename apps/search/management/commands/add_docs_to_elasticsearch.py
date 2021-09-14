@@ -238,7 +238,7 @@ class Command(BaseCommand):
                     'inventor': [{'name': list(x.values())[0]} for x in biblio_data.get('I_72', [])],
                     'owner': [{'name': list(x.values())[0]} if list(x.keys())[0] != 'EDRPOU'
                               else {'name': list(x.values())[1]} for x in biblio_data.get('I_73', [])],
-                    'agent': {'name': biblio_data.get('I_74')},
+                    'agent': [{'name': biblio_data.get('I_74')}],
                     'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
 
@@ -538,9 +538,9 @@ class Command(BaseCommand):
                     'protective_doc_number': doc['registration_number'],
                     'obj_state': 2,
                     'rights_date': data_from_json.get('@INTREGD'),
-                    'owner': {'name': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL')},
-                    'agent': {'name': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL')},
-                    'title': {'name': data_from_json.get('IMAGE', {}).get('@TEXT')},
+                    'owner': [{'name': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL')}],
+                    'agent': [{'name': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL')}],
+                    'title': [{'name': data_from_json.get('IMAGE', {}).get('@TEXT')}],
                 }
             }
 

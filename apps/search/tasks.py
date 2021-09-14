@@ -56,14 +56,28 @@ def perform_simple_search(user_id, get_params):
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
+
+                if elastic_field.field_type == 'text':
+                    if '*' in query:
+                        fields = [
+                            # f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{elastic_field.field_name}.exact^2",
+                        ]
+                    else:
+                        fields = [
+                            # f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{elastic_field.field_name}.exact^2",
+                            f"{elastic_field.field_name}.*",
+                        ]
+                else:
+                    fields = [
+                        f"{elastic_field.field_name}",
+                    ]
+
                 q = Q(
                     'query_string',
                     query=query,
-                    fields=[
-                        f"{elastic_field.field_name}^2",
-                        f"{elastic_field.field_name}.exact^2",
-                        f"{elastic_field.field_name}.lang_*",
-                    ],
+                    fields=fields,
                     quote_field_suffix=".exact",
                     default_operator='AND'
                 )
@@ -372,7 +386,7 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
 
     user = get_user_or_anonymous(user_id)
 
-    s = Search().using(client).query(q).execute()
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
@@ -390,7 +404,7 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
                 'query_string',
                 query=f"search_data.obj_state:1 AND search_data.app_number:{hit['search_data']['app_number']}",
             )
-            s = Search().using(client).query(q).execute()
+            s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
             if s:
                 app_hit = s[0].to_dict()
                 for doc in app_hit['DOCFLOW']['DOCUMENTS']:
@@ -515,7 +529,7 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
     elif app.obj_type_id == 4:
         client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
         q = Q('match', _id=id_app_number)
-        s = Search().using(client).query(q).execute()
+        s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
         if s:
             hit = s[0]
             data = get_data_for_selection_tm(hit)
@@ -551,14 +565,27 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
 
+                if elastic_field.field_type == 'text':
+                    if '*' in query:
+                        fields = [
+                            # f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{elastic_field.field_name}.exact^2",
+                        ]
+                    else:
+                        fields = [
+                            # f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{elastic_field.field_name}.exact^2",
+                            f"{elastic_field.field_name}.*",
+                        ]
+                else:
+                    fields = [
+                        f"{elastic_field.field_name}",
+                    ]
+
                 q = Q(
                     'query_string',
                     query=query,
-                    fields=[
-                        f"{elastic_field.field_name}^2",
-                        f"{elastic_field.field_name}.exact^2",
-                        f"{elastic_field.field_name}.lang_*",
-                    ],
+                    fields=fields,
                     quote_field_suffix=".exact",
                     default_operator='AND'
                 )

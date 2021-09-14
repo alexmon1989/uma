@@ -97,14 +97,27 @@ def get_elastic_results(search_groups, user):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
 
+                    if inid_schedule.elastic_index_field.field_type == 'text':
+                        if '*' in query:
+                            fields = [
+                                # f"{inid_schedule.elastic_index_field.field_name}^2",
+                                f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                            ]
+                        else:
+                            fields = [
+                                # f"{inid_schedule.elastic_index_field.field_name}^2",
+                                f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                                f"{inid_schedule.elastic_index_field.field_name}.*",
+                            ]
+                    else:
+                        fields = [
+                            f"{inid_schedule.elastic_index_field.field_name}",
+                        ]
+
                     q = Q(
                         'query_string',
                         query=query,
-                        fields=[
-                            f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{inid_schedule.elastic_index_field.field_name}.exact^2",
-                            f"{inid_schedule.elastic_index_field.field_name}.*",
-                        ],
+                        fields=fields,
                         quote_field_suffix=".exact",
                         default_operator='AND'
                     )
