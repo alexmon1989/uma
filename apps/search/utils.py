@@ -98,17 +98,23 @@ def get_elastic_results(search_groups, user):
                     query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
 
                     if inid_schedule.elastic_index_field.field_type == 'text':
-                        if '*' in query:
-                            fields = [
-                                # f"{inid_schedule.elastic_index_field.field_name}^2",
-                                f"{inid_schedule.elastic_index_field.field_name}.exact^2",
-                            ]
-                        else:
-                            fields = [
-                                # f"{inid_schedule.elastic_index_field.field_name}^2",
-                                f"{inid_schedule.elastic_index_field.field_name}.exact^2",
-                                f"{inid_schedule.elastic_index_field.field_name}.*",
-                            ]
+                        fields = [
+                            f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.*",
+                        ]
+
+                        # if '*' in query:
+                        #     fields = [
+                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                        #     ]
+                        # else:
+                        #     fields = [
+                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.*",
+                        #     ]
                     else:
                         fields = [
                             f"{inid_schedule.elastic_index_field.field_name}",

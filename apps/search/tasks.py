@@ -58,17 +58,23 @@ def perform_simple_search(user_id, get_params):
                 query = prepare_query(s['value'], elastic_field.field_type)
 
                 if elastic_field.field_type == 'text':
-                    if '*' in query:
-                        fields = [
-                            # f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{elastic_field.field_name}.exact^2",
-                        ]
-                    else:
-                        fields = [
-                            # f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{elastic_field.field_name}.exact^2",
-                            f"{elastic_field.field_name}.*",
-                        ]
+                    fields = [
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.*",
+                    ]
+
+                    # if '*' in query:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #     ]
+                    # else:
+                    #     fields = [
+                    #         f"{elastic_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #         f"{elastic_field.field_name}.*",
+                    #     ]
                 else:
                     fields = [
                         f"{elastic_field.field_name}",
@@ -566,17 +572,23 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 query = prepare_query(s['value'], elastic_field.field_type)
 
                 if elastic_field.field_type == 'text':
-                    if '*' in query:
-                        fields = [
-                            # f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{elastic_field.field_name}.exact^2",
-                        ]
-                    else:
-                        fields = [
-                            # f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{elastic_field.field_name}.exact^2",
-                            f"{elastic_field.field_name}.*",
-                        ]
+                    fields = [
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.*",
+                    ]
+
+                    # if '*' in query:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #     ]
+                    # else:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #         f"{elastic_field.field_name}.*",
+                    #     ]
                 else:
                     fields = [
                         f"{elastic_field.field_name}",
