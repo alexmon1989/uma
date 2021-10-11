@@ -284,7 +284,7 @@ def sort_results(s, sort_by_value):
     else:
         param = sort_param['search_field__elastic_index_field__field_name'].replace('*', '')
         if sort_param['search_field__elastic_index_field__field_type'] == 'text':
-            param = f"{param}.raw"
+            param = f"{param}.exact"
         s = s.sort(
             {
                 param: {
@@ -1274,6 +1274,9 @@ def user_has_access_to_docs(user, hit):
                 for patent_attroney in user.patentattorney_set.all():
                     user_names.append(patent_attroney.name)
 
+            # Удаление None-объектов
+            allowed_persons = list(filter(lambda item: item is not None, allowed_persons))
+
             # Проверка на вхождение
             return any([person for person in allowed_persons for user_name in user_names if
                         user_name.upper() in person.upper()])
@@ -1840,22 +1843,25 @@ def get_registration_status_color(hit):
         except KeyError:
             status = 'red'
     elif hit['Document']['idObjType'] == 4:
-        status = 'green'
+        status = hit.get('TradeMark', {}).get('TrademarkDetails', {}).get('registration_status_color')
 
-        red_transaction_types = [
-            'TerminationNoRenewalFee',
-            'TotalTerminationByOwner',
-            'TotalInvalidationByCourt',
-            'TotalTerminationByCourt',
-            'TotalInvalidationByAppeal',
-        ]
+        if not status:
+            status = 'green'
 
-        if hit.get('TradeMark', {}).get('Transactions'):
-            last_transaction_type = hit['TradeMark']['Transactions']['Transaction'][
-                len(hit['TradeMark']['Transactions']['Transaction']) - 1].get('@type')
+            red_transaction_types = [
+                'TerminationNoRenewalFee',
+                'TotalTerminationByOwner',
+                'TotalInvalidationByCourt',
+                'TotalTerminationByCourt',
+                'TotalInvalidationByAppeal',
+            ]
 
-            if last_transaction_type in red_transaction_types:
-                status = 'red'
+            if hit.get('TradeMark', {}).get('Transactions'):
+                last_transaction_type = hit['TradeMark']['Transactions']['Transaction'][
+                    len(hit['TradeMark']['Transactions']['Transaction']) - 1].get('@type')
+
+                if last_transaction_type in red_transaction_types:
+                    status = 'red'
 
     elif hit['Document']['idObjType'] == 5:
         status = 'green'

@@ -18,7 +18,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
         try:
             image_name = ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename']
             ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f"{files_dir}{image_name}"
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         # Если это пром. образец, то необходимо указывать полные пути к изображениям
@@ -26,7 +26,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
             images = ret['data']['DesignSpecimenDetails'][0]['DesignSpecimen']
             for image in images:
                 image['SpecimenFilename'] = f"{files_dir}{image['SpecimenFilename']}"
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         return ret
@@ -68,8 +68,10 @@ class OpenDataDocsSerializer(serializers.ModelSerializer):
         ret['documents'] = json.loads(ret['documents'])
 
         for doc in ret['documents']:
-            if doc['DocRecord'].get('DocBarCode'):
+            if doc.get('DocRecord', {}).get('DocBarCode'):
                 del doc['DocRecord']['DocBarCode']
+            if doc.get('DOCRECORD', {}).get('DOCBARCODE'):
+                del doc['DOCRECORD']['DOCBARCODE']
             # if doc['DocRecord'].get('DocIdDocCEAD'):
             #     del doc['DocRecord']['DocIdDocCEAD']
 

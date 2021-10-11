@@ -23,7 +23,7 @@ class Command(BaseCommand):
         apps = IpcAppList.objects.filter(
             elasticindexed=1
         ).exclude(
-            obj_type_id__in=(1, 2, 3, 5, 6), registration_date__isnull=True
+            obj_type_id__in=(1, 2, 3, 5), registration_date__isnull=True
         ).exclude(
             obj_type_id__in=(9, 11, 12, 14)
         ).annotate(
@@ -99,7 +99,8 @@ class Command(BaseCommand):
 
                     # Патенты на пром. образцы
                     elif app.obj_type_id == 6:
-                        data_biblio = data['Design']['DesignDetails']
+                        # Записывается только библиография патентов
+                        data_biblio = data['Design']['DesignDetails'] if app.registration_number else []
                         data_docs = data['Design'].get('DocFlow', {}).get('Documents')
 
                     elif app.obj_type_id in (10, 13):  # Авторське право

@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.db import connections
 from django.db.models import Max
 from django.utils import timezone
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
@@ -39,6 +40,11 @@ class Command(BaseCommand):
             '--status',
             type=int,
             help='Add to index only records with certain status: 1 - applications, 2 - protective documents.'
+        )
+        parser.add_argument(
+            '--ignore_indexed',
+            type=bool,
+            help='Ignores elasticindexed=1'
         )
 
     def get_json_path(self, doc):
@@ -117,6 +123,19 @@ class Command(BaseCommand):
             )
 
         return data
+
+    def fix_id_doc_cead(self, documents):
+        """Получает idDocCead из БД EArchive, если он отсутсвует в JSON."""
+        for doc in documents:
+            if not doc['DocRecord'].get('DocIdDocCEAD') and doc['DocRecord'].get('DocBarCode'):
+                with connections['e_archive'].cursor() as cursor:
+                    cursor.execute(
+                        "SELECT idDoc FROM EArchive WHERE BarCODE=%s",
+                        [doc['DocRecord'].get('DocBarCode', '')]
+                    )
+                    row = cursor.fetchone()
+                    if row:
+                        doc['DocRecord']['DocIdDocCEAD'] = row[0]
 
     def process_inv_um_ld(self, doc):
         """Добавляет документ одного из типов (изобретение, полезная модель, топография ИМС) в ElasticSearch."""
@@ -238,9 +257,12 @@ class Command(BaseCommand):
                     'inventor': [{'name': list(x.values())[0]} for x in biblio_data.get('I_72', [])],
                     'owner': [{'name': list(x.values())[0]} if list(x.keys())[0] != 'EDRPOU'
                               else {'name': list(x.values())[1]} for x in biblio_data.get('I_73', [])],
-                    'agent': [{'name': biblio_data.get('I_74')}],
                     'title': [list(x.values())[0] for x in biblio_data.get('I_54', [])]
                 }
+
+                # Представитель
+                if biblio_data.get('I_74'):
+                    res['search_data']['agent'] = [{'name': biblio_data['I_74']}]
 
                 # Статус охранного документа (цвет)
                 if res['search_data']['obj_state'] == 2:
@@ -369,6 +391,18 @@ class Command(BaseCommand):
                     except:
                         pass
 
+            # Fix новых данных
+            if res['TradeMark']['TrademarkDetails'].get('TerminationDate'):
+                try:
+                    res['TradeMark']['TrademarkDetails']['TerminationDate'] = datetime.datetime.strptime(
+                        res['TradeMark']['TrademarkDetails']['TerminationDate'], '%d.%m.%Y'
+                    ).strftime('%Y-%m-%d')
+                except:
+                    pass
+
+            # Fix id_doc_cead
+            self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -425,13 +459,19 @@ class Command(BaseCommand):
                           res['Design']['DesignDetails']['DesignerDetails']['Designer']]
                 if res['Design']['DesignDetails'].get('DesignerDetails') else None,
 
-                'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
-                          res['Design']['DesignDetails']['HolderDetails']['Holder']]
-                if res['Design']['DesignDetails'].get('HolderDetails') else None,
-
                 'title': res['Design']['DesignDetails'].get('DesignTitle')
             }
+
+            res['search_data']['owner'] = []
+            if res['Design']['DesignDetails'].get('HolderDetails'):
+                for x in res['Design']['DesignDetails']['HolderDetails']['Holder']:
+                    try:
+                        res['search_data']['owner'].append({
+                            'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                  'FreeFormatNameDetails']['FreeFormatNameLine']
+                        })
+                    except KeyError:
+                        pass
 
             if res['Design']['DesignDetails'].get('DesignApplicationDate'):
                 res['search_data']['app_date'] = res['Design']['DesignDetails']['DesignApplicationDate']
@@ -456,6 +496,9 @@ class Command(BaseCommand):
 
             if res['Design']['DesignDetails'].get('stages'):
                 res['Design']['DesignDetails']['stages'] = res['Design']['DesignDetails']['stages'][::-1]
+
+            # Fix id_doc_cead
+            self.fix_id_doc_cead(res['Design'].get('DocFlow', {}).get('Documents', []))
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -539,8 +582,8 @@ class Command(BaseCommand):
                     'obj_state': 2,
                     'rights_date': data_from_json.get('@INTREGD'),
                     'owner': [{'name': data_from_json.get('HOLGR', {}).get('NAME', {}).get('NAMEL')}],
-                    'agent': [{'name': data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL')}],
-                    'title': [{'name': data_from_json.get('IMAGE', {}).get('@TEXT')}],
+                    'agent': [{'name': data_from_json['REPGR']['NAME']['NAMEL']}] if data_from_json.get('REPGR', {}).get('NAME', {}).get('NAMEL') else None,
+                    'title': data_from_json.get('IMAGE', {}).get('@TEXT'),
                 }
             }
 
@@ -663,7 +706,7 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.filter(elasticindexed=0).values(
+        documents = IpcAppList.objects.values(
             'id',
             'files_path',
             'obj_type_id',
@@ -672,8 +715,10 @@ class Command(BaseCommand):
             'app_number',
             'app_date',
             'app_input_date',
-        )
+        ).exclude(registration_date__gte=timezone.now())
         # Фильтрация по параметрам командной строки
+        if not options['ignore_indexed']:
+            documents = documents.filter(elasticindexed=0)
         if options['id']:
             documents = documents.filter(id=options['id'])
         if options['obj_type']:

@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.utils.timezone import make_aware
 from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
@@ -165,7 +166,15 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk')
+
+        if self.request.query_params.get('obj_type', None):
+            try:
+                obj_type = int(self.request.query_params['obj_type'])
+                queryset = queryset.filter(obj_type=obj_type)
+            except ValueError:
+                raise Http404
+
         return queryset.values(
             'app_id',
             'obj_type__obj_type_ua',
@@ -179,6 +188,13 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
             'app__files_path',
         )
 
+    def get_object(self):
+        qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
+
+        if qs.count() > 0:
+            return qs.first()
+        raise Http404
+
 
 class OpenDataDocsView(generics.RetrieveAPIView):
     """Возвращает документы объекта по номеру заявки."""
@@ -188,6 +204,21 @@ class OpenDataDocsView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         queryset = OpenData.objects.all()
+
+        if self.request.query_params.get('obj_type', None):
+            try:
+                obj_type = int(self.request.query_params['obj_type'])
+                queryset = queryset.filter(obj_type=obj_type)
+            except ValueError:
+                raise Http404
+
         return queryset.values(
             'data_docs',
         )
+
+    def get_object(self):
+        qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
+
+        if qs.count() > 0:
+            return qs.first()
+        raise Http404

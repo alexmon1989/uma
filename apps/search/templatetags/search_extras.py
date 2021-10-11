@@ -210,10 +210,17 @@ def app_stages_tm(app):
         # Fix
         prev_status = ''
         for stage in stages[::-1]:
-            if stage["title"] == "Встановлення дати подання" and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
+            if stage["title"] == "Встановлення дати подання" \
+                    and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
+                if stage['status'] == 'current':
+                    stages[3]['status'] = 'current'
                 stage['status'] = 'done'
-            if stage['status'] == 'current' == prev_status or (stage['status'] in ('done', 'current') and prev_status in ('current', 'not-active')):
+                continue
+
+            if stage['status'] == 'current' == prev_status \
+                    or (stage['status'] in ('done', 'current', 'stopped',) and prev_status in ('current', 'not-active')):
                 stage['status'] = 'not-active'
+
             prev_status = stage['status']
 
         is_stopped = app['TradeMark']['TrademarkDetails']['application_status'] == 'stopped'
@@ -314,7 +321,7 @@ def app_stages_id(app):
         prev_status = ''
         for stage in stages[::-1]:
             if stage['status'] == 'current' == prev_status or (
-                    stage['status'] in ('done', 'current') and prev_status in ('current', 'not-active')):
+                    stage['status'] in ('done', 'current', 'stopped',) and prev_status in ('current', 'not-active')):
                 stage['status'] = 'not-active'
             prev_status = stage['status']
 

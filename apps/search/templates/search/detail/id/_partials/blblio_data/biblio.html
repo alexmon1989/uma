@@ -138,7 +138,7 @@
                         <td>
                             {% for item in hit.Design.DesignDetails.DesignSpecimenDetails %}
                                 {% if item.Colors %}
-                                    {{ forloop.counter }}-й варіант -
+                                    {{ forloop.counter }}-й варіант - {{ item.Colors.Color }}
                                     {% for color in item.Colors %}{{ color.Color }}{% if not forloop.last %};&nbsp;{% endif %}{% endfor %}{% if not forloop.last %};{% endif %}<br>
                                 {% endif %}
                             {% endfor %}

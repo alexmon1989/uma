@@ -70,11 +70,14 @@ def prepare_tm_data(record):
 
     # 441 - Дата публікації заявки
     date_441 = EBulletinData.objects.filter(app_number=data['ApplicationNumber']).first().publication_date
-    bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
     biblio_data['code_441'] = {
-        'title': '(441) Дата публікації відомостей про заявку та номер бюлетня',
-        'value': f"{date_441.strftime('%d.%m.%Y')}, бюл. № {bul_num_441.bul_number}"
+        'title': '(441) Дата публікації відомостей про заявку та номер бюлетня'
     }
+    try:
+        bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
+        biblio_data['code_441']['value'] = f"{date_441.strftime('%d.%m.%Y')}, бюл. № {bul_num_441.bul_number}"
+    except ClListOfficialBulletinsIp.DoesNotExist:
+        biblio_data['code_441']['value'] = date_441.strftime('%d.%m.%Y')
 
     # 511 - індекс (індекси) МКТП для реєстрації знаків та перелік товарів і послуг
     biblio_data['code_511'] = {
@@ -103,7 +106,10 @@ def prepare_tm_data(record):
     if data.get('MarkImageDetails', {}).get('MarkImage', {}).get('MarkImageCategory', {}).get(
             'CategoryCodeDetails', {}).get('CategoryCode'):
         codes = data['MarkImageDetails']['MarkImage']['MarkImageCategory']['CategoryCodeDetails']['CategoryCode']
-        biblio_data['code_531']['value'] = "<br>".join(codes)
+        try:
+            biblio_data['code_531']['value'] = "<br>".join(codes)
+        except TypeError:
+            pass
 
     # 540 - зображення знака
     biblio_data['code_540'] = {

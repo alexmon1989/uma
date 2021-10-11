@@ -279,7 +279,7 @@ def get_data_app_html(request):
                     )
                     context['code_441_bul_number'] = bul_num_441.bul_number
                     template = 'search/detail/tm_madrid/detail.html'
-                elif context['hit']['Document']['idObjType'] in (10, 13):  # Авторське право
+                elif context['hit']['Document']['idObjType'] in (10, 11, 12, 13):  # Авторське право
                     template = 'search/detail/copyright/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
