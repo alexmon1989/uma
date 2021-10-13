@@ -222,3 +222,45 @@ class OpenDataDocsView(generics.RetrieveAPIView):
         if qs.count() > 0:
             return qs.first()
         raise Http404
+
+
+class SearchListView(generics.ListAPIView):
+    """Поиск в API по номеру заявки, номеру охранного документа, типу объекта."""
+    serializer_class = OpenDataSerializerV1
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+
+        # Тип об'єкта
+        obj_type = self.request.query_params.get('obj_type', None)
+        if obj_type:
+            try:
+                obj_type = int(obj_type)
+            except:
+                raise exceptions.ParseError("Невірне значення параметру obj_type")
+            else:
+                queryset = queryset.filter(obj_type_id=obj_type)
+
+        # Номер заявки
+        app_number = self.request.query_params.get('app_number', None)
+        if app_number:
+            queryset = queryset.filter(app_number__istartswith=app_number)
+
+        # Номер охранного документа
+        registration_number = self.request.query_params.get('registration_number', None)
+        if registration_number:
+            queryset = queryset.filter(registration_number__istartswith=registration_number)
+
+        return queryset.values(
+            'app_id',
+            'obj_type__obj_type_ua',
+            'obj_state',
+            'app_number',
+            'app_date',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+            'app__files_path',
+        )[:20]
