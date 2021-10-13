@@ -245,12 +245,12 @@ class SearchListView(generics.ListAPIView):
         # Номер заявки
         app_number = self.request.query_params.get('app_number', None)
         if app_number:
-            queryset = queryset.filter(app_number__istartswith=app_number)
+            queryset = queryset.filter(app_number__contains_ft=f'"*{app_number}*"')
 
         # Номер охранного документа
         registration_number = self.request.query_params.get('registration_number', None)
         if registration_number:
-            queryset = queryset.filter(registration_number__istartswith=registration_number)
+            queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
 
         return queryset.values(
             'app_id',
