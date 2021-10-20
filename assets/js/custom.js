@@ -419,7 +419,21 @@ $(function () {
             element.style.display = 'block';
         }
 
+        // Отображение элементов для печати
+        let elementsForPrint = content.querySelectorAll(".for-print");
+        elementsForPrint.forEach(function(el) {
+          el.style.display = 'block';
+        });
+
+        // Скрытие элементов, не предназначенных для печати
+        let elementsNotForPrint = content.querySelectorAll(".noprint");
+        elementsNotForPrint.forEach(function(el) {
+          el.style.display = 'none';
+        });
+
         let myWindow = window.open('', 'Print', 'height=600,width=800');
+
+        console.log(content.innerHTML);
 
         myWindow.document.write('<html>' + headHtml);
         myWindow.document.write('<body>' + content.innerHTML + '</body></html>');

@@ -240,7 +240,23 @@
     <!-- End Basic Table -->
 
     {% if hit.Design.DesignDetails.DesignSpecimenDetails %}
-        <div class="row text-center g-mt-20">
+
+        {# Блок для печати #}
+        <div class="for-print">
+            {% for design_specimen_details in hit.Design.DesignDetails.DesignSpecimenDetails %}
+                {% for image in design_specimen_details.DesignSpecimen %}
+                    <div class="text-center">
+                        <img class="img-fluid u-block-hover__main--zoom-v1"
+                             src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}"
+                             alt="">
+                        <p>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</p>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        {# Блок для отображения, не печатается #}
+        <div class="row text-center g-mt-20 noprint">
             {% for design_specimen_details in hit.Design.DesignDetails.DesignSpecimenDetails %}
                 {% for image in design_specimen_details.DesignSpecimen %}
                     <div class="col-md-4 g-mb-30--md">
@@ -256,5 +272,6 @@
                 {% endfor %}
             {% endfor %}
         </div>
+
     {% endif %}
 </div>

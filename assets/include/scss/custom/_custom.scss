@@ -457,3 +457,11 @@
 .nav-link {
     padding: .5rem 1rem !important;
 }
+
+img {
+    page-break-inside: avoid; /* or 'auto' */
+}
+
+.for-print {
+  display: none;
+}
