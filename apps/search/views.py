@@ -76,12 +76,22 @@ class SimpleListView(TemplateView):
 
             # Признак того что производится поиск
             context['is_search'] = True
+
+            # Показывать или скрывать поисковую форму
             context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
 
             # Создание асинхронной задачи для Celery
             task = perform_simple_search.delay(
                 self.request.user.pk,
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
 
@@ -158,13 +168,23 @@ class AdvancedListView(TemplateView):
 
             # Признак того что производится поиск
             context['is_search'] = True
+
+            # Показывать или скрывать поисковую форму
             context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
 
             # Поиск в ElasticSearch
             # Создание асинхронной задачи для Celery
             task = perform_advanced_search.delay(
                 self.request.user.pk,
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
 
@@ -382,13 +402,24 @@ class TransactionsSearchView(TemplateView):
         if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
                 and self.request.GET.get('date'):
             context['is_search'] = True
+
+            # Показывать или скрывать поисковую форму
             context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
+
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
             # Поиск
             # Создание асинхронной задачи для Celery
             task = perform_transactions_search.delay(
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
 
