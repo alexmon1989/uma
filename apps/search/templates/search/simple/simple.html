@@ -23,21 +23,15 @@
                 {% endblocktrans %}
             </p>
         {% endif %}
-
-        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
-            <simple-search-form v-bind:search-parameter-types="{{ search_parameter_types }}"
-                                v-bind:initial-data="{{ initial_data }}"/>
+        <div class="collapse g-mb-20 {% if show_search_form %}show{% endif %}" id="collapseForm">
+            <simple-search-form :search-parameter-types="{{ search_parameter_types }}"
+                                :initial-data="{{ initial_data }}"/>
         </div>
 
         {% if is_search %}
             <div class="results">
                 <div class="g-mt-10">
-                    <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
-                            data-target="#collapseForm"
-                            aria-expanded="false"
-                            aria-controls="collapseExample">
-                        <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-                    </button>
+                    {% include 'search/_partials/show_search_conditions_btn.html' %}
 
                     <div class="g-pos-rel g-min-height-200">
                         <div class="overlay g-bg-white" id="overlay">

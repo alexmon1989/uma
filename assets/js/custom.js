@@ -478,4 +478,18 @@ $(function () {
 
         $.post('/favorites/add-or-remove', { id: $this.data('hit-id') });
     });
+
+    // Обработчик события на нажатие кнопки, показывающей/скрывающей форму поиска
+    $(document).on('click', '#show-search-form-btn', function () {
+        const $this = $(this);
+        $.post( "/search/toggle-search-form", function( data ) {
+            if (data.visible) {
+                $this.find('span.show').hide();
+                $this.find('span.hide').show();
+            } else {
+                $this.find('span.hide').hide();
+                $this.find('span.show').show();
+            }
+        });
+    });
 });

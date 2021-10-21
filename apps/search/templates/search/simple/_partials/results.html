@@ -3,26 +3,14 @@
 
 {% if validation_errors %}
      <div class="g-mt-10">
-            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
-                    data-target="#collapseForm"
-                    aria-expanded="false"
-                    aria-controls="collapseExample">
-                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-            </button>
-            <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
-        </div>
+        {% include 'search/_partials/show_search_conditions_btn.html' %}
+        <p class="text-danger g-font-size-16">{% trans 'Некоректні умови пошуку!' %}</p>
+    </div>
 {% else %}
     {% if results %}
         <div class="row">
             <div class="col-md-3">
-                <button class="btn btn-md u-btn-blue g-mb-20"
-                        type="button"
-                        data-toggle="collapse"
-                        data-target="#collapseForm"
-                        aria-expanded="false"
-                        aria-controls="collapseExample">
-                    <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-                </button>
+                {% include 'search/_partials/show_search_conditions_btn.html' %}
                 {% include 'search/simple/_partials/sidebar.html' %}
             </div>
 
@@ -86,12 +74,7 @@
         </div>
     {% else %}
         <div class="g-mt-10">
-            <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
-                    data-target="#collapseForm"
-                    aria-expanded="false"
-                    aria-controls="collapseExample">
-                <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-            </button>
+            {% include 'search/_partials/show_search_conditions_btn.html' %}
             <p class="lead">{% trans "За вашими умовами пошуку не знайдено жодного об'єкта." %}</p>
         </div>
     {% endif %}

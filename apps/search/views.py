@@ -8,6 +8,7 @@ from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -66,6 +67,7 @@ class SimpleListView(TemplateView):
             '-weight'
         ))
 
+        context['show_search_form'] = True
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)
         if self.request.GET.get('form-TOTAL_FORMS'):
@@ -74,6 +76,7 @@ class SimpleListView(TemplateView):
 
             # Признак того что производится поиск
             context['is_search'] = True
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
 
             # Создание асинхронной задачи для Celery
             task = perform_simple_search.delay(
@@ -144,6 +147,7 @@ class AdvancedListView(TemplateView):
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
+        context['show_search_form'] = True
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
         if self.request.GET.get('form-TOTAL_FORMS'):
@@ -154,6 +158,7 @@ class AdvancedListView(TemplateView):
 
             # Признак того что производится поиск
             context['is_search'] = True
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
 
             # Поиск в ElasticSearch
             # Создание асинхронной задачи для Celery
@@ -373,9 +378,11 @@ class TransactionsSearchView(TemplateView):
 
         context['initial_data'] = dict()
         context['is_search'] = False
+        context['show_search_form'] = True
         if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
                 and self.request.GET.get('date'):
             context['is_search'] = True
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
             # Поиск
@@ -463,3 +470,11 @@ class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
             )
 
         return super().get_redirect_url(*args, **kwargs)
+
+
+@require_POST
+@csrf_exempt
+def toggle_search_form(request):
+    """Записывает в сессию значение того нужно ли держать форму открытой постоянно."""
+    request.session['show_search_form'] = not request.session.get('show_search_form', False)
+    return JsonResponse({'visible': request.session.get('show_search_form')})
