@@ -1971,6 +1971,7 @@ def filter_app_data(app_data, user):
                                 )
                             },
                             'DocFlow': app_data['TradeMark'].get('DocFlow', {}),
+                            'PaymentDetails': app_data['TradeMark'].get('PaymentDetails', {}),
                         }
                     }
                 )
