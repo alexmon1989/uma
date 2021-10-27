@@ -1904,7 +1904,7 @@ def get_fixed_mark_status_code(app_data):
     for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
         if ('ТM-1.1' in doc['DocRecord']['DocType'] or 'ТМ-1.1' in doc['DocRecord']['DocType']) and result < 2000:
             result = 3000
-        if 'Т-05' in doc['DocRecord']['DocType'] and result < 3000:
+        if ('Т-05' in doc['DocRecord']['DocType'] or 'Т-5' in doc['DocRecord']['DocType']) and result < 3000:
             result = 3000
         if 'Т-08' in doc['DocRecord']['DocType'] and result < 4000:
             result = 4000
