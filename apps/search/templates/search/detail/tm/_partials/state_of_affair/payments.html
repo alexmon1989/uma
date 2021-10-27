@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load uma_extras %}
+{% load search_extras %}
 
 <div class="row">
     <div class="col-md-12 g-mb-40">
@@ -34,7 +35,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {{ payment.Comment }}
+                                {{ payment.Comment|remove_inn }}
                             </td>
                         </tr>
                     {% endfor %}

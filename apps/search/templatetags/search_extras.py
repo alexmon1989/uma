@@ -6,6 +6,7 @@ from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSett
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app, get_fixed_mark_status_code)
 from apps.bulletin.models import ClListOfficialBulletinsIp
+import re
 
 register = template.Library()
 
@@ -532,3 +533,21 @@ def filter_tm_id_docs_direction(documents, direction):
     if documents:
         return list(filter(lambda x: x.get('DocRecord', {}).get('DocDirection') == direction, documents))
     return list()
+
+
+@register.filter
+def remove_inn(s):
+    """Удаляет из строки ИНН (10-значное число)."""
+    s = re.sub(r'(?<!\w)\d{6,10}', '', s)
+    s = s.replace('; ; ', '')
+    s = s.strip()
+
+    # Также удаляется запятая, если строка ею заканчивается
+    if s.endswith(','):
+        s = s[:len(s)-2]
+
+    # Также удаляется точка с запятой, если строка ею заканчивается
+    if s.endswith(';'):
+        s = s[:len(s)-2]
+
+    return s
