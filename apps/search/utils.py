@@ -1873,23 +1873,26 @@ def get_registration_status_color(hit):
         status = 'green'
 
     elif hit['Document']['idObjType'] == 6:
-        status = 'green'
+        status = hit.get('Design', {}).get('DesignDetails', {}).get('registration_status_color')
 
-        red_transaction_types = [
-            'Termination',
-            'TerminationByAppeal',
-            'TerminationNoRenewalFee',
-            'TotalInvalidationByAppeal',
-            'TotalInvalidationByCourt',
-            'TotalTerminationByOwner',
-        ]
+        if not status:
+            status = 'green'
 
-        if hit.get('Design', {}).get('Transactions'):
-            last_transaction_type = hit['Design']['Transactions']['Transaction'][
-                len(hit['Design']['Transactions']['Transaction']) - 1].get('@type')
+            red_transaction_types = [
+                'Termination',
+                'TerminationByAppeal',
+                'TerminationNoRenewalFee',
+                'TotalInvalidationByAppeal',
+                'TotalInvalidationByCourt',
+                'TotalTerminationByOwner',
+            ]
 
-            if last_transaction_type in red_transaction_types:
-                status = 'red'
+            if hit.get('Design', {}).get('Transactions'):
+                last_transaction_type = hit['Design']['Transactions']['Transaction'][
+                    len(hit['Design']['Transactions']['Transaction']) - 1].get('@type')
+
+                if last_transaction_type in red_transaction_types:
+                    status = 'red'
 
     # ТМ (Мадрид)
     elif hit['Document']['idObjType'] in (9, 14):
