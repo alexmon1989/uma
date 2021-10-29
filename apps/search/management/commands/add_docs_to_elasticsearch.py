@@ -319,7 +319,7 @@ class Command(BaseCommand):
             except AttributeError:
                 pass
 
-            # Приведение номеря бюлетня к формату "bul_num/YYYY"
+            # Приведение номера бюлетня к формату "bul_num/YYYY"
             if res['TradeMark']['TrademarkDetails'].get('PublicationDetails'):
                 for x in res['TradeMark']['TrademarkDetails']['PublicationDetails']:
                     if len(x.get('PublicationIdentifier')) < 6:
@@ -452,6 +452,12 @@ class Command(BaseCommand):
                 res['Design']['DocFlow'] = data.get('DocFlow')
             if data.get('Transactions'):
                 res['Design']['Transactions'] = data.get('Transactions')
+
+            # Приведение номеря бюлетня к формату "bul_num/YYYY"
+            if res['Design']['DesignDetails'].get('RecordPublicationDetails'):
+                for x in res['Design']['DesignDetails']['RecordPublicationDetails']:
+                    if len(x.get('PublicationIdentifier')) < 6:
+                        x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
 
             applicant = None
             if res['Design']['DesignDetails'].get('ApplicantDetails'):
