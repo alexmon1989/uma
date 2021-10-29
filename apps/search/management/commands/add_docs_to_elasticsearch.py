@@ -300,17 +300,30 @@ class Command(BaseCommand):
             if data.get('Transactions'):
                 res['TradeMark']['Transactions'] = data.get('Transactions')
 
-            # Форматирование даты
-            if res['TradeMark'].get('PublicationDetails', {}).get('PublicationDate'):
-                try:
-                    d = datetime.datetime.today().strptime(
-                        res['TradeMark']['PublicationDetails']['PublicationDate'],
-                        '%d.%m.%Y'
-                    )
-                except ValueError:
-                    pass
-                else:
-                    res['TradeMark']['PublicationDetails']['PublicationDate'] = d.strftime('%Y-%m-%d')
+            # Форматирование даты публикации
+            try:
+                if res['TradeMark']['TrademarkDetails'].get('PublicationDetails', {}).get('Publication'):
+                    try:
+                        d = datetime.datetime.today().strptime(
+                            res['TradeMark']['TrademarkDetails']['PublicationDetails']['Publication']['PublicationDate'],
+                            '%d.%m.%Y'
+                        )
+                    except ValueError:
+                        pass
+                    else:
+                        res['TradeMark']['TrademarkDetails']['PublicationDetails']['Publication']['PublicationDate'] \
+                            = d.strftime('%Y-%m-%d')
+                    res['TradeMark']['TrademarkDetails']['PublicationDetails'] = [
+                        res['TradeMark']['TrademarkDetails']['PublicationDetails']['Publication']
+                    ]
+            except AttributeError:
+                pass
+
+            # Приведение номеря бюлетня к формату "bul_num/YYYY"
+            if res['TradeMark']['TrademarkDetails'].get('PublicationDetails'):
+                for x in res['TradeMark']['TrademarkDetails']['PublicationDetails']:
+                    if len(x.get('PublicationIdentifier')) < 6:
+                        x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
 
             applicant = None
             if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
