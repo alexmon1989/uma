@@ -1995,7 +1995,8 @@ def filter_app_data(app_data, user):
                             'application_status'
                         )
                     },
-                    'DocFlow': app_data['Design'].get('DocFlow')
+                    'DocFlow': app_data['Design'].get('DocFlow'),
+                    'PaymentDetails': app_data['Design'].get('PaymentDetails'),
                 },
                 'search_data': {
                     'app_number': app_data['search_data']['app_number'],
