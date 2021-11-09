@@ -219,7 +219,8 @@ def app_stages_tm(app):
                 continue
 
             if stage['status'] == 'current' == prev_status \
-                    or (stage['status'] in ('done', 'current', 'stopped',) and prev_status in ('current', 'not-active')):
+                    or (stage['status'] in ('done', 'current', 'stopped',)
+                        and prev_status in ('current', 'not-active', 'stopped')):
                 stage['status'] = 'not-active'
 
             prev_status = stage['status']
