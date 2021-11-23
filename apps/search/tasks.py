@@ -60,7 +60,7 @@ def perform_simple_search(user_id, get_params):
                 if elastic_field.field_type == 'text':
                     fields = [
                         f"{elastic_field.field_name}^2",
-                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.exact^3",
                         f"{elastic_field.field_name}.*",
                     ]
 
@@ -574,7 +574,7 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 if elastic_field.field_type == 'text':
                     fields = [
                         f"{elastic_field.field_name}^2",
-                        f"{elastic_field.field_name}.exact^2",
+                        f"{elastic_field.field_name}.exact^3",
                         f"{elastic_field.field_name}.*",
                     ]
 

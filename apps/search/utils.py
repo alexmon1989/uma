@@ -100,7 +100,7 @@ def get_elastic_results(search_groups, user):
                     if inid_schedule.elastic_index_field.field_type == 'text':
                         fields = [
                             f"{inid_schedule.elastic_index_field.field_name}^2",
-                            f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.exact^3",
                             f"{inid_schedule.elastic_index_field.field_name}.*",
                         ]
 
