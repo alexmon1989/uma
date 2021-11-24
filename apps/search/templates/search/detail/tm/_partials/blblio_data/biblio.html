@@ -258,6 +258,9 @@
                             {% if hit.search_data.obj_state == 2 %}
                                 <br>
                                 {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                    [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                                {% endif %}
                             {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
@@ -274,6 +277,9 @@
                             {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                             <br>
                             {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                            {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
@@ -289,6 +295,9 @@
                             {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
                             <br>
                             {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                [{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                            {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
