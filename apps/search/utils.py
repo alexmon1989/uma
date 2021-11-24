@@ -1375,7 +1375,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             ])
         else:
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
-                if hasattr(h.search_data, 'app_date') else ''
+                if hasattr(h.search_data, 'app_date') and h.search_data.app_date else ''
             rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
                 '%d.%m.%Y') if h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
