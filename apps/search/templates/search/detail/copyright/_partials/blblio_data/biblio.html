@@ -141,6 +141,18 @@
                 </tr>
             {% endif %}
 
+            {% get_field '77' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.EmployerDetails.Employer|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.EmployerDetails.Employer %}
+                            {{ person.EmployerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.EmployerAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% get_field '72' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.AuthorDetails.Author|length > 0 %}
                 <tr>
