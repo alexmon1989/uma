@@ -25,7 +25,7 @@ class Command(BaseCommand):
         ).exclude(
             obj_type_id__in=(1, 2, 3, 5), registration_date__isnull=True
         ).exclude(
-            obj_type_id__in=(9, 11, 12, 14)
+            obj_type_id__in=(9, 14)
         ).annotate(
             app_id=F('id'), last_update=F('lastupdate')
         ).values_list('app_id', 'last_update')
@@ -105,6 +105,9 @@ class Command(BaseCommand):
 
                     elif app.obj_type_id in (10, 13):  # Авторське право
                         data_biblio = data['Certificate']['CopyrightDetails']
+
+                    elif app.obj_type_id in (11, 12):  # Авторське право (договора)
+                        data_biblio = data['Decision']['DecisionDetails']
 
                     if data['search_data']['obj_state'] == 2:
                         data_biblio['registration_status_color'] = data['search_data'][

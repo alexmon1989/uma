@@ -29,6 +29,14 @@ class OpenDataSerializer(serializers.ModelSerializer):
         except (KeyError, TypeError):
             pass
 
+        # Если это авт. право, то надо убрать DocBarCode
+        try:
+            doc_flow = ret['data']['DocFlow']['Documents']
+            for doc in doc_flow:
+                del doc['DocRecord']['DocBarCode']
+        except (KeyError, TypeError):
+            pass
+
         return ret
 
     class Meta:
