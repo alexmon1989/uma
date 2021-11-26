@@ -68,6 +68,11 @@ def copyright_item(context, hit, item_num):
     return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
+@register.inclusion_tag('search/advanced/_partials/agreement_item.html', takes_context=True)
+def agreement_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
+
+
 @register.filter
 def document_path(file_name):
     return file_name.replace("\\\\bear\share\\", settings.MEDIA_URL).replace("\\", "/")

@@ -516,6 +516,15 @@ class Command(BaseCommand):
             if res['Design']['DesignDetails'].get('stages'):
                 res['Design']['DesignDetails']['stages'] = res['Design']['DesignDetails']['stages'][::-1]
 
+            # fix priority date
+            try:
+                if res['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority'):
+                    for item in res['Design']['DesignDetails']['PriorityDetails']['Priority']:
+                        if not item['PriorityDate']:
+                            del item['PriorityDate']
+            except AttributeError:
+                pass
+
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['Design'].get('DocFlow', {}).get('Documents', []))
 
@@ -610,16 +619,60 @@ class Command(BaseCommand):
             data['search_data']['registration_status_color'] = get_registration_status_color(data)
 
             # Поле 441 (дата опубликования заявки)
-            data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = doc['registration_date'].strftime('%Y-%m-%d')
+            try:
+                app = IpcAppList.objects.filter(
+                    obj_type_id=9,  # registration_date у заявки с этим obj_type_id и будет 441-м кодом
+                    app_number=doc['app_number']
+                ).first()
+                data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = app.registration_date.strftime('%Y-%m-%d')
+            except AttributeError:
+                data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = doc['registration_date'].strftime('%Y-%m-%d')
+
+            # Поле 450 (Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ)
+            if doc['obj_type_id'] == 14:
+                '''Если это "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні", которая появляется
+                позже чем "Міжнародна реєстрація торговельної марки з поширенням на територію України" с тем же номером,
+                то необхожимо обновить 450-й код у "Міжнародна реєстрація торговельної марки з поширенням на територію України"'''
+                q = Q(
+                    'bool',
+                    must=[
+                        Q('match', Document__idObjType=9),
+                        Q('match', search_data__protective_doc_number=doc['registration_number']),
+                    ],
+                )
+                s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es).query(q).execute()
+                if s:
+                    hit = s[0].to_dict()
+                    hit['MadridTradeMark']['TradeMarkDetails']['ENN'] = data['MadridTradeMark']['TradeMarkDetails']['ENN']
+                    self.es.index(index=settings.ELASTIC_INDEX_NAME,
+                                  doc_type='_doc',
+                                  id=s[0].meta.id,
+                                  body=hit,
+                                  request_timeout=30)
+            elif doc['obj_type_id'] == 9:
+                '''Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України", 
+                то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
+                и взять у неё 450 код.'''
+                q = Q(
+                    'bool',
+                    must=[
+                        Q('match', Document__idObjType=14),
+                        Q('match', search_data__protective_doc_number=doc['registration_number']),
+                    ],
+                )
+                s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es).query(q).execute()
+                if s:
+                    hit = s[0].to_dict()
+                    data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
 
             # Запись в индекс
             self.write_to_es_index(doc, data)
 
-            # Запись в БД для бюлетня (старого)
+            # Запись в БД для бюлетня
             EBulletinData.objects.update_or_create(
                 app_number=doc['registration_number'],
                 unit_id=2,
-                defaults={'publication_date': doc['registration_date']}
+                defaults={'publication_date': data['MadridTradeMark']['TradeMarkDetails']['Code_441']}
             )
 
     def process_cr(self, doc):
