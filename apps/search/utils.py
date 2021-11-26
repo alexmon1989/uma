@@ -13,12 +13,14 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
+from PIL import Image
 import re
 import time
 import datetime
 import os
 from uma.utils import iterable
 import xlsxwriter
+import io
 from apps.bulletin.models import ClListOfficialBulletinsIp
 
 
@@ -1338,12 +1340,32 @@ def create_search_res_doc(data, file_path):
                     row_num + 1,
                     col_num,
                     col_data,
-                    {'x_offset': 2, 'y_offset': 2, 'x_scale': 0.3, 'y_scale': 0.3}
+                    {
+                        'x_offset': 2,
+                        'y_offset': 2,
+                        'x_scale': 0.3,
+                        'y_scale': 0.3,
+                        'image_data': get_resized_image_for_report(col_data)
+                    }
                 )
             else:
                 worksheet.write(row_num + 1, col_num, col_data)
 
     workbook.close()
+
+
+def get_resized_image_for_report(img_path):
+    """Изменяет размер изображения для отчёта и возвращает BytesIO."""
+    fixed_height = 120
+    image = Image.open(img_path)
+
+    height_percent = (fixed_height / float(image.size[1]))
+    width_size = int((float(image.size[0]) * float(height_percent)))
+    image = image.resize((width_size, fixed_height), Image.NEAREST)
+
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='JPEG', optimize=True, quality=50)
+    return img_byte_arr
 
 
 def prepare_data_for_search_report(s, lang_code, user=None):
