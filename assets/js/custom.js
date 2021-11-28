@@ -383,7 +383,7 @@ $(function () {
                         .removeClass('fa-spinner')
                         .addClass('fa-download');
                 },
-                200
+                300
             );
         });
     });
