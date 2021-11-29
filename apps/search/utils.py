@@ -1362,6 +1362,8 @@ def get_resized_image_for_report(img_path):
     height_percent = (fixed_height / float(image.size[1]))
     width_size = int((float(image.size[0]) * float(height_percent)))
     image = image.resize((width_size, fixed_height), Image.NEAREST)
+    if image.mode in ("RGBA", "P"):
+        image = image.convert("RGB")
 
     img_byte_arr = io.BytesIO()
     image.save(img_byte_arr, format='JPEG', optimize=True, quality=50)
