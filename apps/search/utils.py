@@ -794,10 +794,14 @@ def get_data_for_selection_tm(hit):
         'value': datetime.datetime.strptime(hit.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
     }
     # (450) Бюлетень
+    pub_date = datetime.datetime.strptime(
+        hit.TradeMark.TrademarkDetails.PublicationDetails[0].PublicationDate,
+        '%Y-%m-%d'
+    ).strftime('%d.%m.%Y')
     data['biblio']['i_450'] = {
         'key': '450',
-        'value': f"{hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationDate}. "
-                 f"Бюл. {hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier}"
+        'value': f"{pub_date}. "
+                 f"Бюл. {hit.TradeMark.TrademarkDetails.PublicationDetails[0].PublicationIdentifier}"
     }
     # (591) зазначення кольору чи поєднання кольорів, які охороняються
     data['biblio']['i_591'] = {
