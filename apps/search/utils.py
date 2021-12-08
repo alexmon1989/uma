@@ -1542,6 +1542,17 @@ def get_app_applicant(app):
         except AttributeError:
             pass
 
+    # Авторское право (договора)
+    elif app.Document.idObjType in (11, 12):
+        try:
+            for item in app.Decision.DecisionDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
     return ';\r\n'.join(applicants)
 
 
@@ -1652,6 +1663,17 @@ def get_app_inventor(app):
     elif app.Document.idObjType in (10, 13):
         try:
             for item in app.Certificate.CopyrightDetails.AuthorDetails.Author:
+                inventors.append(
+                    f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право (договора)
+    elif app.Document.idObjType in (11, 12):
+        try:
+            for item in app.Decision.DecisionDetails.AuthorDetails.Author:
                 inventors.append(
                     f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
                     f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
