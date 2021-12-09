@@ -79,10 +79,8 @@ def save_file_to_eu_file_store(file):
     return path
 
 
-def check_signed_data(signed_data, secret, key_center_title, key_psz_subject):
+def get_signed_data_info(signed_data, secret, key_center_title):
     """Вроверяет валидность ЭЦП."""
-    res = False
-
     # Загрузка бибилиотек ІІТ
     EULoad()
     pIface = EUGetInterface()
@@ -106,15 +104,11 @@ def check_signed_data(signed_data, secret, key_center_title, key_psz_subject):
     try:
         # Верификация и получение данных из подписанных данных
         pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), sign_info)
-        # Проверка данных человека (эта строка содержит имя, ИНН и т.д.)
-        assert sign_info['pszSubject'] == key_psz_subject
     except:
         pass
-    else:
-        res = True
 
     # Выгрузка бибилиотек ІІТ
     eu_interface.Finalize()
     EUUnload()
 
-    return res
+    return sign_info
