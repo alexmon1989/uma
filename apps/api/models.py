@@ -5,7 +5,7 @@ from apps.search.models import IpcAppList, ObjType
 class OpenData(models.Model):
     """Модель для открытых данных."""
     app = models.ForeignKey(IpcAppList, on_delete=models.CASCADE, verbose_name='Заявка')
-    data = models.TextField(verbose_name='Дані у форматі JSON')
+    data = models.TextField(verbose_name='Дані у форматі JSON', default=None, null=True, blank=True)
     data_docs = models.TextField(verbose_name='Стан діловодства у форматі JSON', default=None, null=True, blank=True)
     data_payments = models.TextField(
         verbose_name='Платежі, збори',

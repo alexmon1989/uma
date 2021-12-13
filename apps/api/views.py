@@ -61,6 +61,8 @@ class OpenDataListView(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )
 
@@ -155,6 +157,8 @@ class OpenDataListViewV1(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )
 
@@ -185,6 +189,8 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )
 
@@ -198,7 +204,6 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
 
 class OpenDataDocsView(generics.RetrieveAPIView):
     """Возвращает документы объекта по номеру заявки."""
-
     serializer_class = OpenDataDocsSerializer
     lookup_field = 'app_number'
 
@@ -262,5 +267,7 @@ class SearchListView(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )[:20]
