@@ -7,6 +7,12 @@ class OpenData(models.Model):
     app = models.ForeignKey(IpcAppList, on_delete=models.CASCADE, verbose_name='Заявка')
     data = models.TextField(verbose_name='Дані у форматі JSON')
     data_docs = models.TextField(verbose_name='Стан діловодства у форматі JSON', default=None, null=True, blank=True)
+    data_payments = models.TextField(
+        verbose_name='Платежі, збори',
+        default=None,
+        null=True,
+        blank=True
+    )
     # Поля для денормализации данных с целью ускорения поиска
     obj_type = models.ForeignKey(ObjType, blank=True, null=True, on_delete=models.CASCADE, default=None)
     obj_state = models.PositiveSmallIntegerField(default=2)
@@ -27,6 +33,12 @@ class OpenDataViewModel(models.Model):
     app = models.ForeignKey(IpcAppList, on_delete=models.CASCADE, verbose_name='Заявка')
     data = models.TextField(verbose_name='Дані у форматі JSON')
     data_docs = models.TextField(verbose_name='Стан діловодства у форматі JSON', default=None, null=True, blank=True)
+    data_payments = models.TextField(
+        verbose_name='Платежі, збори',
+        default=None,
+        null=True,
+        blank=True
+    )
     # Поля для денормализации данных с целью ускорения поиска
     obj_type = models.ForeignKey(ObjType, blank=True, null=True, on_delete=models.CASCADE, default=None)
     obj_state = models.PositiveSmallIntegerField(default=2)
