@@ -6,7 +6,6 @@ import os
 import json
 import logging
 
-logging.basicConfig(level='INFO')
 logger = logging.getLogger(__name__)
 
 
