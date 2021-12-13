@@ -388,3 +388,11 @@ SSL_CERT_FILE = ''
 
 CSRF_COOKIE_SAMESITE = None
 CSRF_COOKIE_SECURE = True
+
+
+# Вкл/выкл валидации цифровой подписи на сервере
+VALIDATE_DS = True
+# Не проводить валидацию для этих номеров сертификатов
+VALIDATE_DS_WHITE_LIST_CERTS = [
+    # '2B6C7DF9A3891DA104000000C7D693000A26BE03',
+]

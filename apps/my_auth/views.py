@@ -5,11 +5,13 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from apps.my_auth.forms import AuthFormDS, AuthFormSimple
 from apps.my_auth.models import CertificateOwner, KeyCenter
-from EUSignCP import *
-from .utils import get_signed_data_info
-import random, string
+from .utils import get_certificate
+import random
+import string
+
 
 def logout_view(request):
     """Логаут пользователя."""
@@ -47,34 +49,9 @@ def login_view(request):
 def login_ds(request):
     """Обработчик запроса на авторизацию по ЭЦП."""
     # Проверка валидности ЭЦП
-    sign_info = get_signed_data_info(request.POST['signed_data'],
-                                     request.session['secret'],
-                                     request.POST['key_center_title'])
-    if sign_info:
-        try:
-            cert = CertificateOwner.objects.get(pszSerial=sign_info['pszSerial'])
-        except CertificateOwner.DoesNotExist:
-            # Запись данных ключа в БД
-            cert = CertificateOwner(
-                pszIssuer=sign_info.get('pszIssuer'),
-                pszIssuerCN=sign_info.get('pszIssuerCN'),
-                pszSerial=sign_info.get('pszSerial'),
-                pszSubject=sign_info.get('pszSubject'),
-                pszSubjCN=sign_info.get('pszSubjCN'),
-                pszSubjOrg=sign_info.get('pszSubjOrg'),
-                pszSubjOrgUnit=sign_info.get('pszSubjOrgUnit'),
-                pszSubjTitle=sign_info.get('pszSubjTitle'),
-                pszSubjState=sign_info.get('pszSubjState'),
-                pszSubjFullName=sign_info.get('pszSubjFullName'),
-                pszSubjAddress=sign_info.get('pszSubjAddress'),
-                pszSubjPhone=sign_info.get('pszSubjPhone'),
-                pszSubjEMail=sign_info.get('pszSubjEMail'),
-                pszSubjDNS=sign_info.get('pszSubjDNS'),
-                pszSubjEDRPOUCode=sign_info.get('pszSubjEDRPOUCode'),
-                pszSubjDRFOCode=sign_info.get('pszSubjDRFOCode'),
-                pszSubjLocality=sign_info.get('pszSubjLocality'),
-            )
-            cert.save()
+    cert = get_certificate(request.POST, request.session['secret'])
+
+    if cert:
         user = authenticate(certificate=cert)
         if user is not None:
             login(request, user)
