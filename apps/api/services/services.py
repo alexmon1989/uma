@@ -57,6 +57,7 @@ def app_get_claim_from_es(app_number: str) -> dict:
     ).execute()
     if claim:
         return claim[0].to_dict()
+    return {}
 
 
 def app_get_payments(app_data: dict) -> Optional[Union[dict, List]]:
@@ -71,10 +72,11 @@ def app_get_payments(app_data: dict) -> Optional[Union[dict, List]]:
         # Если это охранный документ, то необходимо объеденить с платежами по заявке
         if app_data['search_data']['obj_state'] == 2:
             claim = app_get_claim_from_es(app_data['search_data']['app_number'])
-            if claim.get('DOCFLOW', {}).get('PAYMENTS'):
-                res['payments'].extend(claim['DOCFLOW']['PAYMENTS'])
-            if claim.get('DOCFLOW', {}).get('COLLECTIONS'):
-                res['collections'].extend(claim['DOCFLOW']['COLLECTIONS'])
+            if claim:
+                if claim.get('DOCFLOW', {}).get('PAYMENTS'):
+                    res['payments'].extend(claim['DOCFLOW']['PAYMENTS'])
+                if claim.get('DOCFLOW', {}).get('COLLECTIONS'):
+                    res['collections'].extend(claim['DOCFLOW']['COLLECTIONS'])
 
         return res
 
@@ -100,7 +102,7 @@ def app_get_documents(app_data: dict) -> Optional[Union[dict, List]]:
         # Если это охранный документ, то необходимо объеденить с документами по заявке
         if app_data['search_data']['obj_state'] == 2:
             claim = app_get_claim_from_es(app_data['search_data']['app_number'])
-            if claim.get('DOCFLOW', {}).get('DOCUMENTS'):
+            if claim and claim.get('DOCFLOW', {}).get('DOCUMENTS'):
                 res.extend(claim['DOCFLOW']['DOCUMENTS'])
 
         if res:
