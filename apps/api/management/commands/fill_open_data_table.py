@@ -32,6 +32,11 @@ class Command(BaseCommand):
             type=int,
             help='List of object type ids, space-separated'
         )
+        parser.add_argument(
+            '--verbose',
+            type=bool,
+            help='Show progress'
+        )
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
@@ -40,14 +45,15 @@ class Command(BaseCommand):
         # Объекты для добавления в API
         apps = services.app_get_api_list(options)
 
-        c = len(apps)
-        i = 0
+        if options['verbose']:
+            c = len(apps)
+            i = 0
 
         # Добавление/обновление данных
         for d in apps:
-
-            i += 1
-            print(f"{i}/{c} - {d[0]}")
+            if options['verbose']:
+                i += 1
+                self.stdout.write(self.style.SUCCESS(f"{i}/{c} - {d[0]}"))
 
             app_date = None
             app = IpcAppList.objects.get(id=d[0])
