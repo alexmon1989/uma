@@ -4,7 +4,6 @@ from django.utils.timezone import make_aware
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
-from apps.bulletin.models import EBulletinData
 import apps.api.services as services
 from ...models import OpenData
 from datetime import datetime

@@ -107,6 +107,9 @@ def app_get_documents(app_data: dict) -> Optional[Union[dict, List]]:
             if claim and claim.get('DOCFLOW', {}).get('DOCUMENTS'):
                 res.extend(claim['DOCFLOW']['DOCUMENTS'])
 
+        # Не включать документы без номера и даты
+        res = list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER') or x['DOCRECORD'].get('DOCSENDINGDATE'), res))
+
         if res:
             return res
         else:
@@ -135,8 +138,14 @@ def app_get_documents(app_data: dict) -> Optional[Union[dict, List]]:
 
 def app_get_biblio_data(app_data: dict) -> Optional[dict]:
     """Возвращает библиографические данные заявки."""
+    # Библ. данные заявок без установленной даты подачи на изобретения не публикуются
+    if app_data['Document']['idObjType'] == 1 \
+            and app_data['search_data']['obj_state'] == 1 \
+            and not app_data['Claim'].get('I_43.D'):
+        data_biblio = None
+
     # Библ. данные заявок на полезные модели и топографии не публикуются
-    if app_data['Document']['idObjType'] in (1, 3) and app_data['search_data']['obj_state'] == 1:
+    elif app_data['Document']['idObjType'] in (2, 3) and app_data['search_data']['obj_state'] == 1:
         data_biblio = None
 
     # Библ. данные по изобретениям, полезным можелям, топографиям
