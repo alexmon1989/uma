@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 13:58+0200\n"
+"POT-Creation-Date: 2021-12-14 14:52+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -654,7 +654,7 @@ msgstr "Clear all"
 msgid "Відображати на сторінці"
 msgstr "Display on page"
 
-#: apps/favorites/templates/favorites/index/_partials/results.html:68
+#: apps/favorites/templates/favorites/index/_partials/results.html:71
 msgid "Результати відсутні"
 msgstr "No results"
 
@@ -986,7 +986,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:659
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
-#: apps/search/utils.py:1315
+#: apps/search/utils.py:1321
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -1014,14 +1014,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1351
+#: apps/search/utils.py:1379
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1351
+#: apps/search/utils.py:1379
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -1038,7 +1038,6 @@ msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
 #: apps/search/templates/search/_partials/show_search_conditions_btn.html:10
-#| msgid "Показати умови пошуку"
 msgid "Сховати умови пошуку"
 msgstr "Hide search conditions"
 
@@ -1173,7 +1172,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1316
+#: apps/search/utils.py:1322
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1216,7 +1215,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1326
+#: apps/search/utils.py:1332
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1259,7 +1258,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1324
+#: apps/search/utils.py:1330
 msgid "МПК"
 msgstr "IPC"
 
@@ -1348,13 +1347,13 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:20
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:17
-msgid "Свідоцтво на використання кваліфікованого зазначення походження товару"
-msgstr "Certificate of using of a qualified indication of origin of goods"
+msgid "Свідоцтво на використання географічного зазначення"
+msgstr "Certificate of using of a geographical indications"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:22
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:19
-msgid "Свідоцтво на кваліфіковане зазначення походження товару"
-msgstr "Certificate of qualified indication of origin of goods"
+msgid "Свідоцтво на географічне зазначення"
+msgstr "Certificate of geographical indication"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:33
 msgid "Назва товару"
@@ -1371,7 +1370,7 @@ msgid "Некоректні умови пошуку!"
 msgstr "Wrong search params!"
 
 #: apps/search/templates/search/advanced/_partials/results.html:79
-#: apps/search/templates/search/simple/_partials/results.html:78
+#: apps/search/templates/search/simple/_partials/results.html:81
 #: apps/search/templates/search/transactions/_partials/results.html:61
 msgid "За вашими умовами пошуку не знайдено жодного об'єкта."
 msgstr "No results"
@@ -1459,7 +1458,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1325
+#: apps/search/utils.py:1331
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1956,7 +1955,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1321
+#: apps/search/utils.py:1327
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2268,43 +2267,43 @@ msgstr "Waiting for documents on the payment of the fees"
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/utils.py:1313
+#: apps/search/utils.py:1319
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1314
+#: apps/search/utils.py:1320
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1317
+#: apps/search/utils.py:1323
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1318
+#: apps/search/utils.py:1324
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1319
+#: apps/search/utils.py:1325
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1320
+#: apps/search/utils.py:1326
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1322
+#: apps/search/utils.py:1328
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1323
+#: apps/search/utils.py:1329
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1327
+#: apps/search/utils.py:1333
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1328
+#: apps/search/utils.py:1334
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2374,6 +2373,9 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Свідоцтво на кваліфіковане зазначення походження товару"
+#~ msgstr "Certificate of qualified indication of origin of goods"
 
 #~ msgid "Адміністратор бази даних"
 #~ msgstr "Database administrator"
