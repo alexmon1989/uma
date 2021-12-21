@@ -16,7 +16,7 @@ def set_key_center_settings(eu_interface, key_center):
         'szPath': settings.EUSIGN_FILESTORE_PATH,
         'bCheckCRLs': True,
         'bAutoRefresh': True,
-        'bOwnCRLsOnly': False,
+        'bOwnCRLsOnly': True,
         'bFullAndDeltaCRLs': True,
         'bAutoDownloadCRLs': True,
         'bSaveLoadedCerts': True,
@@ -110,6 +110,7 @@ def get_signed_data_info(signed_data, secret, key_center_title):
         # Верификация и получение данных из подписанных данных
         pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), sign_info)
     except Exception as e:
+        print(e)
         logger.error(e)
 
     # Выгрузка бибилиотек ІІТ
