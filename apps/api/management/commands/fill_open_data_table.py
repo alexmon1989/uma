@@ -4,7 +4,7 @@ from django.utils.timezone import make_aware
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
-import apps.api.services as services
+import apps.api.services as api_services
 from ...models import OpenData
 from datetime import datetime
 import json
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Объекты для добавления в API
-        apps = services.app_get_api_list(options)
+        apps = api_services.app_get_api_list(options)
 
         if options['verbose']:
             c = len(apps)
@@ -72,9 +72,9 @@ class Command(BaseCommand):
                 data = data[0].to_dict()
 
                 # Данные заявки из ES (обработанные)
-                biblio_data = services.app_get_biblio_data(data)
-                data_docs = services.app_get_documents(data)
-                data_payments = services.app_get_payments(data)
+                biblio_data = api_services.app_get_biblio_data(data)
+                data_docs = api_services.app_get_documents(data)
+                data_payments = api_services.app_get_payments(data)
 
                 if data['Document']['idObjType'] == 4 and data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
                     app_date = make_aware(

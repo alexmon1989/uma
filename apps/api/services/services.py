@@ -3,6 +3,7 @@ from django.conf import settings
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList
+import apps.search.services as search_services
 from apps.api.models import OpenData
 from apps.bulletin.models import EBulletinData
 from typing import List, Optional, Union
@@ -169,10 +170,12 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
             else:
                 # Если это заявка
                 if app_data['search_data']['obj_state'] == 1:
+                    mark_status = search_services.application_get_tm_fixed_mark_status_code(app_data)
                     # и её дата подачи после 18.07.2020, то публиковать её нельзя
                     app_date = app_data['TradeMark']['TrademarkDetails'].get('ApplicationDate')
                     if not app_date \
-                            or datetime.strptime(app_date[:10], '%Y-%m-%d') > datetime.strptime('2020-07-17', '%Y-%m-%d'):
+                            or datetime.strptime(app_date[:10], '%Y-%m-%d') > datetime.strptime('2020-07-17', '%Y-%m-%d') \
+                            or mark_status < 2000:
                         can_be_published = False
 
         if can_be_published:
@@ -217,5 +220,13 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
 
     if app_data['search_data']['obj_state'] == 2 and data_biblio:
         data_biblio['registration_status_color'] = app_data['search_data']['registration_status_color']
+
+    # Стадии заявки
+    stages = search_services.application_get_stages_statuses(app_data)
+    if stages:
+        if data_biblio:
+            data_biblio['stages'] = stages
+        else:
+            data_biblio = {'stages': stages}
 
     return data_biblio
