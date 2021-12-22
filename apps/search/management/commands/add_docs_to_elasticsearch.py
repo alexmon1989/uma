@@ -413,6 +413,17 @@ class Command(BaseCommand):
                 except:
                     pass
 
+            # fix TradeMark.Transactions.Transaction.TransactionBody.PublicationDetails.Publication.PublicationDate
+            if res['TradeMark'].get('Transactions', {}).get('Transaction'):
+                for transaction in res['TradeMark']['Transactions']['Transaction']:
+                    try:
+                        d = transaction['TransactionBody']['PublicationDetails']['Publication'][
+                            'PublicationDate']
+                        transaction['TransactionBody']['PublicationDetails']['Publication'][
+                            'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
+                    except:
+                        pass
+
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
 
@@ -524,6 +535,16 @@ class Command(BaseCommand):
                             del item['PriorityDate']
             except AttributeError:
                 pass
+
+            # fix Design.Transactions.Transaction.TransactionBody.PublicationDetails.Publication.PublicationDate
+            if res['Design'].get('Transactions', {}).get('Transaction'):
+                for transaction in res['Design']['Transactions']['Transaction']:
+                    try:
+                        d = transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate']
+                        transaction['TransactionBody']['PublicationDetails']['Publication'][
+                            'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
+                    except:
+                        pass
 
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['Design'].get('DocFlow', {}).get('Documents', []))
