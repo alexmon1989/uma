@@ -191,7 +191,8 @@ def filter_bad_documents(documents):
         return list(filter(lambda x: (x['DOCRECORD'].get('DOCREGNUMBER')
                                      or x['DOCRECORD'].get('DOCBARCODE')
                                      or x['DOCRECORD'].get('DOCSENDINGDATE'))
-                                     and 'службова' not in x['DOCRECORD'].get('DOCTYPE', '').lower(), documents))
+                                     and 'службова' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
+                                     and not x['DOCRECORD'].get('DOCREGNUMBER', '').lower().startswith('вн'), documents))
 
 
 @register.simple_tag
@@ -544,9 +545,10 @@ def filter_tm_id_docs_direction(documents, direction):
 
 @register.filter
 def filter_tm_id_bad_docs(documents):
-    """Исключает из списка документы типа "Службова записка"."""
+    """Исключает из списка документы типа "Службова записка" и документы, номер которых начинается с "Вн"."""
     if documents:
-        return list(filter(lambda x: 'службова' not in x.get('DocRecord', {}).get('DocType', '').lower(), documents))
+        return list(filter(lambda x: 'службова' not in x.get('DocRecord', {}).get('DocType', '').lower()
+                            and not x.get('DocRecord', {}).get('DocRegNumber', '').lower().startswith('вн'), documents))
     return list()
 
 
