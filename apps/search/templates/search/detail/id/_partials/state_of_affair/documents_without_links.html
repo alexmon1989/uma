@@ -29,7 +29,7 @@
                             </thead>
 
                             <tbody>
-                            {% for doc in hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction %}
+                            {% for doc in hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction|filter_tm_id_bad_docs %}
                                 <tr>
                                     <th scope="row">{{ forloop.counter }}</th>
                                     <td class="text-center">

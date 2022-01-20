@@ -34,7 +34,7 @@
                                 </thead>
 
                                 <tbody>
-                                {% for doc in hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction %}
+                                {% for doc in hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction|filter_tm_id_bad_docs %}
                                     <tr>
                                         <td>
                                             {% if doc.DocRecord.DocIdDocCEAD %}
@@ -68,7 +68,7 @@
                                 {% endfor %}
                                 <tr>
                                     <td colspan="7" class="g-bg-white">
-                                        {% if hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction|length > 0 %}
+                                        {% if hit.Design.DocFlow.Documents|filter_tm_id_docs_direction:direction|filter_tm_id_bad_docs|length > 0 %}
                                             <button class="btn btn-primary"
                                                     type="submit"><i
                                                     class="fa fa-download"></i>&nbsp;{% trans "Завантажити обрані" %}
