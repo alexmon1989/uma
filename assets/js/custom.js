@@ -352,7 +352,8 @@ $(function () {
                             .find('i').first()
                             .removeClass('fa-spinner')
                             .addClass('fa-download');
-                    });
+                    },
+                    60);
             });
         } else {
             toastr.error(gettext('Не було обрано жодного документу.'));
