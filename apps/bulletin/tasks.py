@@ -29,7 +29,9 @@ def get_app_details(app_number):
         ],
         minimum_should_match=1
     )
-    s = Search().using(client).query(q).execute()
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
