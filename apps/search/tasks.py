@@ -413,7 +413,7 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
             s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
             if s:
                 app_hit = s[0].to_dict()
-                for doc in app_hit['DOCFLOW']['DOCUMENTS']:
+                for doc in app_hit.get('DOCFLOW', {}).get('DOCUMENTS', []):
                     if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
                         hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
 
