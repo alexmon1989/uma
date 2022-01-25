@@ -9,8 +9,9 @@ from apps.search.models import IpcAppList, IndexationError, IndexationProcess
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 from ...utils import get_registration_status_color, filter_bad_apps
 import json
-import os.path
+import os
 import datetime
+import uuid
 
 
 class Command(BaseCommand):
@@ -47,8 +48,7 @@ class Command(BaseCommand):
             help='Ignores elasticindexed=1'
         )
 
-    def get_json_path(self, doc):
-        """Получает путь к файлу JSON с данными объекта."""
+    def get_doc_files_path(self, doc):
         # Путь к файлам объекта
         doc_files_path = doc['files_path'].replace(
             '\\\\bear\\share\\',
@@ -57,6 +57,13 @@ class Command(BaseCommand):
             'e:\\poznach_test_sis\\bear_tmpp_sis\\',
             settings.DOCUMENTS_MOUNT_FOLDER
         ).replace('\\', '/')
+
+        return doc_files_path
+
+    def get_json_path(self, doc):
+        """Получает путь к файлу JSON с данными объекта."""
+        # Путь к файлам объекта
+        doc_files_path = self.get_doc_files_path(doc)
 
         # Если путь к файлу указан сразу (случай с авторским правом)
         if '.json' in doc_files_path:
@@ -427,6 +434,9 @@ class Command(BaseCommand):
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
 
+            # Переименование изображения
+            self.rename_image_tm(doc, res)
+
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
@@ -793,6 +803,34 @@ class Command(BaseCommand):
         for res in results:
             ids.append(res.meta.id)
         IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
+
+    def rename_image_tm(self, doc, data):
+        """Переименовывает изображение ТМ."""
+        try:
+            mark_image = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
+            app_number = data['TradeMark']['TrademarkDetails']['ApplicationNumber']
+        except KeyError:
+            pass
+        else:
+            doc_files_path = self.get_doc_files_path(doc)
+            old_file = os.path.join(doc_files_path, mark_image['MarkImageFilename'])
+
+            # Проверка было ли изображение уже переименовано
+            if os.path.exists(old_file):  # не переименовано - первоначальный файл найден на диске
+                new_file_name = mark_image['MarkImageFilename'].replace(app_number, str(uuid.uuid4()))
+
+                # Переименование файла на диске
+                new_file = os.path.join(doc_files_path, new_file_name)
+                os.rename(old_file, new_file)
+
+                mark_image['MarkImageFilename'] = new_file_name
+            else:
+                ext = old_file.split('.')[1]
+                for file in os.listdir(doc_files_path):
+                    if file.endswith(ext):
+                        mark_image['MarkImageFilename'] = file
+                        break
+
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
