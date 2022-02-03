@@ -16,6 +16,7 @@ from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow
                     filter_app_data, filter_bad_apps)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
+import apps.search.services as search_services
 import os
 import json
 import time
@@ -195,6 +196,10 @@ def get_app_details(id_app_number, user_id):
 
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
+
+    # Сортировка оповещений
+    if hit['search_data']['obj_state'] == 2:
+        search_services.application_sort_transactions(hit)
 
     hit['meta'] = {'id': id_app_number}
 

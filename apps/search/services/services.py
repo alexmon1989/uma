@@ -1,5 +1,6 @@
 from django.utils.translation import gettext as _
 from typing import List, Optional
+import time
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -320,3 +321,46 @@ def application_get_id_stages_statuses(app_data: dict) -> List:
     ]
 
     return stages
+
+
+def application_sort_transactions(app_data: dict) -> None:
+    """Сортирует оповещения заявки."""
+    # Изобретения, полезные модели, топографии
+    if app_data['Document']['idObjType'] in (1, 2, 3):
+        transactions = app_data['transactions']
+        transactions.sort(
+            key=lambda item: time.strptime(item.get('BULLETIN_DATE', '1970-01-01'), "%Y-%m-%d")
+        )
+
+    # Торговые марки
+    elif app_data['Document']['idObjType'] == 4:
+        try:
+            transactions = app_data['TradeMark']['Transactions']['Transaction']
+        except KeyError:
+            pass
+        else:
+            transactions.sort(
+                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+            )
+
+    # Геогр. зазначення
+    elif app_data['Document']['idObjType'] == 5:
+        try:
+            transactions = app_data['Geo']['Transactions']['Transaction']
+        except KeyError:
+            pass
+        else:
+            transactions.sort(
+                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+            )
+
+    # Пром. образцы
+    elif app_data['Document']['idObjType'] == 6:
+        try:
+            transactions = app_data['Design']['Transactions']['Transaction']
+        except KeyError:
+            pass
+        else:
+            transactions.sort(
+                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+            )
