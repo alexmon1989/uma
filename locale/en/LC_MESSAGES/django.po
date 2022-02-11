@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-24 14:49+0200\n"
+"POT-Creation-Date: 2022-02-11 14:17+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1033,54 +1033,54 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/services/services.py:70
-#: apps/search/templatetags/search_extras.py:443
+#: apps/search/services/services.py:71
+#: apps/search/templatetags/search_extras.py:445
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/services/services.py:76 apps/search/services/services.py:222
-#: apps/search/services/services.py:307
-#: apps/search/templatetags/search_extras.py:290
-#: apps/search/templatetags/search_extras.py:368
-#: apps/search/templatetags/search_extras.py:449
+#: apps/search/services/services.py:77 apps/search/services/services.py:221
+#: apps/search/services/services.py:306
+#: apps/search/templatetags/search_extras.py:292
+#: apps/search/templatetags/search_extras.py:370
+#: apps/search/templatetags/search_extras.py:451
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/services/services.py:82
-#: apps/search/templatetags/search_extras.py:455
+#: apps/search/services/services.py:83
+#: apps/search/templatetags/search_extras.py:457
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/services/services.py:88 apps/search/services/services.py:226
-#: apps/search/templatetags/search_extras.py:294
-#: apps/search/templatetags/search_extras.py:461
+#: apps/search/services/services.py:89 apps/search/services/services.py:225
+#: apps/search/templatetags/search_extras.py:296
+#: apps/search/templatetags/search_extras.py:463
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/services/services.py:93
-#: apps/search/templatetags/search_extras.py:466
+#: apps/search/services/services.py:94
+#: apps/search/templatetags/search_extras.py:468
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/services/services.py:99 apps/search/services/services.py:230
-#: apps/search/templatetags/search_extras.py:298
-#: apps/search/templatetags/search_extras.py:472
+#: apps/search/services/services.py:100 apps/search/services/services.py:229
+#: apps/search/templatetags/search_extras.py:300
+#: apps/search/templatetags/search_extras.py:474
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/services/services.py:105 apps/search/services/services.py:234
-#: apps/search/services/services.py:315
-#: apps/search/templatetags/search_extras.py:302
-#: apps/search/templatetags/search_extras.py:376
-#: apps/search/templatetags/search_extras.py:478
+#: apps/search/services/services.py:106 apps/search/services/services.py:233
+#: apps/search/services/services.py:314
+#: apps/search/templatetags/search_extras.py:304
+#: apps/search/templatetags/search_extras.py:378
+#: apps/search/templatetags/search_extras.py:480
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/services/services.py:112 apps/search/services/services.py:238
-#: apps/search/services/services.py:319
-#: apps/search/templatetags/search_extras.py:306
-#: apps/search/templatetags/search_extras.py:380
-#: apps/search/templatetags/search_extras.py:485
+#: apps/search/services/services.py:113 apps/search/services/services.py:237
+#: apps/search/services/services.py:318
+#: apps/search/templatetags/search_extras.py:308
+#: apps/search/templatetags/search_extras.py:382
+#: apps/search/templatetags/search_extras.py:487
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1088,22 +1088,22 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/services/services.py:218
-#: apps/search/templatetags/search_extras.py:286
+#: apps/search/services/services.py:217
+#: apps/search/templatetags/search_extras.py:288
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/services/services.py:303
-#: apps/search/templatetags/search_extras.py:364
+#: apps/search/services/services.py:302
+#: apps/search/templatetags/search_extras.py:366
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/services/services.py:311
-#: apps/search/templatetags/search_extras.py:372
+#: apps/search/services/services.py:310
+#: apps/search/templatetags/search_extras.py:374
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/tasks.py:43 apps/search/tasks.py:220 apps/search/tasks.py:280
+#: apps/search/tasks.py:44 apps/search/tasks.py:225 apps/search/tasks.py:285
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -1720,8 +1720,8 @@ msgstr "There are no documents"
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/payments.html:10
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/payments.html:10
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/payments.html:11
-msgid "Платежі"
-msgstr "Payments"
+msgid "Платежі (зараховані)"
+msgstr "Payments (credited)"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/payments.html:18
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/payments.html:19
@@ -1742,8 +1742,8 @@ msgstr "Payment title"
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/payments.html:48
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/payments.html:48
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/payments.html:45
-msgid "Платежі відсутні"
-msgstr "There are no payments"
+msgid "Зараховані платежі відсутні"
+msgstr "There are no credited payments"
 
 #: apps/search/templates/search/detail/id/_partials/transactions.html:13
 #: apps/search/templates/search/detail/id/_partials/transactions.html:31
@@ -2391,6 +2391,9 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Платежі"
+#~ msgstr "Payments"
 
 #~ msgid "Свідоцтво на кваліфіковане зазначення походження товару"
 #~ msgstr "Certificate of qualified indication of origin of goods"

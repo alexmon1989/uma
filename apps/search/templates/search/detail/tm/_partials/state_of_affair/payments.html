@@ -8,7 +8,7 @@
         <div class="card g-brd-darkpurple rounded-0">
             <h3 class="card-header g-bg-darkpurple g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
                 <i class="fa fa-list g-mr-5"></i>
-                {% trans "Платежі" %}
+                {% trans "Платежі (зараховані)" %}
             </h3>
 
             <div class="table-responsive">
@@ -42,7 +42,7 @@
                     {% if hit.TradeMark.PaymentDetails.Payment|length == 0 %}
                     <tr>
                         <td colspan="5" class="g-bg-white">
-                            {% trans "Платежі відсутні" %}
+                            {% trans "Зараховані платежі відсутні" %}
                         </td>
                     </tr>
                     {% endif %}
