@@ -545,10 +545,17 @@ def filter_tm_id_docs_direction(documents, direction):
 
 @register.filter
 def filter_tm_id_bad_docs(documents):
-    """Исключает из списка документы типа "Службова записка" и документы, номер которых начинается с "Вн"."""
+    """Исключает из списка документы типа "Службова записка",
+    документы, номер которых начинается с "Вн", "Бібліографічні дані"."""
     if documents:
-        return list(filter(lambda x: 'службова' not in x.get('DocRecord', {}).get('DocType', '').lower()
-                            and not x.get('DocRecord', {}).get('DocRegNumber', '').lower().startswith('вн'), documents))
+        res = list()
+        for doc in documents:
+            doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
+            if 'службова' not in doc_type \
+                    and 'бібліографічні дані заявки на знак для товарів і послуг' not in doc_type \
+                    and not doc.get('DocRecord', {}).get('DocRegNumber', '').lower().startswith('вн'):
+                res.append(doc)
+        return res
     return list()
 
 
