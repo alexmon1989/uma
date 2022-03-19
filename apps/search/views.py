@@ -4,7 +4,6 @@ from django.views.generic.base import RedirectView
 from django.db.models import F, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
-from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -22,6 +21,7 @@ from .utils import (get_client_ip, paginate_results, get_ipc_codes_with_schedule
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
+import six
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
