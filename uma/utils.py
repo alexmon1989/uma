@@ -1,13 +1,17 @@
-import collections
 import six
 import datetime
 from django.contrib.auth.models import User, AnonymousUser
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 def iterable(arg):
     """Возвращает признак того, является ли объект итерируемым."""
     return (
-            isinstance(arg, collections.Iterable)
+            isinstance(arg, Iterable)
             and not isinstance(arg, six.string_types)
     )
 
