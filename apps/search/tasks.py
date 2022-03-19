@@ -454,43 +454,31 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
         order = get_completed_order(order.id)
 
         if order:
-            # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
-            if order.orderdocument_set.count() == 1:
-                doc = order.orderdocument_set.first()
-                # Путь к файлу
-                file_path = os.path.join(
-                    settings.MEDIA_URL,
-                    'OrderService',
-                    str(order.user_id),
-                    str(order.id),
-                    doc.file_name
-                )
-                return file_path
-            else:
-                file_path_zip = os.path.join(
-                    settings.ORDERS_ROOT,
-                    str(order.user_id),
-                    str(order.id),
-                    'docs.zip'
-                )
-                with ZipFile(file_path_zip, 'w') as zip_:
-                    for document in order.orderdocument_set.all():
-                        zip_.write(
-                            os.path.join(
-                                settings.DOCUMENTS_MOUNT_FOLDER,
-                                'OrderService',
-                                str(order.user_id),
-                                str(order.id),
-                                document.file_name),
-                            f"{document.file_name}"
-                        )
-                return os.path.join(
-                    settings.MEDIA_URL,
-                    'OrderService',
-                    str(order.user_id),
-                    str(order.id),
-                    'docs.zip'
-                )
+            file_zip_name = f"docs_{order.id}.zip"
+            file_path_zip = os.path.join(
+                settings.ORDERS_ROOT,
+                str(order.user_id),
+                str(order.id),
+                file_zip_name
+            )
+            with ZipFile(file_path_zip, 'w') as zip_:
+                for document in order.orderdocument_set.all():
+                    zip_.write(
+                        os.path.join(
+                            settings.DOCUMENTS_MOUNT_FOLDER,
+                            'OrderService',
+                            str(order.user_id),
+                            str(order.id),
+                            document.file_name),
+                        f"{document.file_name}"
+                    )
+            return os.path.join(
+                settings.MEDIA_URL,
+                'OrderService',
+                str(order.user_id),
+                str(order.id),
+                file_zip_name
+            )
 
     return False
 
