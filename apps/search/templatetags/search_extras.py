@@ -192,6 +192,7 @@ def filter_bad_documents(documents):
                                      or x['DOCRECORD'].get('DOCBARCODE')
                                      or x['DOCRECORD'].get('DOCSENDINGDATE'))
                                      and 'службова' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
+                                     and 'звіт про інформаційний пошук' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
                                      and not x['DOCRECORD'].get('DOCREGNUMBER', '').lower().startswith('вн'), documents))
 
 
