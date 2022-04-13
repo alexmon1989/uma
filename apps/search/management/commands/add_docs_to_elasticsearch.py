@@ -391,6 +391,10 @@ class Command(BaseCommand):
 
             if res['TradeMark']['TrademarkDetails'].get('stages'):
                 res['TradeMark']['TrademarkDetails']['stages'] = res['TradeMark']['TrademarkDetails']['stages'][::-1]
+                # Если есть охранный документ, то все стадии д.б. done
+                if 'RegistrationNumber' in res['TradeMark']['TrademarkDetails']:
+                    for stage in res['TradeMark']['TrademarkDetails']['stages']:
+                        stage['status'] = 'done'
 
             # Fix новых данных
             if res['TradeMark']['TrademarkDetails'].get(
@@ -543,6 +547,10 @@ class Command(BaseCommand):
 
             if res['Design']['DesignDetails'].get('stages'):
                 res['Design']['DesignDetails']['stages'] = res['Design']['DesignDetails']['stages'][::-1]
+                # Если есть охранный документ, то все стадии д.б. done
+                if 'RegistrationNumber' in res['Design']['DesignDetails']:
+                    for stage in res['Design']['DesignDetails']['stages']:
+                        stage['status'] = 'done'
 
             # fix priority date
             try:
