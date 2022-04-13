@@ -420,9 +420,16 @@ class Command(BaseCommand):
                 except:
                     pass
 
-            # fix TradeMark.Transactions.Transaction.TransactionBody.PublicationDetails.Publication.PublicationDate
+            # fix оповещений
             if res['TradeMark'].get('Transactions', {}).get('Transaction'):
+                # Удаление чужих оповещений
+                res['TradeMark']['Transactions']['Transaction'] = list(filter(
+                    lambda x: x.get('@registrationNumber') == res['TradeMark']['TrademarkDetails']['RegistrationNumber'],
+                    res['TradeMark']['Transactions']['Transaction']
+                ))
+
                 for transaction in res['TradeMark']['Transactions']['Transaction']:
+                    # fix дат
                     try:
                         d = transaction['TransactionBody']['PublicationDetails']['Publication'][
                             'PublicationDate']
@@ -546,8 +553,15 @@ class Command(BaseCommand):
             except AttributeError:
                 pass
 
-            # fix Design.Transactions.Transaction.TransactionBody.PublicationDetails.Publication.PublicationDate
+            # fix оповещений
             if res['Design'].get('Transactions', {}).get('Transaction'):
+                # Удаление чужих оповещений
+                res['Design']['Transactions']['Transaction'] = list(filter(
+                    lambda x: x.get('@registrationNumber') == res['Design']['DesignDetails']['RegistrationNumber'],
+                    res['Design']['Transactions']['Transaction']
+                ))
+
+                # fix дат
                 for transaction in res['Design']['Transactions']['Transaction']:
                     try:
                         d = transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate']
