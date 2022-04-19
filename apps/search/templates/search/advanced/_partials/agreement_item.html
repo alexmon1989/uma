@@ -1,0 +1,93 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+    <div class="d-flex justify-content-between card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        <div>
+            {{ item_num }}.
+            <a href="{% url 'search:detail' pk=hit.meta.id %}"
+               class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
+            >{{ hit.Decision.DecisionDetails.Name }}</a>
+        </div>
+
+        {% include 'search/advanced/_partials/favorites_icon.html' %}
+    </div>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% if hit.Document.idObjType == 11 %}
+                {% trans 'Договір про передачу права на використання твору' %}
+            {% else %}
+                {% trans 'Договір про передачу (відчуження) майнових прав на твір' %}
+            {% endif %}
+        </div>
+
+        {% if hit.search_data.obj_state == 2 %}
+            {% registration_status hit=hit %}
+        {% endif %}
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+
+        {% if hit.search_data.obj_state == 2 %}
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Договір' %}:</h4>
+                <a href="#!"
+                   class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                   data-toggle="tooltip"
+                   data-placement="top"
+                   title="{% trans 'Номер реєстрації договору' %}"
+                >{{ hit.search_data.protective_doc_number }}</a><br>
+                <a href="#!"
+                   class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+                   data-toggle="tooltip"
+                   data-placement="bottom"
+                   title="{% trans 'Дата реєстрації договору' %}"
+                >{{ hit.search_data.rights_date|parse_date|date:"d.m.Y" }}</a>
+            </div>
+
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Об'єкт авторського права" %}:</h4>
+                {% for obj in hit.Decision.DecisionDetails.CopyrightObjectKindDetails.CopyrightObjectKind %}
+                    {{ obj.CopyrightObjectKindName }}{% if not forloop.last %};{% endif %}
+                {% endfor %}
+            </div>
+
+            {% if hit.Decision.DecisionDetails.AuthorDetails.Author %}
+                <div class="col-md">
+                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Автор(и)" %}:</h4>
+                    {% for author in hit.Decision.DecisionDetails.AuthorDetails.Author %}
+                        {% if forloop.counter <= 2 %}
+                            {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                        {% elif forloop.counter == 3 %}
+                            <a href="#!"
+                               data-toggle="popover"
+                               data-title="{% trans "Повний список авторів" %}"
+                               data-html="true"
+                               data-trigger="focus"
+                               data-content="
+                                       {% for author_ in hit.Decision.DecisionDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author_.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                            >(+{{ hit.Decision.DecisionDetails.AuthorDetails.Author|length|add:"-2" }})</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if hit.Decision.DecisionDetails.LicensorDetails and hit.Decision.DecisionDetails.LicenseeDetails %}
+                <div class="col-md">
+                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Сторони договору" %}:</h4>
+                    {% for item in hit.Decision.DecisionDetails.LicensorDetails.Licensor %}
+                        {{ item.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
+                    {% endfor %}
+                    &ndash;
+                    {% for item in hit.Decision.DecisionDetails.LicenseeDetails.Licensee %}
+                        {{ item.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% include 'search/advanced/_partials/item_details_link_block.html' %}
+</div>

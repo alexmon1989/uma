@@ -1,0 +1,92 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+
+<div id="biblio-data">
+    <div class="table-responsive">
+        <table class="table table-sm table-biblio g-font-size-13">
+            <tbody>
+                {% get_field '111' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_111 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ app_data.code_111 }}</td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '151' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_151 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ app_data.code_151 }}</td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '441' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_441 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ app_data.code_441 }}, {% trans 'бюл. №' %} {{ app_data.code_441_bul_number }}</td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '450' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_450 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ app_data.code_450 }}</td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '891' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_891 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ app_data.code_891 }}</td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '540' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.code_540 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                               href="javascript:;"
+                               data-src="{{ app_data.code_540 }}">
+                                <img class="img-fluid img-thumbnail"
+                                     src="{{ app_data.code_540 }}"
+                                     alt="">
+                                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                                <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                            </span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% get_field '511' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and app_data.BASICGS.GSGR %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% for cls in app_data.BASICGS.GSGR %}
+                                <div class="d-flex justify-content-start">
+                                    <div class="g-pr-6 text-nowrap">Кл. {{ cls|get:'@NICCLAI' }}{% if cls.GSTERMEN or cls.GSTERMFR %}:{% endif %}</div>
+                                    <div class="text-justify mktp-indexes">
+                                        <span class="more hidden">{{ cls.GSTERMFR }}</span>
+                                        <a href="#"
+                                           class="show-indexes g-font-size-12"
+                                           title="{% trans "Показати" %}"
+                                        ><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

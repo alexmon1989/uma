@@ -1,0 +1,241 @@
+{% load uma_extras %}
+
+{% if transaction_type.title == 'Зміна адреси для листування' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == 'Зміна імені (найменування) та (або) адреси чи особи володільця патенту' %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>(73) Ім'я або повне найменування та адреса власника патенту (деклараційного патенту)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.INID_73 }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Припинення чинності майнових прав інтелектуальної власності у зв'язку із закінченням строку дії" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Дата припинення дії патенту (деклараційного патенту)</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.DATEFACTSTOP|parse_date|date:"d.m.Y" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Припинення чинності майнових прав інтелектуальної власності у разі несплати річного збору" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Дата припинення дії патенту (деклараційного патенту)</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.DATEFACTSTOP|parse_date|date:"d.m.Y" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Заява володільця патенту про готовність надання будь-якій особі дозволу на використання" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Продовження строку чинності майнових прав" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Дата припинення дії патенту (деклараційного патенту) (заплан.)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.DATEPLANSTOP|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Видача ліцензії на використання" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Передача права власності" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% elif transaction_type.title == "Права на винахід визнані недійсними повністю в судовому порядку" %}
+    <table class="table table-bordered table-sm">
+        <thead>
+        <tr>
+            <th>(21) Номер заявки</th>
+            <th>(11) Номер патенту (деклараційного патенту)</th>
+            <th>Назва суду, номер та дата прийняття рішення</th>
+            <th>Дата, від якої патент (деклараційний патент) вважається таким, що не набрав чинності</th>
+            <th>Причина</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for transaction in transactions %}
+            {% json_to_dict transaction.json_data as transaction_data %}
+            <tr>
+                <td>
+                    <a href="{% url 'search:detail' pk=transaction.application.pk %}"
+                       target="_blank">{{ transaction.application.app_number }}</a>
+                </td>
+                <td>{{ transaction.application.registration_number }}</td>
+                <td>{{ transaction_data.COURTNAME }}, {{ transaction_data.COURTDOCNUMBER }}, {{ transaction_data.COURTDOCDATE|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ transaction_data.DATEFACTSTOP|parse_date|date:"d.m.Y" }}</td>
+                <td>{{ transaction_data.REASON }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    {% for transaction in transactions %}
+        {% json_to_dict transaction.json_data as transaction_data %}
+        <pre>{{ transaction_data|pprint }}</pre>
+    {% endfor %}
+{% endif %}

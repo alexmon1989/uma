@@ -3,6 +3,7 @@ from django.urls import translate_url
 from datetime import datetime
 import urllib.parse
 from apps.contacts.models import ContactsPage
+import json
 
 register = template.Library()
 
@@ -42,7 +43,7 @@ def get(mapping, key):
 @register.filter
 def parse_date(value):
     try:
-        return datetime.strptime(value, '%Y-%m-%d')
+        return datetime.strptime(value[:10], '%Y-%m-%d')
     except ValueError:
         return value
 
@@ -79,3 +80,8 @@ def highlight(text, q):
 def footer_contacts(context):
     contacts, created = ContactsPage.objects.get_or_create()
     return {'contacts': contacts, 'request': context['request']}
+
+
+@register.simple_tag
+def json_to_dict(value):
+    return json.loads(value)

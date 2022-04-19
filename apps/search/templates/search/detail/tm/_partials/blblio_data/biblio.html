@@ -5,12 +5,19 @@
 <div id="biblio-data">
     {% if hit.search_data.obj_state == 2 %}
         <div class="g-pb-20 d-flex justify-content-between">
-            {% if hit.TradeMark.TrademarkDetails.PublicationDetails %}
+            {% if hit.TradeMark.TrademarkDetails.PublicationDetails.Publication %}
                 <div>
                     {% trans "Опубліковано" %} <span
                         class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationDate }}</span>,
                     {% trans "бюл." %} № <span
                         class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier }}</span>
+                </div>
+            {% elif hit.TradeMark.TrademarkDetails.PublicationDetails|length > 0 %}
+                <div>
+                    {% trans "Опубліковано" %} <span
+                        class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+                    {% trans "бюл." %} № <span
+                        class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.PublicationDetails.0.PublicationIdentifier }}</span>
                 </div>
             {% endif %}
         </div>
@@ -64,7 +71,10 @@
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.TerminationDate %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.TerminationDate|parse_date|date:"d.m.Y" }}</td>
+                    <td class="g-font-weight-600">
+                        {{ hit.TradeMark.TrademarkDetails.TerminationDate|parse_date|date:"d.m.Y" }}
+                        {% if hit.search_data.registration_status_color == 'green' %}({% trans 'частково' %}){% endif %}
+                    </td>
                 </tr>
             {% endif %}
 
@@ -86,14 +96,151 @@
 
 
             {% get_field '220' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationDate %}
+            {% if ipc_field.enable_view and hit.search_data.app_date %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
+                    <td class="g-font-weight-600">{{ hit.search_data.app_date|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+
+            {% get_field '230.C' ipc_fields as ipc_field_230_c %}
+            {% get_field '230.D' ipc_fields as ipc_field_230_d %}
+            {% if ipc_field_230_c.enable_view or ipc_field_230_d.enable_view %}
+                {% if hit.TradeMark.TrademarkDetails.ExhibitionPriorityDetails.ExhibitionPriority %}
+                    <tr>
+                        <th>
+                            {% if ipc_field_230_d.enable_view %}
+                                {{ ipc_field_230_d.code_title }}
+                            {% else %}
+                                {{ ipc_field_230_d.code_title }}
+                            {% endif %}
+                        </th>
+                        <td>
+                            {% for item in hit.TradeMark.TrademarkDetails.ExhibitionPriorityDetails.ExhibitionPriority %}
+                                {% if ipc_field_230_d.enable_view %}{{ item.ExhibitionDate }}{% endif %}<!--
+                                -->{% if ipc_field_230_c.enable_view and item.ExhibitionCountryCode %}<!--
+                                    -->{% if ipc_field_230_d.enable_view %},&nbsp;{% endif %}<!--
+                                    -->{{ item.ExhibitionCountryCode }}
+                                   {% endif %}
+
+                                {% if item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    <br>{% trans 'Кл.:' %}
+                                {% endif %}
+
+                                {% for class in item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    {{ class.ClassNumber }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+
+                                {% if item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}<br>{% endif %}
+
+                                {% for class in item.ExhibitionPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                    {{ class.ClassNumber }} - {% for class_el in class.ClassificationTermDetails.ClassificationTerm %}{{ class_el.ClassificationTermText }}{% endfor %}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+
+            {% get_field '300' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                            {% if item.PriorityNumber %}{{ item.PriorityNumber }};{% endif %}
+                            {% if item.PriorityDate %}{{ item.PriorityDate }};{% endif %}
+                            {% if item.PriorityCountryCode %}{{ item.PriorityCountryCode }}{% endif %}
+
+                            {% if item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                <br>{% trans 'Кл.:' %}
+                            {% endif %}
+
+                            {% for class in item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                {{ class.ClassNumber }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+
+                            {% if item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                <br>
+                            {% endif %}
+
+                            {% for class in item.PriorityPartialGoodsServices.ClassDescriptionDetails.ClassDescription.ClassDescriptionDetails.ClassDescription %}
+                                {{ class.ClassNumber }} - {% for class_el in class.ClassificationTermDetails.ClassificationTerm %}{{ class_el.ClassificationTermText }}{% endfor %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '310' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                            {% if item.PriorityNumber %}
+                                {{ item.PriorityNumber }}{% if not forloop.last %};&nbsp;{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '320' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                            {% if item.PriorityDate %}
+                                {{ item.PriorityDate }}{% if not forloop.last %};&nbsp;{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '330' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.TradeMark.TrademarkDetails.PriorityDetails.Priority %}
+                            {% if item.PriorityCountryCode %}
+                                {{ item.PriorityCountryCode }}{% if not forloop.last %};&nbsp;{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '441' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.Code_441 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">
+                        {% bul_number_441_code hit.TradeMark.TrademarkDetails.Code_441 as bul_number_441_code_value %}
+                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}{% if bul_number_441_code_value %}, {% trans 'бюл. №' %}&nbsp;{{ bul_number_441_code_value }}{% endif %}
+                    </td>
                 </tr>
             {% endif %}
 
             {% get_field '531' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '554' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
@@ -111,6 +258,9 @@
                             {% if hit.search_data.obj_state == 2 %}
                                 <br>
                                 {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                    [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                                {% endif %}
                             {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
@@ -127,6 +277,9 @@
                             {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                             <br>
                             {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                            {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
@@ -142,6 +295,9 @@
                             {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
                             <br>
                             {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                [{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                            {% endif %}
                             {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
@@ -211,7 +367,7 @@
                                 <div class="text-justify mktp-indexes">
                                 <span class="more hidden">
                                     {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
-                                        {{ term.ClassificationTermText }}{% if not forloop.last %}; {% endif %}
+                                        {{ term.ClassificationTermText }}{% if not forloop.last and term.ClassificationTermText|default:""|slice:"-1:" != "," %};{% endif %}
                                     {% endfor %}
                                 </span>
                                     <a href="#"

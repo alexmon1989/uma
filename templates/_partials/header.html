@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 {% load uma_extras %}
 {% load search_extras %}
@@ -60,7 +60,7 @@
                             <!-- End Submenu -->
                         </li>
 
-                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'services' in request.path %}active{% endif %}">
+                        <li class="nav-item hs-has-sub-menu g-mx-15--lg {% if 'services' in request.path or request.resolver_match.view_name == 'patent_attorneys:list' or request.resolver_match.view_name == 'payments:index' %}active{% endif %}">
                             <a href="#!" class="nav-link g-px-0" id="nav-link-1" aria-haspopup="true"
                                aria-expanded="false" aria-controls="nav-submenu-1">{% trans "Сервіси" %}
                             </a>
@@ -73,12 +73,18 @@
                                 <li class="dropdown-item {% if request.resolver_match.view_name == 'services:api_description'%}active{% endif %}">
                                     <a class="nav-link g-px-0" href="{% url 'services:api_description' %}">API</a>
                                 </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'patent_attorneys:list'%}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'patent_attorneys:list' %}">{% trans 'Відомості з реєстру патентних повірених' %}</a>
+                                </li>
+                                <li class="dropdown-item {% if request.resolver_match.view_name == 'payments:index' %}active{% endif %}">
+                                    <a class="nav-link g-px-0" href="{% url 'payments:index' %}">{% trans 'Сплата зборів' %}</a>
+                                </li>
                             </ul>
                             <!-- End Submenu -->
                         </li>
 
-                        <li class="nav-item g-mx-15--lg {% if 'about' in request.path %}active{% endif %}">
-                            <a href="{% url 'about:about' %}" class="nav-link g-py-7 g-px-0">{% trans "Про сервіс" %}</a>
+                        <li class="nav-item g-mx-15--lg {% if 'bulletin' in request.path %}active{% endif %}">
+                            <a href="{% url 'bulletin:index' %}" class="nav-link g-py-7 g-px-0">{% trans "Бюлетень" %}</a>
                         </li>
 
                         <li class="nav-item g-mx-15--lg {% if 'help' in request.path %}active{% endif %}">

@@ -1,13 +1,13 @@
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.base import RedirectView
-from django.db.models import F
+from django.db.models import F, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
-from django.utils import six
 from django.utils.http import urlencode
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -21,6 +21,7 @@ from .utils import (get_client_ip, paginate_results, get_ipc_codes_with_schedule
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
+import six
 from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
                     perform_advanced_search, perform_transactions_search,
                     get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
@@ -28,6 +29,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     create_transactions_search_results_file, create_shared_docs_archive)
 from ..account.models import BalanceOperation, License
 from .decorators import require_ajax, check_recaptcha
+from apps.bulletin_new.models import Bulletin
 
 
 class SimpleListView(TemplateView):
@@ -48,6 +50,7 @@ class SimpleListView(TemplateView):
 
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
 
         # Параметры поиска
         context['search_parameter_types'] = list(SimpleSearchField.objects.annotate(
@@ -64,6 +67,7 @@ class SimpleListView(TemplateView):
             '-weight'
         ))
 
+        context['show_search_form'] = True
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         SimpleSearchFormSet = formset_factory(SimpleSearchForm)
         if self.request.GET.get('form-TOTAL_FORMS'):
@@ -73,10 +77,21 @@ class SimpleListView(TemplateView):
             # Признак того что производится поиск
             context['is_search'] = True
 
+            # Показывать или скрывать поисковую форму
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
+
             # Создание асинхронной задачи для Celery
             task = perform_simple_search.delay(
                 self.request.user.pk,
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
 
@@ -131,7 +146,9 @@ class AdvancedListView(TemplateView):
 
         # Типы ОПС
         context['obj_types'] = list(
-            ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{context['lang_code']}")).values('id', 'value')
+            ObjType.objects.order_by('order').annotate(
+                value=F(f"obj_type_{context['lang_code']}")
+            ).values('id', 'value')
         )
 
         # ИНИД-коды вместе с их реестрами
@@ -140,6 +157,7 @@ class AdvancedListView(TemplateView):
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
+        context['show_search_form'] = True
         context['initial_data'] = {'form-TOTAL_FORMS': 1}
         AdvancedSearchFormSet = formset_factory(AdvancedSearchForm)
         if self.request.GET.get('form-TOTAL_FORMS'):
@@ -151,13 +169,26 @@ class AdvancedListView(TemplateView):
             # Признак того что производится поиск
             context['is_search'] = True
 
+            # Показывать или скрывать поисковую форму
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
+
             # Поиск в ElasticSearch
             # Создание асинхронной задачи для Celery
             task = perform_advanced_search.delay(
                 self.request.user.pk,
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
+
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
 
         return context
 
@@ -203,6 +234,7 @@ class ObjectDetailView(DetailView):
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Recaptcha
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         # Запись в лог запроса пользователя к заявке
@@ -241,8 +273,7 @@ def get_data_app_html(request):
                     )
                 else:
                     ipc_fields = ipc_fields.filter(
-                        schedule_type__id__gte=3,
-                        schedule_type__id__lte=8,
+                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32))
                     )
                 context['ipc_fields'] = ipc_fields
 
@@ -266,6 +297,17 @@ def get_data_app_html(request):
                     template = 'search/detail/qi/detail.html'
                 elif context['hit']['Document']['idObjType'] == 6:
                     template = 'search/detail/id/detail.html'
+                elif context['hit']['Document']['idObjType'] in (9, 14):
+                    bul_num_441 = Bulletin.objects.get(
+                        date_from__lte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441'],
+                        date_to__gte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441']
+                    )
+                    context['code_441_bul_number'] = bul_num_441.bul_number
+                    template = 'search/detail/tm_madrid/detail.html'
+                elif context['hit']['Document']['idObjType'] in (10, 13):  # Авторське право
+                    template = 'search/detail/copyright/detail.html'
+                elif context['hit']['Document']['idObjType'] in (11, 12):  # Договора
+                    template = 'search/detail/agreement/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:
@@ -285,19 +327,10 @@ def get_data_app_html(request):
 def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
     if request.POST.getlist('cead_id'):
-        # Создание заказа
-        order = OrderService(
-            # user=request.user,
-            user_id=request.user.pk,
-            ip_user=get_client_ip(request),
-            app_id=request.POST['id_app_number']
-        )
-        order.save()
-        for id_cead_doc in request.POST.getlist('cead_id'):
-            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
-
         # Создание асинхронной задачи для получения архива с документами
-        task = get_order_documents.delay(request.user.pk, order.id)
+        task = get_order_documents.delay(
+            request.user.pk, request.POST['id_app_number'], request.POST.getlist('cead_id'), get_client_ip(request)
+        )
         return JsonResponse({'task_id': task.id})
     else:
         raise Http404('Файли не було обрано!')
@@ -305,18 +338,8 @@ def download_docs_zipped(request):
 
 def download_doc(request, id_app_number, id_cead_doc):
     """Возвращает JSON с id асинхронной задачи на заказ документа."""
-    # Создание заказа
-    order = OrderService(
-        # user=request.user,
-        user_id=request.user.pk,
-        ip_user=get_client_ip(request),
-        app_id=id_app_number
-    )
-    order.save()
-    OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
-
     # Создание асинхронной задачи для получения документа
-    task = get_order_documents.delay(request.user.pk, order.id)
+    task = get_order_documents.delay(request.user.pk, id_app_number, id_cead_doc, get_client_ip(request))
     return JsonResponse({'task_id': task.id})
 
 
@@ -372,19 +395,33 @@ class TransactionsSearchView(TemplateView):
         context['lang_code'] = 'ua' if self.request.LANGUAGE_CODE == 'uk' else 'en'
 
         # Recaptcha
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
 
         context['initial_data'] = dict()
         context['is_search'] = False
+        context['show_search_form'] = True
         if self.request.GET.get('obj_type') and self.request.GET.get('transaction_type') \
                 and self.request.GET.get('date'):
             context['is_search'] = True
+
+            # Показывать или скрывать поисковую форму
+            context['show_search_form'] = self.request.session.get('show_search_form', False)
+
+            # Количество результатов на странице
+            self.request.session['show'] = self.request.GET.get(
+                'show',
+                self.request.session.get('show', 10)
+            )
+            get_params = dict(six.iterlists(self.request.GET))
+            get_params['show'] = [self.request.session['show']]
+
             context['initial_data'] = dict(six.iterlists(self.request.GET))
 
             # Поиск
             # Создание асинхронной задачи для Celery
             task = perform_transactions_search.delay(
-                dict(six.iterlists(self.request.GET))
+                get_params
             )
             context['task_id'] = task.id
 
@@ -466,3 +503,11 @@ class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
             )
 
         return super().get_redirect_url(*args, **kwargs)
+
+
+@require_POST
+@csrf_exempt
+def toggle_search_form(request):
+    """Записывает в сессию значение того нужно ли держать форму открытой постоянно."""
+    request.session['show_search_form'] = not request.session.get('show_search_form', False)
+    return JsonResponse({'visible': request.session.get('show_search_form')})

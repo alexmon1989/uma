@@ -4,21 +4,31 @@ from django.db.models import F
 from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
-                     user_has_access_to_tm_app)
+                     user_has_access_to_tm_app, get_fixed_mark_status_code)
+from apps.bulletin.models import ClListOfficialBulletinsIp
+import re
 
 register = template.Library()
 
 
 @register.filter
 def get_person_name(value):
+    try:
+        del value['EDRPOU']
+    except KeyError:
+        pass
     values = list(value.values())
-    return values[0]
+    return values[0] if len(values[0]) > len(values[1]) else values[1]
 
 
 @register.filter
 def get_person_country(value):
+    try:
+        del value['EDRPOU']
+    except KeyError:
+        pass
     values = list(value.values())
-    return values[1]
+    return values[1] if len(values[1]) < len(values[0]) else values[0]
 
 
 @register.inclusion_tag('search/advanced/_partials/inv_um_item.html', takes_context=True)
@@ -38,6 +48,11 @@ def tm_item(context, hit, item_num):
     return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
+@register.inclusion_tag('search/advanced/_partials/tm_item_madrid.html', takes_context=True)
+def tm_item_madrid(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
+
+
 @register.inclusion_tag('search/advanced/_partials/id_item.html', takes_context=True)
 def id_item(context, hit, item_num):
     return {'hit': hit, 'item_num': item_num, 'request': context['request']}
@@ -45,6 +60,16 @@ def id_item(context, hit, item_num):
 
 @register.inclusion_tag('search/advanced/_partials/qi_item.html', takes_context=True)
 def qi_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
+
+
+@register.inclusion_tag('search/advanced/_partials/copyright_item.html', takes_context=True)
+def copyright_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
+
+
+@register.inclusion_tag('search/advanced/_partials/agreement_item.html', takes_context=True)
+def agreement_item(context, hit, item_num):
     return {'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
@@ -61,6 +86,18 @@ def get_image_url(file_path, image_name):
     return f"{settings.MEDIA_URL}/" \
            f"{splitted_path[splitted_path_len-4]}" \
            f"/{splitted_path[splitted_path_len-3]}/" \
+           f"{splitted_path[splitted_path_len-2]}/{image_name}"
+
+
+@register.filter
+def get_image_url_madrid_tm(file_path, image_name):
+    splitted_path = file_path.replace("\\", "/").split('/')
+    splitted_path_len = len(splitted_path)
+
+    return f"{settings.MEDIA_URL}/" \
+           f"{splitted_path[splitted_path_len-5].upper()}/" \
+           f"{splitted_path[splitted_path_len-4]}/" \
+           f"{splitted_path[splitted_path_len-3]}/" \
            f"{splitted_path[splitted_path_len-2]}/{image_name}"
 
 
@@ -151,9 +188,12 @@ def user_has_access_to_docs(user, id_app_number):
 def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
     if documents:
-        return list(filter(lambda x: x['DOCRECORD'].get('DOCREGNUMBER')
+        return list(filter(lambda x: (x['DOCRECORD'].get('DOCREGNUMBER')
                                      or x['DOCRECORD'].get('DOCBARCODE')
-                                     or x['DOCRECORD'].get('DOCSENDINGDATE'), documents))
+                                     or x['DOCRECORD'].get('DOCSENDINGDATE'))
+                                     and 'службова' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
+                                     and 'звіт про інформаційний пошук' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
+                                     and not x['DOCRECORD'].get('DOCREGNUMBER', '').lower().startswith('вн'), documents))
 
 
 @register.simple_tag
@@ -172,7 +212,37 @@ def is_paid_services_enabled():
 @register.inclusion_tag('search/templatetags/app_stages_tm.html')
 def app_stages_tm(app):
     """Отображает стадии заявки (градусник) для знаков для товаров и услуг."""
-    mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    if app['TradeMark'].get('TrademarkDetails', {}).get('stages'):  # Заявки из новой системы
+        stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
+                          app['TradeMark']['TrademarkDetails']['stages']))
+
+        # Fix
+        prev_status = ''
+        for stage in stages[::-1]:
+            if stage["title"] == "Встановлення дати подання" \
+                    and app['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
+                if stage['status'] == 'current':
+                    stages[3]['status'] = 'current'
+                stage['status'] = 'done'
+                continue
+
+            if stage['status'] == 'current' == prev_status \
+                    or (stage['status'] in ('done', 'current', 'stopped',)
+                        and prev_status in ('current', 'not-active', 'stopped')):
+                stage['status'] = 'not-active'
+
+            prev_status = stage['status']
+
+        is_stopped = app['TradeMark']['TrademarkDetails']['application_status'] == 'stopped'
+        return {
+            'stages': stages,
+            'is_stopped': is_stopped,
+            'obj_state': app['search_data']['obj_state'],
+            'mark_status_code': len(list(filter(lambda x: x['status'] == 'done', stages))) * 1000,
+        }
+
+    # mark_status_code = int(app['Document'].get('MarkCurrentStatusCodeType', 0))
+    mark_status_code = get_fixed_mark_status_code(app)
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
                  or mark_status_code == 8000
 
@@ -201,14 +271,22 @@ def app_stages_tm(app):
         # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
         if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
             for doc in app['TradeMark']['DocFlow']['Documents']:
-                if 'Т-08' in doc['DocRecord'].get('DocType', ''):
+                if 'Т-08' in doc['DocRecord'].get('DocFlow', {}).get('Documents', []):
                     stages_statuses[4] = 'current'
                     stages_statuses[3] = 'done'
                     break
 
+        # Если есть форма Т-05, то "Формальна експертиза" пройдена (для случая если делопроизводство остановлено)
+        if is_stopped:
+            for doc in app['TradeMark'].get('DocFlow', {}).get('Documents', []):
+                if 'Т-05' in doc['DocRecord'].get('DocType', ''):
+                    stages_statuses[2] = 'done'
+                    stages_statuses[3] = 'stopped'
+                    break
+
     stages = [
         {
-            'title': _('Знак для товарів і послуг зареєстровано'),
+            'title': _('Торговельну марку зареєстровано'),
             'status': stages_statuses[5],
         },
         {
@@ -244,6 +322,26 @@ def app_stages_tm(app):
 @register.inclusion_tag('search/templatetags/app_stages_id.html')
 def app_stages_id(app):
     """Отображает стадии заявки (градусник) для пром. образцов."""
+    if app['Design'].get('DesignDetails', {}).get('stages'):  # Заявки из новой системы
+        stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
+                          app['Design']['DesignDetails']['stages']))
+        is_stopped = app['Design']['DesignDetails']['application_status'] == 'stopped'
+
+        # Fix
+        prev_status = ''
+        for stage in stages[::-1]:
+            if stage['status'] == 'current' == prev_status or (
+                    stage['status'] in ('done', 'current', 'stopped',) and prev_status in ('current', 'not-active')):
+                stage['status'] = 'not-active'
+            prev_status = stage['status']
+
+        return {
+            'stages': stages,
+            'is_stopped': is_stopped,
+            'app': app,
+            'design_status_code': len(list(filter(lambda x: x['status'] == 'done', stages))) * 1000 + 1000,
+        }
+
     design_status_code = int(app['Document'].get('DesignCurrentStatusCodeType', 0))
     is_stopped = app['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
 
@@ -300,7 +398,7 @@ def app_stages_inv_um(app):
     """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""
     # Состояние делопроизводства
     is_stopped = False
-    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW']['DOCUMENTS']
+    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app['DOCFLOW'].get('DOCUMENTS', [])
                  if doc['DOCRECORD'].get('DOCREGNUMBER')
                  or doc['DOCRECORD'].get('DOCBARCODE')
                  or doc['DOCRECORD'].get('DOCSENDINGDATE')]
@@ -320,7 +418,7 @@ def app_stages_inv_um(app):
 
     # Пройденные стадии
     done_stages = list()
-    for stage in app['DOCFLOW']['STAGES']:
+    for stage in app['DOCFLOW'].get('STAGES', []):
         if stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
             for x in ['[В1]', '[В4]', '[В9]']:
                 for doc_type in doc_types:
@@ -337,7 +435,10 @@ def app_stages_inv_um(app):
             done_stages.append(stage['STAGERECORD']['STAGE'])
 
     # Коды сборов
-    cl_codes = [stage['CLRECORD']['CLCODE'] for stage in app['DOCFLOW']['COLLECTIONS']]
+    cl_codes = []
+    for stage in app['DOCFLOW'].get('COLLECTIONS', []):
+        if stage['CLRECORD'].get('CLCODE'):
+            cl_codes.append(stage['CLRECORD']['CLCODE'])
 
     # Стадии делопроизводства по заявке
     stages = [
@@ -422,3 +523,56 @@ def id_has_colors(hit):
         if item.get('Colors'):
             return True
     return False
+
+
+@register.simple_tag
+def bul_number_441_code(code_441_date):
+    """Возвращает номер бюлетня для 441 кода."""
+    try:
+        obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441_date, date_to__gte=code_441_date)
+    except ClListOfficialBulletinsIp.DoesNotExist:
+        return False
+    else:
+        return obj.bul_number
+
+
+@register.filter
+def filter_tm_id_docs_direction(documents, direction):
+    """Возвращает только входящие/исходящие документы ТМ."""
+    if documents:
+        return list(filter(lambda x: x.get('DocRecord', {}).get('DocDirection') == direction, documents))
+    return list()
+
+
+@register.filter
+def filter_tm_id_bad_docs(documents):
+    """Исключает из списка документы типа "Службова записка",
+    документы, номер которых начинается с "Вн", "Бібліографічні дані"."""
+    if documents:
+        res = list()
+        for doc in documents:
+            doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
+            if 'службова' not in doc_type \
+                    and 'бібліографічні дані заявки на знак для товарів і послуг' not in doc_type \
+                    and not doc.get('DocRecord', {}).get('DocRegNumber', '').lower().startswith('вн'):
+                res.append(doc)
+        return res
+    return list()
+
+
+@register.filter
+def remove_inn(s):
+    """Удаляет из строки ИНН (10-значное число)."""
+    s = re.sub(r'(?<!\w)\d{6,10}', '', s)
+    s = s.replace('; ; ', '')
+    s = s.strip()
+
+    # Также удаляется запятая, если строка ею заканчивается
+    if s.endswith(','):
+        s = s[:len(s)-2]
+
+    # Также удаляется точка с запятой, если строка ею заканчивается
+    if s.endswith(';'):
+        s = s[:len(s)-2]
+
+    return s

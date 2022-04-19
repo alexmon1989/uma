@@ -1,0 +1,370 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<!-- Nav tabs -->
+<ul class="nav justify-content-center u-nav-v1-1 u-nav-primary u-nav-rounded-3 g-mb-20"
+    role="tablist"
+    data-target="nav-1-2-default-hor-left"
+    data-tabs-mobile-type="slide-up-down"
+    data-btn-classes="btn btn-md btn-block rounded-0 u-btn-outline-lightgray g-mb-20">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#nav-1-2-default-hor-left--1" role="tab">Бібілографічні
+            дані</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if not app_data.cl %}disabled{% endif %}"
+           data-toggle="tab"
+           href="#nav-1-2-default-hor-left--2"
+           role="tab"
+        >Формула</a>
+    </li>
+</ul>
+<!-- End Nav tabs -->
+
+<!-- Tab panes -->
+<div id="nav-1-2-default-hor-left" class="tab-content">
+    <div class="tab-pane fade show active" id="nav-1-2-default-hor-left--1" role="tabpanel">
+        <div id="biblio-data">
+            <div class="table-responsive">
+                <table class="table table-sm table-biblio g-font-size-13">
+                    <tbody>
+
+                    {% get_field '11' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_11 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_11 }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '13' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_13 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_13 }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '19' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_19 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_19 }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '21' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_21 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                <a href="{% url 'search:detail' pk=object.app.pk %}"
+                                   target="_blank">{{ app_data.biblio_data.I_21 }}</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '22' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_22 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_22|parse_date|date:"d.m.Y" }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '24' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_24 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_24|parse_date|date:"d.m.Y" }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% if app_data.biblio_data.I_30 %}
+                        {% for I_30 in app_data.biblio_data.I_30 %}
+                            {% get_field '31' ipc_fields as ipc_field %}
+                            {% if ipc_field.enable_view and app_data.biblio_data.I_30.I_31 %}
+                                <tr>
+                                    <th>{{ ipc_field.code_title }}</th>
+                                    <td>{{ app_data.biblio_data.I_30.I_31 }}
+                                        {% get_field '33' ipc_fields as ipc_field %}
+                                        {% if ipc_field.enable_view and app_data.biblio_data.I_30.I_33 %}
+                                            <span title="{{ ipc_field.code_title }}">{{ app_data.biblio_data.I_30.I_33 }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+
+                            {% get_field '32' ipc_fields as ipc_field %}
+                            {% if app_data.biblio_data.I_30.I_32 %}
+                                <tr>
+                                    <th>{{ ipc_field.code_title }}</th>
+                                    <td>{{ app_data.biblio_data.I_30.I_32|parse_date|date:"d.m.Y" }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% get_field '41.D' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data|get:'I_43.D' %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_43 in app_data.biblio_data|get:'I_43.D' %}
+                                    {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '43.D' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data|get:'I_43.D' %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_43 in app_data.biblio_data|get:'I_43.D' %}
+                                    {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '45.D' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data|get:'I_45.D' %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_45 in app_data.biblio_data|get:'I_45.D' %}
+                                    {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '46.D' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data|get:'I_45.D' %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_45 in app_data.biblio_data|get:'I_45.D' %}
+                                    {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '51' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td class="i_51">
+                                {% for IPC in app_data.biblio_data.IPC %}
+                                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                {{ IPC }}
+                                        {% if forloop.counter == 2 and not forloop.last %}
+                                            <a href="#"
+                                               class="show-all g-font-size-12"
+                                               title="{% trans "Показати всі" %}"
+                                            ><i class="fa fa-plus"></i></a>
+                                        {% endif %}
+                                        {% if not forloop.last %}<br>{% endif %}
+                            </span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '54' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_54 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_54 in app_data.biblio_data.I_54 %}
+                                    {% if I_54|get:'I_54.U' %}
+                                        {{ I_54|get:'I_54.U' }} [UA]
+                                    {% endif %}
+                                    {% if I_54|get:'I_54.R' %}
+                                        {{ I_54|get:'I_54.R' }} [RU]
+                                    {% endif %}
+                                    {% if I_54|get:'I_54.E' %}
+                                        {{ I_54|get:'I_54.E' }} [EN]
+                                    {% endif %}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '56.A' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_56 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                <ul class="g-pl-15 g-mb-0 i_56">
+                                    {% for I_56 in app_data.biblio_data.I_56 %}
+                                        <li class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                            {{ I_56|get:"I_56.A" }}
+                                            {% if forloop.counter == 2 and not forloop.last %}
+                                                &nbsp;<a href="#"
+                                                         class="show-all g-font-size-12"
+                                                         title="{% trans "Показати всі" %}"
+                                            ><i class="fa fa-plus"></i></a>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {# (85) Дата входження до національної фази #}
+                    {% get_field '85' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_85 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_85|parse_date|date:"d.m.Y" }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {# (86) Номер заявки РСТ #}
+                    {% get_field '86.N' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_86 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>
+                                {% for I_86 in app_data.biblio_data|get:'I_86' %}
+                                    {{ I_86|get:'I_86.N' }},
+                                    {{ I_86|get:'I_86.D'|parse_date|date:"d.m.Y" }}{% if not forloop.last %};<br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% if app_data.biblio_data.i_62 %}
+                        {% for i_62 in app_data.biblio_data.i_62 %}
+                            {% get_field '62.N' ipc_fields as ipc_field %}
+                            {% if ipc_field.enable_view and i_62|get:"I_62.N" %}
+                                <tr>
+                                    <th>{{ ipc_field.code_title }}</th>
+                                    <td>{{ i_62|get:"I_62.N" }}</td>
+                                </tr>
+                            {% endif %}
+
+                            {% get_field '62.D' ipc_fields as ipc_field %}
+                            {% if ipc_field.enable_view and i_62|get:"I_62.D" %}
+                                <tr>
+                                    <th>{{ ipc_field.code_title }}</th>
+                                    <td>{{ i_62|get:"I_62.D" }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% get_field '71' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_71 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td class="i_71">
+                                {% for I_71_ in app_data.biblio_data.I_71|list_of_dicts_unique %}
+                                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
+                                        {% if forloop.counter == 2 and not forloop.last %}
+                                            &nbsp;<a href="#"
+                                                     class="show-all g-font-size-12"
+                                                     title="{% trans "Показати всі" %}"
+                                        ><i class="fa fa-plus"></i></a>
+                                        {% endif %}
+                                        {% if not forloop.last %}<br>{% endif %}
+                            </span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '72' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_72 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td class="i_72">
+                                {% for I_72_ in app_data.biblio_data.I_72|list_of_dicts_unique %}
+                                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                {{ I_72_|get_person_name }} [{{ I_72_|get_person_country }}]
+                                        {% if forloop.counter == 2 and not forloop.last %}
+                                            &nbsp;<a href="#"
+                                                     class="show-all g-font-size-12"
+                                                     title="{% trans "Показати всі" %}"
+                                        ><i class="fa fa-plus"></i></a>
+                                        {% endif %}
+                                        {% if not forloop.last %}<br>{% endif %}
+                            </span>
+
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '73' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_73 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td class="i_73">
+                                {% for I_73_ in app_data.biblio_data.I_73|list_of_dicts_unique %}
+                                    <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                {{ I_73_|get_person_name }} [{{ I_73_|get_person_country }}]
+                                        {% if forloop.counter == 2 and not forloop.last %}
+                                            &nbsp;<a href="#"
+                                                     class="show-all g-font-size-12"
+                                                     title="{% trans "Показати всі" %}"
+                                        ><i class="fa fa-plus"></i></a>
+                                        {% endif %}
+                                        {% if not forloop.last %}<br>{% endif %}
+                            </span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '74' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_74 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_74 }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% get_field '98' ipc_fields as ipc_field %}
+                    {% if ipc_field.enable_view and app_data.biblio_data.I_98 %}
+                        <tr>
+                            <th>{{ ipc_field.code_title }}</th>
+                            <td>{{ app_data.biblio_data.I_98 }}</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="nav-1-2-default-hor-left--2" role="tabpanel">
+        {% if app_data.cl %}
+            <object data="{{ app_data.cl }}#view=fitH&toolbar=0&navpanes=0"
+                    type="application/pdf"
+                    width="100%"
+                    height="530">
+                <iframe
+                        src="{{ app_data.cl }}#zoom=95&toolbar=0&navpanes=0"
+                        width="100%"
+                        height="530"
+                        style="border: none;">
+                    {% trans "Ваш браузер не підтримує PDF" %}. <a
+                        href="{{ app_data.cl }}">{% trans "Завантажити PDF" %}</a>.
+                </iframe>
+            </object>
+
+            <p><a href="{{ app_data.cl }}" target="_blank"><i class="fa fa-external-link"></i>&nbsp;{% trans "Відкрити у новому вікні" %}</a></p>
+        {% endif %}
+    </div>
+    <!-- End Tab panes -->
+</div>

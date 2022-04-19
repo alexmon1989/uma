@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings, OrderDocument
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
@@ -16,6 +16,7 @@ from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow
                     filter_app_data, filter_bad_apps)
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
+import apps.search.services as search_services
 import os
 import json
 import time
@@ -57,22 +58,43 @@ def perform_simple_search(user_id, get_params):
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
 
+                if elastic_field.field_type == 'text':
+                    fields = [
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^3",
+                        f"{elastic_field.field_name}.*",
+                    ]
+
+                    # if '*' in query:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #     ]
+                    # else:
+                    #     fields = [
+                    #         f"{elastic_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #         f"{elastic_field.field_name}.*",
+                    #     ]
+                else:
+                    fields = [
+                        f"{elastic_field.field_name}",
+                    ]
+
                 q = Q(
                     'query_string',
                     query=query,
-                    default_field=elastic_field.field_name,
+                    fields=fields,
+                    quote_field_suffix=".exact",
                     default_operator='AND'
                 )
 
-                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                    # и морфологического поиска
-                    q |= Q(
-                        'query_string',
-                        query=f"*{query}*",
-                        default_field=elastic_field.field_name,
-                        default_operator='AND',
-                        boost=20
+                # Nested тип
+                if elastic_field.parent:
+                    q = Q(
+                        'nested',
+                        path=elastic_field.parent.field_name,
+                        query=q,
                     )
 
                 if qs is not None:
@@ -83,7 +105,9 @@ def perform_simple_search(user_id, get_params):
     # Не включать в список результатов заявки, по которым выдан патент
     qs = filter_bad_apps(qs)
 
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    )
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -144,8 +168,12 @@ def get_app_details(id_app_number, user_id):
         'bool',
         must=[Q('match', _id=id_app_number)],
     )
+    # Фильтр заявок, которые не положено отоборажать
+    q = filter_bad_apps(q)
 
-    s = Search().using(client).query(q).execute()
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
@@ -168,6 +196,10 @@ def get_app_details(id_app_number, user_id):
 
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
+
+    # Сортировка оповещений
+    if hit['search_data']['obj_state'] == 2:
+        search_services.application_sort_transactions(hit)
 
     hit['meta'] = {'id': id_app_number}
 
@@ -294,7 +326,9 @@ def perform_transactions_search(get_params):
 def get_obj_types_with_transactions(lang_code):
     """Возвращает типы объектов вместе с типами оповещений."""
     obj_types = list(
-        ObjType.objects.order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value')
+        ObjType.objects.exclude(
+            pk__in=(9, 10, 11, 12, 13, 14)
+        ).order_by('id').annotate(value=F(f"obj_type_{lang_code}")).values('id', 'value')
     )
 
     # Типы оповещений
@@ -317,7 +351,9 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
         'bool',
         must=[Q('terms', _id=favorites_ids)],
     )
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).query(q)
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -350,44 +386,80 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
 
 
 @shared_task
-def get_order_documents(user_id, order_id):
+def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
-    # Получение обработанного заказа
-    order = get_completed_order(order_id)
-
     # Получение документа (заявки) из ElasticSearch
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
         'bool',
-        must=[Q('match', _id=order.app_id)],
+        must=[Q('match', _id=id_app_number)],
     )
 
     user = get_user_or_anonymous(user_id)
 
-    s = Search().using(client).query(q).source(['search_data']).execute()
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
     if not s:
         return {}
     hit = s[0].to_dict()
 
-    if order and user_has_access_to_docs(user, hit):
-        # В зависимости от того сколько документов содержит заказ, возвращается путь к файлу или к архиву с файлами
-        if order.orderdocument_set.count() == 1:
-            doc = order.orderdocument_set.first()
-            # Путь к файлу
-            file_path = os.path.join(
-                settings.MEDIA_URL,
-                'OrderService',
-                str(order.user_id),
-                str(order.id),
-                doc.file_name
+    # Список id cead
+    hit_id_cead_list = []
+    if hit['Document']['idObjType'] in (1, 2, 3):
+        for doc in hit['DOCFLOW']['DOCUMENTS']:
+            if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
+
+        # Если это охранный документ, то нужно ещё добавить в список документы заявки
+        if hit['search_data']['obj_state'] == 2:
+            q = Q(
+                'query_string',
+                query=f"search_data.obj_state:1 AND search_data.app_number:{hit['search_data']['app_number']}",
             )
-            return file_path
+            s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
+            if s:
+                app_hit = s[0].to_dict()
+                for doc in app_hit.get('DOCFLOW', {}).get('DOCUMENTS', []):
+                    if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                        hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
+
+    elif hit['Document']['idObjType'] == 4:
+        for doc in hit['TradeMark']['DocFlow']['Documents']:
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+    elif hit['Document']['idObjType'] == 6:
+        for doc in hit['Design']['DocFlow']['Documents']:
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+
+    # Входит ли id_cead_doc в список документов заявки
+    if isinstance(id_cead_doc, list):
+        is_in_list = set(list(map(int, id_cead_doc))).issubset(set(hit_id_cead_list))
+    else:
+        is_in_list = id_cead_doc in hit_id_cead_list
+
+    if is_in_list and user_has_access_to_docs(user, hit):
+        # Создание заказа
+        order = OrderService(
+            # user=request.user,
+            user_id=user_id,
+            ip_user=ip_user,
+            app_id=id_app_number
+        )
+        order.save()
+        if isinstance(id_cead_doc, list):
+            for item in id_cead_doc:
+                OrderDocument.objects.create(order=order, id_cead_doc=item)
         else:
+            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
+        order = get_completed_order(order.id)
+
+        if order:
+            file_zip_name = f"docs_{order.id}.zip"
             file_path_zip = os.path.join(
                 settings.ORDERS_ROOT,
                 str(order.user_id),
                 str(order.id),
-                'docs.zip'
+                file_zip_name
             )
             with ZipFile(file_path_zip, 'w') as zip_:
                 for document in order.orderdocument_set.all():
@@ -405,7 +477,7 @@ def get_order_documents(user_id, order_id):
                 'OrderService',
                 str(order.user_id),
                 str(order.id),
-                'docs.zip'
+                file_zip_name
             )
 
     return False
@@ -456,7 +528,7 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
     elif app.obj_type_id == 4:
         client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
         q = Q('match', _id=id_app_number)
-        s = Search().using(client).query(q).execute()
+        s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
         if s:
             hit = s[0]
             data = get_data_for_selection_tm(hit)
@@ -492,28 +564,51 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             if elastic_field:
                 query = prepare_query(s['value'], elastic_field.field_type)
 
+                if elastic_field.field_type == 'text':
+                    fields = [
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^3",
+                        f"{elastic_field.field_name}.*",
+                    ]
+
+                    # if '*' in query:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #     ]
+                    # else:
+                    #     fields = [
+                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                    #         f"{elastic_field.field_name}.exact^2",
+                    #         f"{elastic_field.field_name}.*",
+                    #     ]
+                else:
+                    fields = [
+                        f"{elastic_field.field_name}",
+                    ]
+
                 q = Q(
                     'query_string',
                     query=query,
-                    default_field=elastic_field.field_name,
+                    fields=fields,
+                    quote_field_suffix=".exact",
                     default_operator='AND'
                 )
 
-                if elastic_field.field_type == 'text' and not any(ext in query for ext in (' OR ', ' AND ', '*')):
-                    # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                    # и морфологического поиска
-                    q |= Q(
-                        'query_string',
-                        query=f"*{query}*",
-                        default_field=elastic_field.field_name,
-                        default_operator='AND',
-                        boost=20
+                # Nested тип
+                if elastic_field.parent:
+                    q = Q(
+                        'nested',
+                        path=elastic_field.parent.field_name,
+                        query=q,
                     )
 
                 if qs is not None:
                     qs &= q
                 else:
                     qs = q
+
+        qs = filter_bad_apps(qs)
 
         s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
 
@@ -559,13 +654,11 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
+                          'Certificate'])
 
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
-
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
 
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
@@ -573,11 +666,11 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('simple_search')}.xls"
+            file_name = f"{get_unique_filename('simple_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(
@@ -637,7 +730,8 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
+                          'Certificate'])
 
             # Сортировка
             if get_params.get('sort_by'):
@@ -648,20 +742,17 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
 
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
                 'search_results',
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('advanced_search')}.xls"
+            file_name = f"{get_unique_filename('advanced_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(
@@ -691,20 +782,17 @@ def create_transactions_search_results_file(get_params, lang_code):
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code)
 
-            # Формировние Excel-файла
-            workbook = create_search_res_doc(data)
-
             directory_path = os.path.join(
                 settings.MEDIA_ROOT,
                 'search_results',
             )
             os.makedirs(directory_path, exist_ok=True)
             # Имя файла с результатами поиска
-            file_name = f"{get_unique_filename('transactions_search')}.xls"
+            file_name = f"{get_unique_filename('transactions_search')}.xlsx"
             file_path = os.path.join(directory_path, file_name)
 
-            # Сохранение файла
-            workbook.save(file_path)
+            # Формировние и сохранение Excel-файла
+            create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
             return os.path.join(

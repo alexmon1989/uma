@@ -13,11 +13,15 @@ from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt, Cm
+from PIL import Image
 import re
 import time
 import datetime
-import xlwt
+import os
 from uma.utils import iterable
+import xlsxwriter
+import io
+from apps.bulletin.models import ClListOfficialBulletinsIp
 
 
 def get_search_groups(search_data):
@@ -55,7 +59,11 @@ def prepare_query(query, field_type):
 
         # На вход происходит получение диапазона дат в формате "дд.мм.гггг ~ дд.мм.гггг"
         # его необходимо преобразовать запрос ElasticSearch
-        query = f">={query.replace(' ~ ', ' AND <=')}"
+        dates = query.split(' ~ ')
+        try:
+            query = f"[{dates[0]} TO {dates[1]}]"
+        except IndexError:
+            pass
 
     query = query.replace(
         " ТА ", " AND "
@@ -77,7 +85,7 @@ def get_elastic_results(search_groups, user):
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
-            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8)
+            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32)
             qs = None
 
             for search_param in group['search_params']:
@@ -91,25 +99,43 @@ def get_elastic_results(search_groups, user):
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
                     query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
 
+                    if inid_schedule.elastic_index_field.field_type == 'text':
+                        fields = [
+                            f"{inid_schedule.elastic_index_field.field_name}^2",
+                            f"{inid_schedule.elastic_index_field.field_name}.exact^3",
+                            f"{inid_schedule.elastic_index_field.field_name}.*",
+                        ]
+
+                        # if '*' in query:
+                        #     fields = [
+                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                        #     ]
+                        # else:
+                        #     fields = [
+                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
+                        #         f"{inid_schedule.elastic_index_field.field_name}.*",
+                        #     ]
+                    else:
+                        fields = [
+                            f"{inid_schedule.elastic_index_field.field_name}",
+                        ]
+
                     q = Q(
                         'query_string',
                         query=query,
-                        default_field=inid_schedule.elastic_index_field.field_name,
-                        default_operator='AND',
-                        analyze_wildcard=True
+                        fields=fields,
+                        quote_field_suffix=".exact",
+                        default_operator='AND'
                     )
 
-                    if inid_schedule.elastic_index_field.field_type == 'text' and not any(
-                            ext in query for ext in (' OR ', ' AND ', '*')):
-                        # Если строковый тип параметра, то необходимо объединять результаты обычного (вхождение строки)
-                        # и морфологического поиска
-                        q |= Q(
-                            'query_string',
-                            query=f"*{query}*",
-                            default_field=inid_schedule.elastic_index_field.field_name,
-                            default_operator='AND',
-                            analyze_wildcard=True,
-                            boost=20
+                    # Nested тип
+                    if inid_schedule.elastic_index_field.parent:
+                        q = Q(
+                            'nested',
+                            path=inid_schedule.elastic_index_field.parent.field_name,
+                            query=q,
                         )
 
                     if not qs:
@@ -133,9 +159,12 @@ def get_elastic_results(search_groups, user):
             qs_result = qs
         else:
             qs_result |= qs
-
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs_result).sort('_score')
+    s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(
+        qs_result
+    ).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).sort('_score')
 
     return s
 
@@ -179,12 +208,23 @@ def paginate_results(s, page, paginate_by=10):
 
 
 def filter_bad_apps(qs):
-    """Исключает из результатов запроса заявки, по которым выдан патент,
-    заявки без даты подачи заявки,
-    заявки на занки для товаров и услуг без платежей"""
+    """Исключает из результатов запроса заявки, которые не положено публиковать."""
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
+    # qs &= ~Q(
+    #     'query_string',
+    #     query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
+    #           'OR (search_data.obj_state:1 AND Document.idObjType:4 '
+    #           'AND NOT _exists_:TradeMark.TrademarkDetails.Code_441 AND search_data.app_date:[2020-07-18 TO *})'
+    # )
+
+    # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
+    # qs &= ~Q(
+    #     'query_string',
+    #     query=f">{datetime.datetime.now().strftime('%Y-%m-%d')}",
+    #     default_field='search_data.rights_date'
+    # )
 
     return qs
 
@@ -251,7 +291,7 @@ def sort_results(s, sort_by_value):
     else:
         param = sort_param['search_field__elastic_index_field__field_name'].replace('*', '')
         if sort_param['search_field__elastic_index_field__field_type'] == 'text':
-            param = f"{param}.raw"
+            param = f"{param}.exact"
         s = s.sort(
             {
                 param: {
@@ -290,10 +330,10 @@ def filter_results(s, get_params):
     #         'title': 'mark_status',
     #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
     #     })
-    filters.append({
-        'title': 'mark_status',
-        'field': 'Document.MarkCurrentStatusCodeType.keyword'
-    })
+    # filters.append({
+    #     'title': 'mark_status',
+    #     'field': 'Document.MarkCurrentStatusCodeType.keyword'
+    # })
 
     # Агрегация без фильтрации
     for item in filters:
@@ -344,7 +384,9 @@ def extend_doc_flow(hit):
         ]
     )
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-    application = Search().using(client).query(q).execute()
+    application = Search().using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).execute()
     if application:
         application = application[0].to_dict()
 
@@ -752,10 +794,14 @@ def get_data_for_selection_tm(hit):
         'value': datetime.datetime.strptime(hit.search_data.app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
     }
     # (450) Бюлетень
+    pub_date = datetime.datetime.strptime(
+        hit.TradeMark.TrademarkDetails.PublicationDetails[0].PublicationDate,
+        '%Y-%m-%d'
+    ).strftime('%d.%m.%Y')
     data['biblio']['i_450'] = {
         'key': '450',
-        'value': f"{hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationDate}. "
-                 f"Бюл. {hit.TradeMark.TrademarkDetails.PublicationDetails.Publication.PublicationIdentifier}"
+        'value': f"{pub_date}. "
+                 f"Бюл. {hit.TradeMark.TrademarkDetails.PublicationDetails[0].PublicationIdentifier}"
     }
     # (591) зазначення кольору чи поєднання кольорів, які охороняються
     data['biblio']['i_591'] = {
@@ -1187,23 +1233,64 @@ def user_has_access_to_docs_decorator(f):
 def user_has_access_to_docs(user, hit):
     """Возвращает признак доступности документа(ов)"""
     # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
-    if not user.is_anonymous and user.is_vip():
-        return True
+    if not user.is_anonymous:
+        if user.is_vip():
+            return True
+        else:
+            allowed_persons = []
 
-    # Проверка наличия имени пользователя в списках заявителей, изобретателей, владельцев, представителей
-    if hasattr(user, 'certificateowner'):
-        user_fullname = user.certificateowner.pszSubjFullName.upper().strip()
+            for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+                try:
+                    if hit['search_data'].get(person_type):
+                        allowed_persons += [x['name'] for x in hit['search_data'][person_type]]
+                except KeyError:
+                    pass
 
-        for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+            # Адреса для листування (ТМ)
             try:
-                persons = [hit['search_data'][person_type]] if isinstance(hit['search_data'][person_type], str) else \
-                    hit['search_data'][person_type]
-                if persons:
-                    for person in persons:
-                        if user_fullname in person.replace('i', 'і').upper():  # замена латинской i на кириллицу
-                            return True
+                allowed_persons.append(
+                    hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                        'Name']['FreeFormatNameLine']
+                )
             except KeyError:
                 pass
+
+            # Адреса для листування (ПЗ)
+            try:
+                allowed_persons.append(
+                    hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
+                        'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
+                )
+            except KeyError:
+                pass
+
+            # Адреса для листування (заявки на винаходи, корисні моделі)
+            try:
+                allowed_persons.append(hit['Claim']['I_98'])
+            except KeyError:
+                pass
+
+            # Адреса для листування (охоронні документи на винаходи, корисні моделі)
+            try:
+                allowed_persons.append(hit['Patent']['I_98'])
+            except KeyError:
+                pass
+
+            # Имена пользователя (если роль - патентный поверенный, то необходимо проверять несколько имён)
+            user_names = []
+            if hasattr(user, 'certificateowner'):
+                user_names = [user.certificateowner.pszSubjFullName.strip()]
+            elif user.is_patent_attorney():
+                user_names.append(f"{user.last_name} {user.first_name}".strip())
+                for patent_attroney in user.patentattorney_set.all():
+                    user_names.append(patent_attroney.name)
+
+            # Удаление None-объектов
+            allowed_persons = list(filter(lambda item: item is not None, allowed_persons))
+
+            # Проверка на вхождение
+            return any([person for person in allowed_persons for user_name in user_names if
+                        user_name.upper() in person.upper()])
 
     return False
 
@@ -1222,13 +1309,12 @@ def user_has_access_to_tm_app(user, hit):
         return False
 
 
-def create_search_res_doc(data):
+def create_search_res_doc(data, file_path):
     """Формировние Excel-файла с результатами поиска."""
-    workbook = xlwt.Workbook()
-    sheet = workbook.add_sheet("Search results")
+    workbook = xlsxwriter.Workbook(file_path)
+    worksheet = workbook.add_worksheet()
 
     # Заголовки
-    style = xlwt.easyxf('font: bold 1')
     titles = [
         _("Тип об'єкта промислової власності"),
         _("Стан об'єкта промислової власності"),
@@ -1244,26 +1330,57 @@ def create_search_res_doc(data):
         _("МПК"),
         _("МКТП"),
         _("МКПЗ"),
+        _("(441) Дата публікації відомостей про заявку та номер бюлетня"),
+        _("Зображення ТМ"),
     ]
-    for i in range(len(titles)):
-        sheet.write(0, i, titles[i], style)
 
-    # Данные
-    style = xlwt.easyxf('align: wrap on, vert top;')
-    for i, l in enumerate(data):
-        for j, col in enumerate(l):
-            sheet.write(i + 1, j, col, style)
+    bold = workbook.add_format({'bold': True})
+    worksheet.write_row(0, 0, titles, bold)
 
-    return workbook
+    for row_num, row_data in enumerate(data):
+        for col_num, col_data in enumerate(row_data):
+            if col_num == 15 and col_data and os.path.exists(col_data):
+                worksheet.insert_image(
+                    row_num + 1,
+                    col_num,
+                    col_data,
+                    {
+                        'x_offset': 2,
+                        'y_offset': 2,
+                        'x_scale': 0.3,
+                        'y_scale': 0.3,
+                        'image_data': get_resized_image_for_report(col_data)
+                    }
+                )
+            else:
+                worksheet.write(row_num + 1, col_num, col_data)
+
+    workbook.close()
+
+
+def get_resized_image_for_report(img_path):
+    """Изменяет размер изображения для отчёта и возвращает BytesIO."""
+    fixed_height = 120
+    image = Image.open(img_path)
+
+    height_percent = (fixed_height / float(image.size[1]))
+    width_size = int((float(image.size[0]) * float(height_percent)))
+    image = image.resize((width_size, fixed_height), Image.NEAREST)
+    if image.mode in ("RGBA", "P"):
+        image = image.convert("RGB")
+
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='JPEG', optimize=True, quality=50)
+    return img_byte_arr
 
 
 def prepare_data_for_search_report(s, lang_code, user=None):
     """Подготавливает данные для файла Excel."""
     obj_states = [_('Заявка'), _('Охоронний документ')]
-    obj_types = ObjType.objects.order_by('id').values_list(f"obj_type_{lang_code}", flat=True)
+    obj_types = ObjType.objects.order_by('id').values_list('id', f"obj_type_{lang_code}")
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
-        obj_type = obj_types[h.Document.idObjType - 1]
+        obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
         obj_state = obj_states[h.search_data.obj_state - 1]
 
         if is_app_limited(h.to_dict(), user):
@@ -1280,20 +1397,31 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                 '',
                 '',
                 '',
+                '',
+                '',
             ])
         else:
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
-                if h.search_data.app_date else ''
+                if hasattr(h.search_data, 'app_date') and h.search_data.app_date else ''
             rights_date = datetime.datetime.strptime(h.search_data.rights_date, '%Y-%m-%d').strftime(
                 '%d.%m.%Y') if h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
             applicant = get_app_applicant(h)
             owner = get_app_owner(h)
             inventor = get_app_inventor(h)
-            agent = ';\r\n'.join(h.search_data.agent) if iterable(h.search_data.agent) else h.search_data.agent
+            if hasattr(h.search_data, 'agent') and h.search_data.agent:
+                agent = ';\r\n'.join([x.name for x in h.search_data.agent])
+            else:
+                agent = ''
             ipc_indexes = get_app_ipc_indexes(h)
             nice_indexes = get_app_nice_indexes(h)
             icid = get_app_icid(h)
+            if h.Document.idObjType in (4, 9, 14):
+                code_441 = get_441_code(h)
+                image = get_tm_image_path(h)
+            else:
+                code_441 = ''
+                image = ''
 
             data.append([
                     obj_type,
@@ -1310,9 +1438,58 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     ipc_indexes,
                     nice_indexes,
                     icid,
+                    code_441,
+                    image,
                 ])
-
     return data
+
+
+def get_tm_image_path(app):
+    """Возвращает путь к изображению ТМ на диске."""
+    if type(app) is not dict:
+        app = app.to_dict()
+    splitted_path = app['Document']['filesPath'].replace("\\", "/").split('/')
+    splitted_path_len = len(splitted_path)
+
+    if app['Document']['idObjType'] == 4:
+        image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+        return f"{settings.MEDIA_ROOT}/" \
+               f"{splitted_path[splitted_path_len-4]}" \
+               f"/{splitted_path[splitted_path_len-3]}/" \
+               f"{splitted_path[splitted_path_len-2]}/{image_name}"
+    else:
+        # ТМ Мадрид
+        image_name = f"{app['search_data']['protective_doc_number']}.jpg"
+        return f"{settings.MEDIA_ROOT}/" \
+               f"{splitted_path[splitted_path_len-5].upper()}/" \
+               f"{splitted_path[splitted_path_len-4]}/" \
+               f"{splitted_path[splitted_path_len-3]}/" \
+               f"{splitted_path[splitted_path_len-2]}/{image_name}"
+
+
+def get_441_code(app):
+    """Возвращает 441 код ТМ."""
+    if type(app) is not dict:
+        app = app.to_dict()
+
+    if app['Document']['idObjType'] in (4, 9, 14):
+        try:
+            if app['Document']['idObjType'] == 4:
+                code_441 = app['TradeMark']['TrademarkDetails']['Code_441']
+            else:
+                code_441 = app['MadridTradeMark']['TradeMarkDetails']['Code_441']
+            code_441_formatted = datetime.datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
+        except KeyError:
+            return ''
+
+        try:
+            obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441, date_to__gte=code_441)
+        except ClListOfficialBulletinsIp.DoesNotExist:
+            return code_441_formatted
+        else:
+            return f"{code_441_formatted}, бюл. №{obj.bul_number}"
+    else:
+        return ''
 
 
 def get_app_applicant(app):
@@ -1332,7 +1509,6 @@ def get_app_applicant(app):
                 item.pop('EDRPOU', '')
                 item_values = sorted(list(item.values()), key=len)
                 applicants.append(f"{item_values[1]} [{item_values[0]}]")
-
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
         try:
@@ -1348,6 +1524,28 @@ def get_app_applicant(app):
     elif app.Document.idObjType == 6:
         try:
             for item in app.Design.DesignDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.ApplicantDetails.Applicant:
+                applicants.append(
+                    f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право (договора)
+    elif app.Document.idObjType in (11, 12):
+        try:
+            for item in app.Decision.DecisionDetails.ApplicantDetails.Applicant:
                 applicants.append(
                     f"{item.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
                     f"[{item.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
@@ -1409,6 +1607,26 @@ def get_app_owner(app):
         except AttributeError:
             pass
 
+    # ТМ (Мадрид)
+    elif app.Document.idObjType in (9, 14):
+        owner = app.MadridTradeMark.TradeMarkDetails.HOLGR.NAME.NAMEL
+        for item in app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.ADDRL:
+            owner += f" {item}"
+        if app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY:
+            owner += f"[{app.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY}]"
+        owners.append(owner)
+
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
     return ';\r\n'.join(owners)
 
 
@@ -1441,6 +1659,28 @@ def get_app_inventor(app):
         except AttributeError:
             pass
 
+    # Авторское право
+    elif app.Document.idObjType in (10, 13):
+        try:
+            for item in app.Certificate.CopyrightDetails.AuthorDetails.Author:
+                inventors.append(
+                    f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
+    # Авторское право (договора)
+    elif app.Document.idObjType in (11, 12):
+        try:
+            for item in app.Decision.DecisionDetails.AuthorDetails.Author:
+                inventors.append(
+                    f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
     return ';\r\n'.join(inventors)
 
 
@@ -1469,6 +1709,13 @@ def get_app_nice_indexes(app):
         for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
             nice_indexes.append(str(cls.ClassNumber))
         return '; '.join(nice_indexes)
+
+    elif app.Document.idObjType in (9, 14):
+        nice_indexes = []
+        for cls in app.MadridTradeMark.TradeMarkDetails.BASICGS.GSGR:
+            nice_indexes.append(str(cls['@NICCLAI']))
+        return '; '.join(nice_indexes)
+
     return ''
 
 
@@ -1570,7 +1817,11 @@ def get_search_in_transactions(search_params):
             )
         )
 
-        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+        qs = filter_bad_apps(qs)
+
+        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).source(
+            excludes=["*.DocBarCode", "*.DOCBARCODE"]
+        ).query(qs)
 
         return s
 
@@ -1582,19 +1833,19 @@ def sort_doc_flow(hit):
     # Изобретения, полезные модели, топографии
     if hit['Document']['idObjType'] in (1, 2, 3):
         if hit.get('DOCFLOW'):
-            hit['DOCFLOW']['DOCUMENTS'].sort(
+            hit['DOCFLOW'].get('DOCUMENTS', []).sort(
                 key=lambda document: time.strptime(document['DOCRECORD'].get(
                     'DOCREGDATE', document['DOCRECORD'].get(
                         'DOCSENDINGDATE', '1970-01-01'
                     )
                 ), "%Y-%m-%d")
             )
-            hit['DOCFLOW']['PAYMENTS'].sort(
+            hit['DOCFLOW'].get('PAYMENTS', []).sort(
                 key=lambda document: time.strptime(document['PFRECORD'].get(
                     'PFDATE', '1970-01-01'
                 ), "%Y-%m-%d")
             )
-            hit['DOCFLOW']['COLLECTIONS'].sort(
+            hit['DOCFLOW'].get('COLLECTIONS', []).sort(
                 key=lambda document: time.strptime(document['CLRECORD'].get(
                     'CLDATEBEGIN', '1970-01-01'
                 ), "%Y-%m-%d")
@@ -1642,66 +1893,80 @@ def get_registration_status_color(hit):
                 status = 'red'
             elif hit['Document']['RegistrationStatus'] == 'T':
                 status = 'yellow'
+            else:
+                status = 'red'
         except KeyError:
             status = 'red'
     elif hit['Document']['idObjType'] == 4:
-        status = 'green'
+        status = hit.get('TradeMark', {}).get('TrademarkDetails', {}).get('registration_status_color')
 
-        red_transaction_types = [
-            'TerminationNoRenewalFee',
-            'TotalTerminationByOwner',
-            'TotalInvalidationByCourt',
-            'TotalTerminationByCourt',
-            'TotalInvalidationByAppeal',
-        ]
+        if not status:
+            status = 'green'
 
-        if hit.get('TradeMark', {}).get('Transactions'):
-            last_transaction_type = hit['TradeMark']['Transactions']['Transaction'][
-                len(hit['TradeMark']['Transactions']['Transaction']) - 1].get('@type')
+            red_transaction_types = [
+                'TerminationNoRenewalFee',
+                'TotalTerminationByOwner',
+                'TotalInvalidationByCourt',
+                'TotalTerminationByCourt',
+                'TotalInvalidationByAppeal',
+            ]
 
-            if last_transaction_type in red_transaction_types:
-                status = 'red'
+            if hit.get('TradeMark', {}).get('Transactions'):
+                last_transaction_type = hit['TradeMark']['Transactions']['Transaction'][
+                    len(hit['TradeMark']['Transactions']['Transaction']) - 1].get('@type')
+
+                if last_transaction_type in red_transaction_types:
+                    status = 'red'
 
     elif hit['Document']['idObjType'] == 5:
         status = 'green'
 
     elif hit['Document']['idObjType'] == 6:
+        status = hit.get('Design', {}).get('DesignDetails', {}).get('registration_status_color')
+
+        if not status:
+            status = 'green'
+
+            red_transaction_types = [
+                'Termination',
+                'TerminationByAppeal',
+                'TerminationNoRenewalFee',
+                'TotalInvalidationByAppeal',
+                'TotalInvalidationByCourt',
+                'TotalTerminationByOwner',
+            ]
+
+            if hit.get('Design', {}).get('Transactions'):
+                last_transaction_type = hit['Design']['Transactions']['Transaction'][
+                    len(hit['Design']['Transactions']['Transaction']) - 1].get('@type')
+
+                if last_transaction_type in red_transaction_types:
+                    status = 'red'
+
+    # ТМ (Мадрид)
+    elif hit['Document']['idObjType'] in (9, 14):
         status = 'green'
-
-        red_transaction_types = [
-            'Termination',
-            'TerminationByAppeal',
-            'TerminationNoRenewalFee',
-            'TotalInvalidationByAppeal',
-            'TotalInvalidationByCourt',
-            'TotalTerminationByOwner',
-        ]
-
-        if hit.get('Design', {}).get('Transactions'):
-            last_transaction_type = hit['Design']['Transactions']['Transaction'][
-                len(hit['Design']['Transactions']['Transaction']) - 1].get('@type')
-
-            if last_transaction_type in red_transaction_types:
-                status = 'red'
 
     return status
 
 
+def get_fixed_mark_status_code(app_data):
+    """Анализирует список документов и возвращает код статуса согласно их наличию."""
+    result = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+    for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
+        if ('ТM-1.1' in doc['DocRecord']['DocType'] or 'ТМ-1.1' in doc['DocRecord']['DocType']) and result < 2000:
+            result = 3000
+        if ('Т-05' in doc['DocRecord']['DocType'] or 'Т-5' in doc['DocRecord']['DocType']) and result < 3000:
+            result = 3000
+        if 'Т-08' in doc['DocRecord']['DocType'] and result < 4000:
+            result = 4000
+    return result
+
+
 def filter_app_data(app_data, user):
     """Фильтрует данные заявки. Оставляет только необходимую и доступную для отображения информацию."""
-    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-    # if app_data['Document'].get('MarkCurrentStatusCodeType') == '1000' and not user_has_access_to_tm_app(user, app_data):
-    #     res = {}
-    #     res.update({'meta': app_data['meta']})
-    #     res.update({'Document': app_data['Document']})
-    #     res.update({'search_data': {
-    #         'app_number': app_data['search_data']['app_number'],
-    #         'obj_state': app_data['search_data']['obj_state'],
-    #     }})
-    #     return res
-    # return app_data
 
-    # Если это заявка на полезную модель или пром образец,
+    # Если это заявка на полезную модель или пром образец, заявка на ТМ без установленной даты подачи
     # то необходимо убрать всю "закрытую" информацию
     # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
     if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
@@ -1730,12 +1995,57 @@ def filter_app_data(app_data, user):
             }
             return res
 
+        elif app_data['Document']['idObjType'] == 4:
+            # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            mark_status = get_fixed_mark_status_code(app_data)
+            app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
+            if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
+                date_441 = datetime.datetime.strptime(
+                    app_data['TradeMark']['TrademarkDetails'].get('Code_441'),
+                    '%Y-%m-%d'
+                )
+            else:
+                date_441 = None
+            date_441_start = datetime.datetime.strptime('2020-08-18', '%Y-%m-%d')
+
+            # Условие, которое определяет установлена ли дата подачи заявки
+            if (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start):
+                res = {}
+                res.update({'meta': app_data['meta']})
+                res.update({'Document': app_data['Document']})
+                res.update(
+                    {
+                        'TradeMark': {
+                            'TrademarkDetails': {
+                                'stages': app_data['TradeMark'].get('TrademarkDetails', {}).get('stages', []),
+                                'application_status': app_data['TradeMark'].get('TrademarkDetails', {}).get(
+                                    'application_status'
+                                )
+                            },
+                            'DocFlow': app_data['TradeMark'].get('DocFlow', {}),
+                            'PaymentDetails': app_data['TradeMark'].get('PaymentDetails', {}),
+                        }
+                    }
+                )
+                res.update({'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }})
+                return res
+
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             res = {
                 'meta': app_data['meta'],
                 'Document': app_data['Document'],
                 'Design': {
-                    'DocFlow': app_data['Design'].get('DocFlow')
+                    'DesignDetails': {
+                        'stages': app_data['Design'].get('DesignDetails', {}).get('stages', []),
+                        'application_status': app_data['Design'].get('DesignDetails', {}).get(
+                            'application_status'
+                        )
+                    },
+                    'DocFlow': app_data['Design'].get('DocFlow'),
+                    'PaymentDetails': app_data['Design'].get('PaymentDetails'),
                 },
                 'search_data': {
                     'app_number': app_data['search_data']['app_number'],
@@ -1754,6 +2064,21 @@ def is_app_limited(app_data, user):
             return True
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
             return True
+        elif app_data['Document']['idObjType'] == 4:  # Заявки на ТМ
+            # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            mark_status = get_fixed_mark_status_code(app_data)
+            app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
+            if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
+                date_441 = datetime.datetime.strptime(
+                    app_data['TradeMark']['TrademarkDetails'].get('Code_441'),
+                    '%Y-%m-%d'
+                )
+            else:
+                date_441 = None
+            date_441_start = datetime.datetime.strptime('2020-08-18', '%Y-%m-%d')
+
+            # Условие, которое определяет установлена ли дата подачи заявки
+            return (mark_status < 2000 and app_date < date_441_start) or (date_441 is None and app_date >= date_441_start)
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             return True
     return False
@@ -1766,21 +2091,24 @@ def get_ipc_codes_with_schedules(lang_code):
         Prefetch(
             'inidcodeschedule_set',
             queryset=InidCodeSchedule.objects.filter(
-                schedule_type__id__lt=16,
                 enable_search=True
+            ).exclude(
+                schedule_type__id__gt=19,
+                schedule_type__id__lt=30
             ).prefetch_related('schedule_type')
         ),
     ).exclude(
         obj_types=None,
     ).exclude(
+        inidcodeschedule__schedule_type__id__gt=19,
+        inidcodeschedule__schedule_type__id__lt=30,
         inidcodeschedule__schedule_type__ipccode__isnull=True,
-        inidcodeschedule__schedule_type__id__gte=16
     )
 
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in range(3, 9) else 1
+            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 
@@ -1792,5 +2120,4 @@ def get_ipc_codes_with_schedules(lang_code):
                 'obj_types': [obj_type.id for obj_type in item.obj_types.all()],
                 'obj_states': obj_states,
             })
-
     return res

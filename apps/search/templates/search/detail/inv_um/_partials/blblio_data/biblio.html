@@ -3,6 +3,28 @@
 {% load i18n %}
 
 <div id="biblio-data">
+    {% if hit.search_data.obj_state == 1 and hit.Document.idObjType == 1 %}
+        <div class="g-pb-20 d-flex justify-content-between">
+            {% if hit.Claim and hit.Claim|get:'I_43.D' %}
+                <div>
+                    {% trans "Опубліковано" %} <span
+                        class="g-font-weight-600">{{ hit.Claim|get:'I_43.D'|last|parse_date|date:"d.m.Y" }}</span>,
+                    {% trans "бюл." %} № <span
+                        class="g-font-weight-600">{{ hit.Claim.I_43_bul_str }}</span>
+                </div>
+            {% endif %}
+        </div>
+    {% elif hit.Patent and hit.Patent|get:'I_45.D' %}
+        <div class="g-pb-20 d-flex justify-content-between">
+            <div>
+                {% trans "Опубліковано" %} <span
+                    class="g-font-weight-600">{{ hit.Patent|get:'I_45.D'|last|parse_date|date:"d.m.Y" }}</span>,
+                {% trans "бюл." %} № <span
+                    class="g-font-weight-600">{{ hit.Patent.I_45_bul_str }}</span>
+            </div>
+        </div>
+    {% endif %}
+
     {% if hit.search_data.obj_state == 2 %}
         <div class="g-pb-10 d-flex justify-content-end">
             {% registration_status hit=hit %}

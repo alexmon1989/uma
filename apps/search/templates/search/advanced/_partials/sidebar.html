@@ -102,28 +102,28 @@
         {# ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ #}
         {#% is_paid_services_enabled as is_paid_services_enabled %#}
         {#% if is_paid_services_enabled %#}
-            {% for status in aggregations.mark_status_terms.buckets|dictsort:"key"|slice:":1" %}
-                {% if status.key == '1000' and status.doc_count > 0 %}
-                    <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус заявки" %}</h2>
-                    <hr class="g-brd-gray-light-v4 g-my-15">
-                    <div class="g-mb-20">
-                        <div class="form-group g-mb-5">
-                            <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
-                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                       type="checkbox"
-                                       name="filter_mark_status"
-                                       value="1000"
-                                       {% if '1000' in get_params.filter_mark_status %}checked{% endif %}
-                                >
-                                <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
-                                    <i class="fa" data-check-icon=""></i>
-                                </div>
-                                {% trans "Лише заявки, за якими не встановлена дата їх подання" %}
-                            </label>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
+{#            {% for status in aggregations.mark_status_terms.buckets|dictsort:"key"|slice:":1" %}#}
+{#                {% if status.key == '1000' and status.doc_count > 0 %}#}
+{#                    <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус заявки" %}</h2>#}
+{#                    <hr class="g-brd-gray-light-v4 g-my-15">#}
+{#                    <div class="g-mb-20">#}
+{#                        <div class="form-group g-mb-5">#}
+{#                            <label class="u-check g-pl-30 {% if color.doc_count == 0 %}g-color-gray-light-v1{% endif %}">#}
+{#                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"#}
+{#                                       type="checkbox"#}
+{#                                       name="filter_mark_status"#}
+{#                                       value="1000"#}
+{#                                       {% if '1000' in get_params.filter_mark_status %}checked{% endif %}#}
+{#                                >#}
+{#                                <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">#}
+{#                                    <i class="fa" data-check-icon=""></i>#}
+{#                                </div>#}
+{#                                {% trans "Лише заявки, за якими не встановлена дата їх подання" %}#}
+{#                            </label>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
         {#% endif %#}
     </form>
 </div>

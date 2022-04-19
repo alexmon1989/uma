@@ -2,13 +2,13 @@
 {% load search_extras %}
 {% load i18n %}
 
-<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+<div class="card g-brd-none rounded-0 g-mb-20 g-font-size-13">
     <div class="d-flex justify-content-between card-header g-font-size-14 g-pl-10 g-py-4 {% if hit.Document.MarkCurrentStatusCodeType == '1000' %}g-bg-green{% else %}g-bg-bluegray-opacity-0_35{% endif %} g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
         <div>
             {{ item_num }}.
             <a href="{% url 'search:detail' pk=hit.meta.id %}"
                class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
-            >{{ hit.search_data.title|default_if_none:"---" }}</a>
+            >{% if hit.search_data.title %}{{ hit.search_data.title|default_if_none:"---" }}{% else %}{{ hit.search_data.app_number }}{% endif %}</a>
             {% if hit.Document.MarkCurrentStatusCodeType == '1000' %}
                 <a href="javascript:void(0);"
                    title="Інформація"
@@ -16,7 +16,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-html="true"
-                   data-content="{% trans "Заявка на знак для товарів і послуг, за якою не встановлена дата її подання" %}"
+                   data-content="{% trans "Заявка на торговельну марку, за якою не встановлена дата її подання" %}"
                 ><i class="fa fa-question-circle"></i></a>
             {% endif %}
         </div>
@@ -27,9 +27,9 @@
     <div class="g-py-5 d-flex justify-content-between">
         <div class="g-text-underline text-info">
             {% if hit.search_data.obj_state == 1 %}
-                {% trans "Заявка на знак для товарів та послуг" %}
+                {% trans "Заявка на торговельну марку" %}
             {% else %}
-                {% trans "Свідоцтво України на знак для товарів та послуг" %}
+                {% trans "Свідоцтво України на торговельну марку" %}
             {% endif %}
         </div>
 
@@ -39,6 +39,14 @@
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+        {% if not hit.TradeMark.TrademarkDetails.ApplicationNumber %}
+            {# Заявка без права просмотра библиографических данных #}
+            <div class="col-md">
+                <p class="g-font-weight-600 g-mb-0 text-danger">{% trans "Для даної заявки можливий перегляд лише її стану діловодства." %}</p>
+            </div>
+
+        {% else %}
+
         <div class="col-md">
             <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
             {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
@@ -65,13 +73,13 @@
                data-placement="top"
                title="(210) {% trans "Номер заявки" %}"
             >{{ hit.TradeMark.TrademarkDetails.ApplicationNumber }}</a><br>
-            {% if hit.TradeMark.TrademarkDetails.ApplicationDate %}
+            {% if hit.search_data.app_date %}
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="bottom"
                    title="(220) {% trans "Дата подання заявки" %}"
-                >{{ hit.TradeMark.TrademarkDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</a>
+                >{{ hit.search_data.app_date|parse_date|date:"d.m.Y" }}</a>
             {% endif %}
         </div>
 
@@ -133,5 +141,8 @@
                 </span>
             </a>
         </div>
+        {% endif %}
     </div>
+
+    {% include 'search/advanced/_partials/item_details_link_block.html' %}
 </div>

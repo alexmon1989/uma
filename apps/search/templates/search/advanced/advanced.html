@@ -25,7 +25,7 @@
             </p>
         {% endif %}
 
-        <div class="collapse g-mb-20 {% if not is_search %}show{% endif %}" id="collapseForm">
+        <div class="collapse g-mb-20 {% if show_search_form %}show{% endif %}" id="collapseForm">
             <advanced-search-form v-bind:obj-types="{{ obj_types }}"
                                   v-bind:ipc-codes="{{ ipc_codes }}"
                                   v-bind:initial-data="{{ initial_data }}"
@@ -35,12 +35,7 @@
         {% if is_search %}
             <div class="results">
                 <div class="g-mt-10">
-                    <button class="btn btn-md u-btn-blue g-mb-20" type="button" data-toggle="collapse"
-                            data-target="#collapseForm"
-                            aria-expanded="false"
-                            aria-controls="collapseExample">
-                        <i class="fa fa-angle-down"></i> {% trans "Показати умови пошуку" %}
-                    </button>
+                    {% include 'search/_partials/show_search_conditions_btn.html' %}
 
                     <div class="g-pos-rel g-min-height-200">
                         <div class="overlay g-bg-white" id="overlay">
@@ -57,7 +52,9 @@
 
 {% block extra_scripts %}
     {% get_current_language as LANGUAGE_CODE %}
-    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    {% if RECAPTCHA_ENABLED %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+    {% endif %}
     <script>
         function get_task_info(task_id, retries) {
             var $resultsDiv = $(".results");
@@ -66,11 +63,13 @@
                 $resultsDiv.find('p').html(gettext("Виникла помилка при отриманні даних. Будь-ласка, спробуйте пізніше."));
             };
 
-            grecaptcha.execute('{{ site_key }}', {action: 'advancedsearch'}).then(function (token) {
+            {% if RECAPTCHA_ENABLED %}
+                grecaptcha.execute('{{ site_key }}', {action: 'advancedsearch'}).then(function (token) {
+            {% endif %}
                 $.ajax({
                     type: 'get',
                     url: '/{{ LANGUAGE_CODE }}/search/results/',
-                    data: {'task_id': task_id, 'search_type': 'advanced', 'token': token},
+                    data: {'task_id': task_id, 'search_type': 'advanced', {% if RECAPTCHA_ENABLED %}'token': token{% endif %}},
                     success: function (data) {
                         if (data.state === 'SUCCESS') {
                             $resultsDiv.html(data.result);
@@ -90,19 +89,27 @@
                         onError();
                     }
                 });
-            });
+            {% if RECAPTCHA_ENABLED %}});{% endif %}
         }
 
         {% if task_id %}
             $(function () {
+                {% if RECAPTCHA_ENABLED %}
                 grecaptcha.ready(function () {
                     get_task_info('{{ task_id }}', 20);
                 });
+                {% else %}
+                    get_task_info('{{ task_id }}', 20);
+                {% endif %}
             });
         {% endif %}
     </script>
+
+    {{ RECAPTCHA_ENABLED|json_script:"recaptcha-enabled" }}
 {% endblock %}
 
 {% block extra_meta %}
-    <meta name="site-key" content="{{ site_key }}">
+    {% if RECAPTCHA_ENABLED %}
+        <meta name="site-key" content="{{ site_key }}">
+    {% endif %}
 {% endblock %}

@@ -1,9 +1,10 @@
-from rest_framework import generics, exceptions
-from .serializers import OpenDataSerializer, OpenDataSerializerV1
-from .models import OpenData
-from apps.search.models import ObjType, IpcAppList
-import datetime
+from django.http import Http404
 from django.utils.timezone import make_aware
+from rest_framework import generics, exceptions
+from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
+from .models import OpenData, OpenDataViewModel
+from apps.search.models import ObjType
+import datetime
 
 
 class OpenDataListView(generics.ListAPIView):
@@ -60,6 +61,8 @@ class OpenDataListView(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )
 
@@ -68,7 +71,7 @@ class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
     def get_queryset(self):
-        queryset = OpenData.objects.select_related('app', 'obj_type').order_by('pk').all()
+        queryset = OpenDataViewModel.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
 
         # Стан об'єкта
         obj_state = self.request.query_params.get('obj_state', None)
@@ -154,5 +157,117 @@ class OpenDataListViewV1(generics.ListAPIView):
             'registration_date',
             'last_update',
             'data',
+            'data_docs',
+            'data_payments',
             'app__files_path',
         )
+
+
+class OpenDataDetailViewV1(generics.RetrieveAPIView):
+    """Возвращает детали объекта по номеру заявки."""
+
+    serializer_class = OpenDataSerializerV1
+    lookup_field = 'app_number'
+
+    def get_queryset(self):
+        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk')
+
+        if self.request.query_params.get('obj_type', None):
+            try:
+                obj_type = int(self.request.query_params['obj_type'])
+                queryset = queryset.filter(obj_type=obj_type)
+            except ValueError:
+                raise Http404
+
+        return queryset.values(
+            'app_id',
+            'obj_type__obj_type_ua',
+            'obj_state',
+            'app_number',
+            'app_date',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+            'data_docs',
+            'data_payments',
+            'app__files_path',
+        )
+
+    def get_object(self):
+        qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
+
+        if qs.count() > 0:
+            return qs.first()
+        raise Http404
+
+
+class OpenDataDocsView(generics.RetrieveAPIView):
+    """Возвращает документы объекта по номеру заявки."""
+    serializer_class = OpenDataDocsSerializer
+    lookup_field = 'app_number'
+
+    def get_queryset(self):
+        queryset = OpenData.objects.all()
+
+        if self.request.query_params.get('obj_type', None):
+            try:
+                obj_type = int(self.request.query_params['obj_type'])
+                queryset = queryset.filter(obj_type=obj_type)
+            except ValueError:
+                raise Http404
+
+        return queryset.values(
+            'data_docs',
+        )
+
+    def get_object(self):
+        qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
+
+        if qs.count() > 0:
+            return qs.first()
+        raise Http404
+
+
+class SearchListView(generics.ListAPIView):
+    """Поиск в API по номеру заявки, номеру охранного документа, типу объекта."""
+    serializer_class = OpenDataSerializerV1
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+
+        # Тип об'єкта
+        obj_type = self.request.query_params.get('obj_type', None)
+        if obj_type:
+            try:
+                obj_type = int(obj_type)
+            except:
+                raise exceptions.ParseError("Невірне значення параметру obj_type")
+            else:
+                queryset = queryset.filter(obj_type_id=obj_type)
+
+        # Номер заявки
+        app_number = self.request.query_params.get('app_number', None)
+        if app_number:
+            queryset = queryset.filter(app_number__contains_ft=f'"*{app_number}*"')
+
+        # Номер охранного документа
+        registration_number = self.request.query_params.get('registration_number', None)
+        if registration_number:
+            queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
+
+        return queryset.values(
+            'app_id',
+            'obj_type__obj_type_ua',
+            'obj_state',
+            'app_number',
+            'app_date',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+            'data_docs',
+            'data_payments',
+            'app__files_path',
+        )[:20]

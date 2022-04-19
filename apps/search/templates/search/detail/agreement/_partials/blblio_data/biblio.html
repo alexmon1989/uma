@@ -1,0 +1,100 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-20">
+            {% trans "Опубліковано" %} <span
+                class="g-font-weight-600">{{ hit.Decision.DecisionDetails.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+            {% trans "бюл." %} №{{ hit.Decision.DecisionDetails.PublicationDetails.Publication.PublicationNumber }}<span
+                class="g-font-weight-600"></span>
+        </div>
+    {% endif %}
+
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
+            {% get_field '11' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.RegistrationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600 g-font-size-16">{{ hit.Decision.DecisionDetails.RegistrationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '15' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.RegistrationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '27' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.RegistrationKind %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Decision.DecisionDetails.RegistrationKind }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '29' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.CopyrightObjectKindDetails.CopyrightObjectKind|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for kind in hit.Decision.DecisionDetails.CopyrightObjectKindDetails.CopyrightObjectKind %}
+                            {{ kind.CopyrightObjectKindName }}{% if not forloop.last %};{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '54' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.Name %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.Name }}</td>
+                </tr>
+            {% endif %}
+
+
+            {% get_field '72' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.AuthorDetails.Author|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Decision.DecisionDetails.AuthorDetails.Author %}
+                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '75' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.LicensorDetails and hit.Decision.DecisionDetails.LicenseeDetails %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.Decision.DecisionDetails.LicensorDetails.Licensor %}
+                            {{ item.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
+                        {% endfor %}
+                        &ndash;
+                        {% for item in hit.Decision.DecisionDetails.LicenseeDetails.Licensee %}
+                            {{ item.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

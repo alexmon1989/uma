@@ -8,7 +8,6 @@
                      placeholder="Оберіть діапазон дат"
                      class="w-100 h-100 g-rounded-4 g-color-main g-color-primary--hover"
                      :value="value"
-                     @input="$emit('input', $event)"
                      range
                      :lang="lang"
                      :first-day-of-week="1"
@@ -33,11 +32,20 @@
         name: "DateInput",
         components: {DatePicker},
         props: {
-            value: [Array, String]
+            initialData: [Array, String]
         },
         data() {
             return {
-                lang: ''
+                lang: '',
+                value: [],
+            }
+        },
+        watch: {
+            initialData: {
+                immediate: true,
+                handler(value) {
+                    this.value = value
+                }
             }
         },
         mounted() {

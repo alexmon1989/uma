@@ -1,0 +1,47 @@
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
+from celery import shared_task
+from django.conf import settings
+from .utils import prepare_tm_data, prepare_madrid_tm_data
+
+
+@shared_task
+def get_app_details(app_number):
+    """Задача для получения деталей по заявке."""
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+
+    # Получение объекта из индекса
+    q = Q(
+        'bool',
+        should=[
+            Q('bool', must=[
+                Q('match', search_data__app_number=app_number),
+                Q('match', Document__idObjType=4)
+            ]),
+            Q('bool', must=[
+                Q('match', search_data__protective_doc_number=app_number),
+                Q('match', Document__idObjType=9)
+            ]),
+            Q('bool', must=[
+                Q('match', search_data__protective_doc_number=app_number),
+                Q('match', Document__idObjType=14)
+            ])
+        ],
+        minimum_should_match=1
+    )
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).execute()
+    if not s:
+        return {}
+    hit = s[0].to_dict()
+
+    biblio_data = dict()
+    # Формирование массива данных
+    if hit['Document']['idObjType'] == 4:
+        biblio_data = prepare_tm_data(s[0])
+
+    elif hit['Document']['idObjType'] in (9, 14):
+        biblio_data = prepare_madrid_tm_data(app_number, s[0])
+
+    return biblio_data

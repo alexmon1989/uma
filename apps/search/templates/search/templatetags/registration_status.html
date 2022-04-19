@@ -13,13 +13,35 @@
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
         {% endif %}
     {# Товографії, знаки для товарів та послуг (свідоцтва), КЗПТ #}
-    {% elif hit.Document.idObjType == 3 or hit.Document.idObjType == 4 or hit.Document.idObjType == 5 %}
+    {% elif hit.Document.idObjType == 3 or hit.Document.idObjType == 4 or hit.Document.idObjType == 5 or hit.Document.idObjType == 9 or hit.Document.idObjType == 14 %}
         {% if hit.search_data.registration_status_color == 'green' %}
             {% trans "Свідоцтво діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
         {% elif hit.search_data.registration_status_color == 'red' %}
             {% trans "Свідоцтво не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
         {% elif hit.search_data.registration_status_color == 'yellow' %}
             <span title="{% trans "Дію свідоцтва припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
+        {% else %}
+            {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
+        {% endif %}
+    {# Авторське право #}
+    {% elif hit.Document.idObjType == 10 or hit.Document.idObjType == 13 %}
+        {% if hit.search_data.registration_status_color == 'green' %}
+            {% trans "Свідоцтво діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'red' %}
+            {% trans "Свідоцтво не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'yellow' %}
+            <span title="{% trans "Дію свідоцтва припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
+        {% else %}
+            {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
+        {% endif %}
+    {# Авторське право - Договори #}
+    {% elif hit.Document.idObjType == 11 or hit.Document.idObjType == 12 %}
+        {% if hit.search_data.registration_status_color == 'green' %}
+            {% trans "Договір діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'red' %}
+            {% trans "Договір не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'yellow' %}
+            <span title="{% trans "Дію договора припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
         {% else %}
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
         {% endif %}

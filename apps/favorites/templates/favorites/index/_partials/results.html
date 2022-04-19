@@ -45,12 +45,21 @@
                 {# Знаки для товаров и услуг #}
                 {% elif hit.Document.idObjType == 4 %}
                     {% tm_item hit forloop.counter0|add:results.start_index %}
+                {# Знаки для товаров и услуг (Мадрид) #}
+                {% elif hit.Document.idObjType == 9 or hit.Document.idObjType == 14 %}
+                    {% tm_item_madrid hit forloop.counter0|add:results.start_index %}
                 {# КЗПТ #}
                 {% elif hit.Document.idObjType == 5 %}
                     {% qi_item hit forloop.counter0|add:results.start_index %}
                 {# Пром. образец #}
                 {% elif hit.Document.idObjType == 6 %}
                     {% id_item hit forloop.counter0|add:results.start_index %}
+                {# Авторське право #}
+                {% elif hit.Document.idObjType == 10 or hit.Document.idObjType == 13 %}
+                    {% copyright_item hit forloop.counter0|add:results.start_index %}
+                {# Авторське право (договора) #}
+                {% elif hit.Document.idObjType == 11 or hit.Document.idObjType == 12 %}
+                    {% agreement_item hit forloop.counter0|add:results.start_index %}
                 {% endif %}
             {% endfor %}
 

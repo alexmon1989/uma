@@ -48,40 +48,56 @@ function updateURLParameter(url, param, paramVal)
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
-function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries=20) {
-    let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries = 20) {
+    const recaptchaEnabled = !!JSON.parse(document.getElementById('recaptcha-enabled').textContent);
 
-    grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
-        $.ajax({
-            type: 'get',
-            url: '/search/get-task-info/',
-            data: {'task_id': taskId, 'token': token},
-            success: function (data) {
-                if (data.state === 'SUCCESS') {
-                    if (data.result === false) {
-                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                    } else {
-                        toastr.success(gettext('Файл було сформовано.'));
-                        saveAs(data.result, data.result.split('/').pop());
-                    }
-                    onSuccess(data);
-                } else {
-                    if (retries > 0) {
-                        setTimeout(function () {
-                            downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
-                        }, 1000);
-                    } else {
-                        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
-                        onError();
-                    }
-                }
-            },
-            error: function (data) {
+    let onAjaxSuccess = function (data) {
+        if (data.state === 'SUCCESS') {
+            if (data.result === false) {
+                toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            } else {
+                toastr.success(gettext('Файл було сформовано.'));
+                saveAs(data.result, data.result.split('/').pop());
+            }
+            onSuccess(data);
+        } else {
+            if (retries > 0) {
+                setTimeout(function () {
+                    downloadFileAfterTaskExec(taskId, onSuccess, onError, --retries);
+                }, 1000);
+            } else {
                 toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
                 onError();
             }
+        }
+    };
+
+    let onAjaxError = function (data) {
+        toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+        onError();
+    };
+
+    if (recaptchaEnabled) {
+        let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
+
+        grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
+            $.ajax({
+                type: 'get',
+                url: '/search/get-task-info/',
+                data: {'task_id': taskId, 'token': token},
+                success: onAjaxSuccess,
+                error: onAjaxError,
+            });
         });
-    });
+    } else {
+        $.ajax({
+            type: 'get',
+            url: '/search/get-task-info/',
+            data: {'task_id': taskId},
+            success: onAjaxSuccess,
+            error: onAjaxError,
+        });
+    }
 }
 
 /**
@@ -189,13 +205,14 @@ $(function () {
     // Выделитть (снять выделение) все документы
     $(document).on(
         'click',
-        '#documents-form #select-all-documents',
+        '.select-all-documents',
         function (e) {
-            var $this = $(this);
+            const $this = $(this);
+            const $input = $this.closest('form').find('input[name=cead_id]');
             if ($this.is(':checked')) {
-                $("#documents-form input[name=cead_id]").prop('checked', true);
+                $input.prop('checked', true);
             } else {
-                $("#documents-form input[name=cead_id]").prop('checked', false);
+                $input.prop('checked', false);
             }
         });
 
@@ -266,7 +283,7 @@ $(function () {
     });
 
     // Обработчтк события нажатия на кнопку формирования ссылки на документ
-    $(document).on('click', '#documents-form button.download-doc', function (e) {
+    $(document).on('click', '.documents-form button.download-doc', function (e) {
         e.preventDefault();
         let $this = $(this);
         $this.attr('disabled', true);
@@ -307,7 +324,7 @@ $(function () {
     });
 
     // Обработчик события нажатия на кнопку загрузки архива с документами
-    $(document).on('submit', '#documents-form', function (e) {
+    $(document).on('submit', '.documents-form', function (e) {
         e.preventDefault();
         let $form = $(this);
         // Проверка стоит ли галочка хотя бы на одном документе
@@ -335,7 +352,8 @@ $(function () {
                             .find('i').first()
                             .removeClass('fa-spinner')
                             .addClass('fa-download');
-                    });
+                    },
+                    60);
             });
         } else {
             toastr.error(gettext('Не було обрано жодного документу.'));
@@ -366,7 +384,7 @@ $(function () {
                         .removeClass('fa-spinner')
                         .addClass('fa-download');
                 },
-                60
+                300
             );
         });
     });
@@ -402,7 +420,21 @@ $(function () {
             element.style.display = 'block';
         }
 
+        // Отображение элементов для печати
+        let elementsForPrint = content.querySelectorAll(".for-print");
+        elementsForPrint.forEach(function(el) {
+          el.style.display = 'block';
+        });
+
+        // Скрытие элементов, не предназначенных для печати
+        let elementsNotForPrint = content.querySelectorAll(".noprint");
+        elementsNotForPrint.forEach(function(el) {
+          el.style.display = 'none';
+        });
+
         let myWindow = window.open('', 'Print', 'height=600,width=800');
+
+        console.log(content.innerHTML);
 
         myWindow.document.write('<html>' + headHtml);
         myWindow.document.write('<body>' + content.innerHTML + '</body></html>');
@@ -446,5 +478,19 @@ $(function () {
         $favoritesTotalElem.html(favoritesTotalVal);
 
         $.post('/favorites/add-or-remove', { id: $this.data('hit-id') });
+    });
+
+    // Обработчик события на нажатие кнопки, показывающей/скрывающей форму поиска
+    $(document).on('click', '#show-search-form-btn', function () {
+        const $this = $(this);
+        $.post( "/search/toggle-search-form", function( data ) {
+            if (data.visible) {
+                $this.find('span.show').hide();
+                $this.find('span.hide').show();
+            } else {
+                $this.find('span.hide').hide();
+                $this.find('span.show').show();
+            }
+        });
     });
 });

@@ -24,14 +24,10 @@ def create_favorites_results_file(user_id, favorites_ids, get_params, lang_code)
         else:
             s = s.sort('_score')
 
-        s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
-
         # Данные для Excel-файла
         user = get_user_or_anonymous(user_id)
+        # Данные для Excel-файла
         data = prepare_data_for_search_report(s, lang_code, user)
-
-        # Формировние Excel-файла
-        workbook = create_search_res_doc(data)
 
         directory_path = os.path.join(
             settings.MEDIA_ROOT,
@@ -39,11 +35,11 @@ def create_favorites_results_file(user_id, favorites_ids, get_params, lang_code)
         )
         os.makedirs(directory_path, exist_ok=True)
         # Имя файла с результатами поиска
-        file_name = f"{get_unique_filename('favorites')}.xls"
+        file_name = f"{get_unique_filename('favorites')}.xlsx"
         file_path = os.path.join(directory_path, file_name)
 
-        # Сохранение файла
-        workbook.save(file_path)
+        # Формировние и сохранение Excel-файла
+        create_search_res_doc(data, file_path)
 
         # Возврат url сформированного файла с результатами поиска
         return os.path.join(

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Бюлетень" %}{% endblock %}
+
+{% block content %}
+
+    {% include 'bulletin_new/_partials/breadcrumbs.html' %}
+
+    <div class="container-semiboxed g-min-height-200 g-py-70">
+        <bulletin-new :bulletins="{{ bulletins }}"
+                      initial-bulletin-date="{{ request.GET.bulletin_date }}"
+                      :tree="{{ tree }}"
+        ></bulletin-new>
+    </div>
+
+{% endblock %}

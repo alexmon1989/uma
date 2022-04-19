@@ -222,7 +222,7 @@
 }
 
 .multiselect__tags {
-    border: 1px solid #ddd;
+    border: 1px solid #ced4da;
 }
 
 .multiselect__option {
@@ -443,4 +443,25 @@
     text-align: center;
     color: #555;
   }
+}
+
+.vuetify-wrap {
+  @import "~vuetify/dist/vuetify.min";
+
+  .v-treeview-node__label {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+}
+
+.nav-link {
+    padding: .5rem 1rem !important;
+}
+
+img {
+    page-break-inside: avoid; /* or 'auto' */
+}
+
+.for-print {
+  display: none;
 }

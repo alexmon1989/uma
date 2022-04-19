@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans 'Відомості з Державного реєстру представників у справах інтелектуальної власності (патентних повірених)' %}{% endblock %}
+
+{% block content %}
+
+    {% include 'patent_attorneys/list/_partials/breadcrumbs.html' %}
+
+    <section class="container g-py-70">
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'patent_attorneys/list/_partials/filter_form.html' %}
+
+                {% include 'patent_attorneys/list/_partials/header.html' %}
+
+                {% include 'patent_attorneys/list/_partials/table.html' %}
+
+                {% include 'patent_attorneys/list/_partials/pagination.html' %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

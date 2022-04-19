@@ -2,8 +2,8 @@ from django.middleware.locale import LocaleMiddleware
 from django.conf import settings
 from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.utils import translation
-from django.utils.translation.trans_real import (get_languages, get_supported_language_variant, check_for_language,
-                                                 parse_accept_lang_header, language_code_re, LANGUAGE_SESSION_KEY)
+from django.utils.translation.trans_real import (get_supported_language_variant, parse_accept_lang_header,
+                                                 language_code_re)
 
 
 def get_language_from_request(request, check_path=False):
@@ -19,13 +19,6 @@ def get_language_from_request(request, check_path=False):
     if check_path:
         lang_code = translation.get_language_from_path(request.path_info)
         if lang_code is not None:
-            return lang_code
-
-    supported_lang_codes = get_languages()
-
-    if hasattr(request, 'session'):
-        lang_code = request.session.get(LANGUAGE_SESSION_KEY)
-        if lang_code in supported_lang_codes and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)

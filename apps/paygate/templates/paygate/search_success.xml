@@ -1,22 +1,19 @@
-{% load l10n %}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Transfer xmlns="http://debt.privatbank.ua/Transfer" interface="Debt" action="Search">
     <Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="DebtPack">
-        <PayerInfo billIdentifier="{{ billIdentifier }}">
-            <Fio>{{ username }}</Fio>
-        </PayerInfo>
+        <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
         <ServiceGroup>
-            <DebtService serviceCode="5.7">
-                <DebtInfo amountToPay="{{ amountToPay|unlocalize }}" debt="0.00"/>
-                <ServiceName>Доступ до інформації щодо заявок, за якими не встановлена дата подачі</ServiceName>
-                <Destination>Оплата за послугу надання доступу до інформації щодо заявок</Destination>
-                <CompanyInfo mfo="320478" okpo="31032378" account="UA093204780000000026008268812">
+            <DebtService serviceCode="{{ order.fee_type.service_group.code }}">
+                <CompanyInfo>
                     <CompanyCode>31032378</CompanyCode>
-                    <CompanyName>ДЕРЖАВНЕ ПІДПРИЄМСТВО "УКРАЇНСЬКИЙ ІНСТИТУТ ІНТЕЛЕКТУАЛЬНОЇ ВЛАСНОСТІ" УКРПАТЕНТ</CompanyName>
                 </CompanyInfo>
-                <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ ls }}">
-                    <Fio>{{ username }}</Fio>
-                </PayerInfo>
+                <DebtInfo amountToPay="{{ order.value }}" debt="0.00"/>
+                <Destination>{% if order.fee_type.service_group_id == 3 or order.fee_type.service_group_id == 4 %}*;101;держмито;заявка №{{ order.app_number }};22090300{% else %}КМУ1716, код {{ order.fee_type.code }}{% if order.app_number %}, № об'єкту {{ order.app_number }}{% endif %}{% endif %}</Destination>
+                <PayerInfo billIdentifier="{{ billIdentifier }}" ls="{{ billIdentifier }}" />
+
+                <DopData>
+                    <Dop name="real_service_code" value="{{ order.fee_type.code }}" />
+                </DopData>
             </DebtService>
         </ServiceGroup>
     </Data>

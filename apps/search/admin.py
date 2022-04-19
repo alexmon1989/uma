@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 from singlemodeladmin import SingleModelAdmin
 from .models import (IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule, SortParameter, AdvancedSearchPage,
                      SimpleSearchPage, PaidServicesSettings, IpcCodeObjType)
@@ -62,12 +63,13 @@ class ObjStatusFilter(admin.SimpleListFilter):
             return queryset.filter(schedule_type__id__in=(10, 11, 12, 13, 14, 15))
         if self.value() == '2':
             # 3, 4, 5, 6, 7, 8 - id реестров охранных документов
-            return queryset.filter(schedule_type__id__in=(3, 4, 5, 6, 7, 8))
+            return queryset.filter(schedule_type__id__in=(3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32))
 
 
 @admin.register(InidCodeSchedule)
 class InidCodeScheduleAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'ipc_code_title',
         'get_obj_types',
         'obj_status',
@@ -91,7 +93,7 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
             'ipc_code',
             'elastic_index_field'
         ).prefetch_related('ipc_code__obj_types').filter(
-            schedule_type__id__lte=15
+            Q(schedule_type__id__lte=19) | Q(schedule_type__id__in=(30, 32))
         ).exclude(ipc_code__obj_types=None)
 
     def ipc_code_title(self, obj):
@@ -104,7 +106,7 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
 
     def obj_status(self, obj):
         # 3, 4, 5, 6, 7, 8 - id реестров охранных документов
-        if obj.schedule_type_id in (3, 4, 5, 6, 7, 8):
+        if obj.schedule_type_id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32):
             return _('Охоронний документ')
         return _('Заявка')
 

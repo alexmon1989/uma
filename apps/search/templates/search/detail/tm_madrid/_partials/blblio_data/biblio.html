@@ -1,0 +1,153 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-20 d-flex justify-content-between">
+            {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                <div>
+                    {% trans "Опубліковано" %} <span
+                        class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</span>,
+                    {% trans "бюл." %} №{{ code_441_bul_number }}<span
+                        class="g-font-weight-600"></span>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
+            {% get_field '111' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails|get:"@INTREGN" %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600 g-font-size-16">{{ hit.MadridTradeMark.TradeMarkDetails|get:"@INTREGN" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '151' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails|get:"@INTREGD" %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails|get:"@INTREGD"|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '180' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails|get:"@EXPDATE" %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails|get:"@EXPDATE"|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '441' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %} {{ code_441_bul_number }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '450' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.MadridTradeMark.TradeMarkDetails.ENN|get:"@PUBDATE"|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %} {{ hit.MadridTradeMark.TradeMarkDetails.ENN|get:"@GAZNO" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '732' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.HOLGR.NAME.NAMEL %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {{ hit.MadridTradeMark.TradeMarkDetails.HOLGR.NAME.NAMEL }}
+                        {% for item in hit.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.ADDRL %}
+                            <br>{{ item }}
+                        {% endfor %} {% if hit.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY %}[{{ hit.MadridTradeMark.TradeMarkDetails.HOLGR.ADDRESS.COUNTRY }}]{% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '740' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.REPGR.NAME.NAMEL %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {{ hit.MadridTradeMark.TradeMarkDetails.REPGR.NAME.NAMEL }}
+                        {% for item in hit.MadridTradeMark.TradeMarkDetails.REPGR.ADDRESS.ADDRL %}
+                            <br>{{ item }}
+                        {% endfor %} {% if hit.MadridTradeMark.TradeMarkDetails.REPGR.ADDRESS.COUNTRY %}[{{ hit.MadridTradeMark.TradeMarkDetails.REPGR.ADDRESS.COUNTRY }}]{% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '821' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.BASGR.BASAPPGR.BASAPPN %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.MadridTradeMark.TradeMarkDetails.BASGR.BASAPPGR.BASAPPD|parse_date|date:"d.m.Y" }}, {{ hit.MadridTradeMark.TradeMarkDetails.BASGR.BASAPPGR.BASAPPN }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '891' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails|get:"@REGEDAT" %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.MadridTradeMark.TradeMarkDetails|get:"@REGEDAT"|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '540' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                           href="javascript:;"
+                           data-src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".jpg" }}">
+                            <img class="img-fluid img-thumbnail"
+                                 src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".jpg" }}"
+                                 alt="">
+
+                            <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                                <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '511' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.BASICGS.GSGR %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for cls in hit.MadridTradeMark.TradeMarkDetails.BASICGS.GSGR %}
+                            <div class="d-flex justify-content-start">
+                                <div class="g-pr-6 text-nowrap">Кл. {{ cls|get:'@NICCLAI' }}{% if cls.GSTERMEN or cls.GSTERMFR %}:{% endif %}</div>
+                                <div class="text-justify mktp-indexes">
+                                    <span class="more hidden">{{ cls.GSTERMEN }}{{ cls.GSTERMFR }}</span>
+                                    <a href="#"
+                                       class="show-indexes g-font-size-12"
+                                       title="{% trans "Показати" %}"
+                                    ><i class="fa fa-plus"></i></a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

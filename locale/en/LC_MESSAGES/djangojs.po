@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 15:10+0300\n"
+"POT-Creation-Date: 2021-09-02 11:14+0300\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,47 +19,46 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: assets/js/custom.js:62 assets/js/custom.js:74 assets/js/custom.js:80
-#: assets/js/vue-components/GetOriginalDoc.vue:135
-#: assets/js/vue-components/GetOriginalDoc.vue:142
+#: assets/js/custom.js:57 assets/js/custom.js:69 assets/js/custom.js:76
+#: assets/js/vue-components/GetOriginalDoc.vue:132
+#: assets/js/vue-components/GetOriginalDoc.vue:157
 msgid "Виникла помилка. Будь-ласка, спробуйте пізніше."
 msgstr "Error! Please try again later."
 
-#: assets/js/custom.js:64 assets/js/vue-components/GetOriginalDoc.vue:156
+#: assets/js/custom.js:59 assets/js/vue-components/GetOriginalDoc.vue:171
 msgid "Файл було сформовано."
 msgstr "File was created."
 
-#: assets/js/custom.js:242 assets/js/custom.js:315 assets/js/custom.js:352
-#: assets/js/vue-components/GetOriginalDoc.vue:70
+#: assets/js/custom.js:259 assets/js/custom.js:332 assets/js/custom.js:369
+#: assets/js/vue-components/GetOriginalDoc.vue:74
 msgid "Будь-ласка, зачекайте, відбувається формування файлу."
 msgstr "Please wait for file creating."
 
-#: assets/js/custom.js:274
+#: assets/js/custom.js:291
 msgid "Будь-ласка, зачекайте, відбувається формування документу."
 msgstr "Please wait for document creating."
 
-#: assets/js/custom.js:288
+#: assets/js/custom.js:305
 msgid "Відкрити"
 msgstr "Open"
 
-#: assets/js/custom.js:341
+#: assets/js/custom.js:358
 msgid "Не було обрано жодного документу."
 msgstr "There is no document selected"
 
-#: assets/js/custom.js:437
+#: assets/js/custom.js:454
 msgid "Видалити зі списку вибраних документів"
 msgstr "Remove from the favorites list."
 
-#: assets/js/custom.js:438
+#: assets/js/custom.js:455
 msgid "Документ було додано до списку вибраних документів."
 msgstr "The document was added to the favorites list."
 
-#: assets/js/custom.js:442
+#: assets/js/custom.js:459
 msgid "Додати до списку вибраних документів"
 msgstr "Add to the favorites list."
 
-#: assets/js/custom.js:443
-#| msgid "Охоронний документ"
+#: assets/js/custom.js:460
 msgid "Документ було видалено зі списку вибраних документів."
 msgstr "The document was removed from the favorites list."
 
@@ -136,14 +135,15 @@ msgstr "Bibliographic elements"
 #: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:15
 #: assets/js/vue-components/ContactForm.vue:88
 #: assets/js/vue-components/DateFilterForm/mixins/translations.js:8
-#: assets/js/vue-components/GetOriginalDoc.vue:51
+#: assets/js/vue-components/GetOriginalDoc.vue:55
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:20
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:15
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
 msgid "Обов'язкове поле для заповнення"
 msgstr "Required field"
 
 #: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:16
-#: assets/js/vue-components/GetOriginalDoc.vue:52
+#: assets/js/vue-components/GetOriginalDoc.vue:56
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:16
 msgid "Поле містить невірне значення"
 msgstr "The field contains wrong value"
@@ -340,10 +340,8 @@ msgid "Тема"
 msgstr "Subject"
 
 #: assets/js/vue-components/ContactForm.vue:85
-#, fuzzy
-#| msgid "Тип сповіщення"
 msgid "Повідомлення"
-msgstr "Transaction type"
+msgstr "Message"
 
 #: assets/js/vue-components/ContactForm.vue:86
 msgid "Відправити повідомлення"
@@ -365,7 +363,7 @@ msgstr "Date filter"
 msgid "Фільтрувати"
 msgstr "Filter"
 
-#: assets/js/vue-components/GetOriginalDoc.vue:46
+#: assets/js/vue-components/GetOriginalDoc.vue:50
 msgid ""
 "Для отримання документу, будь-ласка, введіть його ідентифікатор та натисніть "
 "кнопку \"Завантажити\""
@@ -373,25 +371,75 @@ msgstr ""
 "To get the document, please enter the document ID and click the Download "
 "button"
 
-#: assets/js/vue-components/GetOriginalDoc.vue:47
+#: assets/js/vue-components/GetOriginalDoc.vue:51
 msgid "Введіть ідентифікатор документу"
 msgstr "Enter document id"
 
-#: assets/js/vue-components/GetOriginalDoc.vue:48
+#: assets/js/vue-components/GetOriginalDoc.vue:52
 msgid "Завантажити"
 msgstr "Download"
 
-#: assets/js/vue-components/GetOriginalDoc.vue:49
+#: assets/js/vue-components/GetOriginalDoc.vue:53
 msgid "Зачекайте..."
 msgstr "Wait..."
 
-#: assets/js/vue-components/GetOriginalDoc.vue:54
+#: assets/js/vue-components/GetOriginalDoc.vue:58
 msgid "Помилка звернення до сервера. Спробуйте, будь-ласка, пізніше."
 msgstr "Error accessing server. Please try again later."
 
-#: assets/js/vue-components/GetOriginalDoc.vue:55
+#: assets/js/vue-components/GetOriginalDoc.vue:59
 msgid "Вибачте, за даним ідентифікатором не знайдено жодного документа."
 msgstr "Sorry, no documents were found for this ID."
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:5
+msgid "Введіть суму, яку бажаєте сплатити"
+msgstr "Enter an amount of money you would like to pay"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:6
+msgid "Сума до сплати, грн"
+msgstr "Price"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:8
+msgid "Номер заявки"
+msgstr "Application number"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:9
+msgid "Введіть номер заявки"
+msgstr "Enter application number"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:11
+msgid "Група зборів"
+msgstr "Fee group"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:12
+msgid "Оберіть групу зборів"
+msgstr "Select fee group"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:14
+msgid "Вид збору"
+msgstr "Fee type"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:15
+msgid "Оберіть вид збору"
+msgstr "Select fee type"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:17
+#, fuzzy
+#| msgid "Відправити повідомлення"
+msgid "Сформувати замовлення"
+msgstr "Create order"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:21
+msgid "Поле має містити ціле число"
+msgstr "The field contains wrong value"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:22
+msgid "Заявку в обраній групі зборів не знайдено"
+msgstr "There is no such application in the fee group"
+
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:23
+msgid "Поле має містити позитивне значення"
+msgstr "The field must contain positive integer value"
 
 #: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:12
 #: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:9

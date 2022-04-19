@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '67e@9#2za%$fle7v3c0dr_^=bxqo%070_x@(*=5czgqv&fd7a('
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -36,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'bootstrap4',
     'debug_toolbar',
     'rest_framework',
     'apps.home.apps.HomeConfig',
@@ -50,10 +50,17 @@ INSTALLED_APPS = [
     'apps.account.apps.AccountConfig',
     'apps.paygate.apps.PaygateConfig',
     'apps.favorites.apps.FavoritesConfig',
+    'apps.bulletin.apps.BulletinConfig',
+    'apps.bulletin_new.apps.BulletinNewConfig',
+    'apps.patent_attorneys.apps.PatentAttorneysConfig',
+    'apps.payments.apps.PaymentsConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',
     'django_celery_results',
+    'django_celery_beat',
+    'annoying',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
             ],
             'libraries': {
                 'uma_extras': 'templatetags.uma_extras',
@@ -95,13 +102,20 @@ WSGI_APPLICATION = 'uma.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'UMA',
+        'ENGINE': 'mssql',
+        'NAME': '',
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': '10.10.18.1',
         'PORT': '1433',
 
         'OPTIONS': {
@@ -109,19 +123,37 @@ DATABASES = {
         },
     },
 
-    'ellav': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'UMA',
+    'e_archive': {
+        'ENGINE': 'mssql',
+        'NAME': '',
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'HOST': '10.11.11.10',
+        'PORT': '51433',
 
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     },
+
+    # 'ellav': {
+    #     'ENGINE': 'sql_server.pyodbc',
+    #     'NAME': 'UMA',
+    #     'USER': 'uma',
+    #     'PASSWORD': 'uma',
+    #     'HOST': '10.11.11.10',
+    #     'PORT': '51433',
+    #
+    #     'OPTIONS': {
+    #         'driver': 'ODBC Driver 17 for SQL Server',
+    #     },
+    # },
 }
+
+if 'test' in sys.argv:
+    DATABASES['default']['USER'] = 'sa'
+    DATABASES['default']['PASSWORD'] = ''
+    DATABASES['default']['HOST'] = '10.5.4.222'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -152,7 +184,7 @@ LANGUAGES = (
     ('en', 'English'),
 )
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
@@ -193,76 +225,26 @@ EUSIGN_FILESTORE_PATH = os.path.join(BASE_DIR, "certs")
 import os
 import sys
 
-os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
+#os.environ['LD_LIBRARY_PATH'] = 'lib/EUSignCP/Modules/64/'
 sys.path.append('lib/EUSignCP/Interface/64')
 
-INTERNAL_IPS = ('10.0.2.2',)
+INTERNAL_IPS = ('10.0.2.2', '127.0.0.1')
 
-ELASTIC_HOST = 'localhost:9200'
-ELASTIC_INDEX_NAME = 'uma'
+ELASTIC_HOST = '10.11.11.51:9200'
+#ELASTIC_HOST = 'localhost:9200'
+ELASTIC_INDEX_NAME = 'uma5'
+ELASTIC_TIMEOUT = 60
 
-DOCUMENTS_MOUNT_FOLDER = ''
+ELASTIC_HOST_TESTING = 'localhost:9200'
+ELASTIC_INDEX_NAME_TESTING = 'uma_test'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
-        }
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-        },
-        'console_debug_false': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'logging.StreamHandler',
-        },
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': [
-                'console',
-                'console_debug_false',
-                # 'mail_admins'
-            ],
-            'level': 'INFO',
-        },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
-        }
-    }
-}
+DOCUMENTS_MOUNT_FOLDER = '/mount/bear/'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
 CKEDITOR_CONFIGS = {
     'default': {
+        'allowedContent': True,
         'skin': 'moono',
         # 'skin': 'office2013',
         'toolbar_Basic': [
@@ -326,14 +308,12 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-}
-
-CELERY_BROKER_URL = 'amqp://'
-# CELERY_RESULT_BACKEND = 'amqp://'
+#CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'amqp://root:123OLOLO123@localhost:5672/localhost'
+# CELERY_RESULT_BACKEND = 'amqp://root:123OLOLO123@localhost:5672/localhost'
+# CELERY_RESULT_BACKEND = 'rpc://root:123OLOLO123@localhost:5672/localhost'
 CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -341,19 +321,48 @@ CELERY_EMAIL_TASK_CONFIG = {
     'ignore_result': True,
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_USE_TLS = False
 EMAIL_HOST = ''
 EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
+EMAIL_HOST_USER = 'sis@ukrpatent.org'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 
-ADMINS = (('', ''),)
+ADMINS = (('Alex', 'a.monastyretsky@ukrpatent.org'),)
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache',
+    }
+}
 
+# RECAPTCHA_SITE_KEY = ''
+# RECAPTCHA_SECRET_KEY = ''
+
+RECAPTCHA_ENABLED = False
 RECAPTCHA_SITE_KEY = ''
 RECAPTCHA_SECRET_KEY = ''
 RECAPTCHA_MIN_SCORE = 0.5
 
-SSL_CERT_FILE = ''
+SSL_CERT_FILE = '/usr/local/share/ca-certificates/ukrpatent/www.uipv.org.crt'
+
+CSRF_COOKIE_SAMESITE = None
+# CSRF_COOKIE_SECURE = True
+
+# TEST_RUNNER = 'uma.test_runner.ManagedModelTestRunner'
+
+# Вкл/выкл валидации цифровой подписи на сервере
+VALIDATE_DS = True
+# Не проводить валидацию для этих номеров сертификатов
+VALIDATE_DS_WHITE_LIST_CERTS = [
+    # '2B6C7DF9A3891DA104000000C7D693000A26BE02',
+]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

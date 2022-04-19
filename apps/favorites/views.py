@@ -2,7 +2,6 @@ from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponse
-from django.utils import six
 from django.template.loader import render_to_string
 from django.views.generic.base import RedirectView
 from django.conf import settings
@@ -13,6 +12,7 @@ from apps.search.tasks import perform_favorites_search
 from apps.search.decorators import require_ajax
 from celery.result import AsyncResult
 import json
+import six
 from .tasks import create_favorites_results_file
 
 
@@ -26,6 +26,7 @@ class IndexView(TemplateView):
 
         # Recaptcha
         context['site_key'] = settings.RECAPTCHA_SITE_KEY
+        context['RECAPTCHA_ENABLED'] = settings.RECAPTCHA_ENABLED
 
         if context['favorites_ids']:
             # Создание асинхронной задачи для Celery

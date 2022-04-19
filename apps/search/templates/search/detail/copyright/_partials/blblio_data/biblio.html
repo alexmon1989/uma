@@ -1,0 +1,195 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div id="biblio-data">
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-20">
+            {% trans "Опубліковано" %} <span
+                class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+            {% trans "бюл." %} №{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationNumber }}<span
+                class="g-font-weight-600"></span>
+        </div>
+    {% endif %}
+
+    {% if hit.search_data.obj_state == 2 %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
+            {% get_field '11' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.RegistrationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600 g-font-size-16">{{ hit.Certificate.CopyrightDetails.RegistrationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '15' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.RegistrationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '19' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.RegistrationOfficeCode %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.RegistrationOfficeCode }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '21' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.ApplicationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.ApplicationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '22' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.ApplicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.ApplicationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '27' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.RegistrationKind %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.RegistrationKind }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '29' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.CopyrightObjectKindDetails.CopyrightObjectKind|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for kind in hit.Certificate.CopyrightDetails.CopyrightObjectKindDetails.CopyrightObjectKind %}
+                            {{ kind.CopyrightObjectKindName }}{% if not forloop.last %};&nbsp;{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '45.D' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '45.N' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationNumber %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationNumber }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '54' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.Name %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.Name }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '55' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.WorkCopy %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.WorkCopy }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '57' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.Annotation %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.Annotation }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '58' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.PromulgationData %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.PromulgationData }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '71' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}
+                            {{ person.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '77' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.EmployerDetails.Employer|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.EmployerDetails.Employer %}
+                            {{ person.EmployerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.EmployerAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '72' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.AuthorDetails.Author|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
+                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '73' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.HolderDetails.Holder|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.HolderDetails.Holder %}
+                            {{ person.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '74' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.RepresentativeDetails.Representative|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Certificate.CopyrightDetails.RepresentativeDetails.Representative %}
+                            {{ person.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

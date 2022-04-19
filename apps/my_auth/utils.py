@@ -1,7 +1,12 @@
 import tempfile
 from EUSignCP import *
 from django.conf import settings
-import os, json
+from .models import CertificateOwner
+import os
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def set_key_center_settings(eu_interface, key_center):
@@ -11,7 +16,7 @@ def set_key_center_settings(eu_interface, key_center):
         'szPath': settings.EUSIGN_FILESTORE_PATH,
         'bCheckCRLs': True,
         'bAutoRefresh': True,
-        'bOwnCRLsOnly': False,
+        'bOwnCRLsOnly': True,
         'bFullAndDeltaCRLs': True,
         'bAutoDownloadCRLs': True,
         'bSaveLoadedCerts': True,
@@ -79,10 +84,8 @@ def save_file_to_eu_file_store(file):
     return path
 
 
-def check_signed_data(signed_data, secret, key_center_title):
+def get_signed_data_info(signed_data, secret, key_center_title):
     """Вроверяет валидность ЭЦП."""
-    res = False
-
     # Загрузка бибилиотек ІІТ
     EULoad()
     pIface = EUGetInterface()
@@ -102,15 +105,80 @@ def check_signed_data(signed_data, secret, key_center_title):
     # Проверка подписи
     pData = secret.encode('utf-16-le')
     signed_data = signed_data.encode()
+    sign_info = {}
     try:
-        pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), None)
-    except:
-        pass
-    else:
-        res = True
+        # Верификация и получение данных из подписанных данных
+        pIface.VerifyData(pData, len(pData), signed_data, None, len(signed_data), sign_info)
+    except Exception as e:
+        print(e)
+        logger.error(e)
 
     # Выгрузка бибилиотек ІІТ
     eu_interface.Finalize()
     EUUnload()
 
-    return res
+    return sign_info
+
+
+def get_certificate(post_data, secret):
+    """Возвращает сертификат ЭЦП."""
+    if settings.VALIDATE_DS and not post_data['serial'] in settings.VALIDATE_DS_WHITE_LIST_CERTS:
+        # Проверка валидности ЭЦП
+        sign_info = get_signed_data_info(post_data['signed_data'],
+                                         secret,
+                                         post_data['key_center_title'])
+        if not sign_info:
+            # Проверка закончилась неудачей
+            return None
+        else:
+            try:
+                cert = CertificateOwner.objects.get(pszSerial=sign_info['pszSerial'])
+            except CertificateOwner.DoesNotExist:
+                # Запись данных ключа в БД
+                cert = CertificateOwner(
+                    pszIssuer=sign_info.get('pszIssuer'),
+                    pszIssuerCN=sign_info.get('pszIssuerCN'),
+                    pszSerial=sign_info.get('pszSerial'),
+                    pszSubject=sign_info.get('pszSubject'),
+                    pszSubjCN=sign_info.get('pszSubjCN'),
+                    pszSubjOrg=sign_info.get('pszSubjOrg'),
+                    pszSubjOrgUnit=sign_info.get('pszSubjOrgUnit'),
+                    pszSubjTitle=sign_info.get('pszSubjTitle'),
+                    pszSubjState=sign_info.get('pszSubjState'),
+                    pszSubjFullName=sign_info.get('pszSubjFullName'),
+                    pszSubjAddress=sign_info.get('pszSubjAddress'),
+                    pszSubjPhone=sign_info.get('pszSubjPhone'),
+                    pszSubjEMail=sign_info.get('pszSubjEMail'),
+                    pszSubjDNS=sign_info.get('pszSubjDNS'),
+                    pszSubjEDRPOUCode=sign_info.get('pszSubjEDRPOUCode'),
+                    pszSubjDRFOCode=sign_info.get('pszSubjDRFOCode'),
+                    pszSubjLocality=sign_info.get('pszSubjLocality'),
+                )
+                cert.save()
+    else:
+        try:
+            cert = CertificateOwner.objects.get(pszSerial=post_data['serial'])
+        except CertificateOwner.DoesNotExist:
+            # Запись данных ключа в БД
+            cert = CertificateOwner(
+                pszIssuer=post_data['issuer'],
+                pszIssuerCN=post_data['issuerCN'],
+                pszSerial=post_data['serial'],
+                pszSubject=post_data['subject'],
+                pszSubjCN=post_data['subjCN'],
+                pszSubjOrg=post_data['subjOrg'],
+                pszSubjOrgUnit=post_data['subjOrgUnit'],
+                pszSubjTitle=post_data['subjTitle'],
+                pszSubjState=post_data['subjState'],
+                pszSubjFullName=post_data['subjFullName'],
+                pszSubjAddress=post_data['subjAddress'],
+                pszSubjPhone=post_data['subjPhone'],
+                pszSubjEMail=post_data['subjEMail'],
+                pszSubjDNS=post_data['subjDNS'],
+                pszSubjEDRPOUCode=post_data['subjEDRPOUCode'],
+                pszSubjDRFOCode=post_data['subjDRFOCode'],
+                pszSubjLocality=post_data['subjLocality'],
+            )
+            cert.save()
+
+    return cert

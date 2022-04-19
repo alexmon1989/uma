@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<div class="d-md-flex justify-content-between g-mb-20">
+    <div class="align-self-center g-mb-30 g-mb-0--md h-100">
+        <div class="text-uppercase g-font-weight-600 ">{% trans "Всього осіб" %}:<span
+                class="g-color-gray-dark-v1">&nbsp;{{ page_obj.paginator.count }}</span></div>
+    </div>
+</div>
+
+<div class="d-flex flex-column flex-lg-row justify-content-lg-between g-mb-20">
+    <div class="d-flex justify-content-between g-mb-20 g-mb-0--lg">
+        <div class="g-mr-10 align-self-center g-font-weight-600 text-nowrap">{% trans "Сортувати за" %}:</div>
+        <div>
+            <select class="custom-select rounded-0" id="sort_by">
+                <option value="regnum_asc"
+                        {% if not request.GET.sort_by or request.GET.sort_by == 'regnum_asc' %}selected=""{% endif %}
+                >{% trans "Реєстраційний номер, за зростанням" %}</option>
+                <option value="regnum_desc"
+                        {% if request.GET.sort_by == 'regnum_desc' %}selected=""{% endif %}
+                >{% trans "Реєстраційний номер, за спаданням" %}</option>
+                <option value="regdate_asc"
+                        {% if request.GET.sort_by == 'regdate_asc' %}selected=""{% endif %}
+                >{% trans "Дата реєстрації, старі-нові" %}</option>
+                <option value="regdate_desc"
+                        {% if request.GET.sort_by == 'regdate_desc' %}selected=""{% endif %}
+                >{% trans "Дата реєстрації, нові-старі" %}</option>
+                <option value="name_asc"
+                        {% if request.GET.sort_by == 'name_asc' %}selected=""{% endif %}
+                >{% trans "ПІБ, А-Я" %}</option>
+                <option value="name_desc"
+                        {% if request.GET.sort_by == 'name_desc' %}selected=""{% endif %}
+                >{% trans "ПІБ, Я-А" %}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <div class="g-mr-10 align-self-center g-font-weight-600">{% trans "Відображати на сторінці" %}:</div>
+        <div>
+            <select class="custom-select rounded-0" id="show">
+                <option value="10"
+                        {% if not get_params.show or request.GET.show.0|add:"0" <= 10 %}selected=""{% endif %}>10
+                </option>
+                <option value="20" {% if request.GET.show|add:"0" == 20 %}selected=""{% endif %}>20</option>
+                <option value="50" {% if request.GET.show|add:"0" == 50 %}selected=""{% endif %}>50</option>
+                <option value="100" {% if request.GET.show|add:"0" >= 100 %}selected=""{% endif %}>100</option>
+            </select>
+        </div>
+    </div>
+</div>

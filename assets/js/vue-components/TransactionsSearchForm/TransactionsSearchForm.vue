@@ -14,7 +14,7 @@
         <!-- END Об'єкт промислової власності -->
 
         <!-- Дата сповіщення -->
-        <date-input v-model="date"></date-input>
+        <date-input :initial-data="this.initialDate" v-model="date"></date-input>
         <!-- END Дата сповіщення -->
 
         <!-- Дії -->
@@ -37,7 +37,8 @@
         mixins: [translations],
         props: {
             initial: Object,
-            langCode: String
+            langCode: String,
+            recaptchaEnabled: Boolean,
         },
         data() {
             return {
@@ -45,6 +46,7 @@
                 obj_type: '',
                 transaction_type: [],
                 date: [],
+                initialDate: [],
 
                 isFormSubmitting: false
             }
@@ -74,7 +76,7 @@
                             this.getTaskInfo(task_id).then(result => {
                                     this.objTypes = result;
                                     if (this.initial['obj_type']) {
-                                        this.date = this.initial['date'][0].split(' ~ ');
+                                        this.initialDate = this.initial['date'][0].split(' ~ ');
                                         this.$nextTick(function () {
                                             this.obj_type = this.objTypes.find(e => e.id === parseInt(this.initial['obj_type'][0]));
                                             this.$nextTick(function () {
@@ -102,20 +104,33 @@
 
             // Получает статус и результат выполнения задачи
             getTaskInfo: function (taskId) {
-                let siteKey = document.querySelector('meta[name="site-key"]').content;
 
-                return grecaptcha.execute(siteKey, {action: 'gettransactiontypes'}).then(function (token) {
+                if (this.recaptchaEnabled) {
+                    let siteKey = document.querySelector('meta[name="site-key"]').content;
+
+                    return grecaptcha.execute(siteKey, {action: 'gettransactiontypes'}).then(function (token) {
+                        return axios
+                            .get('/search/get-task-info/', {
+                                params: {
+                                    task_id: taskId,
+                                    token: token,
+                                }
+                            })
+                            .then(response => {
+                                return response.data['result'];
+                            });
+                    });
+                } else {
                     return axios
                         .get('/search/get-task-info/', {
                             params: {
                                 task_id: taskId,
-                                token: token,
                             }
                         })
                         .then(response => {
                             return response.data['result'];
                         });
-                });
+                }
             }
         },
         computed: {
