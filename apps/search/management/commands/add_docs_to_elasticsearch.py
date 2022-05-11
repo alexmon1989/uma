@@ -340,16 +340,16 @@ class Command(BaseCommand):
 
             # Поле 441 (дата опубликования заявки)
             if res['TradeMark']['TrademarkDetails'].get('Code_441'):
-                del res['TradeMark']['TrademarkDetails']['Code_441']
-            if not res['TradeMark']['TrademarkDetails'].get('Code_441'):
-                try:
-                    e_bulletin_app = EBulletinData.objects.get(
-                        app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
-                    )
-                except EBulletinData.DoesNotExist:
-                    pass
-                else:
-                    res['TradeMark']['TrademarkDetails']['Code_441'] = e_bulletin_app.publication_date
+                EBulletinData.objects.get_or_create(
+                    app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
+                    unit_id=1,
+                    defaults={
+                        'publication_date': datetime.datetime.strptime(
+                            res['TradeMark']['TrademarkDetails']['Code_441'],
+                            '%Y-%m-%d'
+                        )
+                    }
+                )
 
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
