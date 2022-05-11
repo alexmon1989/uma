@@ -451,6 +451,9 @@ class Command(BaseCommand):
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
+            # Очистка каталога
+            self.clear_tm_folder(doc, res)
+
     def process_id(self, doc):
         """Добавляет документ типа "пром. образец" ElasticSearch."""
         # Получает данные для загрузки из файла JSON
@@ -853,6 +856,17 @@ class Command(BaseCommand):
                         mark_image['MarkImageFilename'] = file
                         break
 
+    def clear_tm_folder(self, doc, data):
+        """Очищает каталог ТМ от ненужных файлов. Остаются только изображение и json."""
+        try:
+            mark_image_file_name = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            doc_files_path = self.get_doc_files_path(doc)
+            ext = mark_image_file_name.split('.')[1]
+            files_to_remove = [f for f in os.listdir(doc_files_path) if f.endswith(ext) and f != mark_image_file_name]
+            for f in files_to_remove:
+                os.remove(os.path.join(doc_files_path, f))
+        except KeyError:
+            pass
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
