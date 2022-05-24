@@ -350,6 +350,12 @@ class Command(BaseCommand):
                         )
                     }
                 )
+            else:
+                e_bulletin_data = EBulletinData.objects.filter(
+                    app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
+                ).first()
+                if e_bulletin_data:
+                    res['TradeMark']['TrademarkDetails']['Code_441'] = e_bulletin_data.publication_date.strftime('%Y-%m-%d')
 
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
