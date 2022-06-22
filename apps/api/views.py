@@ -247,15 +247,19 @@ class SearchListView(generics.ListAPIView):
             else:
                 queryset = queryset.filter(obj_type_id=obj_type)
 
-        # Номер заявки
+        strict_search = self.request.query_params.get('strict_search', False)
         app_number = self.request.query_params.get('app_number', None)
-        if app_number:
-            queryset = queryset.filter(app_number__contains_ft=f'"*{app_number}*"')
-
-        # Номер охранного документа
         registration_number = self.request.query_params.get('registration_number', None)
-        if registration_number:
-            queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
+        if strict_search:
+            if app_number:
+                queryset = queryset.filter(app_number=app_number)
+            if registration_number:
+                queryset = queryset.filter(registration_number=registration_number)
+        else:
+            if app_number:
+                queryset = queryset.filter(app_number__contains_ft=f'"*{app_number}*"')
+            if registration_number:
+                queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
 
         return queryset.values(
             'app_id',
