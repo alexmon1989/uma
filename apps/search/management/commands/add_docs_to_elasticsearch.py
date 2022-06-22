@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import connections
-from django.db.models import Max
+from django.db.models import Max, Q as Q_db
 from django.utils import timezone
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
@@ -340,7 +340,7 @@ class Command(BaseCommand):
 
             # Поле 441 (дата опубликования заявки)
             if res['TradeMark']['TrademarkDetails'].get('Code_441'):
-                EBulletinData.objects.get_or_create(
+                EBulletinData.objects.update_or_create(
                     app_number=res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
                     unit_id=1,
                     defaults={
@@ -879,7 +879,9 @@ class Command(BaseCommand):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
         # Получение документов для индексации
-        documents = IpcAppList.objects.values(
+        documents = IpcAppList.objects.exclude(
+            Q_db(registration_date__gte=timezone.now()) | Q_db(app_number__in=['m202006737', 'm202006738'])
+        ).values(
             'id',
             'files_path',
             'obj_type_id',
@@ -888,7 +890,7 @@ class Command(BaseCommand):
             'app_number',
             'app_date',
             'app_input_date',
-        ).exclude(registration_date__gte=timezone.now())
+        )
         # Фильтрация по параметрам командной строки
         if not options['ignore_indexed']:
             documents = documents.filter(elasticindexed=0)
