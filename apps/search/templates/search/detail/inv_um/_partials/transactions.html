@@ -599,6 +599,24 @@
                                 <li><span class="g-font-weight-600">{% trans "Причина" %}:</span> {{ transaction.REASON }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction.PUBLICATIONNAME == "Припинення дії прав, що випливають з державної реєстрації, за заявою володільця частково" %}
+                        <ul class="g-pl-20">
+                            {% if transaction.BULLETIN %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction.BULLETIN }}</li>
+                            {% endif %}
+
+                            {% if transaction.PATENTNUMBER %}
+                                <li><span class="g-font-weight-600">(11) {% trans "Номер патенту (деклараційного патенту)" %}:</span> {{ transaction.PATENTNUMBER }}</li>
+                            {% endif %}
+
+                            {% if transaction.DATEPARTIALSTOP %}
+                                <li><span class="g-font-weight-600">{% trans "Дата припинення дії патенту частково" %}:</span> {{ transaction.DATEPARTIALSTOP|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction.REASON %}
+                                <li><span class="g-font-weight-600">{% trans "Причина" %}:</span> {{ transaction.REASON }}</li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}
