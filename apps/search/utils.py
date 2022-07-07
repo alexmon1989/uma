@@ -2107,7 +2107,7 @@ def get_ipc_codes_with_schedules(lang_code):
         inidcodeschedule__schedule_type__id__gt=19,
         inidcodeschedule__schedule_type__id__lt=30,
         inidcodeschedule__schedule_type__ipccode__isnull=True,
-    )
+    ).order_by('code_value_ua')
 
     res = []
     for item in qs:
