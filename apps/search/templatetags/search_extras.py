@@ -545,22 +545,6 @@ def filter_tm_id_docs_direction(documents, direction):
 
 
 @register.filter
-def filter_tm_id_bad_docs(documents):
-    """Исключает из списка документы типа "Службова записка",
-    документы, номер которых начинается с "Вн", "Бібліографічні дані"."""
-    if documents:
-        res = list()
-        for doc in documents:
-            doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
-            if 'службова' not in doc_type \
-                    and 'бібліографічні дані заявки на знак для товарів і послуг' not in doc_type \
-                    and not doc.get('DocRecord', {}).get('DocRegNumber', '').lower().startswith('вн'):
-                res.append(doc)
-        return res
-    return list()
-
-
-@register.filter
 def remove_inn(s):
     """Удаляет из строки ИНН (10-значное число)."""
     s = re.sub(r'(?<!\w)\d{6,10}', '', s)

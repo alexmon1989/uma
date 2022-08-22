@@ -29,7 +29,7 @@
                         </thead>
 
                         <tbody>
-                        {% for doc in hit.DOCFLOW.DOCUMENTS|filter_bad_documents %}
+                        {% for doc in hit.DOCFLOW.DOCUMENTS %}
                             <tr>
                                 <td>
                                     {% if doc.DOCRECORD.DOCIDDOCCEAD %}

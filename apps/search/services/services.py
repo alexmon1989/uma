@@ -364,3 +364,65 @@ def application_sort_transactions(app_data: dict) -> None:
             transactions.sort(
                 key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
             )
+
+
+def application_73_contains_country_code(code: str, biblio_data: dict) -> bool:
+    """Возвращает признак наличия определённого кода страны в поле 73."""
+    code = code.lower()
+    i_73_values = biblio_data.get('I_73')
+    if i_73_values:
+        for item in i_73_values:
+            if item.get('I_73.C', '').lower() == code:
+                return True
+    return False
+
+
+def application_filter_documents_im_um_ld(biblio_data: dict, documents_data: List[dict]) -> List[dict]:
+    """Возвращает отфильтрованные документы изобретения, полезной модели, топографии."""
+    # 73 код содержит ли код страны RU
+    is_73_ru = application_73_contains_country_code('RU', biblio_data)
+
+    res = []
+    for doc in documents_data:
+        doc_reg_number = doc['DOCRECORD'].get('DOCREGNUMBER', '')
+        # Документы без номеров, дат
+        if not doc_reg_number and not doc['DOCRECORD'].get('DOCSENDINGDATE'):
+            continue
+
+        # Внутренние документы
+        if doc_reg_number.startswith('вн'):
+            continue
+
+        # Тип документа
+        doc_type = doc['DOCRECORD'].get('DOCTYPE', '').lower()
+
+        # В рез. список не включаются служебные записки и отчёты о поиске
+        if 'службова' in doc_type or 'звіт про інформаційний пошук' in doc_type:
+            continue
+
+        # Если код владельца - RU, то не включать в рез. список документов документы В8, В9
+        if ('[в8]' in doc_type or '[в9]' in doc_type) and is_73_ru:
+            continue
+
+        res.append(doc)
+
+    return res
+
+
+def application_filter_documents_tm_id(documents_data: List[dict]) -> List[dict]:
+    """Возвращает отфильтрованные документы торг. марки, пром. образца."""
+    res = []
+    for doc in documents_data:
+        doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
+        doc_number = doc.get('DocRecord', {}).get('DocRegNumber', '').lower()
+
+        # В рез. список не включаются служебные записки
+        if 'службова' in doc_type or 'бібліографічні дані заявки на знак для товарів і послуг' in doc_type:
+            continue
+        # и внутренние документы
+        if doc_number.startswith('вн'):
+            continue
+
+        res.append(doc)
+
+    return res
