@@ -24,7 +24,7 @@
                     </thead>
 
                     <tbody>
-                    {% for doc in hit.DOCFLOW.DOCUMENTS|filter_bad_documents %}
+                    {% for doc in hit.DOCFLOW.DOCUMENTS %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td class="text-center">
