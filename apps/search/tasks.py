@@ -199,10 +199,16 @@ def get_app_details(id_app_number, user_id):
             hit.get('DOCFLOW', {}).get('DOCUMENTS', [])
         )
 
-    elif hit['Document']['idObjType'] in (4, 6):
+    elif hit['Document']['idObjType'] == 4:
         if hit['TradeMark'].get('DocFlow', {}).get('Documents'):
             hit['TradeMark']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
                 hit['TradeMark'].get('DocFlow', {}).get('Documents', [])
+            )
+
+    elif hit['Document']['idObjType'] == 6:
+        if hit['Design'].get('DocFlow', {}).get('Documents'):
+            hit['Design']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
+                hit['Design'].get('DocFlow', {}).get('Documents', [])
             )
 
     # Сортировка документов заявки по дате
