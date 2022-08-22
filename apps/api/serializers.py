@@ -1,6 +1,9 @@
 from django.conf import settings
 from rest_framework import serializers
 from .models import OpenData
+
+from ..search.services import services as search_services
+
 import json
 
 
@@ -40,6 +43,10 @@ class OpenDataSerializer(serializers.ModelSerializer):
 
         if ret['data_docs']:
             ret['data_docs'] = json.loads(ret['data_docs'])
+            if instance['obj_type__id'] in (1, 2, 3):
+                ret['data_docs'] = search_services.application_filter_documents_im_um_ld(ret['data'], ret['data_docs'])
+            elif instance['obj_type__id'] in (4, 3):
+                ret['data_docs'] = search_services.application_filter_documents_tm_id(ret['data_docs'])
 
         if ret['data_payments']:
             ret['data_payments'] = json.loads(ret['data_payments'])

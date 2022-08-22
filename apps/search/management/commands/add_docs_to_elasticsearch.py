@@ -775,7 +775,7 @@ class Command(BaseCommand):
                 if cr_data.get('AuthorDetails', {}).get('Author') else None,
 
                 'title': cr_data.get('Name'),
-                'registration_status_color': 'green',
+                'registration_status_color': 'red' if res['Document']['RegistrationStatus'] == 'Реєстрація недійсна' else 'green',
             }
 
             # Запись в индекс

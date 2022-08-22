@@ -55,6 +55,7 @@ class OpenDataListView(generics.ListAPIView):
 
         return queryset.values(
             'app_id',
+            'obj_type__id',
             'obj_type__obj_type_ua',
             'app_number',
             'registration_number',
@@ -149,6 +150,7 @@ class OpenDataListViewV1(generics.ListAPIView):
 
         return queryset.values(
             'app_id',
+            'obj_type__id',
             'obj_type__obj_type_ua',
             'obj_state',
             'app_number',
@@ -170,7 +172,7 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk')
+        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('-registration_number')
 
         if self.request.query_params.get('obj_type', None):
             try:
@@ -181,6 +183,7 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
 
         return queryset.values(
             'app_id',
+            'obj_type__id',
             'obj_type__obj_type_ua',
             'obj_state',
             'app_number',
@@ -263,6 +266,7 @@ class SearchListView(generics.ListAPIView):
 
         return queryset.values(
             'app_id',
+            'obj_type__id',
             'obj_type__obj_type_ua',
             'obj_state',
             'app_number',

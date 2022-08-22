@@ -194,6 +194,17 @@ def get_app_details(id_app_number, user_id):
         if hit['search_data']['obj_state'] == 2:
             extend_doc_flow(hit)
 
+        hit['DOCFLOW']['DOCUMENTS'] = search_services.application_filter_documents_im_um_ld(
+            hit['biblio_data'],
+            hit.get('DOCFLOW', {}).get('DOCUMENTS', [])
+        )
+
+    elif hit['Document']['idObjType'] in (4, 6):
+        if hit['TradeMark'].get('DocFlow', {}).get('Documents'):
+            hit['TradeMark']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
+                hit['TradeMark'].get('DocFlow', {}).get('Documents', [])
+            )
+
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
 
