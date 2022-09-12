@@ -168,7 +168,7 @@ def get_app_details(id_app_number, user_id):
         'bool',
         must=[Q('match', _id=id_app_number)],
     )
-    # Фильтр заявок, которые не положено отоборажать
+    # Фильтр заявок, которые не положено отображать
     q = filter_bad_apps(q)
 
     s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
@@ -206,6 +206,9 @@ def get_app_details(id_app_number, user_id):
             )
 
     elif hit['Document']['idObjType'] == 6:
+        hit['Design']['DesignDetails'] = search_services.application_prepare_biblio_data_id(
+            hit['Design']['DesignDetails']
+        )
         if hit['Design'].get('DocFlow', {}).get('Documents'):
             hit['Design']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
                 hit['Design'].get('DocFlow', {}).get('Documents', [])
