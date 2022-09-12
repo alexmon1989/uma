@@ -1288,9 +1288,9 @@ def user_has_access_to_docs(user, hit):
             # Удаление None-объектов
             allowed_persons = list(filter(lambda item: item is not None, allowed_persons))
 
-            # Замена латинских I, i на кириллицу
-            user_names = [x.replace('I', 'І').replace('i', 'і') for x in user_names]
-            allowed_persons = [x.replace('I', 'І').replace('i', 'і') for x in allowed_persons]
+            # Замена латинских I, i на кириллицу, апострофов
+            user_names = [x.replace('I', 'І').replace('i', 'і').replace("`", "'").replace("’", "'") for x in user_names]
+            allowed_persons = [x.replace('I', 'І').replace('i', 'і').replace("`", "'").replace("’", "'") for x in allowed_persons]
 
             # Проверка на вхождение
             return any([person for person in allowed_persons for user_name in user_names if
