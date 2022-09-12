@@ -26,12 +26,15 @@ class OpenDataSerializer(serializers.ModelSerializer):
                 pass
 
             # Если это пром. образец, то необходимо указывать полные пути к изображениям
-            try:
-                images = ret['data']['DesignSpecimenDetails'][0]['DesignSpecimen']
-                for image in images:
-                    image['SpecimenFilename'] = f"{files_dir}{image['SpecimenFilename']}"
-            except (KeyError, TypeError):
-                pass
+            if instance['obj_type__id'] == 6:
+                # Фильтрация библиографических данных
+                ret['data'] = search_services.application_prepare_biblio_data_id(ret['data'])
+                try:
+                    images = ret['data']['DesignSpecimenDetails'][0]['DesignSpecimen']
+                    for image in images:
+                        image['SpecimenFilename'] = f"{files_dir}{image['SpecimenFilename']}"
+                except (KeyError, TypeError):
+                    pass
 
             # Если это авт. право, то надо убрать DocBarCode
             try:

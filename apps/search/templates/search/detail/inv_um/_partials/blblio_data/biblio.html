@@ -84,28 +84,26 @@
             {% endif %}
 
             {% if hit.biblio_data.I_30 %}
-                {% for I_30 in hit.biblio_data.I_30 %}
-                    {% get_field '31' ipc_fields as ipc_field %}
-                    {% if ipc_field.enable_view and hit.biblio_data.I_30.I_31 %}
-                        <tr>
-                            <th>{{ ipc_field.code_title }}</th>
-                            <td>{{ hit.biblio_data.I_30.I_31 }}
-                                {% get_field '33' ipc_fields as ipc_field %}
-                                {% if ipc_field.enable_view and hit.biblio_data.I_30.I_33 %}
-                                    <span title="{{ ipc_field.code_title }}">{{ hit.biblio_data.I_30.I_33 }}</span>
+                {% get_field '31' ipc_fields as ipc_field_31 %}
+                {% get_field '32' ipc_fields as ipc_field_32 %}
+                {% get_field '33' ipc_fields as ipc_field_33 %}
+                {% if ipc_field_31.enable_view and hit.biblio_data.I_30 %}
+                    <tr>
+                        <th>{{ ipc_field_31.code_title }}</th>
+                        <td>
+                            {% for I_30 in hit.biblio_data.I_30 %}
+                                {{ I_30.I_31 }}
+                                {% if ipc_field_33.enable_view and I_30.I_33 %}
+                                    <span title="{{ ipc_field_33.code_title }}">{{ I_30.I_33 }}</span>
                                 {% endif %}
-                            </td>
-                        </tr>
-                    {% endif %}
-
-                    {% get_field '32' ipc_fields as ipc_field %}
-                    {% if hit.biblio_data.I_30.I_32 %}
-                        <tr>
-                            <th>{{ ipc_field.code_title }}</th>
-                            <td>{{ hit.biblio_data.I_30.I_32|parse_date|date:"d.m.Y" }}</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
+                                {% if ipc_field_32.enable_view and I_30.I_32 %}
+                                    <span title="{{ ipc_field_32.code_title }}">({{ I_30.I_32|parse_date|date:"d.m.Y" }})</span>
+                                {% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '41.D' ipc_fields as ipc_field %}
