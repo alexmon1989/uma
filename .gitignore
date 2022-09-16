@@ -116,3 +116,4 @@ venv.bak/
 /nginx.conf
 /certs/
 /celery_daemon.conf
+/cache/

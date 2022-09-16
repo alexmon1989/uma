@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.conf import settings
 from .models import EBulletinData, ClListOfficialBulletinsIp
+from ..search.services import services as search_services
 import datetime
 import os
 
@@ -8,7 +9,8 @@ import os
 def prepare_tm_data(record):
     """Подлготавливет данные о ТМ для отображения в бюлетне."""
     hit = record.to_dict()
-    data = hit['TradeMark']['TrademarkDetails']
+    app_data_db = search_services.application_get_app_db_data(record.meta.id)
+    data = search_services.application_prepare_biblio_data_tm(hit['TradeMark']['TrademarkDetails'], app_data_db)
     biblio_data = dict()
 
     # (210) Номер заявки
@@ -69,15 +71,12 @@ def prepare_tm_data(record):
         biblio_data['code_330']['value'] = '; '.join(countries)
 
     # 441 - Дата публікації заявки
-    date_441 = EBulletinData.objects.filter(app_number=data['ApplicationNumber']).first().publication_date
     biblio_data['code_441'] = {
-        'title': '(441) Дата публікації відомостей про заявку та номер бюлетня'
+        'title': '(441) Дата публікації відомостей про заявку та номер бюлетня',
+        'value': datetime.datetime.strptime(data['Code_441'], '%Y-%m-%d').strftime('%d.%m.%Y')
     }
-    try:
-        bul_num_441 = ClListOfficialBulletinsIp.objects.get(date_from__lte=date_441, date_to__gte=date_441)
-        biblio_data['code_441']['value'] = f"{date_441.strftime('%d.%m.%Y')}, бюл. № {bul_num_441.bul_number}"
-    except ClListOfficialBulletinsIp.DoesNotExist:
-        biblio_data['code_441']['value'] = date_441.strftime('%d.%m.%Y')
+    if 'Code_441_BulNumber' in data:
+        biblio_data['code_441']['value'] = f"{biblio_data['code_441']['value']},  бюл. № {data['Code_441_BulNumber']}"
 
     # 511 - індекс (індекси) МКТП для реєстрації знаків та перелік товарів і послуг
     biblio_data['code_511'] = {

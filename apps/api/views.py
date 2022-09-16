@@ -53,19 +53,7 @@ class OpenDataListView(generics.ListAPIView):
             except ObjType.DoesNotExist:
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
-        return queryset.values(
-            'app_id',
-            'obj_type__id',
-            'obj_type__obj_type_ua',
-            'app_number',
-            'registration_number',
-            'registration_date',
-            'last_update',
-            'data',
-            'data_docs',
-            'data_payments',
-            'app__files_path',
-        )
+        return queryset
 
 
 class OpenDataListViewV1(generics.ListAPIView):
@@ -148,21 +136,7 @@ class OpenDataListViewV1(generics.ListAPIView):
             except:
                 raise exceptions.ParseError("Невірне значення параметру last_update_to")
 
-        return queryset.values(
-            'app_id',
-            'obj_type__id',
-            'obj_type__obj_type_ua',
-            'obj_state',
-            'app_number',
-            'app_date',
-            'registration_number',
-            'registration_date',
-            'last_update',
-            'data',
-            'data_docs',
-            'data_payments',
-            'app__files_path',
-        )
+        return queryset
 
 
 class OpenDataDetailViewV1(generics.RetrieveAPIView):
@@ -181,21 +155,7 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
             except ValueError:
                 raise Http404
 
-        return queryset.values(
-            'app_id',
-            'obj_type__id',
-            'obj_type__obj_type_ua',
-            'obj_state',
-            'app_number',
-            'app_date',
-            'registration_number',
-            'registration_date',
-            'last_update',
-            'data',
-            'data_docs',
-            'data_payments',
-            'app__files_path',
-        )
+        return queryset
 
     def get_object(self):
         qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
@@ -264,18 +224,4 @@ class SearchListView(generics.ListAPIView):
             if registration_number:
                 queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
 
-        return queryset.values(
-            'app_id',
-            'obj_type__id',
-            'obj_type__obj_type_ua',
-            'obj_state',
-            'app_number',
-            'app_date',
-            'registration_number',
-            'registration_date',
-            'last_update',
-            'data',
-            'data_docs',
-            'data_payments',
-            'app__files_path',
-        )[:20]
+        return queryset[:20]
