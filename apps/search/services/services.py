@@ -440,7 +440,7 @@ def application_prepare_biblio_data_id(data: dict) -> dict:
     """Готовит библиографические данные пром. образца для отображения."""
     res = copy.deepcopy(data)
     # Нужно ли публиковать автора
-    if 'Designer' in data['DesignerDetails']:
+    if 'DesignerDetails' in data and 'Designer' in data['DesignerDetails']:
         for i, designer in enumerate(res['DesignerDetails']['Designer']):
             # Значение поля Publicated - признак того надо ли публиковать автора
             if 'Publicated' in designer and not designer['Publicated']:
