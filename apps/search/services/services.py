@@ -1,6 +1,14 @@
-from django.utils.translation import gettext as _
+import datetime
 from typing import List, Optional
 import time
+import copy
+
+from django.utils.timezone import make_aware
+from django.utils.translation import gettext as _
+from django.conf import settings
+
+from ..models import IpcAppList
+from ...bulletin import services as bulletin_services
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -430,10 +438,33 @@ def application_filter_documents_tm_id(documents_data: List[dict]) -> List[dict]
 
 def application_prepare_biblio_data_id(data: dict) -> dict:
     """Готовит библиографические данные пром. образца для отображения."""
-    res = data.copy()
+    res = copy.deepcopy(data)
+    # Нужно ли публиковать автора
     if 'Designer' in data['DesignerDetails']:
         for i, designer in enumerate(res['DesignerDetails']['Designer']):
             # Значение поля Publicated - признак того надо ли публиковать автора
             if 'Publicated' in designer and not designer['Publicated']:
                 del res['DesignerDetails']['Designer'][i]
     return res
+
+
+def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> dict:
+    """Готовит библиографические данные ТМ для отображения."""
+    res = copy.deepcopy(data)
+
+    # Значение поля 441.
+    # Если последнее изменение данных после значения settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE,
+    # то необходимо отображать значение, которое вернулось с АС "Позначення",
+    # а иначе брать номер бюллетеня из таблицы cl_list_official_bulletins_ip
+    bulletin_date_until = make_aware(
+        datetime.datetime.strptime(settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE, '%d.%m.%Y')
+    )
+    if 'Code_441_BulNumber' in res and app_db_data.lastupdate < bulletin_date_until:
+        res['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(res['Code_441'])
+
+    return res
+
+
+def application_get_app_db_data(app_id: int) -> IpcAppList:
+    """Возвращает данные заявки, хранящиеся в БД."""
+    return IpcAppList.objects.filter(pk=app_id).first()

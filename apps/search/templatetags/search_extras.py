@@ -525,17 +525,6 @@ def id_has_colors(hit):
     return False
 
 
-@register.simple_tag
-def bul_number_441_code(code_441_date):
-    """Возвращает номер бюлетня для 441 кода."""
-    try:
-        obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=code_441_date, date_to__gte=code_441_date)
-    except ClListOfficialBulletinsIp.DoesNotExist:
-        return False
-    else:
-        return obj.bul_number
-
-
 @register.filter
 def filter_tm_id_docs_direction(documents, direction):
     """Возвращает только входящие/исходящие документы ТМ."""

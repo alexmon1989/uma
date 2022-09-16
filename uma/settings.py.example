@@ -338,8 +338,12 @@ ADMINS = (('Alex', 'a.monastyretsky@ukrpatent.org'),)
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache'),
+        'TIMEOUT': None,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
     }
 }
 
@@ -366,3 +370,6 @@ VALIDATE_DS_WHITE_LIST_CERTS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Брать значение номера бюллетеня с данных JSON (АС "Позначення"), начиная с этой даты
+CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE = '14.09.2022'

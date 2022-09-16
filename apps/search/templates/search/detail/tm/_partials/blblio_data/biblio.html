@@ -226,8 +226,7 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">
-                        {% bul_number_441_code hit.TradeMark.TrademarkDetails.Code_441 as bul_number_441_code_value %}
-                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}{% if bul_number_441_code_value %}, {% trans 'бюл. №' %}&nbsp;{{ bul_number_441_code_value }}{% endif %}
+                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}{% if hit.TradeMark.TrademarkDetails.Code_441_BulNumber %}, {% trans 'бюл. №' %}&nbsp;{{ hit.TradeMark.TrademarkDetails.Code_441_BulNumber }}{% endif %}
                     </td>
                 </tr>
             {% endif %}

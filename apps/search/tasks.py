@@ -200,6 +200,10 @@ def get_app_details(id_app_number, user_id):
         )
 
     elif hit['Document']['idObjType'] == 4:
+        hit['TradeMark']['TrademarkDetails'] = search_services.application_prepare_biblio_data_tm(
+            hit['TradeMark']['TrademarkDetails'],
+            search_services.application_get_app_db_data(id_app_number)
+        )
         if hit['TradeMark'].get('DocFlow', {}).get('Documents'):
             hit['TradeMark']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
                 hit['TradeMark'].get('DocFlow', {}).get('Documents', [])
