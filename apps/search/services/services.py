@@ -459,7 +459,7 @@ def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> d
     bulletin_date_until = make_aware(
         datetime.datetime.strptime(settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE, '%d.%m.%Y')
     )
-    if 'Code_441_BulNumber' in res and app_db_data.lastupdate < bulletin_date_until:
+    if 'Code_441_BulNumber' in res and 'Code_441' in res and app_db_data.lastupdate < bulletin_date_until:
         res['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(res['Code_441'])
 
     return res
