@@ -434,7 +434,7 @@ class Command(BaseCommand):
             if res['TradeMark'].get('Transactions', {}).get('Transaction'):
                 # Удаление чужих оповещений
                 res['TradeMark']['Transactions']['Transaction'] = list(filter(
-                    lambda x: x.get('@registrationNumber') == res['TradeMark']['TrademarkDetails']['RegistrationNumber'],
+                    lambda x: x.get('@registrationNumber') == res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                     res['TradeMark']['Transactions']['Transaction']
                 ))
 
@@ -574,7 +574,7 @@ class Command(BaseCommand):
             if res['Design'].get('Transactions', {}).get('Transaction'):
                 # Удаление чужих оповещений
                 res['Design']['Transactions']['Transaction'] = list(filter(
-                    lambda x: x.get('@registrationNumber') == res['Design']['DesignDetails']['RegistrationNumber'],
+                    lambda x: x.get('@registrationNumber') == res['Design']['DesignDetails'].get('RegistrationNumber'),
                     res['Design']['Transactions']['Transaction']
                 ))
 
