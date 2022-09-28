@@ -226,7 +226,13 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">
-                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }}{% if hit.TradeMark.TrademarkDetails.Code_441_BulNumber %}, {% trans 'бюл. №' %}&nbsp;{{ hit.TradeMark.TrademarkDetails.Code_441_BulNumber }}{% endif %}
+                        {{ hit.TradeMark.TrademarkDetails.Code_441|parse_date|date:"d.m.Y" }},&nbsp;{% trans 'бюл. №' %}
+                        {% if hit.TradeMark.TrademarkDetails.Code_441_BulNumber %}
+                            {{ hit.TradeMark.TrademarkDetails.Code_441_BulNumber }}
+                        {% else %}
+                            {% bulletin_number_441_code hit.TradeMark.TrademarkDetails.Code_441 as bul_num %}
+                            {% if bul_num %}{{ bul_num }}{% endif %}
+                        {% endif %}
                     </td>
                 </tr>
             {% endif %}
