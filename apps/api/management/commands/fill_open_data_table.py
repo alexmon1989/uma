@@ -83,6 +83,13 @@ class Command(BaseCommand):
                         ),
                         is_dst=True
                     )
+                elif data['Document']['idObjType'] == 6 and data['Design']['DesignDetails'].get('DesignApplicationDate'):
+                    app_date = make_aware(
+                        datetime.strptime(
+                            data['Design']['DesignDetails']['DesignApplicationDate'][:10], '%Y-%m-%d'
+                        ),
+                        is_dst=True
+                    )
 
                 # Сохраннение данных
                 open_data_record, created = OpenData.objects.get_or_create(app_id=d[0])
