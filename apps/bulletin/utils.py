@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.conf import settings
 from .models import EBulletinData, ClListOfficialBulletinsIp
 from ..search.services import services as search_services
+from .services import bulletin_get_number_441_code
 import datetime
 import os
 
@@ -76,7 +77,10 @@ def prepare_tm_data(record):
         'value': datetime.datetime.strptime(data['Code_441'], '%Y-%m-%d').strftime('%d.%m.%Y')
     }
     if 'Code_441_BulNumber' in data:
-        biblio_data['code_441']['value'] = f"{biblio_data['code_441']['value']},  бюл. № {data['Code_441_BulNumber']}"
+        biblio_data['code_441']['value'] = f"{biblio_data['code_441']['value']}, бюл. № {data['Code_441_BulNumber']}"
+    else:
+        bul_num = bulletin_get_number_441_code(data['Code_441'])
+        biblio_data['code_441']['value'] = f"{biblio_data['code_441']['value']}, бюл. № {bul_num}"
 
     # 511 - індекс (індекси) МКТП для реєстрації знаків та перелік товарів і послуг
     biblio_data['code_511'] = {
