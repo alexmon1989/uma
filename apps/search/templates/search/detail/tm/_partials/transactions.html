@@ -717,6 +717,50 @@
                                 <li><span class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction|get:"@type" == 'LicenceInvalidationByMutualAgreement' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.LicensorDetails.Licensor %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіара" %}:</span>
+                                    <br>
+                                    {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
+                                        {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        ({{ licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
+                                    {% endfor %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.LicenseeDetails.Licensee %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіата" %}:</span>
+                                    <br>
+                                    {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
+                                        {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        ({{ licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
+                                    {% endfor %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.LicencePublicationDetails %}
+                                <li><span class="g-font-weight-600">{% trans "Дата публікації відомостей про видачу ліцензії на використання знака та номер бюлетня" %}:</span> {{ transaction.TransactionBody.LicencePublicationDetails.BulletinNumber }}, {{ transaction.TransactionBody.LicencePublicationDetails.BulletinDate|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.DecisionNumber %}
+                                <li><span class="g-font-weight-600">{% trans "Реєстраційний номер рішення" %}:</span> {{ transaction.TransactionBody.DecisionNumber }}</li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}
