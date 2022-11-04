@@ -406,13 +406,10 @@ def extend_doc_flow(hit):
         except (AttributeError, KeyError):
             pass
 
-        try:
-            # Объединение платежей
-            payments = application['DOCFLOW']['PAYMENTS']
-            payments.extend(hit['DOCFLOW']['PAYMENTS'])
-            hit['DOCFLOW']['PAYMENTS'] = payments
-        except (AttributeError, KeyError):
-            pass
+        # Объединение платежей
+        payments = application.get('DOCFLOW', {}).get('PAYMENTS', [])
+        payments.extend(hit.get('DOCFLOW', {}).get('PAYMENTS', []))
+        hit['DOCFLOW']['PAYMENTS'] = payments
 
         try:
             # Объединение сборов
