@@ -17,7 +17,9 @@
                     </div>
                 {% endif %}
 
-                <payment-form></payment-form>
+                {% if page_data.show_form %}
+                    <payment-form></payment-form>
+                {% endif %}
             </div>
         </div>
     </section>

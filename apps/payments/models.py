@@ -119,6 +119,7 @@ class Page(TimeStampedModel):
     """Модель страницы формирования заказа."""
     description_uk = RichTextUploadingField('Опис сторінки (укр.)', blank=True)
     description_en = RichTextUploadingField('Опис сторінки (англ.)', blank=True)
+    show_form = models.BooleanField('Відображати форму для платежу', default=True)
 
     @property
     def description(self):
