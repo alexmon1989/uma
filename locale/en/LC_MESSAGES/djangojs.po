@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-02 11:14+0300\n"
+"POT-Creation-Date: 2023-01-02 16:01+0200\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -29,7 +29,7 @@ msgstr "Error! Please try again later."
 msgid "Файл було сформовано."
 msgstr "File was created."
 
-#: assets/js/custom.js:259 assets/js/custom.js:332 assets/js/custom.js:369
+#: assets/js/custom.js:259 assets/js/custom.js:332 assets/js/custom.js:370
 #: assets/js/vue-components/GetOriginalDoc.vue:74
 msgid "Будь-ласка, зачекайте, відбувається формування файлу."
 msgstr "Please wait for file creating."
@@ -42,23 +42,23 @@ msgstr "Please wait for document creating."
 msgid "Відкрити"
 msgstr "Open"
 
-#: assets/js/custom.js:358
+#: assets/js/custom.js:359
 msgid "Не було обрано жодного документу."
 msgstr "There is no document selected"
 
-#: assets/js/custom.js:454
+#: assets/js/custom.js:469
 msgid "Видалити зі списку вибраних документів"
 msgstr "Remove from the favorites list."
 
-#: assets/js/custom.js:455
+#: assets/js/custom.js:470
 msgid "Документ було додано до списку вибраних документів."
 msgstr "The document was added to the favorites list."
 
-#: assets/js/custom.js:459
+#: assets/js/custom.js:474
 msgid "Додати до списку вибраних документів"
 msgstr "Add to the favorites list."
 
-#: assets/js/custom.js:460
+#: assets/js/custom.js:475
 msgid "Документ було видалено зі списку вибраних документів."
 msgstr "The document was removed from the favorites list."
 
