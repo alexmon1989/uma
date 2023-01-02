@@ -26,10 +26,10 @@
                 {% get_current_language as LANGUAGE_CODE %}
                 <a href="{% url 'home:index' %}" class="navbar-brand d-flex">
                     {% if LANGUAGE_CODE == 'en' %}
-                        <img src="{% static 'img/logo/logo2-en.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo2_ukrnoivi-en.png' %}" alt="" class="logo-desktop">
                         <img src="{% static 'img/logo/logo-mobile-en.png' %}" alt="" class="logo-mobile">
                     {% else %}
-                        <img src="{% static 'img/logo/logo2.png' %}" alt="" class="logo-desktop">
+                        <img src="{% static 'img/logo/logo2_ukrnoivi.png' %}" alt="" class="logo-desktop">
                         <img src="{% static 'img/logo/logo-mobile.png' %}" alt="" class="logo-mobile">
                     {% endif %}
                 </a>

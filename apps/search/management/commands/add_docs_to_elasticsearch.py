@@ -180,20 +180,20 @@ class Command(BaseCommand):
                 # Строка бюлетня ("10/2011" и т.д.)
                 if res['Document']['idObjType'] == 1 and data.get('Claim', {}).get('I_43.D'):  # Заявки на изобретения
                     i_43_d = data['Claim']['I_43.D'][0]
-                    try:
-                        bulletin = ClListOfficialBulletinsIp.objects.get(bul_date=i_43_d)
-                    except ClListOfficialBulletinsIp.DoesNotExist:
-                        pass
-                    else:
+                    bulletin = ClListOfficialBulletinsIp.objects.filter(
+                        date_from__lte=i_43_d,
+                        date_to__gte=i_43_d
+                    ).first()
+                    if bulletin:
                         bull_str = f"{bulletin.bul_number}/{bulletin.bul_date.year}"
                         data['Claim']['I_43_bul_str'] = bull_str
                 elif data.get('Patent', {}).get('I_45.D'):  # Патенты на изобретения, пол. модели, топографии
                     i_45_d = data['Patent']['I_45.D'][len(data['Patent']['I_45.D']) - 1]
-                    try:
-                        bulletin = ClListOfficialBulletinsIp.objects.get(bul_date=i_45_d)
-                    except ClListOfficialBulletinsIp.DoesNotExist:
-                        pass
-                    else:
+                    bulletin = ClListOfficialBulletinsIp.objects.filter(
+                        date_from__lte=i_45_d,
+                        date_to__gte=i_45_d
+                    ).first()
+                    if bulletin:
                         bull_str = f"{bulletin.bul_number}/{bulletin.bul_date.year}"
                         data['Patent']['I_45_bul_str'] = bull_str
 
