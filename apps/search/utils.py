@@ -409,7 +409,10 @@ def extend_doc_flow(hit):
         # Объединение платежей
         payments = application.get('DOCFLOW', {}).get('PAYMENTS', [])
         payments.extend(hit.get('DOCFLOW', {}).get('PAYMENTS', []))
-        hit['DOCFLOW']['PAYMENTS'] = payments
+        try:
+            hit['DOCFLOW']['PAYMENTS'] = list({v['PFRECORD']['PFCOLLID']:v for v in payments}.values())  
+        except (AttributeError, KeyError):
+            hit['DOCFLOW']['PAYMENTS'] = payments
 
         try:
             # Объединение сборов
