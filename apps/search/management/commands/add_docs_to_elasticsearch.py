@@ -370,7 +370,7 @@ class Command(BaseCommand):
                 if res['TradeMark']['TrademarkDetails'].get('HolderDetails') else None,
                 'title': ', '.join([x['#text'] for x in res['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
                     'MarkSignificantVerbalElement']])
-                if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else None,
+                if res['TradeMark']['TrademarkDetails'].get('WordMarkSpecification') else '',
             }
 
             if res['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
