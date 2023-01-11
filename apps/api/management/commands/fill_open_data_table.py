@@ -39,13 +39,14 @@ class Command(BaseCommand):
     def get_registration_date(self, app: IpcAppList, data: dict) -> datetime | str:
         """Возвращает дату регистрации."""
         if data['Document']['idObjType'] in (1, 2, 3):
-            return data['Patent']['I_24']
+            registration_date = data['Patent']['I_24']
         elif data['Document']['idObjType'] == 4:
-            return data['TradeMark']['TrademarkDetails']['RegistrationDate']
+            registration_date = data['TradeMark']['TrademarkDetails'].get('RegistrationDate')
         elif data['Document']['idObjType'] == 6:
-            return data['Design']['DesignDetails']['RecordEffectiveDate']
+            registration_date = data['Design']['DesignDetails'].get('RecordEffectiveDate')
         else:
-            return app.registration_date
+            registration_date = app.registration_date
+        return registration_date or app.registration_date
 
     def get_app_date(self, app: IpcAppList, data: dict) -> datetime | str:
         """Возвращает дату заявки."""
