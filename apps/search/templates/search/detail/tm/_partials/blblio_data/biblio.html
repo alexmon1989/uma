@@ -32,6 +32,13 @@
     <div class="table-responsive">
         <table class="table table-sm table-trade-mark g-font-size-13">
             <tbody>
+            {% if hit.TradeMark.TrademarkDetails.app_input_date %}
+                <tr>
+                    <th>{% trans "Дата надходження матеріалів заявки до НОІВ" %}</th>
+                    <td>{{ hit.TradeMark.TrademarkDetails.app_input_date|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '111' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicationNumber %}
                 <tr>

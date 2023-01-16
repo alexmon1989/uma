@@ -6,8 +6,12 @@ import copy
 from django.utils.translation import gettext as _
 from django.conf import settings
 
-from ..models import IpcAppList
-from ...bulletin import services as bulletin_services
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
+
+from apps.search.models import IpcAppList
+from apps.bulletin import services as bulletin_services
+from apps.search.utils import filter_bad_apps
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -466,3 +470,22 @@ def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> d
 def application_get_app_db_data(app_id: int) -> IpcAppList:
     """Возвращает данные заявки, хранящиеся в БД."""
     return IpcAppList.objects.filter(pk=app_id).first()
+
+
+def application_get_app_elasticsearch_data(app_id: int) -> dict:
+    """Возвращает данные заявки, хранящиеся в ElasticSearch."""
+    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    q = Q(
+        'bool',
+        must=[Q('match', _id=app_id)],
+    )
+    # Фильтр заявок, которые не положено отображать
+    q = filter_bad_apps(q)
+
+    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
+        excludes=["*.DocBarCode", "*.DOCBARCODE"]
+    ).execute()
+
+    if not s:
+        return {}
+    return s[0].to_dict()

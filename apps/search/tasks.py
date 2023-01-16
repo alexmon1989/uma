@@ -160,23 +160,13 @@ def validate_query(get_params):
 
 
 @shared_task
-def get_app_details(id_app_number, user_id):
+def get_app_details(id_app_number: int, user_id: int) -> dict:
     """Задача для получения деталей по заявке."""
-    user = get_user_or_anonymous(user_id)
-    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-    q = Q(
-        'bool',
-        must=[Q('match', _id=id_app_number)],
-    )
-    # Фильтр заявок, которые не положено отображать
-    q = filter_bad_apps(q)
-
-    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
-        excludes=["*.DocBarCode", "*.DOCBARCODE"]
-    ).execute()
-    if not s:
+    hit = search_services.application_get_app_elasticsearch_data(id_app_number)
+    if not hit:
         return {}
-    hit = s[0].to_dict()
+
+    user = get_user_or_anonymous(user_id)
 
     if hit['Document']['idObjType'] in (1, 2, 3):
         hit['biblio_data'] = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']
