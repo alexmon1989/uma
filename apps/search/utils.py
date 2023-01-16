@@ -1960,7 +1960,17 @@ def filter_app_data(app_data, user):
                         'TradeMark': {
                             'TrademarkDetails': {
                                 'ApplicationNumber': app_data['TradeMark'].get('TrademarkDetails', {}).get('ApplicationNumber'),
-                                'MarkImageDetails': app_data['TradeMark'].get('TrademarkDetails', {}).get('MarkImageDetails'),
+                                'MarkImageDetails': {
+                                    'MarkImage': {
+                                        'MarkImageFilename': app_data['TradeMark'].get(
+                                            'TrademarkDetails', {}
+                                        ).get(
+                                            'MarkImageDetails'
+                                        ).get(
+                                            'MarkImage'
+                                        ).get('MarkImageFilename')
+                                    }
+                                },
                                 'GoodsServicesDetails': app_data['TradeMark'].get('TrademarkDetails', {}).get('GoodsServicesDetails'),
                                 'app_input_date': app_data['search_data'].get('app_date'),
                                 'stages': app_data['TradeMark'].get('TrademarkDetails', {}).get('stages', []),
