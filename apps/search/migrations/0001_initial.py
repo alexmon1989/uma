@@ -17,6 +17,12 @@ class Migration(migrations.Migration):
             name='InidCodeSchedule',
             fields=[
                 ('id', models.AutoField(db_column='idLink', primary_key=True, serialize=False)),
+                ('schedule_type', models.IntegerField(db_column='idSheduleType', blank=True, null=True,
+                                                      verbose_name='Реєстр')),
+                ('ipc_code', models.IntegerField(db_column='idIPCCode', blank=True, null=True,
+                                                 verbose_name='Код ІНІД')),
+                ('elastic_index_field', models.IntegerField(db_column='ElasticIndexField', blank=True, null=True,
+                                                            verbose_name='Поле індексу ElasticSearch')),
                 ('enable_search', models.IntegerField(blank=True, db_column='EnableSearch', null=True)),
                 ('enable_view', models.IntegerField(blank=True, db_column='EnableView', null=True)),
             ],
@@ -49,6 +55,7 @@ class Migration(migrations.Migration):
                 ('obj_server_folder', models.CharField(blank=True, db_column='ObjServerFolder', max_length=255, null=True)),
                 ('file_server_name', models.CharField(blank=True, db_column='FileServerName', max_length=250, null=True)),
                 ('net_share_name', models.CharField(blank=True, db_column='NetShareName', max_length=500, null=True)),
+                ('order', models.PositiveSmallIntegerField(db_column='order', blank=True, null=True)),
             ],
             options={
                 'db_table': 'cl_IP_ObjTypes',
@@ -64,6 +71,7 @@ class Migration(migrations.Migration):
                 ('run_app_path', models.CharField(blank=True, db_column='RunAppPath', max_length=200, null=True)),
                 ('is_scheduled', models.IntegerField(blank=True, db_column='isSheduled', null=True)),
                 ('mask_task_name', models.CharField(blank=True, db_column='MaskTaskName', max_length=100, null=True)),
+                ('idobjtype', models.IntegerField(blank=True, db_column='idObjType', null=True)),
             ],
             options={
                 'db_table': 'cl_SheduleTypes',

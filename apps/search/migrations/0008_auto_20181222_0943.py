@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(db_column='idDocument', primary_key=True, serialize=False)),
                 ('enter_num', models.IntegerField(db_column='enterNum')),
+                ('app', models.IntegerField(db_column='idAPPNumber')),
                 ('add_date', models.DateTimeField(db_column='AddDate')),
                 ('file_name', models.CharField(blank=True, db_column='FileName', max_length=500, null=True)),
                 ('file_type', models.CharField(blank=True, db_column='FileType', max_length=10, null=True)),
@@ -33,8 +34,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(db_column='idOrderDoc', primary_key=True, serialize=False)),
                 ('id_cead_doc', models.IntegerField(blank=True, db_column='idCEADDoc', null=True)),
+                ('order', models.IntegerField(db_column='idOrder', blank=True, null=True)),
                 ('file_type', models.CharField(blank=True, db_column='FileType', max_length=20, null=True)),
                 ('file_size', models.IntegerField(blank=True, db_column='FileSize', null=True)),
+                ('file_name', models.CharField(blank=True, db_column='FileName', null=True, max_length=600)),
             ],
             options={
                 'db_table': 'ls_OrderDocuments',
@@ -46,9 +49,14 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(db_column='idOrder', primary_key=True, serialize=False)),
                 ('ip_user', models.GenericIPAddressField(blank=True, db_column='IP_User', null=True)),
+                ('user', models.IntegerField(db_column='idUser', blank=True, null=True)),
                 ('order_completed', models.BooleanField(blank=True, db_column='OrderCompleted', null=True)),
+                ('app', models.IntegerField(db_column='idAPPNumber', blank=True, null=True)),
                 ('completion_datetime', models.DateTimeField(blank=True, db_column='CompletionDateTime', null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_column='CreateDateTime')),
+                ('create_external_documents', models.IntegerField(db_column='create_external_documents', default=0)),
+                ('externaldoc_enternum', models.IntegerField(db_column='externalDoc_EnterNUM', blank=True, null=True)),
+                ('external_doc_body', models.IntegerField(db_column='external_doc_body', blank=True, null=True)),
             ],
             options={
                 'db_table': 'ls_OrderService',

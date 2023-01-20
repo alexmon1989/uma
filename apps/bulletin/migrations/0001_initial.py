@@ -2,6 +2,7 @@
 
 import ckeditor_uploader.fields
 from django.db import migrations, models
+import sys
 
 
 class Migration(migrations.Migration):
@@ -17,11 +18,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(db_column='idObject', primary_key=True, serialize=False)),
                 ('app_number', models.CharField(blank=True, max_length=50, null=True)),
+                ('unit', models.IntegerField(db_column='idUnit', blank=True, null=True)),
                 ('publication_date', models.DateField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'ls_SIS_ebulletin_data',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
@@ -30,10 +32,11 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(db_column='idUnit', primary_key=True, serialize=False)),
                 ('unit_name', models.CharField(blank=True, db_column='UnitName', max_length=300, null=True)),
                 ('view_order', models.IntegerField(blank=True, null=True)),
+                ('obj_type', models.IntegerField(db_column='idObjType')),
             ],
             options={
                 'db_table': 'cl_ebulletin_units',
-                'managed': False,
+                'managed': 'test' in sys.argv,
             },
         ),
         migrations.CreateModel(
