@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.utils.timezone import make_aware
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
@@ -37,6 +36,27 @@ class Command(BaseCommand):
             help='Show progress'
         )
 
+    def get_registration_date(self, app: IpcAppList, data: dict) -> datetime | str:
+        """Возвращает дату регистрации."""
+        if data['Document']['idObjType'] in (1, 2, 3):
+            registration_date = data['Patent']['I_24']
+        elif data['Document']['idObjType'] == 4:
+            registration_date = data['TradeMark']['TrademarkDetails'].get('RegistrationDate')
+        elif data['Document']['idObjType'] == 6:
+            registration_date = data['Design']['DesignDetails'].get('RecordEffectiveDate')
+        else:
+            registration_date = app.registration_date
+        return registration_date or app.registration_date
+
+    def get_app_date(self, app: IpcAppList, data: dict) -> datetime | str:
+        """Возвращает дату заявки."""
+        if data['Document']['idObjType'] == 4 and data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
+            return data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10]
+        elif data['Document']['idObjType'] == 6 and data['Design']['DesignDetails'].get('DesignApplicationDate'):
+            return data['Design']['DesignDetails']['DesignApplicationDate'][:10]
+        else:
+            return app.app_date
+
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
@@ -54,7 +74,6 @@ class Command(BaseCommand):
                 i += 1
                 self.stdout.write(self.style.SUCCESS(f"{i}/{c} - {d[0]}"))
 
-            app_date = None
             app = IpcAppList.objects.get(id=d[0])
 
             # Получение данных с ElasticSearch
@@ -76,34 +95,19 @@ class Command(BaseCommand):
                 data_docs = api_services.app_get_documents(data)
                 data_payments = api_services.app_get_payments(data)
 
-                if data['Document']['idObjType'] == 4 and data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
-                    app_date = make_aware(
-                        datetime.strptime(
-                            data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10], '%Y-%m-%d'
-                        ),
-                        is_dst=True
-                    )
-                elif data['Document']['idObjType'] == 6 and data['Design']['DesignDetails'].get('DesignApplicationDate'):
-                    app_date = make_aware(
-                        datetime.strptime(
-                            data['Design']['DesignDetails']['DesignApplicationDate'][:10], '%Y-%m-%d'
-                        ),
-                        is_dst=True
-                    )
-
                 # Сохраннение данных
                 open_data_record, created = OpenData.objects.get_or_create(app_id=d[0])
                 open_data_record.obj_type_id = app.obj_type_id
                 open_data_record.last_update = app.lastupdate
                 open_data_record.app_number = app.app_number
-                open_data_record.app_date = app_date or app.app_date
+                open_data_record.app_date = self.get_app_date(app, data)
                 open_data_record.is_visible = True
                 open_data_record.data = json.dumps(biblio_data) if biblio_data else None
                 open_data_record.data_docs = json.dumps(data_docs) if data_docs else None
                 open_data_record.data_payments = json.dumps(data_payments) if data_payments else None
                 if app.registration_date:
                     open_data_record.registration_number = app.registration_number
-                    open_data_record.registration_date = app.registration_date
+                    open_data_record.registration_date = self.get_registration_date(app, data)
                     open_data_record.obj_state = 2
                 else:
                     open_data_record.obj_state = 1

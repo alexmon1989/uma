@@ -29,7 +29,7 @@ from .tasks import (perform_simple_search, validate_query as validate_query_task
                     create_transactions_search_results_file, create_shared_docs_archive)
 from ..account.models import BalanceOperation, License
 from .decorators import require_ajax, check_recaptcha
-from apps.bulletin_new.models import Bulletin
+from apps.bulletin.models import ClListOfficialBulletinsIp as Bulletin
 
 
 class SimpleListView(TemplateView):

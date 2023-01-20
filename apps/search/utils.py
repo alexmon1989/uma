@@ -212,68 +212,6 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     qs &= ~Q('query_string', query="_exists_:Claim.I_11")
-    # qs &= ~Q(
-    #     'query_string',
-    #     query='(Document.MarkCurrentStatusCodeType:{* TO 2000} AND search_data.app_date:{* TO 2020-07-18}) '
-    #           'OR (search_data.obj_state:1 AND Document.idObjType:4 '
-    #           'AND NOT _exists_:TradeMark.TrademarkDetails.Code_441 AND search_data.app_date:[2020-07-18 TO *})'
-    # )
-
-    # Не показывать охранные документы, у которых дата выдачи больше сегодняшней
-    # qs &= ~Q(
-    #     'query_string',
-    #     query=f">{datetime.datetime.now().strftime('%Y-%m-%d')}",
-    #     default_field='search_data.rights_date'
-    # )
-
-    return qs
-
-
-def filter_unpublished_apps(user, qs):
-    """Исключает из результатов запроса неопубликованные заявки для обычных пользователей."""
-    if not user.is_anonymous and user.is_vip():
-        # Если пользователь является членом группы "посадовці, чиновники",
-        # то ему возвращаются все результаты без фильтров
-        return qs
-
-    """Фильтры для обычных пользователей."""
-    # Не показывать заявки по полезным моделям
-    # filter_qs = ~Q('query_string', query="search_data.obj_state:1 AND Document.idObjType:2")
-
-    # paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-
-    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-    # if not paid_services_settings.enabled:
-    #     # Не показывать заявки на знаки со статусом 1000
-    #     filter_qs &= ~Q('query_string', query="Document.MarkCurrentStatusCodeType:1000")
-
-    # Показывать только заявки с датой заяки (но показывать все КЗПТ и заявки на знаки для товаров и услуг с кодом 1000)
-    # filter_qs = Q(
-    #     'query_string',
-    #     query="_exists_:search_data.app_date OR Document.idObjType:5 "
-    #           "OR (NOT _exists_:search_data.app_date AND Document.MarkCurrentStatusCodeType:1000)"
-    # )
-    # Для заявок на изобретения нужно чтоб существовал I_43.D
-    # filter_qs &= ~Q('query_string', query="NOT _exists_:Claim.I_43.D AND search_data.obj_state:1 AND Document.idObjType:1")
-    # Для заявок на знаки для товаров и услуг нужно чтоб существовали платежи
-    # filter_qs &= ~Q(
-    #     'query_string',
-    #     query="NOT _exists_:TradeMark.PaymentDetails "
-    #           "AND search_data.obj_state:1 "
-    #           "AND Document.idObjType:4 "
-    #           "AND NOT Document.MarkCurrentStatusCodeType:1000"
-    # )
-
-    # try:
-    #     # Для обычных пользователей, авторизированных по ЭЦП применяются все фильтры, но показываются "их" заявки
-    #     user_name = user.certificateowner.pszSubjFullName.strip()
-    #     qs &= filter_qs | Q('query_string', query=f"search_data.applicant:\"*{user_name}*\"") \
-    #           | Q('query_string', query=f"search_data.inventor:\"*{user_name}*\"") \
-    #           | Q('query_string', query=f"search_data.owner:\"*{user_name}*\"") \
-    #           | Q('query_string', query=f"search_data.agent:\"*{user_name}*\"")
-    # except (get_user_model().certificateowner.RelatedObjectDoesNotExist, AttributeError):
-    #     # Для обычных пользователей без ЭЦП или анонимных пользователей применяются все фильтры
-    #     qs &= filter_qs
 
     return qs
 
@@ -2021,6 +1959,20 @@ def filter_app_data(app_data, user):
                     {
                         'TradeMark': {
                             'TrademarkDetails': {
+                                'ApplicationNumber': app_data['TradeMark'].get('TrademarkDetails', {}).get('ApplicationNumber'),
+                                'MarkImageDetails': {
+                                    'MarkImage': {
+                                        'MarkImageFilename': app_data['TradeMark'].get(
+                                            'TrademarkDetails', {}
+                                        ).get(
+                                            'MarkImageDetails'
+                                        ).get(
+                                            'MarkImage'
+                                        ).get('MarkImageFilename')
+                                    }
+                                },
+                                'GoodsServicesDetails': app_data['TradeMark'].get('TrademarkDetails', {}).get('GoodsServicesDetails'),
+                                'app_input_date': app_data['search_data'].get('app_date'),
                                 'stages': app_data['TradeMark'].get('TrademarkDetails', {}).get('stages', []),
                                 'application_status': app_data['TradeMark'].get('TrademarkDetails', {}).get(
                                     'application_status'
