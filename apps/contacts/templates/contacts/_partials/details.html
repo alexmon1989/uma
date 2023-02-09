@@ -1,47 +1,6 @@
 {% load i18n %}
 
-<div class="mb-4">
-    <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">{% trans "Технічні питання" %}:</h2>
-    <p class="small text-danger g-mb-5">{% trans "Консультації щодо роботи пошукового сервісу" %}</p>
-
-    {% if data.admin_phone_1 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.admin_phone_1 }}"><span class="g-color-gray-dark-v2">{{ data.admin_phone_1 }}</span></a></p>
-    {% endif %}
-    {% if data.admin_phone_2 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.admin_phone_2 }}"><span class="g-color-gray-dark-v2">{{ data.admin_phone_2 }}</span></a></p>
-    {% endif %}
-    {% if data.admin_phone_3 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.admin_phone_3 }}"><span class="g-color-gray-dark-v2">{{ data.admin_phone_3 }}</span></a></p>
-    {% endif %}
-
-    {% if data.admin_email_1 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">Email: <a class="g-color-gray-dark-v2" href="mailto:{{ data.admin_email_1 }}">{{ data.admin_email_1 }}</a></p>
-    {% endif %}
-    {% if data.admin_email_2 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">Email: <a class="g-color-gray-dark-v2" href="mailto:{{ data.admin_email_2 }}">{{ data.admin_email_2 }}</a></p>
-    {% endif %}
-    {% if data.admin_email_3 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">Email: <a class="g-color-gray-dark-v2" href="mailto:{{ data.admin_email_3 }}">{{ data.admin_email_3 }}</a></p>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    <h2 class="h5 g-color-gray-dark-v2 g-font-weight-600">{% trans "Консультації для заявників" %}:</h2>
-    <p class="small text-danger g-mb-5">{% trans "Консультації щодо строків розгляду заявок, інших юридичних та організаційних питань" %}</p>
-
-    {% if data.consultations_phone_1 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.consultations_phone_1 }}"><span class="g-color-gray-dark-v2">{{ data.consultations_phone_1 }}</span></a></p>
-    {% endif %}
-    {% if data.consultations_phone_2 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.consultations_phone_2 }}"><span class="g-color-gray-dark-v2">{{ data.consultations_phone_2 }}</span></a></p>
-    {% endif %}
-    {% if data.consultations_phone_3 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.consultations_phone_3 }}"><span class="g-color-gray-dark-v2">{{ data.consultations_phone_3 }}</span></a></p>
-    {% endif %}
-    {% if data.consultations_phone_4 %}
-        <p class="g-color-gray-dark-v4 g-mb-0">{% trans "Телефон" %}: <a class="g-color-gray-dark-v2" href="tel:{{ data.consultations_phone_4 }}"><span class="g-color-gray-dark-v2">{{ data.consultations_phone_4 }}</span></a></p>
-    {% endif %}
-</div>
+{{ content_sidebar|safe }}
 
 <div class="g-mb-30">
     <p class="g-color-gray-dark-v5 g-font-weight-600 g-font-size-16"><em>{% trans "Режим роботи" %}:

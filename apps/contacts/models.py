@@ -9,6 +9,9 @@ class ContactsPage(models.Model):
     content_uk = RichTextUploadingField('Зміст (укр.)', blank=True, null=True)
     content_en = RichTextUploadingField('Зміст (en.)', blank=True, null=True)
 
+    content_sidebar_uk = RichTextUploadingField('Зміст бокової панелі (укр.)', blank=True, null=True)
+    content_sidebar_en = RichTextUploadingField('Зміст бокової панелі (en.)', blank=True, null=True)
+
     admin_email_1 = models.EmailField('Email адміністратора (для відображення) 1', blank=True, null=True)
     admin_email_2 = models.EmailField('Email адміністратора (для відображення) 2', blank=True, null=True)
     admin_email_3 = models.EmailField('Email адміністратора (для відображення) 3', blank=True, null=True)

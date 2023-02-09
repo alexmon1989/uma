@@ -26,6 +26,7 @@ class ContactView(FormView):
         context['lang_code'] = self.request.LANGUAGE_CODE
         context['title'] = getattr(context['data'], f"title_{context['lang_code']}")
         context['content'] = getattr(context['data'], f"content_{context['lang_code']}")
+        context['content_sidebar'] = getattr(context['data'], f"content_sidebar_{context['lang_code']}")
         context['operating_mode'] = getattr(context['data'], f"operating_mode_{context['lang_code']}")
         context['lunch_break'] = getattr(context['data'], f"lunch_break_{context['lang_code']}")
         return context
