@@ -102,6 +102,7 @@ class Command(BaseCommand):
                 open_data_record.app_number = app.app_number
                 open_data_record.app_date = self.get_app_date(app, data)
                 open_data_record.is_visible = True
+                open_data_record.files_path = app.files_path
                 open_data_record.data = json.dumps(biblio_data) if biblio_data else None
                 open_data_record.data_docs = json.dumps(data_docs) if data_docs else None
                 open_data_record.data_payments = json.dumps(data_payments) if data_payments else None

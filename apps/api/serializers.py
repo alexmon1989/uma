@@ -3,25 +3,35 @@ from rest_framework import serializers
 from .models import OpenData
 
 from ..search.services import services as search_services
+from apps.bulletin import services as bulletin_services
 
 import json
+import datetime
 
 
 class OpenDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True, source="app_id")
     obj_type = serializers.CharField(read_only=True, source="obj_type__obj_type_ua")
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: OpenData):
         ret = super().to_representation(instance)
 
         if ret['data']:
             ret['data'] = json.loads(ret['data'])
 
-            files_dir = instance.app.files_path.replace('\\\\bear\share\\', settings.MEDIA_URL).replace('\\', '/')
+            files_dir = instance.files_path.replace('\\\\bear\share\\', settings.MEDIA_URL).replace('\\', '/')
 
             # Если это знак для товаров
             if instance.obj_type_id == 4:
-                ret['data'] = search_services.application_prepare_biblio_data_tm(ret['data'], instance.app)
+                bulletin_date_until = datetime.datetime.strptime(
+                    settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE,
+                    '%d.%m.%Y'
+                )
+                if 'Code_441_BulNumber' in ret['data'] \
+                        and 'Code_441' in ret['data'] \
+                        and instance.last_update < bulletin_date_until:
+                    ret['data']['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(ret['data']['Code_441'])
+
                 # Полные пути к изображениям
                 try:
                     image_name = ret['data']['MarkImageDetails']['MarkImage']['MarkImageFilename']

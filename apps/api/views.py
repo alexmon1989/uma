@@ -1,8 +1,12 @@
 from django.http import Http404
 from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
-from .models import OpenData, OpenDataViewModel
+from .models import OpenData
 from apps.search.models import ObjType
+
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
 import datetime
 
 
@@ -54,12 +58,20 @@ class OpenDataListView(generics.ListAPIView):
 
         return queryset
 
+    @method_decorator(cache_page(60 * 60 * 2))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
 
 class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
+    @method_decorator(cache_page(60 * 60 * 2))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
     def get_queryset(self):
-        queryset = OpenDataViewModel.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('pk').all()
 
         # Стан об'єкта
         obj_state = self.request.query_params.get('obj_state', None)
@@ -145,7 +157,7 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('-registration_number')
+        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('-registration_number')
 
         if self.request.query_params.get('obj_type', None):
             try:
@@ -162,6 +174,10 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
         if qs.count() > 0:
             return qs.first()
         raise Http404
+
+    @method_decorator(cache_page(60 * 60 * 2))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
 
 
 class OpenDataDocsView(generics.RetrieveAPIView):
@@ -190,6 +206,10 @@ class OpenDataDocsView(generics.RetrieveAPIView):
             return qs.first()
         raise Http404
 
+    @method_decorator(cache_page(60 * 60 * 2))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
 
 class SearchListView(generics.ListAPIView):
     """Поиск в API по номеру заявки, номеру охранного документа, типу объекта."""
@@ -197,7 +217,7 @@ class SearchListView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('app', 'obj_type').order_by('pk').all()
+        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('pk').all()
 
         # Тип об'єкта
         obj_type = self.request.query_params.get('obj_type', None)
@@ -224,3 +244,7 @@ class SearchListView(generics.ListAPIView):
                 queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
 
         return queryset[:20]
+
+    @method_decorator(cache_page(60 * 60 * 2))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
