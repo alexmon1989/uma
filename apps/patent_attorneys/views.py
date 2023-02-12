@@ -53,7 +53,7 @@ class PatentAttorneyListView(ListView):
                 if self.filter_form.cleaned_data['reg_num']:
                     qs = qs.filter(reg_num=self.filter_form.cleaned_data['reg_num'])
 
-        return qs.values()
+        return qs.exclude(prizv='Потоцький').values()
 
     def get_paginate_by(self, queryset):
         if self.request.GET.get('show'):
