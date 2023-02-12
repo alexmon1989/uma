@@ -34,7 +34,8 @@ $sKnownHosts = array(
 	"ocsp.acsk.uipv.org",
 	"acsk.treasury.gov.ua",
 	"ca.oschadbank.ua",
-    "ca.alfabank.kiev.ua"
+    "ca.alfabank.kiev.ua",
+    "ca.tax.gov.ua",
 );
 
 function is_known_host($value) {
