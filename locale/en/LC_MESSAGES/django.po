@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-02 16:01+0200\n"
+"POT-Creation-Date: 2023-02-14 16:55+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -420,7 +420,7 @@ msgstr "Open in new window"
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:155
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:30
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:229
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:236
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:56
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:64
 msgid "бюл. №"
@@ -428,7 +428,7 @@ msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:380
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:387
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:142
 msgid "Показати"
 msgstr "Show"
@@ -556,44 +556,12 @@ msgstr "Name of the court, number and date of the decision"
 msgid "Дата припинення дії свідоцтва частково"
 msgstr "Date of termination of the certificate in part"
 
-#: apps/contacts/templates/contacts/_partials/details.html:4
-msgid "Технічні питання"
-msgstr "Technical questions"
-
-#: apps/contacts/templates/contacts/_partials/details.html:5
-msgid "Консультації щодо роботи пошукового сервісу"
-msgstr "Consultations on the work of the search service"
-
-#: apps/contacts/templates/contacts/_partials/details.html:8
-#: apps/contacts/templates/contacts/_partials/details.html:11
-#: apps/contacts/templates/contacts/_partials/details.html:14
-#: apps/contacts/templates/contacts/_partials/details.html:33
-#: apps/contacts/templates/contacts/_partials/details.html:36
-#: apps/contacts/templates/contacts/_partials/details.html:39
-#: apps/contacts/templates/contacts/_partials/details.html:42
-#: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:21
-#: templates/templatetags/footer_contacts.html:9
-msgid "Телефон"
-msgstr "Phone"
-
-#: apps/contacts/templates/contacts/_partials/details.html:29
-msgid "Консультації для заявників"
-msgstr "Consultations for applicants"
-
-#: apps/contacts/templates/contacts/_partials/details.html:30
-msgid ""
-"Консультації щодо строків розгляду заявок, інших юридичних та організаційних "
-"питань"
-msgstr ""
-"Consultations on the terms of expertise of applications, other legal and "
-"organizational issues"
-
-#: apps/contacts/templates/contacts/_partials/details.html:47
+#: apps/contacts/templates/contacts/_partials/details.html:6
 #: templates/templatetags/footer_contacts.html:13
 msgid "Режим роботи"
 msgstr "Operating mode"
 
-#: apps/contacts/templates/contacts/_partials/details.html:49
+#: apps/contacts/templates/contacts/_partials/details.html:8
 #: templates/templatetags/footer_contacts.html:15
 msgid "Перерва"
 msgstr "Break"
@@ -900,6 +868,11 @@ msgstr "Specialization"
 msgid "Адреса"
 msgstr "Address"
 
+#: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:21
+#: templates/templatetags/footer_contacts.html:9
+msgid "Телефон"
+msgstr "Phone"
+
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:49
 msgid "Факс:"
 msgstr "Fax:"
@@ -990,7 +963,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
-#: apps/search/utils.py:1325
+#: apps/search/utils.py:1263
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -1018,14 +991,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1383
+#: apps/search/utils.py:1321
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1383
+#: apps/search/utils.py:1321
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -1037,51 +1010,51 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/services/services.py:79
+#: apps/search/services/services.py:82
 #: apps/search/templatetags/search_extras.py:446
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/services/services.py:85 apps/search/services/services.py:229
-#: apps/search/services/services.py:314
+#: apps/search/services/services.py:88 apps/search/services/services.py:232
+#: apps/search/services/services.py:317
 #: apps/search/templatetags/search_extras.py:293
 #: apps/search/templatetags/search_extras.py:371
 #: apps/search/templatetags/search_extras.py:452
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/services/services.py:91
+#: apps/search/services/services.py:94
 #: apps/search/templatetags/search_extras.py:458
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/services/services.py:97 apps/search/services/services.py:233
+#: apps/search/services/services.py:100 apps/search/services/services.py:236
 #: apps/search/templatetags/search_extras.py:297
 #: apps/search/templatetags/search_extras.py:464
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/services/services.py:102
+#: apps/search/services/services.py:105
 #: apps/search/templatetags/search_extras.py:469
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/services/services.py:108 apps/search/services/services.py:237
+#: apps/search/services/services.py:111 apps/search/services/services.py:240
 #: apps/search/templatetags/search_extras.py:301
 #: apps/search/templatetags/search_extras.py:475
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/services/services.py:114 apps/search/services/services.py:241
-#: apps/search/services/services.py:322
+#: apps/search/services/services.py:117 apps/search/services/services.py:244
+#: apps/search/services/services.py:325
 #: apps/search/templatetags/search_extras.py:305
 #: apps/search/templatetags/search_extras.py:379
 #: apps/search/templatetags/search_extras.py:481
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/services/services.py:121 apps/search/services/services.py:245
-#: apps/search/services/services.py:326
+#: apps/search/services/services.py:124 apps/search/services/services.py:248
+#: apps/search/services/services.py:329
 #: apps/search/templatetags/search_extras.py:309
 #: apps/search/templatetags/search_extras.py:383
 #: apps/search/templatetags/search_extras.py:488
@@ -1092,22 +1065,22 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/services/services.py:225
+#: apps/search/services/services.py:228
 #: apps/search/templatetags/search_extras.py:289
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/services/services.py:310
+#: apps/search/services/services.py:313
 #: apps/search/templatetags/search_extras.py:367
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/services/services.py:318
+#: apps/search/services/services.py:321
 #: apps/search/templatetags/search_extras.py:375
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/tasks.py:44 apps/search/tasks.py:249 apps/search/tasks.py:309
+#: apps/search/tasks.py:44 apps/search/tasks.py:239 apps/search/tasks.py:299
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -1246,7 +1219,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1326
+#: apps/search/utils.py:1264
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1289,7 +1262,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1336
+#: apps/search/utils.py:1274
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1332,7 +1305,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1334
+#: apps/search/utils.py:1272
 msgid "МПК"
 msgstr "IPC"
 
@@ -1537,7 +1510,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1335
+#: apps/search/utils.py:1273
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1676,16 +1649,16 @@ msgstr "Notifications"
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:14
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:14
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:14
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
-msgid "Документи Укрпатенту"
-msgstr "Documents of the Ukrainian Institute of Intellectual Property"
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:16
+msgid "Вихідні документи"
+msgstr "Outcoming documents"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:16
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:16
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:16
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:16
-msgid "Документи заявника"
-msgstr "Applicant's documents"
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
+msgid "Вхідні документи"
+msgstr "Incoming documents"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:30
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:26
@@ -2038,7 +2011,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1331
+#: apps/search/utils.py:1269
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2171,12 +2144,16 @@ msgstr "show all"
 msgid "сховати"
 msgstr "hide"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:76
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:37
+msgid "Дата надходження матеріалів заявки до НОІВ"
+msgstr ""
+
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:83
 msgid "частково"
 msgstr "partly"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:128
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:160
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:135
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:167
 msgid "Кл.:"
 msgstr "Cl."
 
@@ -2197,7 +2174,8 @@ msgid ""
 "Дата публікації відомостей про видачу ліцензії на використання знака та "
 "номер бюлетня"
 msgstr ""
-"Date of publication of information on the issuance of a license to issue a sign and bulletin number"
+"Date of publication of information on the issuance of a license to issue a "
+"sign and bulletin number"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
@@ -2304,43 +2282,43 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1323
+#: apps/search/utils.py:1261
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1324
+#: apps/search/utils.py:1262
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1327
+#: apps/search/utils.py:1265
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1328
+#: apps/search/utils.py:1266
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1329
+#: apps/search/utils.py:1267
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1330
+#: apps/search/utils.py:1268
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1332
+#: apps/search/utils.py:1270
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1333
+#: apps/search/utils.py:1271
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1337
+#: apps/search/utils.py:1275
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1338
+#: apps/search/utils.py:1276
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2404,6 +2382,28 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Технічні питання"
+#~ msgstr "Technical questions"
+
+#~ msgid "Консультації щодо роботи пошукового сервісу"
+#~ msgstr "Consultations on the work of the search service"
+
+#~ msgid "Консультації для заявників"
+#~ msgstr "Consultations for applicants"
+
+#~ msgid ""
+#~ "Консультації щодо строків розгляду заявок, інших юридичних та "
+#~ "організаційних питань"
+#~ msgstr ""
+#~ "Consultations on the terms of expertise of applications, other legal and "
+#~ "organizational issues"
+
+#~ msgid "Документи Укрпатенту"
+#~ msgstr "Documents of the Ukrainian Institute of Intellectual Property"
+
+#~ msgid "Документи заявника"
+#~ msgstr "Applicant's documents"
 
 #~ msgid ""
 #~ "Державне підприємство &laquo;Український інститут інтелектуальної "
