@@ -2,20 +2,22 @@
 {% load uma_extras %}
 
 {% if results.paginator.count >= 5000 %}
-    <div class="d-md-flex g-mb-20">
-        <button class="btn btn-sm u-btn-purple disabled"
-           data-toggle="tooltip"
-           data-placement="bottom">
-            <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
-        </button>
-        <div class="align-self-center g-ml-5 g-font-size-12 g-color-pink">{% trans "Завантаження результатів можливе, якщо кількість результатів пошуку менша або рівна 5000" %}</div>
+    <div class="d-flex g-mb-20 align-items-center">
+        <div class="g-font-weight-600">{% trans "Експорт результатів" %}:</div>
+        <div class="g-ml-5 g-color-pink">{% trans "завантаження результатів можливе, якщо кількість елементів менша або рівна 500" %}</div>
     </div>
 {% else %}
-    <div class="d-md-flex g-mb-10">
-        <button class="btn btn-sm u-btn-purple"
-           id="search-result-download-btn"
-           data-task-create-url="{% url 'search:download_xls_simple' %}?{{ get_params|urlencode_dict }}">
-            <i class="fa fa-download"></i> {% trans "Завантажити результати пошуку (.xls)" %}
+    <div class="d-flex g-mb-20 align-items-center">
+        <div class="g-font-weight-600">{% trans "Експорт результатів" %}:</div>
+
+        <button class="btn btn-sm u-btn-purple g-ml-10 search-result-download-btn"
+                data-task-create-url="{% url 'search:download_simple' format_='xlsx' %}?{{ get_params|urlencode_dict }}">
+            <i class="fa fa-file-excel-o g-mr-5"></i>.xlsx
+        </button>
+
+        <button class="btn btn-sm u-btn-brown g-ml-10 search-result-download-btn"
+                data-task-create-url="{% url 'search:download_simple' format_='docx' %}?{{ get_params|urlencode_dict }}">
+            <i class="fa fa-file-word-o g-mr-5"></i>.docx
         </button>
     </div>
 {% endif %}

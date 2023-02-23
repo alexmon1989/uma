@@ -13,9 +13,17 @@ class ReportItem(ABC):
     application_data: dict
     ipc_fields: List[InidCode]  # Список полей для отображения с флагом доступно ли поле для отображения
 
-    def _get_inid(self, code: str, obj_state: int = 1):
+    def _get_inid(self, obj_type_id: int, code: str, obj_state: int = 1) -> InidCode | None:
         """Возвращает признак необходимости отображения поля."""
-        return next(filter(lambda x: x.code == code and x.obj_state == obj_state, self.ipc_fields))
+        try:
+            return next(
+                filter(
+                    lambda x: x.obj_type_id == obj_type_id and x.code == code and x.obj_state == obj_state,
+                    self.ipc_fields
+                )
+            )
+        except StopIteration:
+            return None
 
 
 class ReportItemDocx(ReportItem):
@@ -34,12 +42,13 @@ class ReportItemDocxTM(ReportItemDocx):
     """Торговая марка."""
     _paragraph: Paragraph
     document: Document
+    obj_type_id = 4
 
     def _write_111(self) -> None:
         """Записывает номер свидетельства в документ."""
-        inid = self._get_inid('111', self.application_data['search_data']['obj_state'])
+        inid = self._get_inid(self.obj_type_id, '111', self.application_data['search_data']['obj_state'])
         registration_number = self.application_data['TradeMark']['TrademarkDetails'].get('RegistrationNumber')
-        if inid.visible and registration_number:
+        if inid and inid.visible and registration_number:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
             self._paragraph.add_run(registration_number).bold = True

@@ -362,7 +362,7 @@ $(function () {
 
     // Обработчик события нажатия на кнопку формирования и загрузки файла с результатами поиска
     // Обработчик события нажатия на кнопку формирования и загрузки файла с досутпными для всех документами
-    $(document).on('click', '#search-result-download-btn, #download-shared-docs-btn', function (e) {
+    $(document).on('click', '.file-download-btn, .search-result-download-btn, #download-shared-docs-btn', function (e) {
         e.preventDefault();
         let $this = $(this);
         $this.attr('disabled', true);

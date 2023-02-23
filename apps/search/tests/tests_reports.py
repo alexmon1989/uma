@@ -26,7 +26,7 @@ class ReportItemDocxTmTestCase(TestCase):
             }
         }
         inid_data = [
-            InidCode('111', 'Номер свідоцтва', 2, True)
+            InidCode(4, '111', 'Номер свідоцтва', 2, True)
         ]
         item = ReportItemDocxTM(biblio_data, inid_data)
         p = item.write(self.document)
@@ -34,7 +34,7 @@ class ReportItemDocxTmTestCase(TestCase):
 
         # Номер регистрации есть в данных и не разрешён для отображения
         inid_data = [
-            InidCode('111', 'Номер свідоцтва', 2, False)
+            InidCode(4, '111', 'Номер свідоцтва', 2, False)
         ]
         item = ReportItemDocxTM(biblio_data, inid_data)
         p = item.write(self.document)
@@ -50,7 +50,7 @@ class ReportItemDocxTmTestCase(TestCase):
             }
         }
         inid_data = [
-            InidCode('111', 'Номер свідоцтва', 2, True)
+            InidCode(4, '111', 'Номер свідоцтва', 2, True)
         ]
         item = ReportItemDocxTM(biblio_data, inid_data)
         p = item.write(self.document)
@@ -75,7 +75,7 @@ class ReportWriterDocxTestCase(TestCase):
             }
         }
         inid_data = [
-            InidCode('111', 'Номер свідоцтва', 2, True)
+            InidCode(4, '111', 'Номер свідоцтва', 2, True)
         ]
         items = [ReportItemDocxTM(biblio_data, inid_data)]
 
@@ -83,3 +83,5 @@ class ReportWriterDocxTestCase(TestCase):
         writer = ReportWriterDocx(items)
         writer.generate(file_path)
         self.assertTrue(file_path.exists())
+
+# class InidCodesServiceTestCase(TestCase):

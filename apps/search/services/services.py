@@ -12,6 +12,7 @@ from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList
 from apps.bulletin import services as bulletin_services
 from apps.search.utils import filter_bad_apps
+from apps.search.dataclasses import InidCode
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -489,3 +490,81 @@ def application_get_app_elasticsearch_data(app_id: int) -> dict:
     if not s:
         return {}
     return s[0].to_dict()
+
+
+def inid_code_get_list(lang: str) -> List[InidCode]:
+    """
+    Возвращает список ИНИД-кодов объектов пром собств.
+
+    TODO: Сделать выборку из БД
+    TODO: Сделать кеширование
+    """
+    res = []
+
+    if lang == 'ua':
+        # ТМ регистрации
+        inid_data = [
+            InidCode(4, '540', 'Зображення знака', 2, True),
+            InidCode(4, '141', 'Дата закінчення строку дії реєстрації знака', 2, True),
+            InidCode(4, '111', 'Порядковий номер реєстрації', 2, True),
+            InidCode(4, '151', 'Дата реєстрації', 2, True),
+            InidCode(4, '181', 'Очікувана дата закінчення строку дії реєстрації', 2, True),
+            InidCode(4, '186', 'Очікувана дата продовження строку дії реєстрації', 2, True),
+            InidCode(4, '210', 'Номер заявки', 2, True),
+            InidCode(4, '220', 'Дата подання заявки', 2, True),
+            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
+                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '731', 'Ім\'я та адреса заявника', 2, True),
+            InidCode(4, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
+            InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # ТМ заявки
+        inid_data = [
+            InidCode(4, '540', 'Зображення знака', 1, True),
+            InidCode(4, '210', 'Номер заявки', 1, True),
+            InidCode(4, '220', 'Дата подання заявки', 1, True),
+            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
+                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '731', 'Ім\'я та адреса заявника', 1, True),
+            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
+            InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
+        ]
+        res.extend(inid_data)
+
+    elif lang == 'en':
+        # ТМ регистрации
+        inid_data = [
+            InidCode(4, '540', 'Reproduction of the mark', 2, True),
+            InidCode(4, '141', 'Date of the termination of the registration of the mark', 2, True),
+            InidCode(4, '111', 'Serial number of the registration', 2, True),
+            InidCode(4, '151', 'Date of the registration', 2, True),
+            InidCode(4, '181', 'Expected expiration date of the registration', 2, True),
+            InidCode(4, '186', 'Expected prolongation date of the registration', 2, True),
+            InidCode(4, '210', 'Serial number of the application', 2, True),
+            InidCode(4, '220', 'Date of filing of the application', 2, True),
+            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
+                               'or registration of the mark in the origin country', 2, True),
+            InidCode(4, '731', 'Name and address of the applicant', 2, True),
+            InidCode(4, '732', 'Name and address of the holder of the registration', 2, True),
+            InidCode(4, '591', 'Information concerning colors claimed', 2, True),
+            InidCode(4, '511', 'Nice Classification indexes', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # ТМ заявки
+        inid_data = [
+            InidCode(4, '540', 'Reproduction of the mark', 1, True),
+            InidCode(4, '210', 'Serial number of the application', 1, True),
+            InidCode(4, '220', 'Date of filing of the application', 1, True),
+            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
+                               'or registration of the mark in the origin country', 1, True),
+            InidCode(4, '731', 'Name and address of the applicant', 1, True),
+            InidCode(4, '591', 'Information concerning colors claimed', 1, True),
+            InidCode(4, '511', 'Nice Classification indexes', 1, True),
+        ]
+        res.extend(inid_data)
+
+    return res

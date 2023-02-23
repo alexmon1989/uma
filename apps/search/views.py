@@ -1,34 +1,25 @@
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.base import RedirectView
 from django.db.models import F, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
 from django.utils.http import urlencode
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib import messages
 from django.contrib.admin.views.decorators import user_passes_test
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
-from django.db import transaction
 from django.conf import settings
-from .models import (ObjType, InidCodeSchedule, SimpleSearchField, OrderService, OrderDocument, IpcAppList,
-                     SimpleSearchPage, AdvancedSearchPage, AppUserAccess, AppVisit, PaidServicesSettings)
+from .models import (ObjType, InidCodeSchedule, SimpleSearchField, IpcAppList, SimpleSearchPage, AdvancedSearchPage,
+                     AppVisit)
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import (get_client_ip, paginate_results, get_ipc_codes_with_schedules, user_has_access_to_tm_app)
+from .utils import (get_client_ip, paginate_results, get_ipc_codes_with_schedules)
 from urllib.parse import parse_qs, urlparse
 from celery.result import AsyncResult
 import json
 import six
-from .tasks import (perform_simple_search, validate_query as validate_query_task, get_app_details,
-                    perform_advanced_search, perform_transactions_search,
-                    get_obj_types_with_transactions as get_obj_types_with_transactions_task, get_order_documents,
-                    create_selection, create_simple_search_results_file, create_advanced_search_results_file,
-                    create_transactions_search_results_file, create_shared_docs_archive)
-from ..account.models import BalanceOperation, License
-from .decorators import require_ajax, check_recaptcha
+import apps.search.tasks as tasks
+from apps.search.decorators import require_ajax, check_recaptcha
 from apps.bulletin.models import ClListOfficialBulletinsIp as Bulletin
 
 
@@ -89,7 +80,7 @@ class SimpleListView(TemplateView):
             get_params['show'] = [self.request.session['show']]
 
             # Создание асинхронной задачи для Celery
-            task = perform_simple_search.delay(
+            task = tasks.perform_simple_search.delay(
                 self.request.user.pk,
                 get_params
             )
@@ -182,7 +173,7 @@ class AdvancedListView(TemplateView):
 
             # Поиск в ElasticSearch
             # Создание асинхронной задачи для Celery
-            task = perform_advanced_search.delay(
+            task = tasks.perform_advanced_search.delay(
                 self.request.user.pk,
                 get_params
             )
@@ -224,7 +215,7 @@ class ObjectDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         # Создание асинхронной задачи на получение данных объекта
-        task = get_app_details.delay(
+        task = tasks.get_app_details.delay(
             self.object.pk,
             self.request.user.pk
         )
@@ -283,15 +274,6 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] == 3:
                     template = 'search/detail/ld/detail.html'
                 elif context['hit']['Document']['idObjType'] == 4:
-                    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-                    # if not user_has_access_to_tm_app(request.user, context['hit']):
-                    #     # Шаблон подтверждения получения доступа к заявке с платным доступом
-                    #     context['paid_service_settings'], created = PaidServicesSettings.objects.get_or_create()
-                    #     if not request.user.is_anonymous and not request.user.has_confirmed_license():
-                    #         context['license'], created = License.objects.get_or_create()
-                    #     template = 'search/detail/paid_access_conformation.html'
-                    # else:
-                    #     template = 'search/detail/tm/detail.html'
                     template = 'search/detail/tm/detail.html'
                 elif context['hit']['Document']['idObjType'] == 5:
                     template = 'search/detail/qi/detail.html'
@@ -328,7 +310,7 @@ def download_docs_zipped(request):
     """Инициирует загрузку архива с документами."""
     if request.POST.getlist('cead_id'):
         # Создание асинхронной задачи для получения архива с документами
-        task = get_order_documents.delay(
+        task = tasks.get_order_documents.delay(
             request.user.pk, request.POST['id_app_number'], request.POST.getlist('cead_id'), get_client_ip(request)
         )
         return JsonResponse({'task_id': task.id})
@@ -339,39 +321,77 @@ def download_docs_zipped(request):
 def download_doc(request, id_app_number, id_cead_doc):
     """Возвращает JSON с id асинхронной задачи на заказ документа."""
     # Создание асинхронной задачи для получения документа
-    task = get_order_documents.delay(request.user.pk, id_app_number, id_cead_doc, get_client_ip(request))
+    task = tasks.get_order_documents.delay(request.user.pk, id_app_number, id_cead_doc, get_client_ip(request))
     return JsonResponse({'task_id': task.id})
 
 
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name='Посадовці (чиновники)').exists())
 def download_selection(request, id_app_number):
     """Возвращает JSON с id асинхронной задачи на формирование выписки."""
-    task = create_selection.delay(id_app_number, request.user.pk, get_client_ip(request), request.GET)
+    task = tasks.create_selection.delay(id_app_number, request.user.pk, get_client_ip(request), request.GET)
     return JsonResponse({'task_id': task.id})
 
 
 def validate_query(request):
     """Создаёт задание на валидацию запроса, который идёт в ElasticSearch (для валидации на стороне клиента)"""
-    task = validate_query_task.delay(dict(six.iterlists(request.GET)))
+    task = tasks.validate_query.delay(dict(six.iterlists(request.GET)))
     return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
 
-def download_xls_simple(request):
+def download_simple(request, format_: str):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами простого поиска."""
-    task = create_simple_search_results_file.delay(
-        request.user.pk,
-        dict(six.iterlists(request.GET)),
-        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-    )
+    if format_ not in ('docx', 'xlsx'):
+        raise Http404
+
+    lang = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    get_params = dict(six.iterlists(request.GET))
+
+    if format_ == 'docx':
+        task = tasks.create_simple_search_results_file_docx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
+    else:  # xlsx
+        task = tasks.create_simple_search_results_file_xlsx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
     return JsonResponse({'task_id': task.id})
 
 
-def download_xls_advanced(request):
+def download_advanced(request, format_: str):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами расширенного поиска."""
-    task = create_advanced_search_results_file.delay(
+    if format_ not in ('docx', 'xlsx'):
+        raise Http404
+
+    lang = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    get_params = dict(six.iterlists(request.GET))
+
+    if format_ == 'docx':
+        task = tasks.create_advanced_search_results_file_docx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
+    else:  # xlsx
+        task = tasks.create_advanced_search_results_file_xlsx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
+    return JsonResponse({'task_id': task.id})
+
+
+def download_details_docx(request, id_app_number: int):
+    """Возвращает JSON с id асинхронной задачи на формирование файла
+    с библиографическими данными объекта. пром. собств."""
+    lang = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    task = tasks.create_details_file_docx.delay(
+        id_app_number,
         request.user.pk,
-        dict(six.iterlists(request.GET)),
-        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+        lang
     )
     return JsonResponse({'task_id': task.id})
 
@@ -379,7 +399,7 @@ def download_xls_advanced(request):
 def download_shared_docs(request, id_app_number):
     """Возвращает JSON с id асинхронной задачи на формирование архива с документами,
      которые доступны всем пользователям."""
-    task = create_shared_docs_archive.delay(id_app_number)
+    task = tasks.create_shared_docs_archive.delay(id_app_number)
     return JsonResponse({'task_id': task.id})
 
 
@@ -420,7 +440,7 @@ class TransactionsSearchView(TemplateView):
 
             # Поиск
             # Создание асинхронной задачи для Celery
-            task = perform_transactions_search.delay(
+            task = tasks.perform_transactions_search.delay(
                 get_params
             )
             context['task_id'] = task.id
@@ -428,12 +448,26 @@ class TransactionsSearchView(TemplateView):
         return context
 
 
-def download_xls_transactions(request):
+def download_transactions(request, format_: str):
     """Возвращает JSON с id асинхронной задачи на формирование файла с результатами поиска по оповещениям."""
-    task = create_transactions_search_results_file.delay(
-        dict(six.iterlists(request.GET)),
-        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-    )
+    if format_ not in ('docx', 'xlsx'):
+        raise Http404
+
+    lang = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    get_params = dict(six.iterlists(request.GET))
+
+    if format_ == 'docx':
+        task = tasks.create_transactions_search_results_file_docx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
+    else:  # xlsx
+        task = tasks.create_transactions_search_results_file_xlsx.delay(
+            request.user.pk,
+            get_params,
+            lang
+        )
     return JsonResponse({'task_id': task.id})
 
 
@@ -471,38 +505,8 @@ def get_validation_info(request):
 def get_obj_types_with_transactions(request):
     """Создаёт задачу на получение типов объектов их типами оповещений."""
     lang_code = 'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
-    task = get_obj_types_with_transactions_task.delay(lang_code)
+    task = tasks.get_obj_types_with_transactions.delay(lang_code)
     return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
-
-
-class GetAccessToAppRedirectView(LoginRequiredMixin, RedirectView):
-    """Получает доступ к заявке и переадресовывает на страницу это заявки."""
-    pattern_name = 'search:detail'
-
-    @transaction.atomic
-    def get_redirect_url(self, *args, **kwargs):
-        app = get_object_or_404(IpcAppList, pk=kwargs['pk'])
-
-        # Создание записи о доступе пользователя к заявке
-        paid_service_settings, created = PaidServicesSettings.objects.get_or_create()
-        if self.request.user not in app.users_with_access.all() \
-                and self.request.user.balance.value >= paid_service_settings.tm_app_access_price:
-            self.request.user.balance.value -= paid_service_settings.tm_app_access_price
-            self.request.user.balance.save()
-            AppUserAccess.objects.create(user=self.request.user, app=app)
-            BalanceOperation.objects.create(
-                balance=self.request.user.balance,
-                value=paid_service_settings.tm_app_access_price,
-                type=1,
-                app=app
-            )
-            messages.success(
-                self.request,
-                f'Надано доступ до заявки <b>{app.app_number}</b><br>'
-                f'Баланс рахунку: <b>{self.request.user.balance.value} грн</b>'
-            )
-
-        return super().get_redirect_url(*args, **kwargs)
 
 
 @require_POST
