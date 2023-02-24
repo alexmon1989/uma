@@ -514,8 +514,11 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Дата подання заявки', 2, True),
             InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
                                'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '531', 'Віденська класифікація', 2, True),
             InidCode(4, '731', 'Ім\'я та адреса заявника', 2, True),
             InidCode(4, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+            InidCode(4, '740', 'Ім\'я та адреса представника', 2, True),
+            InidCode(4, '750', 'Адреса для листування', 2, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
         ]
@@ -528,7 +531,10 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Дата подання заявки', 1, True),
             InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
                                'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '531', 'Віденська класифікація', 1, True),
             InidCode(4, '731', 'Ім\'я та адреса заявника', 1, True),
+            InidCode(4, '740', 'Ім\'я та адреса представника', 1, True),
+            InidCode(4, '750', 'Адреса для листування', 1, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
         ]
@@ -547,8 +553,11 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Date of filing of the application', 2, True),
             InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
                                'or registration of the mark in the origin country', 2, True),
+            InidCode(4, '531', 'Vienna Classification', 1, True),
             InidCode(4, '731', 'Name and address of the applicant', 2, True),
             InidCode(4, '732', 'Name and address of the holder of the registration', 2, True),
+            InidCode(4, '740', 'Name and address of the representative', 1, True),
+            InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 2, True),
             InidCode(4, '511', 'Nice Classification indexes', 2, True),
         ]
@@ -561,7 +570,10 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Date of filing of the application', 1, True),
             InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
                                'or registration of the mark in the origin country', 1, True),
+            InidCode(4, '531', 'Vienna Classification', 1, True),
             InidCode(4, '731', 'Name and address of the applicant', 1, True),
+            InidCode(4, '740', 'Name and address of the representative', 1, True),
+            InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 1, True),
             InidCode(4, '511', 'Nice Classification indexes', 1, True),
         ]
