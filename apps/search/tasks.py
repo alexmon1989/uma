@@ -14,7 +14,7 @@ from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
                     prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs, sort_doc_flow,
                     filter_app_data, filter_bad_apps)
-from apps.search.services.reports import ReportItemDocxTM, ReportWriterDocx
+from apps.search.services.reports import ReportWriterDocxCreator
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import apps.search.services as search_services
@@ -632,14 +632,8 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
-            inid_data = search_services.inid_code_get_list(lang_code)
-            report_items = []
-            for item in s.params(size=1000, preserve_order=True).scan():
-                report_item = ReportItemDocxTM(
-                    application_data=filter_app_data(item.to_dict(), user),
-                    ipc_fields=inid_data
-                )
-                report_items.append(report_item)
+            # Получение заявок и фильтрация данных
+            applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
 
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
@@ -648,7 +642,11 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
             file_name = f"{get_unique_filename('simple_search')}.docx"
             file_path = directory_path / file_name
 
-            report_writer = ReportWriterDocx(items=report_items)
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                applications,
+                search_services.inid_code_get_list(lang_code)
+            )
             report_writer.generate(file_path)
 
             # Возврат url сформированного файла с результатами поиска
@@ -799,14 +797,8 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 5000:
-            inid_data = search_services.inid_code_get_list(lang_code)
-            report_items = []
-            for item in s.params(size=1000, preserve_order=True).scan():
-                report_item = ReportItemDocxTM(
-                    application_data=filter_app_data(item.to_dict(), user),
-                    ipc_fields=inid_data
-                )
-                report_items.append(report_item)
+            # Получение заявок и фильтрация данных
+            applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
 
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
@@ -815,7 +807,11 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
             file_name = f"{get_unique_filename('advanced_search')}.docx"
             file_path = directory_path / file_name
 
-            report_writer = ReportWriterDocx(items=report_items)
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                applications,
+                search_services.inid_code_get_list(lang_code)
+            )
             report_writer.generate(file_path)
 
             # Возврат url сформированного файла с результатами поиска
@@ -901,15 +897,6 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
         if s and s.count() <= 5000:
-            inid_data = search_services.inid_code_get_list(lang_code)
-            report_items = []
-            for item in s.params(size=1000, preserve_order=True).scan():
-                report_item = ReportItemDocxTM(
-                    application_data=item.to_dict(),
-                    ipc_fields=inid_data
-                )
-                report_items.append(report_item)
-
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
 
@@ -917,7 +904,11 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
             file_name = f"{get_unique_filename('transactions_search')}.docx"
             file_path = directory_path / file_name
 
-            report_writer = ReportWriterDocx(items=report_items)
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                [x.to_dict() for x in s.params(size=1000, preserve_order=True).scan()],
+                search_services.inid_code_get_list(lang_code)
+            )
             report_writer.generate(file_path)
 
             # Возврат url сформированного файла с результатами поиска
@@ -974,12 +965,6 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
         return {}
 
     user = get_user_or_anonymous(user_id)
-    inid_data = search_services.inid_code_get_list(lang_code)
-    report_item = ReportItemDocxTM(
-        application_data=filter_app_data(hit, user),
-        ipc_fields=inid_data
-    )
-
     directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
     os.makedirs(str(directory_path), exist_ok=True)
 
@@ -987,7 +972,11 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     file_name = f"{get_unique_filename(hit['search_data']['app_number'])}.docx"
     file_path = directory_path / file_name
 
-    report_writer = ReportWriterDocx(items=[report_item])
+    # Генерация отчёта
+    report_writer = ReportWriterDocxCreator.create(
+        [filter_app_data(hit, user)],
+        search_services.inid_code_get_list(lang_code)
+    )
     report_writer.generate(file_path)
 
     # Возврат url сформированного файла с результатами поиска

@@ -9,7 +9,7 @@ from typing import List
 from pathlib import Path
 
 from ..search.utils import sort_results, prepare_data_for_search_report, create_search_res_doc, filter_app_data
-from ..search.services.reports import ReportItemDocxTM, ReportWriterDocx
+from ..search.services.reports import ReportWriterDocxCreator
 from ..search.services import services as search_services
 from uma.utils import get_unique_filename, get_user_or_anonymous
 
@@ -74,17 +74,6 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
         else:
             s = s.sort('_score')
 
-        user = get_user_or_anonymous(user_id)
-
-        inid_data = search_services.inid_code_get_list(lang_code)
-        report_items = []
-        for item in s.params(size=1000, preserve_order=True).scan():
-            report_item = ReportItemDocxTM(
-                application_data=filter_app_data(item.to_dict(), user),
-                ipc_fields=inid_data
-            )
-            report_items.append(report_item)
-
         directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
         os.makedirs(str(directory_path), exist_ok=True)
 
@@ -92,7 +81,15 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
         file_name = f"{get_unique_filename('favorites')}.docx"
         file_path = directory_path / file_name
 
-        report_writer = ReportWriterDocx(items=report_items)
+        # Получение заявок и фильтрация данных
+        user = get_user_or_anonymous(user_id)
+        applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
+
+        # Генерация отчёта
+        report_writer = ReportWriterDocxCreator.create(
+            applications,
+            search_services.inid_code_get_list(lang_code)
+        )
         report_writer.generate(file_path)
 
         # Возврат url сформированного файла с результатами поиска

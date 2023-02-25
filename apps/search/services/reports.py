@@ -454,3 +454,37 @@ class ReportWriterDocx(ReportWriter):
             p.add_run(f"{str(i + 1)}.").bold = True
             item.write(document)
         document.save(str(file_path))
+
+
+class ReportWriterCreator(ABC):
+    """Интерфейс создателя генератора отчётов."""
+    @staticmethod
+    @abstractmethod
+    def create(applications: List[dict], inid_data: List[InidCode]) -> ReportWriter:
+        """
+        Создаёт объект генератора отчётов.
+
+        :param applications список заявок
+        :param inid_data список кодов инид
+        """
+        raise NotImplemented
+
+
+class ReportWriterDocxCreator(ReportWriterCreator):
+    """Класс, задачей которого есть создание объекта генератора отчётов в формате .docx."""
+    @staticmethod
+    def create(applications: List[dict], inid_data: List[InidCode]) -> ReportWriterDocx:
+        report_item_classes = {
+            4: ReportItemDocxTM
+        }
+        report_items = []
+        for app in applications:
+            try:
+                report_item = report_item_classes[app['Document']['idObjType']](
+                    application_data=app,
+                    ipc_fields=inid_data
+                )
+                report_items.append(report_item)
+            except KeyError:
+                continue
+        return ReportWriterDocx(items=report_items)
