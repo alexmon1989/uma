@@ -514,6 +514,8 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Дата подання заявки', 2, True),
             InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
                                'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 2, True),
+            InidCode(4, '450', 'Дата публікації відомостей про видачу свідоцтва', 2, True),
             InidCode(4, '531', 'Віденська класифікація', 2, True),
             InidCode(4, '731', 'Ім\'я та адреса заявника', 2, True),
             InidCode(4, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
@@ -529,14 +531,59 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '540', 'Зображення знака', 1, True),
             InidCode(4, '210', 'Номер заявки', 1, True),
             InidCode(4, '220', 'Дата подання заявки', 1, True),
+            InidCode(4, '221', 'Дата надходження матеріалів заявки до НОІВ', 1, True),
             InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
-                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 1, True),
+            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 1, True),
             InidCode(4, '531', 'Віденська класифікація', 1, True),
             InidCode(4, '731', 'Ім\'я та адреса заявника', 1, True),
             InidCode(4, '740', 'Ім\'я та адреса представника', 1, True),
             InidCode(4, '750', 'Адреса для листування', 1, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы регистрации
+        inid_data = [
+            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 2, True),
+            InidCode(6, '11', 'Номер реєстрації (патенту)', 2, True),
+            InidCode(6, '24', 'Дата, з якої є чинними права на промисловий зразок', 2, True),
+            InidCode(6, '21', 'Номер заявки', 2, True),
+            InidCode(6, '22', 'Дата подання заявки', 2, True),
+            InidCode(6, '23', 'Дата виставкового пріоритету', 2, True),
+            InidCode(6, '28', 'Кількість заявлених варіантів', 2, True),
+            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 2, True),
+            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 2, True),
+            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку', 2, True),
+            InidCode(6, '45', 'Дата публікації відомостей про видачу патенту та номер бюлетеня', 2, True),
+            InidCode(6, '54', 'Назва промислового зразка', 2, True),
+            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 2, True),
+            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 2, True),
+            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 2, True),
+            InidCode(6, '73', "Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави", 2, True),
+            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 2, True),
+            InidCode(6, '98', "Адреса для листування", 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы заявик
+        inid_data = [
+            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 1, True),
+            InidCode(6, '21', 'Номер заявки', 1, True),
+            InidCode(6, '22', 'Дата подання заявки', 1, True),
+            InidCode(6, '23', 'Дата виставкового пріоритету', 1, True),
+            InidCode(6, '28', 'Кількість заявлених варіантів', 1, True),
+            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 1, True),
+            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 1, True),
+            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку',
+                     1, True),
+            InidCode(6, '54', 'Назва промислового зразка', 1, True),
+            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 1, True),
+            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 1, True),
+            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 1, True),
+            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 1, True),
+            InidCode(6, '98', "Адреса для листування", 1, True),
         ]
         res.extend(inid_data)
 
@@ -553,7 +600,9 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '220', 'Date of filing of the application', 2, True),
             InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
                                'or registration of the mark in the origin country', 2, True),
-            InidCode(4, '531', 'Vienna Classification', 1, True),
+            InidCode(4, '441', 'Application publication date and bulletin number', 2, True),
+            InidCode(4, '450', 'Date of publication of information on the issuance of the certificate', 2, True),
+            InidCode(4, '531', 'Vienna Classification', 2, True),
             InidCode(4, '731', 'Name and address of the applicant', 2, True),
             InidCode(4, '732', 'Name and address of the holder of the registration', 2, True),
             InidCode(4, '740', 'Name and address of the representative', 1, True),
@@ -568,14 +617,46 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '540', 'Reproduction of the mark', 1, True),
             InidCode(4, '210', 'Serial number of the application', 1, True),
             InidCode(4, '220', 'Date of filing of the application', 1, True),
+            InidCode(4, '221', 'Date of receipt of application materials to NIPIO', 1, True),
             InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
                                'or registration of the mark in the origin country', 1, True),
+            InidCode(4, '441', 'Application publication date and bulletin number', 1, True),
             InidCode(4, '531', 'Vienna Classification', 1, True),
             InidCode(4, '731', 'Name and address of the applicant', 1, True),
             InidCode(4, '740', 'Name and address of the representative', 1, True),
             InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 1, True),
             InidCode(4, '511', 'Nice Classification indexes', 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы регистрации
+        inid_data = [
+            InidCode(6, '51', 'International Classification for Industrial Designs', 2, True),
+            InidCode(6, '11', 'Serial number of the registration', 2, True),
+            InidCode(6, '24', 'Date from which the industrial design right has effect', 2, True),
+            InidCode(6, '21', 'Serial number of the application', 2, True),
+            InidCode(6, '22', 'Date of filing of the application', 2, True),
+            InidCode(6, '23', 'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)', 2, True),
+            InidCode(6, '28', 'Number of industrial designs included in the application', 2, True),
+            InidCode(6, '31', 'Serial number assigned to the priority application', 2, True),
+            InidCode(6, '32', 'Date of filing of the priority application', 2, True),
+            InidCode(6, '33', 'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
+                     2, True),
+            InidCode(6, '45', 'Date of publication of information on patent issuance and bulletin number', 2, True),
+            InidCode(6, '54', 'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design', 2, True),
+            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 2, True),
+            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 2, True),
+            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 2, True),
+            InidCode(6, '73', "Name(s) and address(es) of the owner(s)", 2, True),
+            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 2, True),
+            InidCode(6, '98', "Correspondense address", 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы заявик
+        inid_data = [
+            InidCode(6, '21', 'Serial number of the application', 1, True),
         ]
         res.extend(inid_data)
 

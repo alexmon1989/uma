@@ -645,7 +645,8 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
             # Генерация отчёта
             report_writer = ReportWriterDocxCreator.create(
                 applications,
-                search_services.inid_code_get_list(lang_code)
+                search_services.inid_code_get_list(lang_code),
+                lang_code
             )
             report_writer.generate(file_path)
 
@@ -810,7 +811,8 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
             # Генерация отчёта
             report_writer = ReportWriterDocxCreator.create(
                 applications,
-                search_services.inid_code_get_list(lang_code)
+                search_services.inid_code_get_list(lang_code),
+                lang_code
             )
             report_writer.generate(file_path)
 
@@ -907,7 +909,8 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
             # Генерация отчёта
             report_writer = ReportWriterDocxCreator.create(
                 [x.to_dict() for x in s.params(size=1000, preserve_order=True).scan()],
-                search_services.inid_code_get_list(lang_code)
+                search_services.inid_code_get_list(lang_code),
+                lang_code
             )
             report_writer.generate(file_path)
 
@@ -963,6 +966,7 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     hit = search_services.application_get_app_elasticsearch_data(id_app_number)
     if not hit:
         return {}
+    hit['meta'] = {'id': id_app_number}
 
     user = get_user_or_anonymous(user_id)
     directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
@@ -975,7 +979,8 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     # Генерация отчёта
     report_writer = ReportWriterDocxCreator.create(
         [filter_app_data(hit, user)],
-        search_services.inid_code_get_list(lang_code)
+        search_services.inid_code_get_list(lang_code),
+        lang_code
     )
     report_writer.generate(file_path)
 

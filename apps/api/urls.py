@@ -7,6 +7,6 @@ urlpatterns = [
 
     path('v1/open-data/', OpenDataListViewV1.as_view()),
     path('v1/open-data/search/', SearchListView.as_view()),
-    path('v1/open-data/<str:app_number>/', OpenDataDetailViewV1.as_view()),
-    path('v1/open-data/documents/<str:app_number>/', OpenDataDocsView.as_view()),
+    path('v1/open-data/<path:app_number>/', OpenDataDetailViewV1.as_view()),
+    path('v1/open-data/documents/<path:app_number>/', OpenDataDocsView.as_view()),
 ]

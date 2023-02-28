@@ -88,7 +88,8 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
         # Генерация отчёта
         report_writer = ReportWriterDocxCreator.create(
             applications,
-            search_services.inid_code_get_list(lang_code)
+            search_services.inid_code_get_list(lang_code),
+            lang_code
         )
         report_writer.generate(file_path)
 

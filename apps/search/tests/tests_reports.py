@@ -1,6 +1,7 @@
 from django.test import TestCase
-from apps.search.services.reports import ReportItemDocxTM, ReportWriterDocx
+from apps.search.services.reports import ReportItemDocxTM, ReportItemDocxID, ReportWriterDocx
 from apps.search.dataclasses import InidCode
+from apps.bulletin.models import ClListOfficialBulletinsIp
 
 from docx import Document
 
@@ -832,14 +833,6 @@ class ReportItemDocxTmTestCase(TestCase):
         p = item.write(self.document)
         self.assertNotIn(expected_str, p.text)
 
-        # Данные существуют и запрещены для отображения
-        inid_data = [
-            InidCode(4, '732', inid_title, 2, False)
-        ]
-        item = ReportItemDocxTM(biblio_data, inid_data)
-        p = item.write(self.document)
-        self.assertNotIn(expected_str, p.text)
-
         # Данные отсутствуют и разрешены для отображения
         biblio_data = {
             'TradeMark': {
@@ -950,14 +943,6 @@ class ReportItemDocxTmTestCase(TestCase):
         p = item.write(self.document)
         self.assertNotIn(expected_str, p.text)
 
-        # Данные существуют и запрещены для отображения
-        inid_data = [
-            InidCode(4, '740', inid_title, 2, False)
-        ]
-        item = ReportItemDocxTM(biblio_data, inid_data)
-        p = item.write(self.document)
-        self.assertNotIn(expected_str, p.text)
-
         # Данные отсутствуют и разрешены для отображения
         biblio_data = {
             'TradeMark': {
@@ -1056,14 +1041,6 @@ class ReportItemDocxTmTestCase(TestCase):
         p = item.write(self.document)
         self.assertNotIn(expected_str, p.text)
 
-        # Данные существуют и запрещены для отображения
-        inid_data = [
-            InidCode(4, '750', inid_title, 2, False)
-        ]
-        item = ReportItemDocxTM(biblio_data, inid_data)
-        p = item.write(self.document)
-        self.assertNotIn(expected_str, p.text)
-
         # Данные отсутствуют и разрешены для отображения
         biblio_data = {
             'TradeMark': {
@@ -1140,14 +1117,6 @@ class ReportItemDocxTmTestCase(TestCase):
         item = ReportItemDocxTM(biblio_data, inid_data)
         p = item.write(self.document)
         self.assertIn(expected_str, p.text)
-
-        # Данные существуют и запрещены для отображения
-        inid_data = [
-            InidCode(4, '591', inid_title, 2, False)
-        ]
-        item = ReportItemDocxTM(biblio_data, inid_data)
-        p = item.write(self.document)
-        self.assertNotIn(expected_str, p.text)
 
         # Данные существуют и запрещены для отображения
         inid_data = [
@@ -1340,6 +1309,1883 @@ class ReportItemDocxTmTestCase(TestCase):
         p = item.write(self.document)
         self.assertNotIn(expected_str, p.text)
 
+    def test_app_input_date(self):
+        """
+        Тестирует корректность добавления информации о значении поля "Дата надходження матеріалів заявки до НОІВ"
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата надходження матеріалів заявки до НОІВ"
+        expected_str = f"{inid_title}: 25.02.2023"
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "app_input_date": "2023-02-25",
+                }
+            },
+            'search_data': {
+                'obj_state': 1
+            }
+        }
+        inid_data = [
+            InidCode(4, '221', inid_title, 1, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(4, '221', inid_title, 1, False)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '221', inid_title, 1, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "app_input_date": "2023-02-25",
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_441(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (441) Дата публікації відомостей про заявку та номер бюлетня
+        """
+        inid_title = "Дата публікації відомостей про заявку та номер бюлетня"
+        expected_str_ua = f"(441)\t{inid_title}: 26.02.2023, бюл. №1"
+        expected_str_en = f"(441)\t{inid_title}: 26.02.2023, bul. №1"
+
+        # Данные существуют и разрешены для отображения, номер бюллетеня присутствует в данных JSON
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "Code_441": "2023-02-26",
+                    "Code_441_BulNumber": "1"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '441', inid_title, 2, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data, 'ua')
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные существуют и разрешены для отображения, номер бюлетня отсутствует в данных JSON
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "Code_441": "2023-02-26"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '441', inid_title, 2, True)
+        ]
+        ClListOfficialBulletinsIp.objects.create(
+            bul_number=1,
+            bul_date='2023-02-26',
+            date_from='2023-02-20',
+            date_to='2023-02-28',
+        )
+        item = ReportItemDocxTM(biblio_data, inid_data, 'ua')
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(4, '441', inid_title, 2, False)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '441', inid_title, 2, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "Code_441": "2023-02-26"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+    def test_inid_450(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (450) Дата публікації відомостей про видачу свідоцтва
+        """
+        inid_title = "Дата публікації відомостей про видачу свідоцтва"
+        expected_str_ua = f"(450)\t{inid_title}: 27.02.2023, бюл. № 1/2023"
+        expected_str_en = f"(450)\t{inid_title}: 27.02.2023, bul. № 1/2023"
+
+        # Данные существуют и разрешены для отображения, номер бюллетеня присутствует в данных JSON
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "PublicationDetails": [
+                        {
+                            "PublicationDate": "2023-02-27",
+                            "PublicationIdentifier": "1/2023"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '450', inid_title, 2, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data, 'ua')
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(4, '450', inid_title, 2, False)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(4, '450', inid_title, 2, True)
+        ]
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    "PublicationDetails": [
+                        {
+                            "PublicationDate": "2023-02-27",
+                            "PublicationIdentifier": "1/2023"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxTM(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxTM(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+
+class ReportItemDocxIDTestCase(TestCase):
+    def setUp(self) -> None:
+        self.document = Document()
+
+    def test_inid_21(self):
+        """
+        Тестирует корректность добавления информации о значении ИНИД (21) Номер заявки
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Номер заявки"
+        expected_str = f"(21)\t{inid_title}: s202300001"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignApplicationNumber": "s202300001"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '21', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '21', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '21', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignApplicationNumber": "s202300001"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_51(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (51) Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)"
+        expected_str = f"(51)\t{inid_title}: 01-00, 02-00"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "IndicationProductDetails": [
+                        {
+                            "Class": "01-00"
+                        },
+                        {
+                            "Class": "02-00"
+                        },
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '51', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '51', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '51', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "IndicationProductDetails": [
+                        {
+                            "Class": "01-00"
+                        },
+                        {
+                            "Class": "02-00"
+                        },
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_11(self):
+        """
+        Тестирует корректность добавления информации о значении ИНИД (11) Номер реєстрації (патенту)
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Номер реєстрації (патенту)"
+        expected_str = f"(11)\t{inid_title}: 11111"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RegistrationNumber": "11111"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '11', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '11', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '11', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RegistrationNumber": "11111"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_22(self):
+        """
+        Тестирует корректность добавления информации о значении ИНИД (22) Дата подання заявки
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата подання заявки"
+        expected_str = f"(22)\t{inid_title}: 26.02.2023"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignApplicationDate": "2023-02-26"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '22', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '22', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '22', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignApplicationDate": "2023-02-26"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_23(self):
+        """
+        Тестирует корректность добавления информации о значении ИНИД (23) Дата виставкового пріоритету
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата виставкового пріоритету"
+        expected_str = f"(23)\t{inid_title}:\n27.02.2023; UA\n28.02.2023; UA"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "ExhibitionPriorityDetails": [
+                        {
+                            "ExhibitionDate": "2023-02-27",
+                            "ExhibitionCountryCode": "UA"
+                        },
+                        {
+                            "ExhibitionDate": "2023-02-28",
+                            "ExhibitionCountryCode": "UA"
+                        }
+                    ],
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '23', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '23', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '23', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "ExhibitionPriorityDetails": [
+                        {
+                            "ExhibitionDate": "2023-02-27",
+                            "ExhibitionCountryCode": "UA"
+                        },
+                        {
+                            "ExhibitionDate": "2023-02-28",
+                            "ExhibitionCountryCode": "UA"
+                        }
+                    ],
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_24(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (24) Дата, з якої є чинними права на промисловий зразок
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата, з якої є чинними права на промисловий зразок"
+        expected_str = f"(24)\t{inid_title}: 27.02.2023"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RecordEffectiveDate": "2023-02-27"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '24', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '24', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '24', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "RecordEffectiveDate": "2023-02-27"
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_28(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (28) Кількість заявлених варіантів
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Кількість заявлених варіантів"
+        expected_str = f"(28)\t{inid_title}: 2"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "TotalSpecimen": 2
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '28', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '28', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '28', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "TotalSpecimen": 2
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_31(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (31) Номер попередньої заявки відповідно до Паризької конвенції
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Номер попередньої заявки відповідно до Паризької конвенції"
+        expected_str = f"(31)\t{inid_title}: s202300001"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": [
+                        {
+                            "PriorityNumber": "s202300001",
+                            "PriorityDate": "2023-02-27",
+                            "PriorityCountryCode": "UA"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '31', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '31', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '31', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "PriorityDetails": [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_32(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (32) Номер попередньої заявки відповідно до Паризької конвенції
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата подання попередньої заявки відповідно до Паризької конвенції"
+        expected_str = f"(32)\t{inid_title}: 27.02.2023"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": [
+                        {
+                            "PriorityNumber": "s202300001",
+                            "PriorityDate": "2023-02-27",
+                            "PriorityCountryCode": "UA"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '32', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '32', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '32', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "PriorityDetails": [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_33(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (33) Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата подання попередньої заявки відповідно до Паризької конвенції"
+        expected_str = f"(33)\t{inid_title}: UA"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": [
+                        {
+                            "PriorityNumber": "s202300001",
+                            "PriorityDate": "2023-02-27",
+                            "PriorityCountryCode": "UA"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '33', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '33', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '33', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "PriorityDetails": [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_45(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (45) Дата публікації відомостей про видачу патенту та номер бюлетеня
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Дата публікації відомостей про заявку та номер бюлетня"
+        expected_str_ua = f"(45)\t{inid_title}: 27.02.2023, бюл. № 1/2023"
+        expected_str_en = f"(45)\t{inid_title}: 27.02.2023, bul. № 1/2023"
+
+        # Данные существуют и разрешены для отображения, номер бюллетеня присутствует в данных JSON
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RecordPublicationDetails": [
+                        {
+                            "PublicationIdentifier": "1/2023",
+                            "PublicationDate": "2023-02-27"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '45', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data, 'ua')
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxID(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '45', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxID(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '45', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxID(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RecordPublicationDetails": [
+                        {
+                            "PublicationIdentifier": "1/2023",
+                            "PublicationDate": "2023-02-27"
+                        }
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxID(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+    def test_inid_54(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (54) Назва промислового зразка
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Назва промислового зразка"
+        expected_str = f"(54)\t{inid_title}: Назва промислового зразка"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignTitle": "Назва промислового зразка",
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '54', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '54', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '54', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "DesignTitle": "Назва промислового зразка",
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_55(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (55) Зображення промислового зразка та вказівка відносно кольорів
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Зображення промислового зразка та вказівка відносно кольорів"
+        expected_str = f"(55)\t{inid_title}:\n1-й варіант - чорний, білий\n2-й варіант - червоний, зелений"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignSpecimenDetails": [
+                        {
+                            "Colors": {
+                                "Color": "чорний, білий"
+                            }
+                        },
+                        {
+                            "Colors": {
+                                "Color": "червоний, зелений"
+                            }
+                        },
+                    ]
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '55', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '55', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '55', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignDetails': {
+                        "DesignTitle": "Назва промислового зразка",
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_71(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (71) Ім'я (імена) та адреса (адреси) заявника (заявників)
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Ім'я (імена) та адреса (адреси) заявника (заявників)"
+        expected_str = f"(71)\t{inid_title}:\nІваненко Іван Іванович\nм.Київ\nПетренко Петро Петрович\nм.Дніпро"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "ApplicantDetails": {
+                        "Applicant": [
+                            {
+                                "ApplicantAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "ApplicantAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Дніпро",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '71', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '71', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '71', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "ApplicantDetails": {
+                        "Applicant": [
+                            {
+                                "ApplicantAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "ApplicantAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Дніпро",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_72(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (72) Ім'я (імена) автора (авторів), якщо воно відоме
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Ім'я (імена) автора (авторів), якщо воно відоме"
+        expected_str = f"(72)\t{inid_title}:\nІваненко Іван Іванович\nПетренко Петро Петрович"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignerDetails": {
+                        "Designer": [
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": True
+                            },
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Вікторов Віктор Вікторович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": False
+                            },
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": True
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '72', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '72', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '72', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignerDetails": {
+                        "Designer": [
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": True
+                            },
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Вікторов Віктор Вікторович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": False
+                            },
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                                "Publicated": True
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_73(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (73) Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави"
+        expected_str = f"(73)\t{inid_title}:\nІваненко Іван Іванович\nм.Київ\n(UA)\nПетренко Петро Петрович\nм.Дніпро\n(EN)"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "HolderDetails": {
+                        "Holder": [
+                            {
+                                "HolderAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "AddressCountryCode": "UA",
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "HolderAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "AddressCountryCode": "EN",
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Дніпро",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '73', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '73', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '73', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "HolderDetails": {
+                        "Holder": [
+                            {
+                                "HolderAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "AddressCountryCode": "UA",
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "HolderAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "AddressCountryCode": "EN",
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Дніпро",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Петренко Петро Петрович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_74(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (74) Ім'я (імена) та адреса (адреси) представника (представників)
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Ім'я (імена) та адреса (адреси) представника (представників)"
+        expected_str = f"(74)\t{inid_title}:\nІваненко Іван Іванович\nм.Київ"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RepresentativeDetails": {
+                        "Representative": [
+                            {
+                                "RepresentativeAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '74', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '74', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '74', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RepresentativeDetails": {
+                        "Representative": [
+                            {
+                                "RepresentativeAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Address": {
+                                            "FreeFormatAddress": {
+                                                "FreeFormatAddressLine": "м.Київ",
+                                            }
+                                        },
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_98(self):
+        """
+        Тестирует корректность добавления информации о значении
+        ИНИД (98) Адреса для листування
+        """
+        # Данные существуют и разрешены для отображения
+        inid_title = "Адреса для листування"
+        expected_str = f"(98)\t{inid_title}:\nІваненко Іван Іванович\nм.Київ\n(UA)"
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "CorrespondenceAddress": {
+                        "CorrespondenceAddressBook": {
+                            "FormattedNameAddress": {
+                                "Address": {
+                                    "AddressCountryCode": "UA",
+                                    "FreeFormatAddress": {
+                                        "FreeFormatAddressLine": "м.Київ"
+                                    }
+                                },
+                                "Name": {
+                                    "FreeFormatName": {
+                                        "FreeFormatNameDetails": {
+                                            "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '98', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные существуют и запрещены для отображения
+        inid_data = [
+            InidCode(6, '98', inid_title, 2, False)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(6, '98', inid_title, 2, True)
+        ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные существуют, ИНИД код - нет
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "CorrespondenceAddress": {
+                        "CorrespondenceAddressBook": {
+                            "FormattedNameAddress": {
+                                "Address": {
+                                    "AddressCountryCode": "UA",
+                                    "FreeFormatAddress": {
+                                        "FreeFormatAddressLine": "м.Київ"
+                                    }
+                                },
+                                "Name": {
+                                    "FreeFormatName": {
+                                        "FreeFormatNameDetails": {
+                                            "FreeFormatNameLine": "Іваненко Іван Іванович"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
 
 class ReportWriterDocxTestCase(TestCase):
     """Тестирует класс создания файла отчёта в формате .docx."""
@@ -1367,5 +3213,3 @@ class ReportWriterDocxTestCase(TestCase):
         writer = ReportWriterDocx(items)
         writer.generate(file_path)
         self.assertTrue(file_path.exists())
-
-# class InidCodesServiceTestCase(TestCase):

@@ -1,4 +1,5 @@
 from apps.search.dataclasses import InidCode
+from apps.bulletin.services import bulletin_get_number_441_code
 
 from typing import List
 from abc import ABC, abstractmethod
@@ -37,9 +38,10 @@ class ReportItemDocx(ReportItem):
         """Возвращает абзац текста с информацией об объекте пром. собств."""
         raise NotImplemented
 
-    def __init__(self, application_data: dict, ipc_fields: List[InidCode]):
+    def __init__(self, application_data: dict, ipc_fields: List[InidCode], lang_code: str = 'ua'):
         self.application_data = application_data
         self.ipc_fields = ipc_fields
+        self.lang_code = lang_code
 
 
 class ReportItemDocxTM(ReportItemDocx):
@@ -142,6 +144,16 @@ class ReportItemDocxTM(ReportItemDocx):
             app_date = datetime.strptime(app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(app_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_app_input_date(self) -> None:
+        """Записывает в документ данные о поле "Дата надходження матеріалів заявки до НОІВ"."""
+        inid = self._get_inid(self.obj_type_id, '221', self.application_data['search_data']['obj_state'])
+        app_input_date = self.application_data['TradeMark']['TrademarkDetails'].get('app_input_date')
+        if inid and inid.visible and app_input_date:
+            app_date = datetime.strptime(app_input_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(app_date).bold = True
             self._paragraph.add_run('\r')
 
@@ -397,7 +409,8 @@ class ReportItemDocxTM(ReportItemDocx):
         if inid and inid.visible and goods:
             self._paragraph.add_run(f"({inid.code})").bold = True
             goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
-            self._paragraph.add_run(f"\t{inid.title}: {goods_classes_str}")
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(goods_classes_str).bold = True
             for item in goods:
                 self._paragraph.add_run('\r')
                 self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
@@ -406,12 +419,55 @@ class ReportItemDocxTM(ReportItemDocx):
                 self._paragraph.add_run(values_str)
             self._paragraph.add_run('\r')
 
+    def _write_441(self) -> None:
+        """Записывает в документ данные об ИНИД (441) Дата публікації відомостей про заявку та номер бюлетня."""
+        inid = self._get_inid(self.obj_type_id, '441', self.application_data['search_data']['obj_state'])
+        code_441 = self.application_data['TradeMark']['TrademarkDetails'].get('Code_441')
+        if inid and inid.visible and code_441:
+            bul_number = self.application_data['TradeMark']['TrademarkDetails'].get('Code_441_BulNumber')
+            if not bul_number:
+                bul_number = str(bulletin_get_number_441_code(code_441))
+
+            code_441 = datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(code_441).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. №').bold = True
+            else:
+                self._paragraph.add_run(', bul. №').bold = True
+            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
+    def _write_450(self) -> None:
+        """Записывает в документ данные об ИНИД (450) Дата публікації відомостей про видачу свідоцтва."""
+        inid = self._get_inid(self.obj_type_id, '450', self.application_data['search_data']['obj_state'])
+        publication_details = self.application_data['TradeMark']['TrademarkDetails'].get('PublicationDetails')
+        if inid and inid.visible and publication_details and len(publication_details) > 0:
+            bul_number = publication_details[0]['PublicationIdentifier']
+            publication_date = datetime.strptime(
+                publication_details[0]['PublicationDate'],
+                '%Y-%m-%d'
+            ).strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(publication_date).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. № ').bold = True
+            else:
+                self._paragraph.add_run(', bul. № ').bold = True
+            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
     def write(self, document: Document) -> Paragraph:
         """Записывает информацию о ТМ в абзац и возвращает его."""
         self.document = document
         self._paragraph = self.document.add_paragraph('')
 
         self._write_540()
+        self._write_app_input_date()
         self._write_111()
         self._write_151()
         self._write_141()
@@ -421,12 +477,412 @@ class ReportItemDocxTM(ReportItemDocx):
         self._write_220()
         self._write_531()
         self._write_300()
+        self._write_441()
+        self._write_450()
         self._write_731()
         self._write_732()
         self._write_740()
         self._write_750()
         self._write_591()
         self._write_511()
+
+        return self._paragraph
+
+
+class ReportItemDocxID(ReportItemDocx):
+    """Торговая марка."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 6
+
+    def _write_21(self) -> None:
+        """Записывает в документ данные об ИНИД (21) Номер заявки."""
+        inid = self._get_inid(self.obj_type_id, '21', self.application_data['search_data']['obj_state'])
+        app_number = self.application_data['Design']['DesignDetails'].get('DesignApplicationNumber')
+        if inid and inid.visible and app_number:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(app_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_51(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (51) Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)."""
+        inid = self._get_inid(self.obj_type_id, '51', self.application_data['search_data']['obj_state'])
+        classes = self.application_data['Design']['DesignDetails'].get('IndicationProductDetails')
+        if inid and inid.visible and classes:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(', '.join([x['Class'] for x in classes])).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_11(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (11) Номер реєстрації (патенту)."""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Design']['DesignDetails'].get('RegistrationNumber')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_22(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (22) Дата подання заявки."""
+        inid = self._get_inid(self.obj_type_id, '22', self.application_data['search_data']['obj_state'])
+        app_date = self.application_data['Design']['DesignDetails'].get('DesignApplicationDate')
+        if inid and inid.visible and app_date:
+            app_date = datetime.strptime(app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(app_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_23(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (23) Дата виставкового пріоритету."""
+        inid = self._get_inid(self.obj_type_id, '23', self.application_data['search_data']['obj_state'])
+        priority = self.application_data['Design']['DesignDetails'].get('ExhibitionPriorityDetails')
+        if inid and inid.visible and priority and len(priority) > 0:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\r")
+
+            for item in priority:
+                exhibition_date = datetime.strptime(item['ExhibitionDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
+                self._paragraph.add_run(exhibition_date).bold = True
+                self._paragraph.add_run('; ')
+                self._paragraph.add_run(item['ExhibitionCountryCode'])
+                self._paragraph.add_run('\r')
+
+            self._paragraph.add_run('\r')
+
+    def _write_24(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (24) Дата, з якої є чинними права на промисловий зразок."""
+        inid = self._get_inid(self.obj_type_id, '24', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Design']['DesignDetails'].get('RecordEffectiveDate')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_28(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (28) Кількість заявлених варіантів."""
+        inid = self._get_inid(self.obj_type_id, '28', self.application_data['search_data']['obj_state'])
+        total_specimen = self.application_data['Design']['DesignDetails'].get('TotalSpecimen')
+        if inid and inid.visible and total_specimen:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(str(total_specimen)).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_31(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (31) Номер попередньої заявки відповідно до Паризької конвенції."""
+        inid = self._get_inid(self.obj_type_id, '31', self.application_data['search_data']['obj_state'])
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        if inid and inid.visible and priority and len(priority) > 0:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(priority[0]['PriorityNumber']).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_32(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (32) Дата подання попередньої заявки відповідно до Паризької конвенції."""
+        inid = self._get_inid(self.obj_type_id, '32', self.application_data['search_data']['obj_state'])
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        if inid and inid.visible and priority and len(priority) > 0:
+            priority_date = datetime.strptime(priority[0]['PriorityDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(priority_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_33(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (33) Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку."""
+        inid = self._get_inid(self.obj_type_id, '33', self.application_data['search_data']['obj_state'])
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        if inid and inid.visible and priority and len(priority) > 0:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(priority[0]['PriorityCountryCode']).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_45(self) -> None:
+        """Записывает в документ данные об ИНИД (45) Дата публікації відомостей про видачу патенту та номер бюлетеня."""
+        inid = self._get_inid(self.obj_type_id, '45', self.application_data['search_data']['obj_state'])
+        publication_details = self.application_data['Design']['DesignDetails'].get('RecordPublicationDetails')
+        if inid and inid.visible and publication_details and len(publication_details) > 0:
+            bul_number = publication_details[0]['PublicationIdentifier']
+            publication_date = datetime.strptime(
+                publication_details[0]['PublicationDate'],
+                '%Y-%m-%d'
+            ).strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(publication_date).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. № ').bold = True
+            else:
+                self._paragraph.add_run(', bul. № ').bold = True
+            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
+    def _write_54(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Назва промислового зразка."""
+        inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
+        title = self.application_data['Design']['DesignDetails'].get('DesignTitle')
+        if inid and inid.visible and title:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(title).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_55(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (55) Назва промислового зразка."""
+        inid = self._get_inid(self.obj_type_id, '55', self.application_data['search_data']['obj_state'])
+        specimen_details = self.application_data['Design']['DesignDetails'].get('DesignSpecimenDetails')
+        if inid and inid.visible and specimen_details:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for i, item in enumerate(specimen_details):
+                if 'Colors' in item:
+                    self._paragraph.add_run('\r')
+                    self._paragraph.add_run(f"{i + 1}-й варіант - {item['Colors']['Color']}").bold = True
+            self._paragraph.add_run("\r")
+
+            for specimen in specimen_details:
+                for image in specimen['DesignSpecimen']:
+                    self._paragraph.add_run(image['SpecimenIndex'])
+                    self._paragraph.add_run(':\r')
+                    path = Path(self.application_data['Document']['filesPath'].replace('\\', '/'))
+                    parts_len = len(path.parts)
+                    # Путь к изображению на диске
+                    mark_image_filepath = Path(settings.MEDIA_ROOT) / path.parts[parts_len - 3]
+                    mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
+                    mark_image_filepath /= path.parts[parts_len - 1]
+                    mark_image_filepath /= image['SpecimenFilename']
+                    run = self._paragraph.add_run()
+                    run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                    self._paragraph.add_run('\r')
+
+    def _write_71(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (71) Ім'я (імена) та адреса (адреси) заявника (заявників)
+        """
+        inid = self._get_inid(self.obj_type_id, '71', self.application_data['search_data']['obj_state'])
+        applicants = self.application_data['Design']['DesignDetails'].get(
+            'ApplicantDetails', {}
+        ).get(
+            'Applicant'
+        )
+        if inid and inid.visible and applicants:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for applicant in applicants:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        applicant['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        applicant['ApplicantAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                            'FreeFormatAddressLine']
+                    )
+                except KeyError:
+                    pass
+
+            self._paragraph.add_run('\r')
+
+    def _write_72(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (72) Ім'я (імена) автора (авторів), якщо воно відоме
+        """
+        inid = self._get_inid(self.obj_type_id, '72', self.application_data['search_data']['obj_state'])
+        designers = self.application_data['Design']['DesignDetails'].get(
+            'DesignerDetails', {}
+        ).get(
+            'Designer'
+        )
+        if inid and inid.visible and designers:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for designer in designers:
+                if designer.get('Publicated'):
+                    self._paragraph.add_run('\r')
+                    try:
+                        self._paragraph.add_run(
+                            designer['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                'FreeFormatNameDetails']['FreeFormatNameLine']
+                        ).bold = True
+                    except KeyError:
+                        pass
+
+            self._paragraph.add_run('\r')
+
+    def _write_73(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (73) Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави
+        """
+        inid = self._get_inid(self.obj_type_id, '73', self.application_data['search_data']['obj_state'])
+        holders = self.application_data['Design']['DesignDetails'].get(
+            'HolderDetails', {}
+        ).get(
+            'Holder'
+        )
+        if inid and inid.visible and holders:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for holder in holders:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        holder['HolderAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                            'FreeFormatAddressLine']
+                    )
+                except KeyError:
+                    pass
+
+                self._paragraph.add_run('\r')
+                try:
+                    country = holder['HolderAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f"({country})"
+                    )
+                except KeyError:
+                    pass
+
+            self._paragraph.add_run('\r')
+
+    def _write_74(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (74) Ім'я (імена) та адреса (адреси) представника (представників)
+        """
+        inid = self._get_inid(self.obj_type_id, '74', self.application_data['search_data']['obj_state'])
+        representatives = self.application_data['Design']['DesignDetails'].get(
+            'RepresentativeDetails', {}
+        ).get(
+            'Representative'
+        )
+        if inid and inid.visible and representatives:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for representative in representatives:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        representative['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        representative['RepresentativeAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                            'FreeFormatAddressLine']
+                    )
+                except KeyError:
+                    pass
+
+            self._paragraph.add_run('\r')
+
+    def _write_98(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (98) Адреса для листування
+        """
+        inid = self._get_inid(self.obj_type_id, '98', self.application_data['search_data']['obj_state'])
+        correspondence = self.application_data['Design']['DesignDetails'].get(
+            'CorrespondenceAddress'
+        )
+        if inid and inid.visible and correspondence:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            self._paragraph.add_run('\r')
+            try:
+                self._paragraph.add_run(
+                    correspondence['CorrespondenceAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'FreeFormatNameDetails']['FreeFormatNameLine']
+                ).bold = True
+            except KeyError:
+                pass
+
+            self._paragraph.add_run('\r')
+            try:
+                self._paragraph.add_run(
+                    correspondence['CorrespondenceAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                        'FreeFormatAddressLine']
+                )
+            except KeyError:
+                pass
+
+            self._paragraph.add_run('\r')
+            try:
+                country = correspondence['CorrespondenceAddressBook']['FormattedNameAddress']['Address'][
+                    'AddressCountryCode']
+                self._paragraph.add_run(
+                    f"({country})"
+                )
+            except KeyError:
+                pass
+
+            self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        """Записывает информацию о ТМ в абзац и возвращает его."""
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_51()
+        self._write_11()
+        self._write_21()
+        self._write_22()
+        self._write_23()
+        self._write_24()
+        self._write_31()
+        self._write_32()
+        self._write_33()
+        self._write_45()
+        self._write_54()
+        self._write_55()
+        self._write_71()
+        self._write_72()
+        self._write_73()
+        self._write_74()
+        self._write_98()
+
+        self._write_28()
 
         return self._paragraph
 
@@ -460,7 +916,7 @@ class ReportWriterCreator(ABC):
     """Интерфейс создателя генератора отчётов."""
     @staticmethod
     @abstractmethod
-    def create(applications: List[dict], inid_data: List[InidCode]) -> ReportWriter:
+    def create(applications: List[dict], inid_data: List[InidCode], lang_code: str) -> ReportWriter:
         """
         Создаёт объект генератора отчётов.
 
@@ -473,16 +929,18 @@ class ReportWriterCreator(ABC):
 class ReportWriterDocxCreator(ReportWriterCreator):
     """Класс, задачей которого есть создание объекта генератора отчётов в формате .docx."""
     @staticmethod
-    def create(applications: List[dict], inid_data: List[InidCode]) -> ReportWriterDocx:
+    def create(applications: List[dict], inid_data: List[InidCode], lang_code: str = 'ua') -> ReportWriterDocx:
         report_item_classes = {
-            4: ReportItemDocxTM
+            4: ReportItemDocxTM,
+            6: ReportItemDocxID,
         }
         report_items = []
         for app in applications:
             try:
                 report_item = report_item_classes[app['Document']['idObjType']](
                     application_data=app,
-                    ipc_fields=inid_data
+                    ipc_fields=inid_data,
+                    lang_code=lang_code,
                 )
                 report_items.append(report_item)
             except KeyError:
