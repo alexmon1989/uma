@@ -567,7 +567,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
-        # Пром. образцы заявик
+        # Пром. образцы заявки
         inid_data = [
             InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 1, True),
             InidCode(6, '21', 'Номер заявки', 1, True),
@@ -586,6 +586,23 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(6, '98', "Адреса для листування", 1, True),
         ]
         res.extend(inid_data)
+
+        # Мадрид
+        for obj_type_id in [9, 14]:
+            inid_data = [
+                InidCode(obj_type_id, '111', 'Номер міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '151', 'Дата міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '180', 'Очікувана дата закінчення строку дії реєстрації/продовження', 2, True),
+                InidCode(obj_type_id, '441', 'Дата публікації відомостей про міжнародну реєстрацію торговельної марки, що надійшла для проведення експертизи', 2, True),
+                InidCode(obj_type_id, '450', 'Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ', 2, True),
+                InidCode(obj_type_id, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+                InidCode(obj_type_id, '740', 'Ім\'я та адреса представника', 2, True),
+                InidCode(obj_type_id, '821', 'Базова заявка', 2, True),
+                InidCode(obj_type_id, '891', 'Дата територіального поширення міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '540', 'Зображення торговельної марки', 2, True),
+                InidCode(obj_type_id, '511', 'Індекс (індекси) МКТП та перелік товарів і послуг', 2, True),
+            ]
+            res.extend(inid_data)
 
     elif lang == 'en':
         # ТМ регистрации
@@ -645,7 +662,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                      2, True),
             InidCode(6, '45', 'Date of publication of information on patent issuance and bulletin number', 2, True),
             InidCode(6, '54', 'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design', 2, True),
-            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 2, True),
+            InidCode(6, '55', 'Images', 2, True),
             InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 2, True),
             InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 2, True),
             InidCode(6, '73', "Name(s) and address(es) of the owner(s)", 2, True),
@@ -654,10 +671,46 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
-        # Пром. образцы заявик
+        # Пром. образцы заявки
         inid_data = [
+            InidCode(6, '51', 'International Classification for Industrial Designs', 1, True),
             InidCode(6, '21', 'Serial number of the application', 1, True),
+            InidCode(6, '22', 'Date of filing of the application', 1, True),
+            InidCode(6, '23',
+                     'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)',
+                     1, True),
+            InidCode(6, '28', 'Number of industrial designs included in the application', 1, True),
+            InidCode(6, '31', 'Serial number assigned to the priority application', 1, True),
+            InidCode(6, '32', 'Date of filing of the priority application', 1, True),
+            InidCode(6, '33',
+                     'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
+                     1, True),
+            InidCode(6, '54',
+                     'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design',
+                     1, True),
+            InidCode(6, '55', 'Images', 1, True),
+            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 1, True),
+            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 1, True),
+            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 1, True),
+            InidCode(6, '98', "Correspondense address", 1, True),
         ]
         res.extend(inid_data)
+
+        # Мадрид
+        for obj_type_id in [9, 14]:
+            inid_data = [
+                InidCode(obj_type_id, '111', 'International registration number', 2, True),
+                InidCode(obj_type_id, '151', 'Date of international registration', 2, True),
+                InidCode(obj_type_id, '180', 'Expected expiration date of the registration', 2, True),
+                InidCode(obj_type_id, '441', 'Application publication date and bulletin number', 2, True),
+                InidCode(obj_type_id, '450', 'Date of publication of information on international registration and number of the WIPO International Bureau bulletin', 2, True),
+                InidCode(obj_type_id, '732', 'Name and address of the holder of the registration', 2, True),
+                InidCode(obj_type_id, '740', 'Name and address of the representative', 2, True),
+                InidCode(obj_type_id, '821', 'Base application', 2, True),
+                InidCode(obj_type_id, '891', 'Date of territorial distribution of international registration', 2, True),
+                InidCode(obj_type_id, '540', 'Brand image', 2, True),
+                InidCode(obj_type_id, '511', 'ICCI index (s) and list of goods and services', 2, True),
+            ]
+            res.extend(inid_data)
 
     return res

@@ -489,6 +489,221 @@ class ReportItemDocxTM(ReportItemDocx):
         return self._paragraph
 
 
+class ReportItemDocxMadrid(ReportItemDocx):
+    """Торговая марка (Мадрид)."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id: int
+
+    def _write_111(self) -> None:
+        """Записывает в документ информацию об ИНИД (111) Номер міжнародної реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '111', self.application_data['search_data']['obj_state'])
+        registration_number = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGN')
+        if inid and inid.visible and registration_number:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(registration_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_540(self) -> None:
+        """Записывает в документ информацию об ИНИД (540) Зображення торговельної марки."""
+        inid = self._get_inid(self.obj_type_id, '540', self.application_data['search_data']['obj_state'])
+        if inid and inid.visible:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            self._paragraph.add_run('\r')
+
+            # Зображення
+            try:
+                path = Path(self.application_data['Document']['filesPath'].replace('\\', '/'))
+            except KeyError:
+                pass
+            else:
+                parts_len = len(path.parts)
+                # Путь к изображению на диске
+                mark_image_filepath = Path(settings.MEDIA_ROOT) / path.parts[parts_len - 4].upper()
+                mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 3]
+                mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
+                mark_image_filepath /= path.parts[parts_len - 1]
+                registration_number = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGN')
+                mark_image_filepath /= f"{registration_number}.jpg"
+                run = self._paragraph.add_run()
+                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                self._paragraph.add_run('\r')
+
+    def _write_151(self) -> None:
+        """Записывает в документ информацию об ИНИД (151) Дата міжнародної реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '151', self.application_data['search_data']['obj_state'])
+        registration_date = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGD')
+        if inid and inid.visible and registration_date:
+            registration_date = datetime.strptime(registration_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(registration_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_180(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (180) Очікувана дата закінчення строку дії реєстрації/продовження."""
+        inid = self._get_inid(self.obj_type_id, '180', self.application_data['search_data']['obj_state'])
+        exp_date = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGD')
+        if inid and inid.visible and exp_date:
+            exp_date = datetime.strptime(exp_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(exp_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_441(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (441) Дата публікації відомостей про міжнародну реєстрацію торговельної марки,
+        що надійшла для проведення експертизи."""
+        inid = self._get_inid(self.obj_type_id, '441', self.application_data['search_data']['obj_state'])
+        code_441 = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('Code_441')
+        if inid and inid.visible and code_441:
+            bul_number = str(bulletin_get_number_441_code(code_441))
+            code_441 = datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(code_441).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. № ').bold = True
+            else:
+                self._paragraph.add_run(', bul. № ').bold = True
+            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
+    def _write_450(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (450) Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ"""
+        inid = self._get_inid(self.obj_type_id, '450', self.application_data['search_data']['obj_state'])
+        pub_date = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('ENN', {}).get('@PUBDATE')
+        if inid and inid.visible and pub_date:
+            pub_date = datetime.strptime(pub_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            bul_number = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('ENN', {}).get('@GAZNO')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(pub_date).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. № ').bold = True
+            else:
+                self._paragraph.add_run(', bul. № ').bold = True
+            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
+    def _write_732(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (732) Ім'я та адреса володільця реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '732', self.application_data['search_data']['obj_state'])
+        holder = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('HOLGR')
+        if inid and inid.visible and holder:
+            holder_name = holder.get('NAME', {}).get('NAMEL')
+            holder_address = '\n'.join([x for x in holder.get('ADDRESS', {}).get('ADDRL', [])])
+            holder_country = holder.get('ADDRESS', {}).get('COUNTRY')
+
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+
+            self._paragraph.add_run(holder_name).bold = True
+            self._paragraph.add_run('\r')
+
+            self._paragraph.add_run(holder_address)
+            self._paragraph.add_run('\r')
+
+            self._paragraph.add_run(f"({holder_country})")
+            self._paragraph.add_run('\r')
+
+    def _write_740(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (740) Ім'я та адреса представника."""
+        inid = self._get_inid(self.obj_type_id, '740', self.application_data['search_data']['obj_state'])
+        representative = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('REPGR')
+        if inid and inid.visible and representative:
+            representative_name = representative.get('NAME', {}).get('NAMEL')
+            representative_address = '\n'.join([x for x in representative.get('ADDRESS', {}).get('ADDRL', [])])
+            representative_country = representative.get('ADDRESS', {}).get('COUNTRY')
+
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+
+            self._paragraph.add_run(representative_name).bold = True
+            self._paragraph.add_run('\r')
+
+            self._paragraph.add_run(representative_address)
+            self._paragraph.add_run('\r')
+
+            self._paragraph.add_run(f"({representative_country})")
+            self._paragraph.add_run('\r')
+
+    def _write_821(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (821) Базова заявка."""
+        inid = self._get_inid(self.obj_type_id, '821', self.application_data['search_data']['obj_state'])
+        base_app = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('BASGR', {}).get('BASAPPGR')
+        if inid and inid.visible and base_app:
+            app_date = datetime.strptime(base_app['BASAPPD'], '%Y-%m-%d').strftime('%d.%m.%Y')
+
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(f"{app_date}, ").bold = True
+            self._paragraph.add_run(base_app['BASAPPN']).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_891(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (891) Дата територіального поширення міжнародної реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '891', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@REGEDAT')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(f"{reg_date}, ").bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_511(self) -> None:
+        """Записывает в документ информацию об
+        ИНИД (511) Індекс (індекси) МКТП та перелік товарів і послуг."""
+        inid = self._get_inid(self.obj_type_id, '511', self.application_data['search_data']['obj_state'])
+        gsgr = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('BASICGS', {}).get('GSGR')
+        if inid and inid.visible and gsgr:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:")
+            for cl in gsgr:
+                self._paragraph.add_run(f"\nКл. {cl.get('@NICCLAI')}: ").bold = True
+                self._paragraph.add_run(cl.get('GSTERMEN'))
+            self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        """Записывает информацию о ТМ в абзац и возвращает его."""
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_540()
+        self._write_111()
+        self._write_151()
+        self._write_180()
+        self._write_441()
+        self._write_450()
+        self._write_732()
+        self._write_740()
+        self._write_821()
+        self._write_891()
+        self._write_511()
+
+        return self._paragraph
+
+
+class ReportItemDocxMadrid9(ReportItemDocxMadrid):
+    obj_type_id = 9
+
+
+class ReportItemDocxMadrid14(ReportItemDocxMadrid):
+    obj_type_id = 14
+
+
 class ReportItemDocxID(ReportItemDocx):
     """Торговая марка."""
     _paragraph: Paragraph
@@ -933,6 +1148,8 @@ class ReportWriterDocxCreator(ReportWriterCreator):
         report_item_classes = {
             4: ReportItemDocxTM,
             6: ReportItemDocxID,
+            9: ReportItemDocxMadrid9,
+            14: ReportItemDocxMadrid14,
         }
         report_items = []
         for app in applications:

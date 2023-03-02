@@ -1,5 +1,5 @@
 from django.test import TestCase
-from apps.search.services.reports import ReportItemDocxTM, ReportItemDocxID, ReportWriterDocx
+from apps.search.services.reports import ReportItemDocxTM, ReportItemDocxID, ReportItemDocxMadrid9, ReportWriterDocx
 from apps.search.dataclasses import InidCode
 from apps.bulletin.models import ClListOfficialBulletinsIp
 
@@ -3183,6 +3183,802 @@ class ReportItemDocxIDTestCase(TestCase):
         }
         inid_data = []
         item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+
+class ReportItemDocxMadridTestCase(TestCase):
+    def setUp(self) -> None:
+        self.document = Document()
+
+    def test_inid_540(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (540) Зображення торговельної марки."""
+        # Разрешено для отображения
+        inid_title = "Зображення торговельної марки"
+        expected_str = f"(540)\t{inid_title}:"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '540', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Запрещено для отображения
+        inid_data = [
+            InidCode(9, '540', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_111(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (111) Номер міжнародної реєстрації."""
+        # Номер регистрации есть в данных и разрешён для отображения
+        inid_title = "Номер міжнародної реєстрації"
+        expected_str = f"(111)\t{inid_title}: 111111"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    '@INTREGN': '111111'
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '111', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Номер регистрации есть в данных и не разрешён для отображения
+        inid_data = [
+            InidCode(9, '111', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Номера регистрации нет данных, разрешён для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '111', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Номер регистрации есть в данных, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    '@INTREGN': '111111'
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_151(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (151) Дата міжнародної реєстрації."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Дата міжнародної реєстрації"
+        expected_str = f"(151)\t{inid_title}: 01.03.2023"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@INTREGD": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '151', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '151', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '151', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@INTREGD" : "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_180(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (180) Очікувана дата закінчення строку дії реєстрації/продовження."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Очікувана дата закінчення строку дії реєстрації/продовження"
+        expected_str = f"(180)\t{inid_title}: 01.03.2023"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@INTREGD": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '180', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '180', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '180', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@INTREGD": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_441(self):
+        """Тестирует корректность добавления информации об
+           ИНИД (441) Дата публікації відомостей про міжнародну реєстрацію торговельної марки,
+           що надійшла для проведення експертизи."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Дата публікації відомостей про міжнародну реєстрацію торговельної марки, " \
+                     "що надійшла для проведення експертизи"
+        expected_str_ua = f"(441)\t{inid_title}: 01.03.2023, бюл. № 8"
+        expected_str_en = f"(441)\t{inid_title}: 01.03.2023, bul. № 8"
+        ClListOfficialBulletinsIp.objects.create(
+            bul_number=8,
+            bul_date='2023-03-01',
+            date_from='2023-02-20',
+            date_to='2023-03-28',
+        )
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "Code_441": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '441', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '441', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '441', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "Code_441": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+    def test_inid_450(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (450) Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ"""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ"
+        expected_str_ua = f"(450)\t{inid_title}: 01.03.2023, бюл. № 2023/8 Gaz"
+        expected_str_en = f"(450)\t{inid_title}: 01.03.2023, bul. № 2023/8 Gaz"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "ENN": {
+                        "@PUBDATE": "2023-03-01",
+                        "@GAZNO": "2023/8 Gaz"
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '450', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertIn(expected_str_en, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '450', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '450', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "ENN": {
+                        "@PUBDATE": "2023-03-01",
+                        "@GAZNO": "2023/8 Gaz"
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_ua, p.text)
+        item = ReportItemDocxMadrid9(biblio_data, inid_data, 'en')
+        p = item.write(self.document)
+        self.assertNotIn(expected_str_en, p.text)
+
+    def test_inid_732(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (732) Ім'я та адреса володільця реєстрації."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Ім'я та адреса володільця реєстрації"
+        expected_str = f"(732)\t{inid_title}:\nName\nAddr. str. 1\nAddr. str. 2\n(UA)"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "HOLGR": {
+                        "NAME": {
+                            "NAMEL": "Name"
+                        },
+                        "ADDRESS": {
+                            "ADDRL": [
+                                "Addr. str. 1",
+                                "Addr. str. 2"
+                            ],
+                            "COUNTRY": "UA"
+                        },
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '732', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '732', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '732', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "HOLGR": {
+                        "NAME": {
+                            "NAMEL": "Name"
+                        },
+                        "ADDRESS": {
+                            "ADDRL": [
+                                "Addr. str. 1",
+                                "Addr. str. 2"
+                            ],
+                            "COUNTRY": "UA"
+                        },
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_740(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (740) Ім'я та адреса представника."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Ім'я та адреса представника"
+        expected_str = f"(740)\t{inid_title}:\nName\nAddr. str. 1\nAddr. str. 2\n(UA)"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "REPGR": {
+                        "NAME": {
+                            "NAMEL": "Name"
+                        },
+                        "ADDRESS": {
+                            "ADDRL": [
+                                "Addr. str. 1",
+                                "Addr. str. 2",
+                            ],
+                            "COUNTRY": "UA"
+                        }
+                    },
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '740', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '740', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '740', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "REPGR": {
+                        "NAME": {
+                            "NAMEL": "Name"
+                        },
+                        "ADDRESS": {
+                            "ADDRL": [
+                                "Addr. str. 1",
+                                "Addr. str. 2",
+                            ],
+                            "COUNTRY": "UA"
+                        }
+                    },
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_821(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (821) Базова заявка."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Базова заявка"
+        expected_str = f"(821)\t{inid_title}: 01.03.2023, 12345"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "BASGR": {
+                        "BASAPPGR": {
+                            "BASAPPD": "2023-03-01",
+                            "BASAPPN": "12345"
+                        }
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '821', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '821', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '821', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "BASGR": {
+                        "BASAPPGR": {
+                            "BASAPPD": "2023-03-01",
+                            "BASAPPN": "12345"
+                        }
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_891(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (891) Дата територіального поширення міжнародної реєстрації."""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Дата територіального поширення міжнародної реєстрації"
+        expected_str = f"(891)\t{inid_title}: 01.03.2023"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@REGEDAT": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '891', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '891', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '891', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "@REGEDAT": "2023-03-01"
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+    def test_inid_511(self):
+        """Тестирует корректность добавления информации об
+        ИНИД (511) Індекс (індекси) МКТП та перелік товарів і послуг"""
+        # Данные присутствуют и разрешены для отображения
+        inid_title = "Індекс (індекси) МКТП та перелік товарів і послуг"
+        expected_str = f"(511)\t{inid_title}:\nКл. 01: qwe, rty, uio\nКл. 02: asd, fgh, jkl"
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "BASICGS": {
+                        "@NICEVER": "10",
+                        "GSGR": [
+                            {
+                                "@NICCLAI": "01",
+                                "GSTERMEN": "qwe, rty, uio"
+                            },
+                            {
+                                "@NICCLAI": "02",
+                                "GSTERMEN": "asd, fgh, jkl"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '511', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Данные присутствуют и не разрешены для отображения
+        inid_data = [
+            InidCode(9, '511', inid_title, 2, False)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные отсутствуют и разрешены для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {}
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = [
+            InidCode(9, '511', inid_title, 2, True)
+        ]
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertNotIn(expected_str, p.text)
+
+        # Данные присутствуют, ИНИД-кода нет в данных для отображения
+        biblio_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    "BASICGS": {
+                        "@NICEVER": "10",
+                        "GSGR": [
+                            {
+                                "@NICCLAI": "01",
+                                "GSTERMEN": "qwe, rty, uio"
+                            },
+                            {
+                                "@NICCLAI": "02",
+                                "GSTERMEN": "asd, fgh, jkl"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        inid_data = []
+        item = ReportItemDocxMadrid9(biblio_data, inid_data)
         p = item.write(self.document)
         self.assertNotIn(expected_str, p.text)
 
