@@ -672,6 +672,20 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Топографии (регистрации)
+        inid_data = [
+            InidCode(5, '111', 'Номер реєстрації', 2, True),
+            InidCode(5, '151', 'Дата реєстрації', 2, True),
+            InidCode(5, '190', 'Держава реєстрації КЗПТ', 2, True),
+            InidCode(5, '210', 'Номер заявки', 2, True),
+            InidCode(5, '220', 'Дата подання заявки', 2, True),
+            InidCode(5, '539.I', 'Назва КЗПТ', 2, True),
+            InidCode(5, '540', 'Назва товару', 2, True),
+            InidCode(5, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+            InidCode(5, '750', 'Адреса для листування', 2, True),
+        ]
+        res.extend(inid_data)
+
     elif lang == 'en':
         # ТМ регистрации
         inid_data = [

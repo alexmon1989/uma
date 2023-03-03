@@ -1104,6 +1104,176 @@ class ReportItemDocxID(ReportItemDocx):
         return self._paragraph
 
 
+class ReportItemDocxGeo(ReportItemDocx):
+    """Торговая марка."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 5
+
+    def _write_111(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (111) Номер реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '111', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Geo']['GeoDetails'].get('RegistrationNumber')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_151(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (151) Номер реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '151', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Geo']['GeoDetails'].get('RegistrationDate')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_190(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (190) Держава реєстрації КЗПТ."""
+        inid = self._get_inid(self.obj_type_id, '190', self.application_data['search_data']['obj_state'])
+        country = self.application_data['Geo']['GeoDetails'].get('RegistrationOriginCountry', [])
+        if inid and inid.visible and len(country) > 0:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(country[0]).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_210(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (210) Номер заявки."""
+        inid = self._get_inid(self.obj_type_id, '210', self.application_data['search_data']['obj_state'])
+        app_number = self.application_data['Geo']['GeoDetails'].get('ApplicationNumber', [])
+        if inid and inid.visible and app_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(app_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_220(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (220) Дата подання заявки."""
+        inid = self._get_inid(self.obj_type_id, '220', self.application_data['search_data']['obj_state'])
+        app_date = self.application_data['Geo']['GeoDetails'].get('ApplicationDate')
+        if inid and inid.visible and app_date:
+            app_date = datetime.strptime(app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(app_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_539i(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (539.I) Назва КЗПТ."""
+        inid = self._get_inid(self.obj_type_id, '539.I', self.application_data['search_data']['obj_state'])
+        product_name = self.application_data['Geo']['GeoDetails'].get('ProductName')
+        if inid and inid.visible and product_name:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(product_name).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_540(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (540) Назва товару."""
+        inid = self._get_inid(self.obj_type_id, '540', self.application_data['search_data']['obj_state'])
+        indication = self.application_data['Geo']['GeoDetails'].get('Indication')
+        if inid and inid.visible and indication:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(indication).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_732(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (732) Ім'я та адреса володільця реєстрації."""
+        inid = self._get_inid(self.obj_type_id, '732', self.application_data['search_data']['obj_state'])
+        holders = self.application_data['Geo']['GeoDetails'].get('HolderDetails', {}).get('Holder')
+        if inid and inid.visible and holders:
+            self._paragraph.add_run(f"{inid.title}:\n")
+            for holder in holders:
+                try:
+                    self._paragraph.add_run(
+                        holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        holder['HolderAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                            'FreeFormatAddressLine']
+                    )
+                except KeyError:
+                    pass
+
+                try:
+                    country = holder['HolderAddressBook']['FormattedNameAddress']['Address']['AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
+            self._paragraph.add_run('\r')
+
+    def _write_750(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (750) Адреса для листування
+        """
+        inid = self._get_inid(self.obj_type_id, '750', self.application_data['search_data']['obj_state'])
+        correspondence = self.application_data['Geo']['GeoDetails'].get(
+            'CorrespondenceAddress', {}
+        ).get(
+            'CorrespondenceAddressBook', {}
+        ).get(
+            'FormattedNameAddress'
+        )
+        if inid and inid.visible and correspondence:
+            self._paragraph.add_run(f"{inid.title}:")
+            self._paragraph.add_run('\r')
+            try:
+                self._paragraph.add_run(
+                    correspondence['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
+                ).bold = True
+            except KeyError:
+                pass
+
+            self._paragraph.add_run('\r')
+            try:
+                self._paragraph.add_run(
+                    correspondence['Address']['FreeFormatAddress']['FreeFormatAddressLine']
+                )
+            except KeyError:
+                pass
+
+            try:
+                country = correspondence['Address']['AddressCountryCode']
+                self._paragraph.add_run(
+                    f" ({country})"
+                )
+            except KeyError:
+                pass
+        self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        """Записывает информацию о геогр в абзац и возвращает его."""
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_111()
+        self._write_151()
+        self._write_190()
+        self._write_210()
+        self._write_220()
+        self._write_539i()
+        self._write_540()
+        self._write_732()
+        self._write_750()
+
+        return self._paragraph
+
+
 class ReportItemInvUMLD(ReportItemDocx):
     """Изобретения, полезные модели."""
     _paragraph: Paragraph
@@ -1493,6 +1663,7 @@ class ReportWriterDocxCreator(ReportWriterCreator):
             2: ReportItemUM,
             3: ReportItemLD,
             4: ReportItemDocxTM,
+            5: ReportItemDocxGeo,
             6: ReportItemDocxID,
             9: ReportItemDocxMadrid9,
             14: ReportItemDocxMadrid14,
