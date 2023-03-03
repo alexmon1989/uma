@@ -604,6 +604,74 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             ]
             res.extend(inid_data)
 
+        # Изобретения, полезные модели (регистрации)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер патенту', 2, True),
+                InidCode(obj_type_id, '21', 'Номер заявки', 2, True),
+                InidCode(obj_type_id, '22', 'Дата подання заявки', 2, True),
+                InidCode(obj_type_id, '24', 'Дата, з якої є чинними права', 2, True),
+                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 2, True),
+                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 2, True),
+                InidCode(obj_type_id, '33', 'Двобуквений код держави', 2, True),
+                InidCode(obj_type_id, '41', 'Дата публікації заявки', 2, True),
+                InidCode(obj_type_id, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2, True),
+                InidCode(obj_type_id, '51', 'Iндекс МПК', 2, True),
+                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 2, True),
+                InidCode(obj_type_id, '56', 'Аналоги винаходу', 2, True),
+                InidCode(obj_type_id, '62', 'Номер та дата більш ранньої заявки, з якої було виділено даний патентний документ', 2, True),
+                InidCode(obj_type_id, '71', 'Заявник', 2, True),
+                InidCode(obj_type_id, '72', 'Винахідник', 2, True),
+                InidCode(obj_type_id, '73', 'Власник', 2, True),
+                InidCode(obj_type_id, '74', 'Представник', 2, True),
+                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 2, True),
+                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 2, True),
+                InidCode(obj_type_id, '98', 'Адреса для листування', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (заявки)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '21', 'Номер заявки', 1, True),
+                InidCode(obj_type_id, '22', 'Дата подання заявки', 1, True),
+                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 1, True),
+                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 1, True),
+                InidCode(obj_type_id, '33', 'Двобуквений код держави', 1, True),
+                InidCode(obj_type_id, '41', 'Дата публікації заявки', 1, True),
+                InidCode(obj_type_id, '51', 'Iндекс МПК', 1, True),
+                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 1, True),
+                InidCode(obj_type_id, '56', 'Аналоги винаходу', 1, True),
+                InidCode(obj_type_id, '71', 'Заявник', 1, True),
+                InidCode(obj_type_id, '72', 'Винахідник', 1, True),
+                InidCode(obj_type_id, '74', 'Представник', 1, True),
+                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 1, True),
+                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 1, True),
+                InidCode(obj_type_id, '98', 'Адреса для листування', 1, True),
+            ]
+            res.extend(inid_data)
+
+        # Топографии (регистрации)
+        inid_data = [
+            InidCode(3, '11', 'Номер свідоцтва', 2, True),
+            InidCode(3, '21', 'Номер заявки', 2, True),
+            InidCode(3, '22', 'Дата подання заявки', 2, True),
+            InidCode(3, '24', 'Дата, з якої є чинними права', 2, True),
+            InidCode(3, '31', 'Номер попередньої заявки', 2, True),
+            InidCode(3, '32', 'Дата подання попередньої заявки', 2, True),
+            InidCode(3, '33', 'Двобуквений код держави', 2, True),
+            InidCode(3, '41', 'Дата публікації заявки', 2, True),
+            InidCode(3, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2,
+                     True),
+            InidCode(3, '54', 'Назва інтегральної мікросхеми', 2, True),
+            InidCode(3, '71', 'Заявник', 2, True),
+            InidCode(3, '72', 'Винахідник', 2, True),
+            InidCode(3, '73', 'Власник', 2, True),
+            InidCode(3, '74', 'Представник', 2, True),
+            InidCode(3, '98', 'Адреса для листування', 2, True),
+        ]
+        res.extend(inid_data)
+
     elif lang == 'en':
         # ТМ регистрации
         inid_data = [
@@ -710,6 +778,56 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                 InidCode(obj_type_id, '891', 'Date of territorial distribution of international registration', 2, True),
                 InidCode(obj_type_id, '540', 'Brand image', 2, True),
                 InidCode(obj_type_id, '511', 'ICCI index (s) and list of goods and services', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (регистрации)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Number of the patent, SPC or patent document', 2, True),
+                InidCode(obj_type_id, '21', 'Number assigned to the application', 2, True),
+                InidCode(obj_type_id, '22', 'Date of filing of the application', 2, True),
+                InidCode(obj_type_id, '24', 'Date from which industrial property rights may have effec', 2, True),
+                InidCode(obj_type_id, '31', 'Number assigned to priority application', 2, True),
+                InidCode(obj_type_id, '32', 'Date of filing of priority application', 2, True),
+                InidCode(obj_type_id, '33', 'Twoleter of country code', 2, True),
+                InidCode(obj_type_id, '41', 'Date of publication of application', 2, True),
+                InidCode(obj_type_id, '46', 'Bulletin number and date of publication about patents grant', 2,
+                         True),
+                InidCode(obj_type_id, '51', 'Internmational patent classification', 2, True),
+                InidCode(obj_type_id, '54', 'Title of the invention', 2, True),
+                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 2, True),
+                InidCode(obj_type_id, '62',
+                         'Number and date of the earlier application from which the present patent document has been divided up', 2,
+                         True),
+                InidCode(obj_type_id, '71', 'Applicant', 2, True),
+                InidCode(obj_type_id, '72', 'Inventor', 2, True),
+                InidCode(obj_type_id, '73', 'Name of grantee, holder, assignee or owner', 2, True),
+                InidCode(obj_type_id, '74', 'Name of attorney or agent', 2, True),
+                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 2, True),
+                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 2, True),
+                InidCode(obj_type_id, '98', 'Mailing address', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (заявки)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '21', 'Number assigned to the application', 1, True),
+                InidCode(obj_type_id, '22', 'Date of filing of the application', 1, True),
+                InidCode(obj_type_id, '31', 'Number assigned to priority application', 1, True),
+                InidCode(obj_type_id, '32', 'Date of filing of priority application', 1, True),
+                InidCode(obj_type_id, '33', 'Twoleter of country code', 1, True),
+                InidCode(obj_type_id, '41', 'Date of publication of application', 1, True),
+                InidCode(obj_type_id, '51', 'Internmational patent classification', 1, True),
+                InidCode(obj_type_id, '54', 'Title of the invention', 1, True),
+                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 1, True),
+                InidCode(obj_type_id, '71', 'Applicant', 1, True),
+                InidCode(obj_type_id, '72', 'Inventor', 1, True),
+                InidCode(obj_type_id, '74', 'Name of attorney or agent', 1, True),
+                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 1, True),
+                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 1, True),
+                InidCode(obj_type_id, '98', 'Mailing address', 1, True),
             ]
             res.extend(inid_data)
 

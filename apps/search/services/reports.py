@@ -1,5 +1,7 @@
 from apps.search.dataclasses import InidCode
+from apps.search.templatetags.search_extras import get_person_name, get_person_country
 from apps.bulletin.services import bulletin_get_number_441_code
+from templatetags.uma_extras import list_of_dicts_unique
 
 from typing import List
 from abc import ABC, abstractmethod
@@ -1102,6 +1104,346 @@ class ReportItemDocxID(ReportItemDocx):
         return self._paragraph
 
 
+class ReportItemInvUMLD(ReportItemDocx):
+    """Изобретения, полезные модели."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id: int
+    body: dict
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.application_data['search_data']['obj_state'] == 1:
+            self.body = self.application_data['Claim']
+        else:
+            self.body = self.application_data['Patent']
+
+    def _write_11(self):
+        """Записывает в документ данные об
+        ИНИД (11) Номер патенту"""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.body.get('I_11')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(str(reg_number)).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_21(self):
+        """Записывает в документ данные об
+        ИНИД (21) Номер заявки"""
+        inid = self._get_inid(self.obj_type_id, '21', self.application_data['search_data']['obj_state'])
+        app_number = self.body.get('I_21')
+        if inid and inid.visible and app_number:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(app_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_22(self):
+        """Записывает в документ данные об
+        ИНИД (22) Дата подання заявки"""
+        inid = self._get_inid(self.obj_type_id, '22', self.application_data['search_data']['obj_state'])
+        app_date = self.body.get('I_22')
+        if inid and inid.visible and app_date:
+            app_date = datetime.strptime(app_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(app_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_24(self):
+        """Записывает в документ данные об
+        ИНИД (24) Дата, з якої є чинними права"""
+        inid = self._get_inid(self.obj_type_id, '24', self.application_data['search_data']['obj_state'])
+        reg_date = self.body.get('I_24')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_31(self):
+        """Записывает в документ данные об
+        ИНИД (31) Номер попередньої заявки"""
+        inid = self._get_inid(self.obj_type_id, '31', self.application_data['search_data']['obj_state'])
+        i_30 = self.body.get('I_30')
+        if inid and inid.visible and i_30:
+            for item in i_30:
+                i_31 = item.get('I_31')
+                if i_31:
+                    self._paragraph.add_run(f"({inid.code})").bold = True
+                    self._paragraph.add_run(f"\t{inid.title}: ")
+                    self._paragraph.add_run(i_31).bold = True
+                    self._paragraph.add_run('\r')
+
+    def _write_32(self):
+        """Записывает в документ данные об
+        ИНИД (32) Дата подання попередньої заявки"""
+        inid = self._get_inid(self.obj_type_id, '32', self.application_data['search_data']['obj_state'])
+        i_30 = self.body.get('I_30')
+        if inid and inid.visible and i_30:
+            for item in i_30:
+                i_32 = item.get('I_32')
+                if i_32:
+                    i_32 = datetime.strptime(i_32, '%Y-%m-%d').strftime('%d.%m.%Y')
+                    self._paragraph.add_run(f"({inid.code})").bold = True
+                    self._paragraph.add_run(f"\t{inid.title}: ")
+                    self._paragraph.add_run(i_32).bold = True
+                    self._paragraph.add_run('\r')
+
+    def _write_33(self):
+        """Записывает в документ данные об
+        ИНИД (33) Двобуквений код держави"""
+        inid = self._get_inid(self.obj_type_id, '33', self.application_data['search_data']['obj_state'])
+        i_30 = self.body.get('I_30')
+        if inid and inid.visible and i_30:
+            for item in i_30:
+                i_33 = item.get('I_33')
+                if i_33:
+                    self._paragraph.add_run(f"({inid.code})").bold = True
+                    self._paragraph.add_run(f"\t{inid.title}: ")
+                    self._paragraph.add_run(i_33).bold = True
+                    self._paragraph.add_run('\r')
+
+    def _write_41(self):
+        """Записывает в документ данные об
+        ИНИД (41) Дата публікації заявки"""
+        inid = self._get_inid(self.obj_type_id, '41', self.application_data['search_data']['obj_state'])
+        i_43 = self.body.get('I_43.D')
+        if inid and inid.visible and i_43:
+            for item in i_43:
+                value = datetime.strptime(item, '%Y-%m-%d').strftime('%d.%m.%Y')
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(value).bold = True
+                self._paragraph.add_run('\r')
+
+    def _write_46(self):
+        """Записывает в документ данные об
+        ИНИД (46) Дата публікації відомостей про видачу патенту, номер бюлетня"""
+        inid = self._get_inid(self.obj_type_id, '46', self.application_data['search_data']['obj_state'])
+        i_45 = self.body.get('I_45.D')
+        if inid and inid.visible and i_45:
+            for item in i_45:
+                value = datetime.strptime(item, '%Y-%m-%d').strftime('%d.%m.%Y')
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(value).bold = True
+                if self.body.get('I_45_bul_str'):
+                    if self.lang_code == 'ua':
+                        self._paragraph.add_run(f", бюл. № {self.body.get('I_45_bul_str')}").bold = True
+                    else:
+                        self._paragraph.add_run(f", bul. № {self.body.get('I_45_bul_str')}").bold = True
+                self._paragraph.add_run('\r')
+
+    def _write_51(self):
+        """Записывает в документ данные об
+        ИНИД (51) Iндекс МПК"""
+        inid = self._get_inid(self.obj_type_id, '51', self.application_data['search_data']['obj_state'])
+        ipc = self.body.get('IPC')
+        if inid and inid.visible and ipc:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in ipc:
+                self._paragraph.add_run(item).bold = True
+                self._paragraph.add_run('\r')
+
+    def _write_54(self):
+        """Записывает в документ данные об
+        ИНИД (54) Назва винаходу (корисної моделі)"""
+        inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
+        i_54 = self.body.get('I_54')
+        if inid and inid.visible and i_54:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_54:
+                try:
+                    values = list(item.values())
+                    keys = list(item.keys())
+                    self._paragraph.add_run(values[0]).bold = True
+                    if 'U' in keys[0]:
+                        self._paragraph.add_run(' [UA]')
+                    elif 'E' in keys[0]:
+                        self._paragraph.add_run(' [EN]')
+                    elif 'R' in keys[0]:
+                        self._paragraph.add_run(' [RU]')
+                    self._paragraph.add_run('\r')
+                except IndexError:
+                    pass
+
+    def _write_56(self):
+        """Записывает в документ данные об
+        ИНИД (56) Аналоги винаходу"""
+        inid = self._get_inid(self.obj_type_id, '56', self.application_data['search_data']['obj_state'])
+        i_56 = self.body.get('I_56')
+        if inid and inid.visible and i_56:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_56:
+                value = item.get('I_56.A')
+                if value:
+                    self._paragraph.add_run(value).bold = True
+                    self._paragraph.add_run('\r')
+
+    def _write_85(self):
+        """Записывает в документ данные об
+        ИНИД (85) Дата входження до національної фази"""
+        inid = self._get_inid(self.obj_type_id, '85', self.application_data['search_data']['obj_state'])
+        i_85 = self.body.get('I_85')
+        if inid and inid.visible and i_85:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            i_85 = datetime.strptime(i_85, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(i_85).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_86(self):
+        """Записывает в документ данные об
+        ИНИД (86) Номер та дата подання заявки РСТ"""
+        inid = self._get_inid(self.obj_type_id, '86', self.application_data['search_data']['obj_state'])
+        i_86 = self.body.get('I_86')
+        if inid and inid.visible and i_86:
+            for item in i_86:
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}:\n")
+                i_86_number = item.get('I_86.N')
+                if i_86_number:
+                    self._paragraph.add_run(i_86_number).bold = True
+                i_86_date = item.get('I_86.D')
+                if i_86_date:
+                    i_86_date = datetime.strptime(i_86_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                    self._paragraph.add_run(f", {i_86_date}").bold = True
+                self._paragraph.add_run('\r')
+
+    def _write_71(self):
+        """Записывает в документ данные об
+        ИНИД (71) Заявник"""
+        inid = self._get_inid(self.obj_type_id, '71', self.application_data['search_data']['obj_state'])
+        i_71 = self.body.get('I_71')
+        if inid and inid.visible and i_71:
+            i_71 = list_of_dicts_unique(i_71)
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_71:
+                person_name = get_person_name(item)
+                person_country = get_person_country(item)
+                self._paragraph.add_run(person_name).bold = True
+                self._paragraph.add_run(f" ({person_country})")
+                self._paragraph.add_run('\r')
+
+    def _write_72(self):
+        """Записывает в документ данные об
+        ИНИД (72) Винахідник"""
+        inid = self._get_inid(self.obj_type_id, '72', self.application_data['search_data']['obj_state'])
+        i_72 = self.body.get('I_72')
+        if inid and inid.visible and i_72:
+            i_72 = list_of_dicts_unique(i_72)
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_72:
+                person_name = get_person_name(item)
+                person_country = get_person_country(item)
+                self._paragraph.add_run(person_name).bold = True
+                self._paragraph.add_run(f" ({person_country})")
+                self._paragraph.add_run('\r')
+
+    def _write_73(self):
+        """Записывает в документ данные об
+        ИНИД (73) Власник"""
+        inid = self._get_inid(self.obj_type_id, '73', self.application_data['search_data']['obj_state'])
+        i_73 = self.body.get('I_73')
+        if inid and inid.visible and i_73:
+            i_73 = list_of_dicts_unique(i_73)
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_73:
+                person_name = get_person_name(item)
+                person_country = get_person_country(item)
+                self._paragraph.add_run(person_name).bold = True
+                self._paragraph.add_run(f" ({person_country})")
+                self._paragraph.add_run('\r')
+
+    def _write_74(self):
+        """Записывает в документ данные об
+        ИНИД (74) Представник"""
+        inid = self._get_inid(self.obj_type_id, '74', self.application_data['search_data']['obj_state'])
+        i_74 = self.body.get('I_74')
+        if inid and inid.visible and i_74:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(i_74).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_98(self):
+        """Записывает в документ данные об
+        ИНИД (98) Адреса для листування"""
+        inid = self._get_inid(self.obj_type_id, '98', self.application_data['search_data']['obj_state'])
+        i_98 = self.body.get('I_98')
+        if inid and inid.visible and i_98:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(i_98).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_62(self):
+        """Записывает в документ данные об
+        ИНИД (62) Номер та дата більш ранньої заявки, з якої було виділено даний патентний документ"""
+        inid = self._get_inid(self.obj_type_id, '62', self.application_data['search_data']['obj_state'])
+        i_62 = self.body.get('i_62')
+        if inid and inid.visible and i_62:
+            for item in i_62:
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}:\n")
+                i_62_number = item.get('I_62.N')
+                self._paragraph.add_run(i_62_number).bold = True
+                i_62_date = item.get('I_62.D')
+                if i_62_date:
+                    i_62_date = datetime.strptime(i_62_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                    self._paragraph.add_run(f", {i_62_date}").bold = True
+                self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_11()
+        self._write_21()
+        self._write_22()
+        self._write_24()
+        self._write_31()
+        self._write_32()
+        self._write_33()
+        self._write_41()
+        self._write_46()
+        self._write_51()
+        self._write_54()
+        self._write_56()
+        self._write_62()
+        self._write_85()
+        self._write_86()
+        self._write_71()
+        self._write_72()
+        self._write_73()
+        self._write_74()
+        self._write_98()
+
+        return self._paragraph
+
+
+class ReportItemInv(ReportItemInvUMLD):
+    obj_type_id = 1
+
+
+class ReportItemUM(ReportItemInvUMLD):
+    obj_type_id = 2
+
+
+class ReportItemLD(ReportItemInvUMLD):
+    obj_type_id = 3
+
+
 class ReportWriter(ABC):
     """Интерфейс создателя файла отчёта."""
     items: List[ReportItem]
@@ -1137,6 +1479,7 @@ class ReportWriterCreator(ABC):
 
         :param applications список заявок
         :param inid_data список кодов инид
+        :param lang_code языковой код
         """
         raise NotImplemented
 
@@ -1146,6 +1489,9 @@ class ReportWriterDocxCreator(ReportWriterCreator):
     @staticmethod
     def create(applications: List[dict], inid_data: List[InidCode], lang_code: str = 'ua') -> ReportWriterDocx:
         report_item_classes = {
+            1: ReportItemInv,
+            2: ReportItemUM,
+            3: ReportItemLD,
             4: ReportItemDocxTM,
             6: ReportItemDocxID,
             9: ReportItemDocxMadrid9,
