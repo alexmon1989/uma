@@ -458,13 +458,11 @@ def download_transactions(request, format_: str):
 
     if format_ == 'docx':
         task = tasks.create_transactions_search_results_file_docx.delay(
-            request.user.pk,
             get_params,
             lang
         )
     else:  # xlsx
         task = tasks.create_transactions_search_results_file_xlsx.delay(
-            request.user.pk,
             get_params,
             lang
         )

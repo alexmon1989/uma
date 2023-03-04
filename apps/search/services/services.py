@@ -672,7 +672,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
-        # Топографии (регистрации)
+        # Географічні зазначення (регистрации)
         inid_data = [
             InidCode(5, '111', 'Номер реєстрації', 2, True),
             InidCode(5, '151', 'Дата реєстрації', 2, True),
@@ -685,6 +685,36 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '750', 'Адреса для листування', 2, True),
         ]
         res.extend(inid_data)
+
+        # Авт. право (регистрации)
+        for obj_type_id in [10, 13]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер свідоцтва про реєстрацію авторського права на твір', 2, True),
+                InidCode(obj_type_id, '15', 'Дата реєстрації авторського права', 2, True),
+                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
+                InidCode(obj_type_id, '45.D', 'Дата публікації', 2, True),
+                InidCode(obj_type_id, '45.N', 'Номер бюлетеня', 2, True),
+                InidCode(obj_type_id, '54', 'Вид, повна та скорочена назва твору (творів)', 2, True),
+                InidCode(obj_type_id, '57', 'Анотація', 2, True),
+                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів), чи позначення «Анонімно»', 2, True),
+                InidCode(obj_type_id, '58', 'Вихідні дані для оприлюднених творів', 2, True),
+                InidCode(obj_type_id, '77', 'Повне ім\'я або повне офіційне найменування роботодавця', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Договора авт. право (регистрации)
+        for obj_type_id in [11, 12]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер реєстрації договору', 2, True),
+                InidCode(obj_type_id, '15', 'Дата реєстрації договору', 2, True),
+                InidCode(obj_type_id, '27', 'Вид договору', 2, True),
+                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
+                InidCode(obj_type_id, '54', 'Вид, повна та скорочена назва твору (творів)', 2, True),
+                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів) твору', 2, True),
+                InidCode(obj_type_id, '75', 'Повне ім\'я фізичної(их) або повне офіційне найменування юридичної(их) '
+                                            'особи (осіб), сторін договору', 2, True),
+            ]
+            res.extend(inid_data)
 
     elif lang == 'en':
         # ТМ регистрации
@@ -845,4 +875,69 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             ]
             res.extend(inid_data)
 
+        # Топографии (регистрации)
+        inid_data = [
+            InidCode(3, '11', 'Number of the patent, SPC or patent document', 2, True),
+            InidCode(3, '21', 'Number assigned to the application', 2, True),
+            InidCode(3, '22', 'Date of filing of the application', 2, True),
+            InidCode(3, '24', 'Date from which industrial property rights may have effect', 2, True),
+            InidCode(3, '31', 'Number assigned to priority application', 2, True),
+            InidCode(3, '32', 'Date of filing of priority application', 2, True),
+            InidCode(3, '33', 'Twoleter of country code', 2, True),
+            InidCode(3, '41', 'Date of publication of application', 2, True),
+            InidCode(3, '46', 'Bulletin number and date of publication about patents grant', 2,
+                     True),
+            InidCode(3, '54', 'Title of Integral micro ciquit', 2, True),
+            InidCode(3, '71', 'Applicant', 2, True),
+            InidCode(3, '72', 'Inventor', 2, True),
+            InidCode(3, '73', 'Name of grantee, holder, assignee or owner', 2, True),
+            InidCode(3, '74', 'Name of attorney or agent', 2, True),
+            InidCode(3, '98', 'Mailing address', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Географічні зазначення (регистрации)
+        inid_data = [
+            InidCode(5, '111', 'Registration number', 2, True),
+            InidCode(5, '151', 'Date of the registration', 2, True),
+            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 2, True),
+            InidCode(5, '210', 'Application number', 2, True),
+            InidCode(5, '220', 'Date of filing of the application', 2, True),
+            InidCode(5, '539.I', 'Title of the qualified indication of origin of the product', 2, True),
+            InidCode(5, '540', 'Name of the product', 2, True),
+            InidCode(5, '732', 'Name and address of the holder of the registration', 2, True),
+            InidCode(5, '750', 'Address for correspondence', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Авт. право (регистрации)
+        for obj_type_id in [10, 13]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'The number of the copyright registration certificate for the office work',
+                         2, True),
+                InidCode(obj_type_id, '15', 'Copyright registration date', 2, True),
+                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
+                InidCode(obj_type_id, '45.D', 'Date of publication', 2, True),
+                InidCode(obj_type_id, '45.N', 'Bulletin number', 2, True),
+                InidCode(obj_type_id, '54', 'Type, full and abbreviated title of the work (works)', 2, True),
+                InidCode(obj_type_id, '57', 'Annotation', 2, True),
+                InidCode(obj_type_id, '72', 'Name(s) of the creator(s) if known to be such', 2, True),
+                InidCode(obj_type_id, '58', 'Initial data for published works', 2, True),
+                InidCode(obj_type_id, '77', 'Name(s) and address(es) of the Employer(s)', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Договора авт. право (регистрации)
+        for obj_type_id in [11, 12]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Agreement registration number', 2, True),
+                InidCode(obj_type_id, '15', 'Agreement registration date', 2, True),
+                InidCode(obj_type_id, '27', 'Kind of agreement', 2, True),
+                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
+                InidCode(obj_type_id, '54', 'Type, full and abbreviated title of the work (works)', 2, True),
+                InidCode(obj_type_id, '72', 'Name(s) of the creator(s)', 2, True),
+                InidCode(obj_type_id, '75', 'Name of the natural person(s) or full official name of the legal '
+                                            'entity(ies), parties to the agreement', 2, True),
+            ]
+            res.extend(inid_data)
     return res

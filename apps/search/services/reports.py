@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime
 
 from docx import Document
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
 
 from django.conf import settings
@@ -372,7 +372,7 @@ class ReportItemDocxTM(ReportItemDocx):
                 )
             except KeyError:
                 pass
-        self._paragraph.add_run('\r')
+            self._paragraph.add_run('\r')
 
     def _write_591(self) -> None:
         """
@@ -438,7 +438,7 @@ class ReportItemDocxTM(ReportItemDocx):
                 self._paragraph.add_run(', бюл. №').bold = True
             else:
                 self._paragraph.add_run(', bul. №').bold = True
-            self._paragraph.add_run(bul_number).bold = True
+            self._paragraph.add_run(str(bul_number)).bold = True
             self._paragraph.add_run()
             self._paragraph.add_run('\r')
 
@@ -715,7 +715,7 @@ class ReportItemDocxID(ReportItemDocx):
     def _write_21(self) -> None:
         """Записывает в документ данные об ИНИД (21) Номер заявки."""
         inid = self._get_inid(self.obj_type_id, '21', self.application_data['search_data']['obj_state'])
-        app_number = self.application_data['Design']['DesignDetails'].get('DesignApplicationNumber')
+        app_number = self.application_data['search_data']['app_number']
         if inid and inid.visible and app_number:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -1283,10 +1283,13 @@ class ReportItemInvUMLD(ReportItemDocx):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.application_data['search_data']['obj_state'] == 1:
-            self.body = self.application_data['Claim']
-        else:
-            self.body = self.application_data['Patent']
+        try:
+            if self.application_data['search_data']['obj_state'] == 1:
+                self.body = self.application_data['Claim']
+            else:
+                self.body = self.application_data['Patent']
+        except KeyError:
+            self.body = {}
 
     def _write_11(self):
         """Записывает в документ данные об
@@ -1303,7 +1306,7 @@ class ReportItemInvUMLD(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (21) Номер заявки"""
         inid = self._get_inid(self.obj_type_id, '21', self.application_data['search_data']['obj_state'])
-        app_number = self.body.get('I_21')
+        app_number = self.application_data['search_data']['app_number']
         if inid and inid.visible and app_number:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -1614,6 +1617,369 @@ class ReportItemLD(ReportItemInvUMLD):
     obj_type_id = 3
 
 
+class ReportItemCopyright(ReportItemDocx):
+    """Авторське право на твір"""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 10
+
+    def _write_11(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (11) Номер свідоцтва про реєстрацію авторського права на твір."""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Certificate']['CopyrightDetails'].get('RegistrationNumber')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_15(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (15) Дата реєстрації авторського права."""
+        inid = self._get_inid(self.obj_type_id, '15', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Certificate']['CopyrightDetails'].get('RegistrationDate')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_29(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (29) Об'єкт авторського права, до якого належить твір."""
+        inid = self._get_inid(self.obj_type_id, '29', self.application_data['search_data']['obj_state'])
+        obj_kind = self.application_data['Certificate']['CopyrightDetails'].get(
+            'CopyrightObjectKindDetails', {}
+        ).get('CopyrightObjectKind')
+        if inid and inid.visible and obj_kind and len(obj_kind) > 0:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(obj_kind[0]['CopyrightObjectKindName']).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_45d(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (45) Дата публікації"""
+        inid = self._get_inid(self.obj_type_id, '45.D', self.application_data['search_data']['obj_state'])
+        pub_date = self.application_data['Certificate']['CopyrightDetails'].get(
+            'PublicationDetails', {}
+        ).get(
+            'Publication', {}
+        ).get('PublicationDate')
+        if inid and inid.visible and pub_date:
+            pub_date = datetime.strptime(pub_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(pub_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_45n(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (45) Номер бюлетеня"""
+        inid = self._get_inid(self.obj_type_id, '45.N', self.application_data['search_data']['obj_state'])
+        pub_number = self.application_data['Certificate']['CopyrightDetails'].get(
+            'PublicationDetails', {}
+        ).get(
+            'Publication', {}
+        ).get('PublicationNumber')
+        if inid and inid.visible and pub_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(pub_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_54(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Вид, повна та скорочена назва твору (творів)"""
+        inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
+        name = self.application_data['Certificate']['CopyrightDetails'].get('Name')
+        if inid and inid.visible and name:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(name).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_57(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (57) Анотація"""
+        inid = self._get_inid(self.obj_type_id, '57', self.application_data['search_data']['obj_state'])
+        annotation = self.application_data['Certificate']['CopyrightDetails'].get('Annotation')
+        if inid and inid.visible and annotation:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(annotation).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_58(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (58) Вихідні дані для оприлюднених творів"""
+        inid = self._get_inid(self.obj_type_id, '58', self.application_data['search_data']['obj_state'])
+        promulgation = self.application_data['Certificate']['CopyrightDetails'].get('PromulgationData')
+        if inid and inid.visible and promulgation:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(promulgation).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_72(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (72) Повне ім'я та/або псевдонім автора (авторів), чи позначення «Анонімно»"""
+        inid = self._get_inid(self.obj_type_id, '72', self.application_data['search_data']['obj_state'])
+        authors = self.application_data['Certificate']['CopyrightDetails'].get(
+            'AuthorDetails', {}
+        ).get(
+            'Author'
+        )
+        if inid and inid.visible and authors:
+            self._paragraph.add_run(f"{inid.title}:")
+            for author in authors:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                if self.application_data['search_data']['obj_state'] == 2:
+                    self._paragraph.add_run('\r')
+                    try:
+                        self._paragraph.add_run(
+                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                                'FreeFormatAddressLine']
+                        )
+                    except KeyError:
+                        pass
+
+                    try:
+                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                            'AddressCountryCode']
+                        self._paragraph.add_run(
+                            f" ({country})"
+                        )
+                    except KeyError:
+                        pass
+            self._paragraph.add_run('\r')
+
+    def _write_77(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (77) Повне ім'я або повне офіційне найменування роботодавця"""
+        inid = self._get_inid(self.obj_type_id, '77', self.application_data['search_data']['obj_state'])
+        employers = self.application_data['Certificate']['CopyrightDetails'].get(
+            'EmployerDetails', {}
+        ).get(
+            'Employer'
+        )
+        if inid and inid.visible and employers:
+            self._paragraph.add_run(f"{inid.title}:")
+            for employer in employers:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        employer['EmployerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                if self.application_data['search_data']['obj_state'] == 2:
+                    self._paragraph.add_run('\r')
+                    try:
+                        self._paragraph.add_run(
+                            employer['EmployerAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                                'FreeFormatAddressLine']
+                        )
+                    except KeyError:
+                        pass
+
+                    try:
+                        country = employer['EmployerAddressBook']['FormattedNameAddress']['Address'][
+                            'AddressCountryCode']
+                        self._paragraph.add_run(
+                            f" ({country})"
+                        )
+                    except KeyError:
+                        pass
+            self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_11()
+        self._write_15()
+        self._write_29()
+        self._write_45d()
+        self._write_45n()
+        self._write_54()
+        self._write_57()
+        self._write_58()
+        self._write_72()
+        self._write_77()
+
+        return self._paragraph
+
+
+class ReportItemCopyrightOfficialWork(ReportItemCopyright):
+    """Авторське право на службовий твір."""
+    obj_type_id = 13
+
+
+class ReportItemAgreement(ReportItemDocx):
+    """Авторське право (договір)"""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 11
+
+    def _write_11(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (11) Номер реєстрації договору."""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Decision']['DecisionDetails'].get('RegistrationNumber')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_15(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (15) Дата реєстрації договору."""
+        inid = self._get_inid(self.obj_type_id, '15', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Decision']['DecisionDetails'].get('RegistrationDate')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_27(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (27) Вид договору."""
+        inid = self._get_inid(self.obj_type_id, '27', self.application_data['search_data']['obj_state'])
+        reg_kind = self.application_data['Decision']['DecisionDetails'].get('RegistrationKind')
+        if inid and inid.visible and reg_kind:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_kind).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_29(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (29) Об'єкт авторського права, до якого належить твір."""
+        inid = self._get_inid(self.obj_type_id, '29', self.application_data['search_data']['obj_state'])
+        obj_kind = self.application_data['Decision']['DecisionDetails'].get(
+            'CopyrightObjectKindDetails', {}
+        ).get('CopyrightObjectKind')
+        if inid and inid.visible and obj_kind and len(obj_kind) > 0:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(obj_kind[0]['CopyrightObjectKindName']).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_54(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Вид, повна та скорочена назва твору (творів)"""
+        inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
+        name = self.application_data['Decision']['DecisionDetails'].get('Name')
+        if inid and inid.visible and name:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(name).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_72(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (72) Повне ім'я та/або псевдонім автора (авторів), чи позначення «Анонімно»"""
+        inid = self._get_inid(self.obj_type_id, '72', self.application_data['search_data']['obj_state'])
+        authors = self.application_data['Decision']['DecisionDetails'].get(
+            'AuthorDetails', {}
+        ).get(
+            'Author'
+        )
+        if inid and inid.visible and authors:
+            self._paragraph.add_run(f"{inid.title}:")
+            for author in authors:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                if self.application_data['search_data']['obj_state'] == 2:
+                    self._paragraph.add_run('\r')
+                    try:
+                        self._paragraph.add_run(
+                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                                'FreeFormatAddressLine']
+                        )
+                    except KeyError:
+                        pass
+
+                    try:
+                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                            'AddressCountryCode']
+                        self._paragraph.add_run(
+                            f" ({country})"
+                        )
+                    except KeyError:
+                        pass
+            self._paragraph.add_run('\r')
+
+    def _write_75(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (75) Повне ім'я фізичної(их) або повне офіційне найменування юридичної(их) особи (осіб), сторін договору"""
+        inid = self._get_inid(self.obj_type_id, '75', self.application_data['search_data']['obj_state'])
+
+        licensors = self.application_data['Decision']['DecisionDetails'].get(
+            'LicensorDetails', {}
+        ).get(
+            'Licensor'
+        )
+        licensees = self.application_data['Decision']['DecisionDetails'].get(
+            'LicenseeDetails', {}
+        ).get(
+            'Licensee'
+        )
+
+        if inid and inid.visible and licensors and licensees:
+            self._paragraph.add_run(f"{inid.title}:\n")
+
+            for i, licensor in enumerate(licensors):
+                try:
+                    self._paragraph.add_run(
+                        licensor['LicensorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                    if i < len(licensors) - 1:
+                        self._paragraph.add_run('; ')
+                except KeyError:
+                    pass
+            self._paragraph.add_run(' - ')
+            for i, licensee in enumerate(licensees):
+                try:
+                    self._paragraph.add_run(
+                        licensee['LicenseeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                    if i < len(licensors) - 1:
+                        self._paragraph.add_run('; ')
+                except KeyError:
+                    pass
+
+    def write(self, document: Document) -> Paragraph:
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_11()
+        self._write_15()
+        self._write_27()
+        self._write_29()
+        self._write_54()
+        self._write_72()
+        self._write_75()
+
+        return self._paragraph
+
+
+class ReportItemAgreementTransfer(ReportItemAgreement):
+    obj_type_id = 12
+
+
 class ReportWriter(ABC):
     """Интерфейс создателя файла отчёта."""
     items: List[ReportItem]
@@ -1629,13 +1995,134 @@ class ReportWriter(ABC):
 class ReportWriterDocx(ReportWriter):
     """Создатель файла отчёта в формате docx."""
     items: List[ReportItemDocx]
+    _obj_type_titles = [
+        {
+            'obj_type_id': 1,
+            'obj_state': 1,
+            'ua': 'Заявка на винахід',
+            'en': 'Invention Application',
+        },
+        {
+            'obj_type_id': 1,
+            'obj_state': 2,
+            'ua': 'Патент на винахід',
+            'en': 'Invention Patent ',
+        },
+        {
+            'obj_type_id': 2,
+            'obj_state': 1,
+            'ua': 'Заявка на корисну модель',
+            'en': 'Utility Model Application',
+        },
+        {
+            'obj_type_id': 2,
+            'obj_state': 1,
+            'ua': 'Патент на корисну модель',
+            'en': 'Utility Model Patent',
+        },
+        {
+            'obj_type_id': 3,
+            'obj_state': 2,
+            'ua': 'Свідоцтво України на топографію (компонування) ІМС',
+            'en': 'Certificate of Ukraine on topography (layout) of IC',
+        },
+        {
+            'obj_type_id': 4,
+            'obj_state': 1,
+            'ua': 'Заявка на торговельну марку',
+            'en': 'Trademark Application',
+        },
+        {
+            'obj_type_id': 4,
+            'obj_state': 2,
+            'ua': 'Свідоцтво України на торговельну марку',
+            'en': 'Trademark certificate of Ukraine',
+        },
+        {
+            'obj_type_id': 5,
+            'obj_state': 2,
+            'ua': 'Свідоцтво на використання географічного зазначення',
+            'en': 'Certificate of using of a geographical indications',
+        },
+        {
+            'obj_type_id': 6,
+            'obj_state': 1,
+            'ua': 'Заявка на промисловий зразок',
+            'en': 'Industrial design Application',
+        },
+        {
+            'obj_type_id': 6,
+            'obj_state': 2,
+            'ua': 'Патент України на промисловий зразок',
+            'en': 'Patent of Ukraine for industrial design',
+        },
+        {
+            'obj_type_id': 9,
+            'obj_state': 2,
+            'ua': 'Міжнародна реєстрація торговельної марки з поширенням на територію України',
+            'en': 'International trademark registration with distribution to the territory of Ukraine',
+        },
+        {
+            'obj_type_id': 10,
+            'obj_state': 2,
+            'ua': 'Авторське право на твір',
+            'en': 'Copyright to the work',
+        },
+        {
+            'obj_type_id': 11,
+            'obj_state': 2,
+            'ua': 'Договір про передачу права на використання твору',
+            'en': 'Agreement on the transfer of the right to use the work',
+        },
+        {
+            'obj_type_id': 12,
+            'obj_state': 2,
+            'ua': 'Договір про передачу (відчуження) майнових прав на твір',
+            'en': 'Agreement on the transfer (alienation) of property rights to the work',
+        },
+        {
+            'obj_type_id': 13,
+            'obj_state': 2,
+            'ua': 'Авторське право на службовий твір',
+            'en': 'Copyright for an official work',
+        },
+        {
+            'obj_type_id': 14,
+            'obj_state': 2,
+            'ua': 'Міжнародна реєстрація торговельної марки, що зареєстрована в Україні',
+            'en': 'International trademark registration registered in Ukraine',
+        },
+    ]
+
+    def _set_font(self, document: Document(), font_name='Times New Roman'):
+        style = document.styles['Normal']
+        font = style.font
+        font.name = font_name
+        font.size = Pt(12)
+
+        for paragraph in document.paragraphs:
+            paragraph.style = document.styles['Normal']
+
+    def _get_obj_type_title(self, obj_type_id: int, obj_state: int, lang_code: str) -> str:
+        for item in self._obj_type_titles:
+            if item['obj_type_id'] == obj_type_id and item['obj_state'] == obj_state:
+                return item[lang_code]
+        return ''
 
     def generate(self, file_path: Path):
         document = Document()
         for i, item in enumerate(self.items):
             p = document.add_paragraph()
-            p.add_run(f"{str(i + 1)}.").bold = True
+            p.add_run(f"{str(i + 1)}. ").bold = True
+            obj_type_title = self._get_obj_type_title(
+                item.application_data['Document']['idObjType'],
+                item.application_data['search_data']['obj_state'],
+                item.lang_code,
+            )
+            if obj_type_title:
+                p.add_run(f" {obj_type_title}").bold = True
             item.write(document)
+        self._set_font(document)
         document.save(str(file_path))
 
 
@@ -1666,17 +2153,18 @@ class ReportWriterDocxCreator(ReportWriterCreator):
             5: ReportItemDocxGeo,
             6: ReportItemDocxID,
             9: ReportItemDocxMadrid9,
+            10: ReportItemCopyright,
+            11: ReportItemAgreement,
+            12: ReportItemAgreementTransfer,
+            13: ReportItemCopyrightOfficialWork,
             14: ReportItemDocxMadrid14,
         }
         report_items = []
         for app in applications:
-            try:
-                report_item = report_item_classes[app['Document']['idObjType']](
-                    application_data=app,
-                    ipc_fields=inid_data,
-                    lang_code=lang_code,
-                )
-                report_items.append(report_item)
-            except KeyError:
-                continue
+            report_item = report_item_classes[app['Document']['idObjType']](
+                application_data=app,
+                ipc_fields=inid_data,
+                lang_code=lang_code,
+            )
+            report_items.append(report_item)
         return ReportWriterDocx(items=report_items)

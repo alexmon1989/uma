@@ -631,9 +631,13 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             # Получение заявок и фильтрация данных
-            applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
+            applications = []
+            for application in s.params(size=1000, preserve_order=True).scan():
+                res = application.to_dict()
+                res['meta'] = application.meta.to_dict()
+                applications.append(filter_app_data(res, user))
 
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
@@ -734,7 +738,7 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
                           'Certificate'])
 
@@ -797,9 +801,13 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             # Получение заявок и фильтрация данных
-            applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
+            applications = []
+            for application in s.params(size=1000, preserve_order=True).scan():
+                res = application.to_dict()
+                res['meta'] = application.meta.to_dict()
+                applications.append(filter_app_data(res, user))
 
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
@@ -857,7 +865,7 @@ def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
                           'Certificate'])
 
@@ -898,7 +906,7 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
-        if s and s.count() <= 5000:
+        if s and s.count() <= 500:
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
 
@@ -927,7 +935,7 @@ def create_transactions_search_results_file_xlsx(get_params, lang_code):
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
-        if s and s.count() <= 5000:
+        if s and s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
 
             # Сортировка
