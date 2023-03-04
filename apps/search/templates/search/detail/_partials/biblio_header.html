@@ -6,7 +6,12 @@
     <div class="d-flex">
         {% include 'search/detail/_partials/favorites_icon.html' %}
 
-        <button class="btn btn-sm u-btn-bluegray"
+        <button class="btn btn-sm u-btn-brown file-download-btn"
+                data-task-create-url="{% url 'search:download_details_docx' id_app_number=hit.meta.id %}"
+                title="{% trans "Експорт в MS Word (.docx)" %}"
+        ><i class="fa fa-file-word-o"></i></button>
+
+        <button class="btn btn-sm u-btn-bluegray g-ml-5"
                 id="biblio-print-btn"
                 title="{% trans "Роздрукувати бібліографічні дані об'єкта" %}"
         ><i class="fa fa-print"></i></button>
