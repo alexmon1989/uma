@@ -1735,6 +1735,15 @@ class ReportItemCopyright(ReportItemDocx):
                     ).bold = True
                 except KeyError:
                     pass
+
+                try:
+                    country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
             self._paragraph.add_run('\r')
 
     def _write_77(self) -> None:
@@ -1755,6 +1764,15 @@ class ReportItemCopyright(ReportItemDocx):
                         employer['EmployerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                             'FreeFormatNameDetails']['FreeFormatNameLine']
                     ).bold = True
+                except KeyError:
+                    pass
+
+                try:
+                    country = employer['EmployerAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
                 except KeyError:
                     pass
             self._paragraph.add_run('\r')
@@ -1859,6 +1877,15 @@ class ReportItemAgreement(ReportItemDocx):
                         author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                             'FreeFormatNameDetails']['FreeFormatNameLine']
                     ).bold = True
+                except KeyError:
+                    pass
+
+                try:
+                    country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
                 except KeyError:
                     pass
             self._paragraph.add_run('\r')
