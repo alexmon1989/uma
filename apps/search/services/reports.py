@@ -1735,25 +1735,6 @@ class ReportItemCopyright(ReportItemDocx):
                     ).bold = True
                 except KeyError:
                     pass
-
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
             self._paragraph.add_run('\r')
 
     def _write_77(self) -> None:
@@ -1776,25 +1757,6 @@ class ReportItemCopyright(ReportItemDocx):
                     ).bold = True
                 except KeyError:
                     pass
-
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            employer['EmployerAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = employer['EmployerAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
             self._paragraph.add_run('\r')
 
     def write(self, document: Document) -> Paragraph:
@@ -1899,25 +1861,6 @@ class ReportItemAgreement(ReportItemDocx):
                     ).bold = True
                 except KeyError:
                     pass
-
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
             self._paragraph.add_run('\r')
 
     def _write_75(self) -> None:
