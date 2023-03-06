@@ -874,13 +874,19 @@ class ReportItemDocxID(ReportItemDocx):
             self._paragraph.add_run(f"\t{inid.title}:")
             for i, item in enumerate(specimen_details):
                 if 'Colors' in item:
-                    self._paragraph.add_run('\r')
-                    self._paragraph.add_run(f"{i + 1}-й варіант - {item['Colors']['Color']}").bold = True
+                    self._paragraph.add_run('\n')
+                    self._paragraph.add_run(f"{i + 1}-й варіант - ")
+                    if isinstance(item['Colors'], list):
+                        for color in item['Colors']:
+                            self._paragraph.add_run(f"{color['Color']}; ").bold = True
+                    else:
+                        self._paragraph.add_run(f"{item['Colors']['Color']}").bold = True
             self._paragraph.add_run("\r")
 
             for specimen in specimen_details:
                 for image in specimen['DesignSpecimen']:
-                    self._paragraph.add_run(image['SpecimenIndex'])
+                    specimen_index = str(image.get('SpecimenIndex', image.get('SpecimenIdentifier', '')))
+                    self._paragraph.add_run(specimen_index)
                     self._paragraph.add_run(':\r')
                     path = Path(self.application_data['Document']['filesPath'].replace('\\', '/'))
                     parts_len = len(path.parts)
