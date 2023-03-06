@@ -889,9 +889,10 @@ class ReportItemDocxID(ReportItemDocx):
                     mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
                     mark_image_filepath /= path.parts[parts_len - 1]
                     mark_image_filepath /= image['SpecimenFilename']
-                    run = self._paragraph.add_run()
-                    run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-                    self._paragraph.add_run('\r')
+                    if mark_image_filepath.exists():
+                        run = self._paragraph.add_run()
+                        run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                        self._paragraph.add_run('\r')
 
     def _write_71(self) -> None:
         """
