@@ -399,27 +399,27 @@ class ReportItemDocxTM(ReportItemDocx):
         данные об ИНИД (511) Індекси Ніццької класифікації
         """
         inid = self._get_inid(self.obj_type_id, '511', self.application_data['search_data']['obj_state'])
-        goods = self.application_data['TradeMark']['TrademarkDetails'].get(
-            'GoodsServicesDetails', {}
-        ).get(
-            'GoodsServices', {}
-        ).get(
-            'ClassDescriptionDetails', {}
-        ).get(
-            'ClassDescription'
-        )
-        if inid and inid.visible and goods:
-            self._paragraph.add_run(f"({inid.code})").bold = True
-            goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
-            self._paragraph.add_run(f"\t{inid.title}: ")
-            self._paragraph.add_run(goods_classes_str).bold = True
-            for item in goods:
+        if 'GoodsServicesDetails' in self.application_data['TradeMark']['TrademarkDetails'] and \
+                self.application_data['TradeMark']['TrademarkDetails']['GoodsServicesDetails'] is not None:
+            goods = self.application_data['TradeMark']['TrademarkDetails']['GoodsServicesDetails'].get(
+                'GoodsServices', {}
+            ).get(
+                'ClassDescriptionDetails', {}
+            ).get(
+                'ClassDescription'
+            )
+            if inid and inid.visible and goods:
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(goods_classes_str).bold = True
+                for item in goods:
+                    self._paragraph.add_run('\r')
+                    self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
+                    terms = item['ClassificationTermDetails']['ClassificationTerm']
+                    values_str = '; '.join([x['ClassificationTermText'] for x in terms])
+                    self._paragraph.add_run(values_str)
                 self._paragraph.add_run('\r')
-                self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
-                terms = item['ClassificationTermDetails']['ClassificationTerm']
-                values_str = '; '.join([x['ClassificationTermText'] for x in terms])
-                self._paragraph.add_run(values_str)
-            self._paragraph.add_run('\r')
 
     def _write_441(self) -> None:
         """Записывает в документ данные об ИНИД (441) Дата публікації відомостей про заявку та номер бюлетня."""
