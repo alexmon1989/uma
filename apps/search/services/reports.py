@@ -75,7 +75,7 @@ class ReportItemDocxTM(ReportItemDocx):
                 run = self._paragraph.add_run()
                 run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                 self._paragraph.add_run('\r')
-            except UnrecognizedImageError:
+            except (UnrecognizedImageError, ZeroDivisionError):
                 pass
 
     def _write_111(self) -> None:
@@ -538,7 +538,7 @@ class ReportItemDocxMadrid(ReportItemDocx):
                     run = self._paragraph.add_run()
                     run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                     self._paragraph.add_run('\r')
-                except UnrecognizedImageError:
+                except (UnrecognizedImageError, ZeroDivisionError):
                     pass
 
     def _write_151(self) -> None:
@@ -875,7 +875,6 @@ class ReportItemDocxID(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (55) Назва промислового зразка."""
         inid = self._get_inid(self.obj_type_id, '55', self.application_data['search_data']['obj_state'])
-        print(self.application_data['search_data']['app_number'])
         specimen_details = self.application_data['Design']['DesignDetails'].get('DesignSpecimenDetails')
         if inid and inid.visible and specimen_details:
             self._paragraph.add_run(f"({inid.code})").bold = True
@@ -908,7 +907,7 @@ class ReportItemDocxID(ReportItemDocx):
                             run = self._paragraph.add_run()
                             run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                             self._paragraph.add_run('\r')
-                        except UnrecognizedImageError:
+                        except (UnrecognizedImageError, ZeroDivisionError):
                             pass
 
     def _write_71(self) -> None:
