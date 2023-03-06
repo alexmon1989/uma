@@ -154,6 +154,7 @@ class ReportItemDocxTM(ReportItemDocx):
         inid = self._get_inid(self.obj_type_id, '221', self.application_data['search_data']['obj_state'])
         app_input_date = self.application_data['TradeMark']['TrademarkDetails'].get('app_input_date')
         if inid and inid.visible and app_input_date:
+            app_input_date = app_input_date[:10]
             app_date = datetime.strptime(app_input_date, '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(app_date).bold = True
