@@ -2005,7 +2005,7 @@ class ReportWriterDocx(ReportWriter):
         },
         {
             'obj_type_id': 2,
-            'obj_state': 1,
+            'obj_state': 2,
             'ua': 'Патент на корисну модель',
             'en': 'Utility Model Patent',
         },
