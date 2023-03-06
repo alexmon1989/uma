@@ -11,6 +11,7 @@ from datetime import datetime
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
+from docx.image.exceptions import UnrecognizedImageError
 
 from django.conf import settings
 
@@ -70,9 +71,12 @@ class ReportItemDocxTM(ReportItemDocx):
             mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
             mark_image_filepath /= path.parts[parts_len - 1]
             mark_image_filepath /= mark_image_filename
-            run = self._paragraph.add_run()
-            run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-            self._paragraph.add_run('\r')
+            try:
+                run = self._paragraph.add_run()
+                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                self._paragraph.add_run('\r')
+            except UnrecognizedImageError:
+                pass
 
     def _write_111(self) -> None:
         """Записывает номер свидетельства в документ."""
@@ -530,9 +534,12 @@ class ReportItemDocxMadrid(ReportItemDocx):
                 mark_image_filepath /= path.parts[parts_len - 1]
                 registration_number = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGN')
                 mark_image_filepath /= f"{registration_number}.jpg"
-                run = self._paragraph.add_run()
-                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-                self._paragraph.add_run('\r')
+                try:
+                    run = self._paragraph.add_run()
+                    run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                    self._paragraph.add_run('\r')
+                except UnrecognizedImageError:
+                    pass
 
     def _write_151(self) -> None:
         """Записывает в документ информацию об ИНИД (151) Дата міжнародної реєстрації."""
@@ -868,6 +875,7 @@ class ReportItemDocxID(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (55) Назва промислового зразка."""
         inid = self._get_inid(self.obj_type_id, '55', self.application_data['search_data']['obj_state'])
+        print(self.application_data['search_data']['app_number'])
         specimen_details = self.application_data['Design']['DesignDetails'].get('DesignSpecimenDetails')
         if inid and inid.visible and specimen_details:
             self._paragraph.add_run(f"({inid.code})").bold = True
@@ -896,9 +904,12 @@ class ReportItemDocxID(ReportItemDocx):
                     mark_image_filepath /= path.parts[parts_len - 1]
                     mark_image_filepath /= image['SpecimenFilename']
                     if mark_image_filepath.exists():
-                        run = self._paragraph.add_run()
-                        run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-                        self._paragraph.add_run('\r')
+                        try:
+                            run = self._paragraph.add_run()
+                            run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                            self._paragraph.add_run('\r')
+                        except UnrecognizedImageError:
+                            pass
 
     def _write_71(self) -> None:
         """
