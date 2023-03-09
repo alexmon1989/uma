@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load uma_extras %}
 
-{% if results.paginator.count >= 5000 %}
+{% if results.paginator.count >= 500 %}
     <div class="d-flex g-mb-20 align-items-center">
         <div class="g-font-weight-600">{% trans "Експорт результатів" %}:</div>
         <div class="g-ml-5 g-color-pink">{% trans "завантаження результатів можливе, якщо кількість елементів менша або рівна 500" %}</div>

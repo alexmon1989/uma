@@ -24,7 +24,7 @@ def create_favorites_results_file_xlsx(user_id, favorites_ids, get_params, lang_
     )
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
-    if s.count() <= 5000:
+    if s.count() <= 500:
         # Сортировка
         if get_params.get('sort_by'):
             s = sort_results(s, get_params['sort_by'][0])
@@ -67,7 +67,7 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
     )
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
-    if s.count() <= 5000:
+    if s.count() <= 500:
         # Сортировка
         if get_params.get('sort_by'):
             s = sort_results(s, get_params['sort_by'][0])
@@ -83,7 +83,11 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
 
         # Получение заявок и фильтрация данных
         user = get_user_or_anonymous(user_id)
-        applications = [filter_app_data(x.to_dict(), user) for x in s.params(size=1000, preserve_order=True).scan()]
+        applications = []
+        for application in s.params(size=1000, preserve_order=True).scan():
+            res = application.to_dict()
+            res['meta'] = application.meta.to_dict()
+            applications.append(filter_app_data(res, user))
 
         # Генерация отчёта
         report_writer = ReportWriterDocxCreator.create(

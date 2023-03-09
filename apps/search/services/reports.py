@@ -11,6 +11,7 @@ from datetime import datetime
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
+from docx.image.exceptions import UnrecognizedImageError
 
 from django.conf import settings
 
@@ -70,9 +71,12 @@ class ReportItemDocxTM(ReportItemDocx):
             mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
             mark_image_filepath /= path.parts[parts_len - 1]
             mark_image_filepath /= mark_image_filename
-            run = self._paragraph.add_run()
-            run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-            self._paragraph.add_run('\r')
+            try:
+                run = self._paragraph.add_run()
+                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                self._paragraph.add_run('\r')
+            except (UnrecognizedImageError, ZeroDivisionError):
+                pass
 
     def _write_111(self) -> None:
         """Записывает номер свидетельства в документ."""
@@ -154,6 +158,7 @@ class ReportItemDocxTM(ReportItemDocx):
         inid = self._get_inid(self.obj_type_id, '221', self.application_data['search_data']['obj_state'])
         app_input_date = self.application_data['TradeMark']['TrademarkDetails'].get('app_input_date')
         if inid and inid.visible and app_input_date:
+            app_input_date = app_input_date[:10]
             app_date = datetime.strptime(app_input_date, '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(app_date).bold = True
@@ -399,27 +404,27 @@ class ReportItemDocxTM(ReportItemDocx):
         данные об ИНИД (511) Індекси Ніццької класифікації
         """
         inid = self._get_inid(self.obj_type_id, '511', self.application_data['search_data']['obj_state'])
-        goods = self.application_data['TradeMark']['TrademarkDetails'].get(
-            'GoodsServicesDetails', {}
-        ).get(
-            'GoodsServices', {}
-        ).get(
-            'ClassDescriptionDetails', {}
-        ).get(
-            'ClassDescription'
-        )
-        if inid and inid.visible and goods:
-            self._paragraph.add_run(f"({inid.code})").bold = True
-            goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
-            self._paragraph.add_run(f"\t{inid.title}: ")
-            self._paragraph.add_run(goods_classes_str).bold = True
-            for item in goods:
+        if 'GoodsServicesDetails' in self.application_data['TradeMark']['TrademarkDetails'] and \
+                self.application_data['TradeMark']['TrademarkDetails']['GoodsServicesDetails'] is not None:
+            goods = self.application_data['TradeMark']['TrademarkDetails']['GoodsServicesDetails'].get(
+                'GoodsServices', {}
+            ).get(
+                'ClassDescriptionDetails', {}
+            ).get(
+                'ClassDescription'
+            )
+            if inid and inid.visible and goods:
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(goods_classes_str).bold = True
+                for item in goods:
+                    self._paragraph.add_run('\r')
+                    self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
+                    terms = item['ClassificationTermDetails']['ClassificationTerm']
+                    values_str = '; '.join([x['ClassificationTermText'] for x in terms])
+                    self._paragraph.add_run(values_str)
                 self._paragraph.add_run('\r')
-                self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
-                terms = item['ClassificationTermDetails']['ClassificationTerm']
-                values_str = '; '.join([x['ClassificationTermText'] for x in terms])
-                self._paragraph.add_run(values_str)
-            self._paragraph.add_run('\r')
 
     def _write_441(self) -> None:
         """Записывает в документ данные об ИНИД (441) Дата публікації відомостей про заявку та номер бюлетня."""
@@ -529,9 +534,12 @@ class ReportItemDocxMadrid(ReportItemDocx):
                 mark_image_filepath /= path.parts[parts_len - 1]
                 registration_number = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('@INTREGN')
                 mark_image_filepath /= f"{registration_number}.jpg"
-                run = self._paragraph.add_run()
-                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-                self._paragraph.add_run('\r')
+                try:
+                    run = self._paragraph.add_run()
+                    run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                    self._paragraph.add_run('\r')
+                except (UnrecognizedImageError, ZeroDivisionError):
+                    pass
 
     def _write_151(self) -> None:
         """Записывает в документ информацию об ИНИД (151) Дата міжнародної реєстрації."""
@@ -873,13 +881,19 @@ class ReportItemDocxID(ReportItemDocx):
             self._paragraph.add_run(f"\t{inid.title}:")
             for i, item in enumerate(specimen_details):
                 if 'Colors' in item:
-                    self._paragraph.add_run('\r')
-                    self._paragraph.add_run(f"{i + 1}-й варіант - {item['Colors']['Color']}").bold = True
+                    self._paragraph.add_run('\n')
+                    self._paragraph.add_run(f"{i + 1}-й варіант - ")
+                    if isinstance(item['Colors'], list):
+                        for color in item['Colors']:
+                            self._paragraph.add_run(f"{color['Color']}; ").bold = True
+                    else:
+                        self._paragraph.add_run(f"{item['Colors']['Color']}").bold = True
             self._paragraph.add_run("\r")
 
             for specimen in specimen_details:
                 for image in specimen['DesignSpecimen']:
-                    self._paragraph.add_run(image['SpecimenIndex'])
+                    specimen_index = str(image.get('SpecimenIndex', image.get('SpecimenIdentifier', '')))
+                    self._paragraph.add_run(specimen_index)
                     self._paragraph.add_run(':\r')
                     path = Path(self.application_data['Document']['filesPath'].replace('\\', '/'))
                     parts_len = len(path.parts)
@@ -888,9 +902,13 @@ class ReportItemDocxID(ReportItemDocx):
                     mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
                     mark_image_filepath /= path.parts[parts_len - 1]
                     mark_image_filepath /= image['SpecimenFilename']
-                    run = self._paragraph.add_run()
-                    run.add_picture(str(mark_image_filepath), width=Inches(2.5))
-                    self._paragraph.add_run('\r')
+                    if mark_image_filepath.exists():
+                        try:
+                            run = self._paragraph.add_run()
+                            run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                            self._paragraph.add_run('\r')
+                        except (UnrecognizedImageError, ZeroDivisionError):
+                            pass
 
     def _write_71(self) -> None:
         """
@@ -1736,24 +1754,14 @@ class ReportItemCopyright(ReportItemDocx):
                 except KeyError:
                     pass
 
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
+                try:
+                    country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
             self._paragraph.add_run('\r')
 
     def _write_77(self) -> None:
@@ -1777,24 +1785,14 @@ class ReportItemCopyright(ReportItemDocx):
                 except KeyError:
                     pass
 
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            employer['EmployerAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = employer['EmployerAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
+                try:
+                    country = employer['EmployerAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
             self._paragraph.add_run('\r')
 
     def write(self, document: Document) -> Paragraph:
@@ -1900,24 +1898,14 @@ class ReportItemAgreement(ReportItemDocx):
                 except KeyError:
                     pass
 
-                if self.application_data['search_data']['obj_state'] == 2:
-                    self._paragraph.add_run('\r')
-                    try:
-                        self._paragraph.add_run(
-                            author['AuthorAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                                'FreeFormatAddressLine']
-                        )
-                    except KeyError:
-                        pass
-
-                    try:
-                        country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
-                            'AddressCountryCode']
-                        self._paragraph.add_run(
-                            f" ({country})"
-                        )
-                    except KeyError:
-                        pass
+                try:
+                    country = author['AuthorAddressBook']['FormattedNameAddress']['Address'][
+                        'AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
             self._paragraph.add_run('\r')
 
     def _write_75(self) -> None:
@@ -2016,7 +2004,7 @@ class ReportWriterDocx(ReportWriter):
         },
         {
             'obj_type_id': 2,
-            'obj_state': 1,
+            'obj_state': 2,
             'ua': 'Патент на корисну модель',
             'en': 'Utility Model Patent',
         },

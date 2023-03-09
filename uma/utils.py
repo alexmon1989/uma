@@ -16,10 +16,14 @@ def iterable(arg):
     )
 
 
-def get_unique_filename(prefix=''):
+def get_datetime_now_str() -> str:
+    return datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+
+
+def get_unique_filename(prefix: str = '') -> str:
     """Возвращает уникальное имя файла без расширения."""
-    suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-    return "_".join([prefix, suffix])
+    suffix = get_datetime_now_str()
+    return "_".join([prefix, suffix]).replace('/', '_')
 
 
 def get_user_or_anonymous(user_id):
