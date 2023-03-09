@@ -260,19 +260,6 @@ def filter_results(s, get_params):
         },
     ]
 
-    # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
-    paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-    """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-    # if paid_services_settings.enabled:
-    #     filters.append({
-    #         'title': 'mark_status',
-    #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
-    #     })
-    # filters.append({
-    #     'title': 'mark_status',
-    #     'field': 'Document.MarkCurrentStatusCodeType.keyword'
-    # })
-
     # Агрегация без фильтрации
     for item in filters:
         s.aggs.bucket(f"{item['title']}_terms", A('terms', field=item['field'], order={"_key": "asc"}, size=1000))

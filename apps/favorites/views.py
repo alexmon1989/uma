@@ -13,7 +13,7 @@ from apps.search.decorators import require_ajax
 from celery.result import AsyncResult
 import json
 import six
-from .tasks import create_favorites_results_file
+from .tasks import create_favorites_results_file_xlsx, create_favorites_results_file_docx
 
 
 class IndexView(TemplateView):
@@ -95,8 +95,19 @@ class ClearRedirectView(RedirectView):
 
 
 def download_xls_favorites(request):
-    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами содержимого в избранном."""
-    task = create_favorites_results_file.delay(
+    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами содержимого в избранном (xlsx)."""
+    task = create_favorites_results_file_xlsx.delay(
+        request.user.pk,
+        request.session['favorites_ids'],
+        dict(six.iterlists(request.GET)),
+        'ua' if request.LANGUAGE_CODE == 'uk' else 'en'
+    )
+    return JsonResponse({'task_id': task.id})
+
+
+def download_docx_favorites(request):
+    """Возвращает JSON с id асинхронной задачи на формирование файла с результатами содержимого в избранном (docx)."""
+    task = create_favorites_results_file_docx.delay(
         request.user.pk,
         request.session['favorites_ids'],
         dict(six.iterlists(request.GET)),

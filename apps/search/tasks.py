@@ -8,12 +8,13 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, PaidServicesSettings, OrderDocument
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, OrderDocument
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
                     prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs, sort_doc_flow,
                     filter_app_data, filter_bad_apps)
+from apps.search.services.reports import ReportWriterDocxCreator
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
 import apps.search.services as search_services
@@ -64,18 +65,6 @@ def perform_simple_search(user_id, get_params):
                         f"{elastic_field.field_name}.exact^3",
                         f"{elastic_field.field_name}.*",
                     ]
-
-                    # if '*' in query:
-                    #     fields = [
-                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
-                    #         f"{elastic_field.field_name}.exact^2",
-                    #     ]
-                    # else:
-                    #     fields = [
-                    #         f"{elastic_field.field_name}^2",
-                    #         f"{elastic_field.field_name}.exact^2",
-                    #         f"{elastic_field.field_name}.*",
-                    #     ]
                 else:
                     fields = [
                         f"{elastic_field.field_name}",
@@ -565,8 +554,8 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
 
 
 @shared_task
-def create_simple_search_results_file(user_id, get_params, lang_code):
-    """Возвращает url файла с результатами простого поиска."""
+def create_simple_search_results_file_docx(user_id, get_params, lang_code):
+    """Возвращает url файла с результатами простого поиска (docx)."""
     formset = get_search_form('simple', get_params)
     # Валидация запроса
     if formset.is_valid():
@@ -584,18 +573,6 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
                         f"{elastic_field.field_name}.exact^3",
                         f"{elastic_field.field_name}.*",
                     ]
-
-                    # if '*' in query:
-                    #     fields = [
-                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
-                    #         f"{elastic_field.field_name}.exact^2",
-                    #     ]
-                    # else:
-                    #     fields = [
-                    #         # f"{inid_schedule.elastic_index_field.field_name}^2",
-                    #         f"{elastic_field.field_name}.exact^2",
-                    #         f"{elastic_field.field_name}.*",
-                    #     ]
                 else:
                     fields = [
                         f"{elastic_field.field_name}",
@@ -649,25 +626,119 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
             },
         ]
 
-        # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
-        paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-        # if paid_services_settings.enabled:
-        #     filters.append({
-        #         'title': 'mark_status',
-        #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        #     })
-        filters.append({
-            'title': 'mark_status',
-            'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        })
+        for item in filters:
+            if get_params.get(f"filter_{item['title']}"):
+                # Фильтрация в основном запросе
+                s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
+
+        if s.count() <= 500:
+            # Получение заявок и фильтрация данных
+            applications = []
+            for application in s.params(size=1000, preserve_order=True).scan():
+                res = application.to_dict()
+                res['meta'] = application.meta.to_dict()
+                applications.append(filter_app_data(res, user))
+
+            directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
+            os.makedirs(str(directory_path), exist_ok=True)
+
+            # Имя файла с результатами поиска
+            file_name = f"{get_unique_filename('simple_search')}.docx"
+            file_path = directory_path / file_name
+
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                applications,
+                search_services.inid_code_get_list(lang_code),
+                lang_code
+            )
+            report_writer.generate(file_path)
+
+            # Возврат url сформированного файла с результатами поиска
+            res = Path(settings.MEDIA_URL) / 'search_results' / file_name
+            return str(res)
+    return False
+
+
+@shared_task
+def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
+    """Возвращает url файла с результатами простого поиска (.xlsx)."""
+    formset = get_search_form('simple', get_params)
+    # Валидация запроса
+    if formset.is_valid():
+        client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+        user = get_user_or_anonymous(user_id)
+        qs = None
+        for s in formset.cleaned_data:
+            elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
+            if elastic_field:
+                query = prepare_query(s['value'], elastic_field.field_type)
+
+                if elastic_field.field_type == 'text':
+                    fields = [
+                        f"{elastic_field.field_name}^2",
+                        f"{elastic_field.field_name}.exact^3",
+                        f"{elastic_field.field_name}.*",
+                    ]
+                else:
+                    fields = [
+                        f"{elastic_field.field_name}",
+                    ]
+
+                q = Q(
+                    'query_string',
+                    query=query,
+                    fields=fields,
+                    quote_field_suffix=".exact",
+                    default_operator='AND'
+                )
+
+                # Nested тип
+                if elastic_field.parent:
+                    q = Q(
+                        'nested',
+                        path=elastic_field.parent.field_name,
+                        query=q,
+                    )
+
+                if qs is not None:
+                    qs &= q
+                else:
+                    qs = q
+
+        qs = filter_bad_apps(qs)
+
+        s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(qs)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
+
+        # Фильтрация
+        # Возможные фильтры
+        filters = [
+            {
+                'title': 'obj_type',
+                'field': 'Document.idObjType'
+            },
+            {
+                'title': 'obj_state',
+                'field': 'search_data.obj_state'
+            },
+            {
+                'title': 'registration_status_color',
+                'field': 'search_data.registration_status_color'
+            },
+        ]
 
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
                           'Certificate'])
 
@@ -696,8 +767,8 @@ def create_simple_search_results_file(user_id, get_params, lang_code):
 
 
 @shared_task
-def create_advanced_search_results_file(user_id, get_params, lang_code):
-    """Возвращает url файла с результатами расширенного поиска."""
+def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
+    """Возвращает url файла с результатами расширенного поиска (.docx)."""
     formset = get_search_form('advanced', get_params)
     # Валидация запроса
     if formset.is_valid():
@@ -725,25 +796,76 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
             },
         ]
 
-        # Если включены платные услуги, то необходимо включить возможность фильтрации по коду MarkCurrentStatusCodeType
-        paid_services_settings, created = PaidServicesSettings.objects.get_or_create()
-        """ ВРЕМЕННО ОТКРЫТЬ ДОСТУП ВСЕМ """
-        # if paid_services_settings.enabled:
-        #     filters.append({
-        #         'title': 'mark_status',
-        #         'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        #     })
-        filters.append({
-            'title': 'mark_status',
-            'field': 'Document.MarkCurrentStatusCodeType.keyword'
-        })
+        for item in filters:
+            if get_params.get(f"filter_{item['title']}"):
+                # Фильтрация в основном запросе
+                s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
+
+        if s.count() <= 500:
+            # Получение заявок и фильтрация данных
+            applications = []
+            for application in s.params(size=1000, preserve_order=True).scan():
+                res = application.to_dict()
+                res['meta'] = application.meta.to_dict()
+                applications.append(filter_app_data(res, user))
+
+            directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
+            os.makedirs(str(directory_path), exist_ok=True)
+
+            # Имя файла с результатами поиска
+            file_name = f"{get_unique_filename('advanced_search')}.docx"
+            file_path = directory_path / file_name
+
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                applications,
+                search_services.inid_code_get_list(lang_code),
+                lang_code
+            )
+            report_writer.generate(file_path)
+
+            # Возврат url сформированного файла с результатами поиска
+            res = Path(settings.MEDIA_URL) / 'search_results' / file_name
+            return str(res)
+    return False
+
+
+@shared_task
+def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
+    """Возвращает url файла с результатами расширенного поиска (.docx)."""
+    formset = get_search_form('advanced', get_params)
+    # Валидация запроса
+    if formset.is_valid():
+        # Разбивка поисковых данных на поисковые группы
+        search_groups = get_search_groups(formset.cleaned_data)
+
+        # Поиск в ElasticSearch по каждой группе
+        user = get_user_or_anonymous(user_id)
+        s = get_elastic_results(search_groups, user)
+
+        # Фильтрация
+        # Возможные фильтры
+        filters = [
+            {
+                'title': 'obj_type',
+                'field': 'Document.idObjType'
+            },
+            {
+                'title': 'obj_state',
+                'field': 'search_data.obj_state'
+            },
+            {
+                'title': 'registration_status_color',
+                'field': 'search_data.registration_status_color'
+            },
+        ]
 
         for item in filters:
             if get_params.get(f"filter_{item['title']}"):
                 # Фильтрация в основном запросе
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
-        if s.count() <= 5000:
+        if s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
                           'Certificate'])
 
@@ -778,13 +900,42 @@ def create_advanced_search_results_file(user_id, get_params, lang_code):
 
 
 @shared_task
-def create_transactions_search_results_file(get_params, lang_code):
+def create_transactions_search_results_file_docx(get_params, lang_code):
     """Возвращает url файла с результатами поиска по оповещениям."""
     form = get_search_form('transactions', get_params)
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
-        if s and s.count() <= 5000:
+        if s and s.count() <= 500:
+            directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
+            os.makedirs(str(directory_path), exist_ok=True)
+
+            # Имя файла с результатами поиска
+            file_name = f"{get_unique_filename('transactions_search')}.docx"
+            file_path = directory_path / file_name
+
+            # Генерация отчёта
+            report_writer = ReportWriterDocxCreator.create(
+                [x.to_dict() for x in s.params(size=1000, preserve_order=True).scan()],
+                search_services.inid_code_get_list(lang_code),
+                lang_code
+            )
+            report_writer.generate(file_path)
+
+            # Возврат url сформированного файла с результатами поиска
+            res = Path(settings.MEDIA_URL) / 'search_results' / file_name
+            return str(res)
+    return False
+
+
+@shared_task
+def create_transactions_search_results_file_xlsx(get_params, lang_code):
+    """Возвращает url файла с результатами поиска по оповещениям."""
+    form = get_search_form('transactions', get_params)
+    # Валидация запроса
+    if form.is_valid():
+        s = get_search_in_transactions(form.cleaned_data)
+        if s and s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
 
             # Сортировка
@@ -815,6 +966,35 @@ def create_transactions_search_results_file(get_params, lang_code):
                 file_name
             )
     return False
+
+
+@shared_task
+def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
+    """Создаёт файл docx с библиографическими данными объекта пром. собственности."""
+    hit = search_services.application_get_app_elasticsearch_data(id_app_number)
+    if not hit:
+        return {}
+    hit['meta'] = {'id': id_app_number}
+
+    user = get_user_or_anonymous(user_id)
+    directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
+    os.makedirs(str(directory_path), exist_ok=True)
+
+    # Имя файла с результатами поиска
+    file_name = f"{get_unique_filename(hit['search_data']['app_number'])}.docx"
+    file_path = directory_path / file_name
+
+    # Генерация отчёта
+    report_writer = ReportWriterDocxCreator.create(
+        [filter_app_data(hit, user)],
+        search_services.inid_code_get_list(lang_code),
+        lang_code
+    )
+    report_writer.generate(file_path)
+
+    # Возврат url сформированного файла с результатами поиска
+    res = Path(settings.MEDIA_URL) / 'search_results' / file_name
+    return str(res)
 
 
 @shared_task

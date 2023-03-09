@@ -12,6 +12,7 @@ from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList
 from apps.bulletin import services as bulletin_services
 from apps.search.utils import filter_bad_apps
+from apps.search.dataclasses import InidCode
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -489,3 +490,454 @@ def application_get_app_elasticsearch_data(app_id: int) -> dict:
     if not s:
         return {}
     return s[0].to_dict()
+
+
+def inid_code_get_list(lang: str) -> List[InidCode]:
+    """
+    Возвращает список ИНИД-кодов объектов пром собств.
+
+    TODO: Сделать выборку из БД
+    TODO: Сделать кеширование
+    """
+    res = []
+
+    if lang == 'ua':
+        # ТМ регистрации
+        inid_data = [
+            InidCode(4, '540', 'Зображення знака', 2, True),
+            InidCode(4, '141', 'Дата закінчення строку дії реєстрації знака', 2, True),
+            InidCode(4, '111', 'Порядковий номер реєстрації', 2, True),
+            InidCode(4, '151', 'Дата реєстрації', 2, True),
+            InidCode(4, '181', 'Очікувана дата закінчення строку дії реєстрації', 2, True),
+            InidCode(4, '186', 'Очікувана дата продовження строку дії реєстрації', 2, True),
+            InidCode(4, '210', 'Номер заявки', 2, True),
+            InidCode(4, '220', 'Дата подання заявки', 2, True),
+            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
+                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
+            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 2, True),
+            InidCode(4, '450', 'Дата публікації відомостей про видачу свідоцтва', 2, True),
+            InidCode(4, '531', 'Віденська класифікація', 2, True),
+            InidCode(4, '731', 'Ім\'я та адреса заявника', 2, True),
+            InidCode(4, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+            InidCode(4, '740', 'Ім\'я та адреса представника', 2, True),
+            InidCode(4, '750', 'Адреса для листування', 2, True),
+            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
+            InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # ТМ заявки
+        inid_data = [
+            InidCode(4, '540', 'Зображення знака', 1, True),
+            InidCode(4, '210', 'Номер заявки', 1, True),
+            InidCode(4, '220', 'Дата подання заявки', 1, True),
+            InidCode(4, '221', 'Дата надходження матеріалів заявки до НОІВ', 1, True),
+            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
+                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 1, True),
+            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 1, True),
+            InidCode(4, '531', 'Віденська класифікація', 1, True),
+            InidCode(4, '731', 'Ім\'я та адреса заявника', 1, True),
+            InidCode(4, '740', 'Ім\'я та адреса представника', 1, True),
+            InidCode(4, '750', 'Адреса для листування', 1, True),
+            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
+            InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы регистрации
+        inid_data = [
+            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 2, True),
+            InidCode(6, '11', 'Номер реєстрації (патенту)', 2, True),
+            InidCode(6, '24', 'Дата, з якої є чинними права на промисловий зразок', 2, True),
+            InidCode(6, '21', 'Номер заявки', 2, True),
+            InidCode(6, '22', 'Дата подання заявки', 2, True),
+            InidCode(6, '23', 'Дата виставкового пріоритету', 2, True),
+            InidCode(6, '28', 'Кількість заявлених варіантів', 2, True),
+            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 2, True),
+            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 2, True),
+            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку', 2, True),
+            InidCode(6, '45', 'Дата публікації відомостей про видачу патенту та номер бюлетеня', 2, True),
+            InidCode(6, '54', 'Назва промислового зразка', 2, True),
+            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 2, True),
+            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 2, True),
+            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 2, True),
+            InidCode(6, '73', "Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави", 2, True),
+            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 2, True),
+            InidCode(6, '98', "Адреса для листування", 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы заявки
+        inid_data = [
+            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 1, True),
+            InidCode(6, '21', 'Номер заявки', 1, True),
+            InidCode(6, '22', 'Дата подання заявки', 1, True),
+            InidCode(6, '23', 'Дата виставкового пріоритету', 1, True),
+            InidCode(6, '28', 'Кількість заявлених варіантів', 1, True),
+            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 1, True),
+            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 1, True),
+            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку',
+                     1, True),
+            InidCode(6, '54', 'Назва промислового зразка', 1, True),
+            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 1, True),
+            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 1, True),
+            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 1, True),
+            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 1, True),
+            InidCode(6, '98', "Адреса для листування", 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Мадрид
+        for obj_type_id in [9, 14]:
+            inid_data = [
+                InidCode(obj_type_id, '111', 'Номер міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '151', 'Дата міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '180', 'Очікувана дата закінчення строку дії реєстрації/продовження', 2, True),
+                InidCode(obj_type_id, '441', 'Дата публікації відомостей про міжнародну реєстрацію торговельної марки, що надійшла для проведення експертизи', 2, True),
+                InidCode(obj_type_id, '450', 'Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ', 2, True),
+                InidCode(obj_type_id, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+                InidCode(obj_type_id, '740', 'Ім\'я та адреса представника', 2, True),
+                InidCode(obj_type_id, '821', 'Базова заявка', 2, True),
+                InidCode(obj_type_id, '891', 'Дата територіального поширення міжнародної реєстрації', 2, True),
+                InidCode(obj_type_id, '540', 'Зображення торговельної марки', 2, True),
+                InidCode(obj_type_id, '511', 'Індекс (індекси) МКТП та перелік товарів і послуг', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (регистрации)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер патенту', 2, True),
+                InidCode(obj_type_id, '21', 'Номер заявки', 2, True),
+                InidCode(obj_type_id, '22', 'Дата подання заявки', 2, True),
+                InidCode(obj_type_id, '24', 'Дата, з якої є чинними права', 2, True),
+                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 2, True),
+                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 2, True),
+                InidCode(obj_type_id, '33', 'Двобуквений код держави', 2, True),
+                InidCode(obj_type_id, '41', 'Дата публікації заявки', 2, True),
+                InidCode(obj_type_id, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2, True),
+                InidCode(obj_type_id, '51', 'Iндекс МПК', 2, True),
+                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 2, True),
+                InidCode(obj_type_id, '56', 'Аналоги винаходу', 2, True),
+                InidCode(obj_type_id, '62', 'Номер та дата більш ранньої заявки, з якої було виділено даний патентний документ', 2, True),
+                InidCode(obj_type_id, '71', 'Заявник', 2, True),
+                InidCode(obj_type_id, '72', 'Винахідник', 2, True),
+                InidCode(obj_type_id, '73', 'Власник', 2, True),
+                InidCode(obj_type_id, '74', 'Представник', 2, True),
+                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 2, True),
+                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 2, True),
+                InidCode(obj_type_id, '98', 'Адреса для листування', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (заявки)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '21', 'Номер заявки', 1, True),
+                InidCode(obj_type_id, '22', 'Дата подання заявки', 1, True),
+                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 1, True),
+                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 1, True),
+                InidCode(obj_type_id, '33', 'Двобуквений код держави', 1, True),
+                InidCode(obj_type_id, '41', 'Дата публікації заявки', 1, True),
+                InidCode(obj_type_id, '51', 'Iндекс МПК', 1, True),
+                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 1, True),
+                InidCode(obj_type_id, '56', 'Аналоги винаходу', 1, True),
+                InidCode(obj_type_id, '71', 'Заявник', 1, True),
+                InidCode(obj_type_id, '72', 'Винахідник', 1, True),
+                InidCode(obj_type_id, '74', 'Представник', 1, True),
+                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 1, True),
+                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 1, True),
+                InidCode(obj_type_id, '98', 'Адреса для листування', 1, True),
+            ]
+            res.extend(inid_data)
+
+        # Топографии (регистрации)
+        inid_data = [
+            InidCode(3, '11', 'Номер свідоцтва', 2, True),
+            InidCode(3, '21', 'Номер заявки', 2, True),
+            InidCode(3, '22', 'Дата подання заявки', 2, True),
+            InidCode(3, '24', 'Дата, з якої є чинними права', 2, True),
+            InidCode(3, '31', 'Номер попередньої заявки', 2, True),
+            InidCode(3, '32', 'Дата подання попередньої заявки', 2, True),
+            InidCode(3, '33', 'Двобуквений код держави', 2, True),
+            InidCode(3, '41', 'Дата публікації заявки', 2, True),
+            InidCode(3, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2,
+                     True),
+            InidCode(3, '54', 'Назва інтегральної мікросхеми', 2, True),
+            InidCode(3, '71', 'Заявник', 2, True),
+            InidCode(3, '72', 'Винахідник', 2, True),
+            InidCode(3, '73', 'Власник', 2, True),
+            InidCode(3, '74', 'Представник', 2, True),
+            InidCode(3, '98', 'Адреса для листування', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Географічні зазначення (регистрации)
+        inid_data = [
+            InidCode(5, '111', 'Номер реєстрації', 2, True),
+            InidCode(5, '151', 'Дата реєстрації', 2, True),
+            InidCode(5, '190', 'Держава реєстрації КЗПТ', 2, True),
+            InidCode(5, '210', 'Номер заявки', 2, True),
+            InidCode(5, '220', 'Дата подання заявки', 2, True),
+            InidCode(5, '539.I', 'Назва КЗПТ', 2, True),
+            InidCode(5, '540', 'Назва товару', 2, True),
+            InidCode(5, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
+            InidCode(5, '750', 'Адреса для листування', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Авт. право (регистрации)
+        for obj_type_id in [10, 13]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер свідоцтва про реєстрацію авторського права на твір', 2, True),
+                InidCode(obj_type_id, '15', 'Дата реєстрації авторського права', 2, True),
+                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
+                InidCode(obj_type_id, '45.D', 'Дата публікації', 2, True),
+                InidCode(obj_type_id, '45.N', 'Номер бюлетеня', 2, True),
+                InidCode(obj_type_id, '54', 'Вид, повна та скорочена назва твору (творів)', 2, True),
+                InidCode(obj_type_id, '57', 'Анотація', 2, True),
+                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів), чи позначення «Анонімно»', 2, True),
+                InidCode(obj_type_id, '58', 'Вихідні дані для оприлюднених творів', 2, True),
+                InidCode(obj_type_id, '77', 'Повне ім\'я або повне офіційне найменування роботодавця', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Договора авт. право (регистрации)
+        for obj_type_id in [11, 12]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Номер реєстрації договору', 2, True),
+                InidCode(obj_type_id, '15', 'Дата реєстрації договору', 2, True),
+                InidCode(obj_type_id, '27', 'Вид договору', 2, True),
+                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
+                InidCode(obj_type_id, '54', 'Вид, повна та скорочена назва твору (творів)', 2, True),
+                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів) твору', 2, True),
+                InidCode(obj_type_id, '75', 'Повне ім\'я фізичної(их) або повне офіційне найменування юридичної(их) '
+                                            'особи (осіб), сторін договору', 2, True),
+            ]
+            res.extend(inid_data)
+
+    elif lang == 'en':
+        # ТМ регистрации
+        inid_data = [
+            InidCode(4, '540', 'Reproduction of the mark', 2, True),
+            InidCode(4, '141', 'Date of the termination of the registration of the mark', 2, True),
+            InidCode(4, '111', 'Serial number of the registration', 2, True),
+            InidCode(4, '151', 'Date of the registration', 2, True),
+            InidCode(4, '181', 'Expected expiration date of the registration', 2, True),
+            InidCode(4, '186', 'Expected prolongation date of the registration', 2, True),
+            InidCode(4, '210', 'Serial number of the application', 2, True),
+            InidCode(4, '220', 'Date of filing of the application', 2, True),
+            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
+                               'or registration of the mark in the origin country', 2, True),
+            InidCode(4, '441', 'Application publication date and bulletin number', 2, True),
+            InidCode(4, '450', 'Date of publication of information on the issuance of the certificate', 2, True),
+            InidCode(4, '531', 'Vienna Classification', 2, True),
+            InidCode(4, '731', 'Name and address of the applicant', 2, True),
+            InidCode(4, '732', 'Name and address of the holder of the registration', 2, True),
+            InidCode(4, '740', 'Name and address of the representative', 1, True),
+            InidCode(4, '750', 'Address for correspondence', 1, True),
+            InidCode(4, '591', 'Information concerning colors claimed', 2, True),
+            InidCode(4, '511', 'Nice Classification indexes', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # ТМ заявки
+        inid_data = [
+            InidCode(4, '540', 'Reproduction of the mark', 1, True),
+            InidCode(4, '210', 'Serial number of the application', 1, True),
+            InidCode(4, '220', 'Date of filing of the application', 1, True),
+            InidCode(4, '221', 'Date of receipt of application materials to NIPIO', 1, True),
+            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
+                               'or registration of the mark in the origin country', 1, True),
+            InidCode(4, '441', 'Application publication date and bulletin number', 1, True),
+            InidCode(4, '531', 'Vienna Classification', 1, True),
+            InidCode(4, '731', 'Name and address of the applicant', 1, True),
+            InidCode(4, '740', 'Name and address of the representative', 1, True),
+            InidCode(4, '750', 'Address for correspondence', 1, True),
+            InidCode(4, '591', 'Information concerning colors claimed', 1, True),
+            InidCode(4, '511', 'Nice Classification indexes', 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы регистрации
+        inid_data = [
+            InidCode(6, '51', 'International Classification for Industrial Designs', 2, True),
+            InidCode(6, '11', 'Serial number of the registration', 2, True),
+            InidCode(6, '24', 'Date from which the industrial design right has effect', 2, True),
+            InidCode(6, '21', 'Serial number of the application', 2, True),
+            InidCode(6, '22', 'Date of filing of the application', 2, True),
+            InidCode(6, '23', 'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)', 2, True),
+            InidCode(6, '28', 'Number of industrial designs included in the application', 2, True),
+            InidCode(6, '31', 'Serial number assigned to the priority application', 2, True),
+            InidCode(6, '32', 'Date of filing of the priority application', 2, True),
+            InidCode(6, '33', 'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
+                     2, True),
+            InidCode(6, '45', 'Date of publication of information on patent issuance and bulletin number', 2, True),
+            InidCode(6, '54', 'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design', 2, True),
+            InidCode(6, '55', 'Images', 2, True),
+            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 2, True),
+            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 2, True),
+            InidCode(6, '73', "Name(s) and address(es) of the owner(s)", 2, True),
+            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 2, True),
+            InidCode(6, '98', "Correspondense address", 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Пром. образцы заявки
+        inid_data = [
+            InidCode(6, '51', 'International Classification for Industrial Designs', 1, True),
+            InidCode(6, '21', 'Serial number of the application', 1, True),
+            InidCode(6, '22', 'Date of filing of the application', 1, True),
+            InidCode(6, '23',
+                     'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)',
+                     1, True),
+            InidCode(6, '28', 'Number of industrial designs included in the application', 1, True),
+            InidCode(6, '31', 'Serial number assigned to the priority application', 1, True),
+            InidCode(6, '32', 'Date of filing of the priority application', 1, True),
+            InidCode(6, '33',
+                     'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
+                     1, True),
+            InidCode(6, '54',
+                     'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design',
+                     1, True),
+            InidCode(6, '55', 'Images', 1, True),
+            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 1, True),
+            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 1, True),
+            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 1, True),
+            InidCode(6, '98', "Correspondense address", 1, True),
+        ]
+        res.extend(inid_data)
+
+        # Мадрид
+        for obj_type_id in [9, 14]:
+            inid_data = [
+                InidCode(obj_type_id, '111', 'International registration number', 2, True),
+                InidCode(obj_type_id, '151', 'Date of international registration', 2, True),
+                InidCode(obj_type_id, '180', 'Expected expiration date of the registration', 2, True),
+                InidCode(obj_type_id, '441', 'Application publication date and bulletin number', 2, True),
+                InidCode(obj_type_id, '450', 'Date of publication of information on international registration and number of the WIPO International Bureau bulletin', 2, True),
+                InidCode(obj_type_id, '732', 'Name and address of the holder of the registration', 2, True),
+                InidCode(obj_type_id, '740', 'Name and address of the representative', 2, True),
+                InidCode(obj_type_id, '821', 'Base application', 2, True),
+                InidCode(obj_type_id, '891', 'Date of territorial distribution of international registration', 2, True),
+                InidCode(obj_type_id, '540', 'Brand image', 2, True),
+                InidCode(obj_type_id, '511', 'ICCI index (s) and list of goods and services', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (регистрации)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Number of the patent, SPC or patent document', 2, True),
+                InidCode(obj_type_id, '21', 'Number assigned to the application', 2, True),
+                InidCode(obj_type_id, '22', 'Date of filing of the application', 2, True),
+                InidCode(obj_type_id, '24', 'Date from which industrial property rights may have effec', 2, True),
+                InidCode(obj_type_id, '31', 'Number assigned to priority application', 2, True),
+                InidCode(obj_type_id, '32', 'Date of filing of priority application', 2, True),
+                InidCode(obj_type_id, '33', 'Twoleter of country code', 2, True),
+                InidCode(obj_type_id, '41', 'Date of publication of application', 2, True),
+                InidCode(obj_type_id, '46', 'Bulletin number and date of publication about patents grant', 2,
+                         True),
+                InidCode(obj_type_id, '51', 'Internmational patent classification', 2, True),
+                InidCode(obj_type_id, '54', 'Title of the invention', 2, True),
+                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 2, True),
+                InidCode(obj_type_id, '62',
+                         'Number and date of the earlier application from which the present patent document has been divided up', 2,
+                         True),
+                InidCode(obj_type_id, '71', 'Applicant', 2, True),
+                InidCode(obj_type_id, '72', 'Inventor', 2, True),
+                InidCode(obj_type_id, '73', 'Name of grantee, holder, assignee or owner', 2, True),
+                InidCode(obj_type_id, '74', 'Name of attorney or agent', 2, True),
+                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 2, True),
+                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 2, True),
+                InidCode(obj_type_id, '98', 'Mailing address', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Изобретения, полезные модели (заявки)
+        for obj_type_id in [1, 2]:
+            inid_data = [
+                InidCode(obj_type_id, '21', 'Number assigned to the application', 1, True),
+                InidCode(obj_type_id, '22', 'Date of filing of the application', 1, True),
+                InidCode(obj_type_id, '31', 'Number assigned to priority application', 1, True),
+                InidCode(obj_type_id, '32', 'Date of filing of priority application', 1, True),
+                InidCode(obj_type_id, '33', 'Twoleter of country code', 1, True),
+                InidCode(obj_type_id, '41', 'Date of publication of application', 1, True),
+                InidCode(obj_type_id, '51', 'Internmational patent classification', 1, True),
+                InidCode(obj_type_id, '54', 'Title of the invention', 1, True),
+                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 1, True),
+                InidCode(obj_type_id, '71', 'Applicant', 1, True),
+                InidCode(obj_type_id, '72', 'Inventor', 1, True),
+                InidCode(obj_type_id, '74', 'Name of attorney or agent', 1, True),
+                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 1, True),
+                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 1, True),
+                InidCode(obj_type_id, '98', 'Mailing address', 1, True),
+            ]
+            res.extend(inid_data)
+
+        # Топографии (регистрации)
+        inid_data = [
+            InidCode(3, '11', 'Number of the patent, SPC or patent document', 2, True),
+            InidCode(3, '21', 'Number assigned to the application', 2, True),
+            InidCode(3, '22', 'Date of filing of the application', 2, True),
+            InidCode(3, '24', 'Date from which industrial property rights may have effect', 2, True),
+            InidCode(3, '31', 'Number assigned to priority application', 2, True),
+            InidCode(3, '32', 'Date of filing of priority application', 2, True),
+            InidCode(3, '33', 'Twoleter of country code', 2, True),
+            InidCode(3, '41', 'Date of publication of application', 2, True),
+            InidCode(3, '46', 'Bulletin number and date of publication about patents grant', 2,
+                     True),
+            InidCode(3, '54', 'Title of Integral micro ciquit', 2, True),
+            InidCode(3, '71', 'Applicant', 2, True),
+            InidCode(3, '72', 'Inventor', 2, True),
+            InidCode(3, '73', 'Name of grantee, holder, assignee or owner', 2, True),
+            InidCode(3, '74', 'Name of attorney or agent', 2, True),
+            InidCode(3, '98', 'Mailing address', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Географічні зазначення (регистрации)
+        inid_data = [
+            InidCode(5, '111', 'Registration number', 2, True),
+            InidCode(5, '151', 'Date of the registration', 2, True),
+            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 2, True),
+            InidCode(5, '210', 'Application number', 2, True),
+            InidCode(5, '220', 'Date of filing of the application', 2, True),
+            InidCode(5, '539.I', 'Title of the qualified indication of origin of the product', 2, True),
+            InidCode(5, '540', 'Name of the product', 2, True),
+            InidCode(5, '732', 'Name and address of the holder of the registration', 2, True),
+            InidCode(5, '750', 'Address for correspondence', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Авт. право (регистрации)
+        for obj_type_id in [10, 13]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'The number of the copyright registration certificate for the office work',
+                         2, True),
+                InidCode(obj_type_id, '15', 'Copyright registration date', 2, True),
+                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
+                InidCode(obj_type_id, '45.D', 'Date of publication', 2, True),
+                InidCode(obj_type_id, '45.N', 'Bulletin number', 2, True),
+                InidCode(obj_type_id, '54', 'Type, full and abbreviated title of the work (works)', 2, True),
+                InidCode(obj_type_id, '57', 'Annotation', 2, True),
+                InidCode(obj_type_id, '72', 'Name(s) of the creator(s) if known to be such', 2, True),
+                InidCode(obj_type_id, '58', 'Initial data for published works', 2, True),
+                InidCode(obj_type_id, '77', 'Name(s) and address(es) of the Employer(s)', 2, True),
+            ]
+            res.extend(inid_data)
+
+        # Договора авт. право (регистрации)
+        for obj_type_id in [11, 12]:
+            inid_data = [
+                InidCode(obj_type_id, '11', 'Agreement registration number', 2, True),
+                InidCode(obj_type_id, '15', 'Agreement registration date', 2, True),
+                InidCode(obj_type_id, '27', 'Kind of agreement', 2, True),
+                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
+                InidCode(obj_type_id, '54', 'Type, full and abbreviated title of the work (works)', 2, True),
+                InidCode(obj_type_id, '72', 'Name(s) of the creator(s)', 2, True),
+                InidCode(obj_type_id, '75', 'Name of the natural person(s) or full official name of the legal '
+                                            'entity(ies), parties to the agreement', 2, True),
+            ]
+            res.extend(inid_data)
+    return res
