@@ -87,6 +87,9 @@ def login_password(request):
             if not form.cleaned_data.get('remember_me'):
                 request.session.set_expiry(0)
                 request.session.modified = True
+            nxt = request.POST.get('next')
+            if nxt:
+                return redirect(nxt)
             return redirect('/')
         else:
             return redirect(reverse('auth:login'))

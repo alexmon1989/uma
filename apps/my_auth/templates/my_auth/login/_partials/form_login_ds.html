@@ -34,7 +34,9 @@
             <form class="g-py-15" onSubmit="return false">
 
                 <input type="hidden" id="secret" value="{{ request.session.secret }}">
-                <input type="hidden" id="next" value="{{ request.META.HTTP_REFERER }}">
+                <input type="hidden"
+                       id="next"
+                       value="{% if request.get_full_path not in request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% endif %}">
 
                 <div class="mb-4">
                     <label class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">{% trans "Оберіть ЦСК" %}:</label>
