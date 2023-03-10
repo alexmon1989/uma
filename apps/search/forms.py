@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.forms import formset_factory
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q, Index
 from .models import SimpleSearchField, InidCodeSchedule, ObjType, IpcCode

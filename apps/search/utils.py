@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.utils.translation import ugettext as _
-from django.contrib.auth import get_user_model
+from django.utils.translation import gettext as _
 from django.db.models import Prefetch
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
