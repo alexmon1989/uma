@@ -9,7 +9,6 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 from apps.search.utils import paginate_results
 from apps.search.tasks import perform_favorites_search
-from apps.search.decorators import require_ajax
 from celery.result import AsyncResult
 import json
 import six
@@ -55,7 +54,6 @@ def add_or_remove(request):
     return JsonResponse({'success': True})
 
 
-@require_ajax
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
