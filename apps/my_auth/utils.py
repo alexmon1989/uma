@@ -1,4 +1,3 @@
-import tempfile
 from EUSignCP import *
 from django.conf import settings
 from .models import CertificateOwner
@@ -64,24 +63,6 @@ def get_certificate_data(file_path, password, key_center):
     EUUnload()
     cert_info.pop('bFilled')
     return cert_info
-
-
-def save_file_to_temp(file):
-    """Сохраняет файл во временный каталог ОС."""
-    handle, path = tempfile.mkstemp()
-    with open(handle, "wb+") as f:
-        for chunk in file.chunks():
-            f.write(chunk)
-    return path
-
-
-def save_file_to_eu_file_store(file):
-    """Сохраняет файл во файловое хранилище библиотек ЭЦП."""
-    path = os.path.join(settings.EUSIGN_FILESTORE_PATH, file.name)
-    with open(path, "wb+") as f:
-        for chunk in file.chunks():
-            f.write(chunk)
-    return path
 
 
 def get_signed_data_info(signed_data, secret, key_center_title):

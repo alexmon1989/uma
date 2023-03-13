@@ -19,7 +19,7 @@ from celery.result import AsyncResult
 import json
 import six
 import apps.search.tasks as tasks
-from apps.search.decorators import require_ajax, check_recaptcha
+from apps.search.decorators import check_recaptcha
 from apps.bulletin.models import ClListOfficialBulletinsIp as Bulletin
 
 
@@ -89,7 +89,6 @@ class SimpleListView(TemplateView):
         return context
 
 
-@require_ajax
 @check_recaptcha
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
@@ -235,7 +234,6 @@ class ObjectDetailView(DetailView):
         return context
 
 
-@require_ajax
 @check_recaptcha
 def get_data_app_html(request):
     """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
@@ -469,7 +467,6 @@ def download_transactions(request, format_: str):
     return JsonResponse({'task_id': task.id})
 
 
-@require_ajax
 @check_recaptcha
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
@@ -485,7 +482,6 @@ def get_task_info(request):
         return HttpResponse('No job id given.')
 
 
-@require_ajax
 def get_validation_info(request):
     """Возвращает JSON с результатами валидации поискового запроса."""
     task_id = request.GET.get('task_id', None)

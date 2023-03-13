@@ -671,7 +671,12 @@ function() {
 				data['csrfmiddlewaretoken'] = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 				$.post( "/uk/auth/login_ds/", data, function (data) {
 					if (data.is_logged === 1) {
-						location.href = '/account/dashboard';
+						var next = document.getElementById('next').value;
+						if (next) {
+							location.href = next;
+						} else {
+							location.href = '/';
+						}
 					} else {
 						document.getElementById('DSLoginErrorsText').innerHTML = 'Авторизація неможлива!';
 						document.getElementById('DSLoginErrors').style.display = '';
