@@ -11,7 +11,7 @@ from datetime import datetime
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
-from docx.image.exceptions import UnrecognizedImageError
+from docx.image.exceptions import UnrecognizedImageError, UnexpectedEndOfFileError
 
 from django.conf import settings
 
@@ -75,7 +75,7 @@ class ReportItemDocxTM(ReportItemDocx):
                 run = self._paragraph.add_run()
                 run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                 self._paragraph.add_run('\r')
-            except (UnrecognizedImageError, ZeroDivisionError):
+            except (UnrecognizedImageError, UnexpectedEndOfFileError, ZeroDivisionError):
                 pass
 
     def _write_111(self) -> None:
@@ -538,7 +538,7 @@ class ReportItemDocxMadrid(ReportItemDocx):
                     run = self._paragraph.add_run()
                     run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                     self._paragraph.add_run('\r')
-                except (UnrecognizedImageError, ZeroDivisionError):
+                except (UnrecognizedImageError, UnexpectedEndOfFileError, ZeroDivisionError):
                     pass
 
     def _write_151(self) -> None:
@@ -907,7 +907,7 @@ class ReportItemDocxID(ReportItemDocx):
                             run = self._paragraph.add_run()
                             run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                             self._paragraph.add_run('\r')
-                        except (UnrecognizedImageError, ZeroDivisionError):
+                        except (UnrecognizedImageError, UnexpectedEndOfFileError, ZeroDivisionError):
                             pass
 
     def _write_71(self) -> None:
