@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from apps.my_auth.models import KeyCenter, CertificateOwner, PatentAttorney
+from apps.my_auth.models import CertificateOwner, PatentAttorney
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
@@ -38,21 +38,6 @@ class PatentAttorneyAdmin(admin.ModelAdmin):
         return f"{obj.user.username} - {obj.user.last_name} {obj.user.first_name}"
 
     user_field.short_description = "Користувач"
-
-
-@admin.register(KeyCenter)
-class KeyCenterAdmin(admin.ModelAdmin):
-    list_display = (
-        'title',
-        'address',
-        'ocspAccessPointAddress',
-        'ocspAccessPointPort',
-        'cmpAddress',
-        'tspAddress',
-        'tspAddressPort',
-        'created_at',
-        'updated_at',
-    )
 
 
 @admin.register(CertificateOwner)

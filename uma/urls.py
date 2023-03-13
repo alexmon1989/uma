@@ -38,7 +38,6 @@ urlpatterns += i18n_patterns(
     path('help/', include('apps.help.urls')),
     path('services/patent_attorneys/', include('apps.patent_attorneys.urls')),
     path('services/', include('apps.services.urls')),
-    path('account/', include('apps.account.urls')),
     path('favorites/', include('apps.favorites.urls')),
     path('bulletin/', include('apps.bulletin.urls')),
     # path('bulletin_new/', include('apps.bulletin_new.urls')),

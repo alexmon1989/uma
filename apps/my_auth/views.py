@@ -2,12 +2,8 @@ from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 from django.views.decorators.http import require_POST
-from django.conf import settings
-from apps.my_auth.forms import AuthFormDS, AuthFormSimple
-from apps.my_auth.models import CertificateOwner, KeyCenter
+from apps.my_auth.forms import AuthFormSimple
 from .utils import get_certificate
 import random
 import string
@@ -24,12 +20,6 @@ def logout_view(request):
     return HttpResponseRedirect('/')
 
 
-def get_ca_data(request, pk):
-    """Возвращает данные АЦСК в формате JSON."""
-    ca = get_object_or_404(KeyCenter, pk=pk)
-    return JsonResponse(model_to_dict(ca))
-
-
 def login_view(request):
     """Страница логина пользователей."""
     request.session['secret'] = ''.join(
@@ -40,7 +30,6 @@ def login_view(request):
         'my_auth/login/login.html',
         {
             'form_login_password': AuthFormSimple(),
-            'form_ds': AuthFormDS(),
         }
     )
 
@@ -99,6 +88,5 @@ def login_password(request):
             'my_auth/login/login.html',
             {
                 'form_login_password': form,
-                'form_ds': AuthFormDS(),
             }
         )

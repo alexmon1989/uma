@@ -3,7 +3,6 @@ import string
 from django.db import models
 from django.contrib.auth.models import User
 from uma.abstract_models import TimeStampedModel
-from ..account.models import Message, License
 
 
 class PatentAttorney(TimeStampedModel):
@@ -63,25 +62,6 @@ class CertificateOwner(TimeStampedModel):
         verbose_name_plural = 'Сертифікати'
 
 
-class KeyCenter(TimeStampedModel):
-    """Модель данных центра сертификации ключей."""
-    title = models.CharField('Назва', max_length=255)
-    address = models.CharField('Web-адреса', max_length=255, blank=True, null=True)
-    ocspAccessPointAddress = models.CharField('OCSP-сервер', max_length=255, blank=True, null=True)
-    ocspAccessPointPort = models.PositiveIntegerField('Порт OCSP-сервера', blank=True, null=True)
-    cmpAddress = models.CharField('CMP-сервер', max_length=255, blank=True, null=True)
-    tspAddress = models.CharField('TSP-сервер', max_length=255, blank=True, null=True)
-    tspAddressPort = models.PositiveIntegerField('Порт TSP-сервера', blank=True, null=True)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = 'АЦСК'
-        verbose_name_plural = 'АЦСК'
-        ordering = ('title',)
-
-
 def is_vip(self):
     """Возвращает значение (boolean) того является ли юзер суперадмином или членом группы 'Посадовці (чиновники)'"""
     return self.is_superuser or self.groups.filter(name='Посадовці (чиновники)').exists()
@@ -113,21 +93,6 @@ def get_email(self):
     return ''
 
 
-def get_unread_messages_count(self):
-    """Возвращает количество непрочитанных сообщений."""
-    return Message.objects.filter(
-        created_at__gte=self.joined_at
-    ).count() - Message.objects.filter(
-        users__id=self.pk
-    ).count()
-
-
-def has_confirmed_license(self):
-    """Подписал ли пользователь лицензию."""
-    lic, created = License.objects.get_or_create()
-    return self in lic.users.all()
-
-
 def user_str(self):
     full_name = self.get_username_full()
     if full_name.strip():
@@ -141,5 +106,3 @@ User.add_to_class('is_patent_attorney', is_patent_attorney)
 User.add_to_class('get_username_short', get_username_short)
 User.add_to_class('get_username_full', get_username_full)
 User.add_to_class('get_email', get_email)
-User.add_to_class('get_unread_messages_count', get_unread_messages_count)
-User.add_to_class('has_confirmed_license', has_confirmed_license)
