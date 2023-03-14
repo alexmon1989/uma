@@ -4,6 +4,7 @@ from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.utils import translation
 from django.utils.translation.trans_real import (get_supported_language_variant, parse_accept_lang_header,
                                                  language_code_re)
+from django.http import HttpResponseRedirect
 from django.utils.cache import patch_vary_headers
 from django.urls import get_script_prefix, is_valid_path
 
@@ -59,11 +60,25 @@ class MyLocaleMiddleware(LocaleMiddleware):
     Необходимо для того чтобы в случае, если браузер настроен на русский язык,
     показывался бы украинский интерфейс, а не английский.
     """
-    def process_response(self, request, response):
+    response_redirect_class = HttpResponseRedirect
+
+    def process_request(self, request):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
         language = get_language_from_request(request, check_path=i18n_patterns_used)
+        print(language)
         language_from_path = translation.get_language_from_path(request.path_info)
+        if not language_from_path and i18n_patterns_used and not prefixed_default_language:
+            language = settings.LANGUAGE_CODE
+        print(language)
+        translation.activate(language)
+        request.LANGUAGE_CODE = translation.get_language()
+
+    def process_response(self, request, response):
+        language = translation.get_language()
+        language_from_path = translation.get_language_from_path(request.path_info)
+        urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
+        i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
 
         if (response.status_code == 404 and not language_from_path and
                 i18n_patterns_used and prefixed_default_language):
@@ -91,5 +106,6 @@ class MyLocaleMiddleware(LocaleMiddleware):
 
         if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
-        response.headers.setdefault('Content-Language', language)
+        if 'Content-Language' not in response:
+            response['Content-Language'] = language
         return response
