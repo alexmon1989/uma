@@ -22,7 +22,6 @@ class OpenData(models.Model):
     registration_number = models.CharField(blank=True, null=True, default=None, max_length=32)
     registration_date = models.DateTimeField(blank=True, null=True, default=None, db_index=True)
     files_path = models.CharField(max_length=500, blank=True, null=True)
-    is_visible = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'Відкриті дані'
