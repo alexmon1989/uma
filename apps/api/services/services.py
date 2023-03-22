@@ -283,7 +283,6 @@ def opendata_prepare_filters(query_params: dict) -> dict:
 
 def opendata_get_list_queryset(filters: dict) -> QuerySet[OpenData]:
     """Возвращает Queryset (с применением фильтров) для API."""
-    # TODO remove is_visible from model
     queryset = OpenData.objects.select_related('obj_type').order_by('pk').all()
 
     # Стан об'єкта
