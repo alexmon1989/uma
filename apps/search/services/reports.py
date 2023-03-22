@@ -810,6 +810,8 @@ class ReportItemDocxID(ReportItemDocx):
         ИНИД (31) Номер попередньої заявки відповідно до Паризької конвенції."""
         inid = self._get_inid(self.obj_type_id, '31', self.application_data['search_data']['obj_state'])
         priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
+        if isinstance(priority, dict) and 'Priority' in priority:
+            priority = priority['Priority']
         if inid and inid.visible and priority and len(priority) > 0:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -821,6 +823,8 @@ class ReportItemDocxID(ReportItemDocx):
         ИНИД (32) Дата подання попередньої заявки відповідно до Паризької конвенції."""
         inid = self._get_inid(self.obj_type_id, '32', self.application_data['search_data']['obj_state'])
         priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
+        if isinstance(priority, dict) and 'Priority' in priority:
+            priority = priority['Priority']
         if inid and inid.visible and priority and len(priority) > 0:
             priority_date = datetime.strptime(priority[0]['PriorityDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"({inid.code})").bold = True
@@ -833,6 +837,8 @@ class ReportItemDocxID(ReportItemDocx):
         ИНИД (33) Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку."""
         inid = self._get_inid(self.obj_type_id, '33', self.application_data['search_data']['obj_state'])
         priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
+        if isinstance(priority, dict) and 'Priority' in priority:
+            priority = priority['Priority']
         if inid and inid.visible and priority and len(priority) > 0:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
