@@ -3,6 +3,7 @@ from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
 from .models import OpenData
 from apps.search.models import ObjType
+from apps.api.services import services
 
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
@@ -71,82 +72,8 @@ class OpenDataListViewV1(generics.ListAPIView):
         return super().get(*args, **kwargs)
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('pk').all()
-
-        # Стан об'єкта
-        obj_state = self.request.query_params.get('obj_state', None)
-        if obj_state:
-            try:
-                obj_state = int(obj_state)
-            except:
-                raise exceptions.ParseError("Невірне значення параметру obj_state")
-            else:
-                queryset = queryset.filter(obj_state=obj_state)
-
-        # Тип об'єкта
-        obj_type = self.request.query_params.get('obj_type', None)
-        if obj_type:
-            try:
-                obj_type = int(obj_type)
-            except:
-                raise exceptions.ParseError("Невірне значення параметру obj_type")
-            else:
-                queryset = queryset.filter(obj_type_id=obj_type)
-
-        # Дата заявки від
-        app_date_from = self.request.query_params.get('app_date_from', None)
-        if app_date_from:
-            try:
-                app_date_from = datetime.datetime.strptime(app_date_from, '%d.%m.%Y')
-                queryset = queryset.filter(app_date__gte=app_date_from.replace(hour=0, minute=0, second=0))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру app_date_from")
-
-        # Дата заявки до
-        app_date_to = self.request.query_params.get('app_date_to', None)
-        if app_date_to:
-            try:
-                app_date_to = datetime.datetime.strptime(app_date_to, '%d.%m.%Y')
-                queryset = queryset.filter(app_date__lte=app_date_to.replace(hour=23, minute=59, second=59))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру app_date_to")
-
-        # Дата реєстрації від
-        reg_date_from = self.request.query_params.get('reg_date_from', None)
-        if reg_date_from:
-            try:
-                reg_date_from = datetime.datetime.strptime(reg_date_from, '%d.%m.%Y')
-                queryset = queryset.filter(registration_date__gte=reg_date_from.replace(hour=0, minute=0, second=0))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру reg_date_from")
-
-        # Дата реєстрації до
-        reg_date_to = self.request.query_params.get('reg_date_to', None)
-        if reg_date_to:
-            try:
-                reg_date_to = datetime.datetime.strptime(reg_date_to, '%d.%m.%Y')
-                queryset = queryset.filter(registration_date__lte=reg_date_to.replace(hour=23, minute=59, second=59))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру reg_date_to")
-
-        # Дата останньої зміни від
-        last_update_from = self.request.query_params.get('last_update_from', None)
-        if last_update_from:
-            try:
-                last_update_from = datetime.datetime.strptime(last_update_from, '%d.%m.%Y')
-                queryset = queryset.filter(last_update__gte=last_update_from.replace(hour=0, minute=0, second=0))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру last_update_from")
-
-        # Дата останньої зміни до
-        last_update_to = self.request.query_params.get('last_update_to', None)
-        if last_update_to:
-            try:
-                last_update_to = datetime.datetime.strptime(last_update_to, '%d.%m.%Y')
-                queryset = queryset.filter(last_update__lte=last_update_to.replace(hour=23, minute=59, second=59))
-            except:
-                raise exceptions.ParseError("Невірне значення параметру last_update_to")
-
+        filters = services.opendata_prepare_filters(self.request.query_params)
+        queryset = services.opendata_get_list_queryset(filters)
         return queryset
 
 
@@ -157,7 +84,7 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('-registration_number')
+        queryset = OpenData.objects.select_related('obj_type').order_by('-registration_number')
 
         if self.request.query_params.get('obj_type', None):
             try:
@@ -217,7 +144,7 @@ class SearchListView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=1).select_related('obj_type').order_by('pk').all()
+        queryset = OpenData.objects.select_related('obj_type').order_by('pk').all()
 
         # Тип об'єкта
         obj_type = self.request.query_params.get('obj_type', None)

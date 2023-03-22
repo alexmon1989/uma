@@ -1,11 +1,15 @@
-from django.db.models import F
+from django.db.models import F, QuerySet
 from django.conf import settings
+
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
+from rest_framework import exceptions
+
 from apps.search.models import IpcAppList
 import apps.search.services as search_services
 from apps.api.models import OpenData
 from apps.bulletin.models import EBulletinData
+
 from typing import List, Optional, Union
 from datetime import datetime
 
@@ -230,3 +234,92 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
             data_biblio = {'stages': stages}
 
     return data_biblio
+
+
+def opendata_prepare_filters(query_params: dict) -> dict:
+    """Возвращает провалидированные значения фильтров."""
+    res = {}
+
+    # Целочисленные фильтры
+    filters = (
+        'obj_state',  # Стан об'єкта
+        'obj_type',  # Тип об'єкта
+    )
+    for key in filters:
+        value = query_params.get(key)
+        if value:
+            try:
+                value = int(value)
+            except ValueError:
+                raise exceptions.ParseError(f"Невірне значення параметру {key}")
+            else:
+                res[key] = value
+
+    # Фильтры даты
+    filters = (
+        'app_date_from',  # Дата заявки від
+        'app_date_to',  # Дата заявки від
+        'reg_date_from',  # Дата реєстрації від
+        'reg_date_to',  # Дата реєстрації до
+        'last_update_from',  # Дата останньої зміни від
+        'last_update_to',  # Дата останньої зміни до
+    )
+    for key in filters:
+        value = query_params.get(key)
+        if value:
+            try:
+                value = datetime.strptime(value, '%d.%m.%Y')
+            except (ValueError, TypeError):
+                raise exceptions.ParseError(f"Невірне значення параметру {key}")
+            else:
+                res[key] = value
+
+    # Номер заявки
+    if query_params.get('app_number'):
+        res['app_number'] = query_params['app_number']
+
+    return res
+
+
+def opendata_get_list_queryset(filters: dict) -> QuerySet[OpenData]:
+    """Возвращает Queryset (с применением фильтров) для API."""
+    # TODO remove is_visible from model
+    queryset = OpenData.objects.select_related('obj_type').order_by('pk').all()
+
+    # Стан об'єкта
+    if filters.get('obj_state'):
+        queryset = queryset.filter(obj_state=filters['obj_state'])
+
+    # Тип об'єкта
+    if filters.get('obj_type'):
+        queryset = queryset.filter(obj_type_id=filters['obj_type'])
+
+    # Дата заявки від
+    if filters.get('app_date_from'):
+        queryset = queryset.filter(app_date__gte=filters['app_date_from'].replace(hour=0, minute=0, second=0))
+
+    # Дата заявки до
+    if filters.get('app_date_to'):
+        queryset = queryset.filter(app_date__lte=filters['app_date_to'].replace(hour=23, minute=59, second=59))
+
+    # Дата реєстрації від
+    if filters.get('reg_date_from'):
+        queryset = queryset.filter(registration_date__gte=filters['reg_date_from'].replace(hour=0, minute=0, second=0))
+
+    # Дата реєстрації до
+    if filters.get('reg_date_to'):
+        queryset = queryset.filter(registration_date__lte=filters['reg_date_to'].replace(hour=23, minute=59, second=59))
+
+    # Дата останньої зміни від
+    if filters.get('last_update_from'):
+        queryset = queryset.filter(last_update__gte=filters['last_update_from'].replace(hour=0, minute=0, second=0))
+
+    # Дата останньої зміни до
+    if filters.get('last_update_to'):
+        queryset = queryset.filter(last_update__lte=filters['last_update_to'].replace(hour=23, minute=59, second=59))
+
+    # Номер заявки
+    if filters.get('app_number'):
+        queryset = queryset.filter(app_number=filters['app_number'])
+
+    return queryset
