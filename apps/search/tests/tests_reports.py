@@ -2092,6 +2092,29 @@ class ReportItemDocxIDTestCase(TestCase):
         p = item.write(self.document)
         self.assertIn(expected_str, p.text)
 
+        # Альтернативная структура данных (есть ключ Priority)
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": {
+                        'Priority': [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
         # Данные существуют и запрещены для отображения
         inid_data = [
             InidCode(6, '31', inid_title, 2, False)
@@ -2171,6 +2194,29 @@ class ReportItemDocxIDTestCase(TestCase):
         p = item.write(self.document)
         self.assertIn(expected_str, p.text)
 
+        # Альтернативная структура данных (есть ключ Priority)
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": {
+                        'Priority': [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
         # Данные существуют и запрещены для отображения
         inid_data = [
             InidCode(6, '32', inid_title, 2, False)
@@ -2246,6 +2292,29 @@ class ReportItemDocxIDTestCase(TestCase):
         inid_data = [
             InidCode(6, '33', inid_title, 2, True)
         ]
+        item = ReportItemDocxID(biblio_data, inid_data)
+        p = item.write(self.document)
+        self.assertIn(expected_str, p.text)
+
+        # Альтернативная структура данных (есть ключ Priority)
+        biblio_data = {
+            'Design': {
+                'DesignDetails': {
+                    "PriorityDetails": {
+                        'Priority': [
+                            {
+                                "PriorityNumber": "s202300001",
+                                "PriorityDate": "2023-02-27",
+                                "PriorityCountryCode": "UA"
+                            }
+                        ]
+                    }
+                }
+            },
+            'search_data': {
+                'obj_state': 2
+            }
+        }
         item = ReportItemDocxID(biblio_data, inid_data)
         p = item.write(self.document)
         self.assertIn(expected_str, p.text)
