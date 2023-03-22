@@ -11,7 +11,7 @@ import datetime
 
 class OpenDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True, source="app_id")
-    obj_type = serializers.CharField(read_only=True, source="obj_type__obj_type_ua")
+    obj_type = serializers.CharField(read_only=True, source="obj_type.obj_type_ua")
 
     def to_representation(self, instance: OpenData):
         ret = super().to_representation(instance)
