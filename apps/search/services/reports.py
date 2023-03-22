@@ -723,7 +723,7 @@ class ReportItemDocxID(ReportItemDocx):
     def _write_21(self) -> None:
         """Записывает в документ данные об ИНИД (21) Номер заявки."""
         inid = self._get_inid(self.obj_type_id, '21', self.application_data['search_data']['obj_state'])
-        app_number = self.application_data['search_data']['app_number']
+        app_number = self.application_data['search_data'].get('app_number')
         if inid and inid.visible and app_number:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -809,7 +809,7 @@ class ReportItemDocxID(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (31) Номер попередньої заявки відповідно до Паризької конвенції."""
         inid = self._get_inid(self.obj_type_id, '31', self.application_data['search_data']['obj_state'])
-        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
         if inid and inid.visible and priority and len(priority) > 0:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -820,7 +820,7 @@ class ReportItemDocxID(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (32) Дата подання попередньої заявки відповідно до Паризької конвенції."""
         inid = self._get_inid(self.obj_type_id, '32', self.application_data['search_data']['obj_state'])
-        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
         if inid and inid.visible and priority and len(priority) > 0:
             priority_date = datetime.strptime(priority[0]['PriorityDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"({inid.code})").bold = True
@@ -832,7 +832,7 @@ class ReportItemDocxID(ReportItemDocx):
         """Записывает в документ данные об
         ИНИД (33) Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку."""
         inid = self._get_inid(self.obj_type_id, '33', self.application_data['search_data']['obj_state'])
-        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority')
+        priority = self.application_data['Design']['DesignDetails'].get('PriorityDetails')
         if inid and inid.visible and priority and len(priority) > 0:
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
