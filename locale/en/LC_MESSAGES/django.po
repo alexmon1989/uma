@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-14 16:55+0200\n"
+"POT-Creation-Date: 2023-03-29 13:53+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,13 +19,6 @@ msgstr ""
 "X-Generator: Poedit 2.2\n"
 
 #: apps/about/templates/about/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/account_balance/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/account_balance_deposit/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/dashboard/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/messages/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/orders/detail/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:16
-#: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:16
 #: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:16
 #: apps/bulletin_new/templates/bulletin_new/_partials/breadcrumbs.html:16
 #: apps/contacts/templates/contacts/_partials/breadcrumbs.html:16
@@ -54,258 +47,6 @@ msgstr ""
 #: apps/services/templates/services/original_document/_partials/breadcrumbs.html:16
 msgid "Головна"
 msgstr "Home"
-
-#: apps/account/forms.py:6
-msgid "Сума поповнення"
-msgstr "Credit value"
-
-#: apps/account/forms.py:10
-msgid "Ваш контактний E-Mail"
-msgstr "Contact E-Mail"
-
-#: apps/account/forms.py:12
-msgid "Я погоджуюсь з умовами договору про надання інформаційних послуг"
-msgstr "I agree to the terms of the information service agreement"
-
-#: apps/account/forms.py:14
-msgid ""
-"Перегляд матеріалів заявок з обмеженим доступом можливий лише на умовах <a "
-"href=\"#\" data-toggle=\"modal\" data-target=\"#modal1\">цього договору</a>"
-msgstr ""
-"You can only view paid application materials under <a href=\"#\" data-toggle="
-"\"modal\" data-target=\"#modal\">this license</a>"
-
-#: apps/account/models.py:34
-msgid "Надання доступу до інформації про заявку"
-msgstr "Providing access to application information"
-
-#: apps/account/models.py:35
-#: apps/account/templates/accounts/account_balance_deposit/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/account_balance_deposit/_partials/breadcrumbs.html:24
-msgid "Поповнення рахунку"
-msgstr "Deposit balance"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:6
-#: apps/account/templates/accounts/dashboard/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/dashboard/_partials/breadcrumbs.html:24
-#: apps/account/templates/accounts/dashboard/index.html:4
-#: apps/account/templates/accounts/dashboard/index.html:19
-msgid "Загальна інформація"
-msgstr "Dashboard"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:10
-#: templates/_partials/header.html:164
-msgid "Мій рахунок (баланс)"
-msgstr "My account balance"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:14
-#: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:24
-#: apps/account/templates/accounts/views_history/index.html:4
-#: apps/account/templates/accounts/views_history/index.html:19
-msgid "Історія переглядів заявок"
-msgstr "Applications views history"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:18
-#: apps/contacts/templates/contacts/_partials/form.html:24
-#: templates/_partials/header.html:170
-msgid "Повідомлення"
-msgstr "Message"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:22
-#: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:24
-#: apps/account/templates/accounts/settings/index.html:5
-#: apps/account/templates/accounts/settings/index.html:20
-#: templates/_partials/header.html:173
-msgid "Налаштування"
-msgstr "Settings"
-
-#: apps/account/templates/accounts/_partials/sidebar.html:26
-#: templates/_partials/header.html:178 templates/_partials/header.html:187
-msgid "Вихід"
-msgstr "Exit"
-
-#: apps/account/templates/accounts/account_balance/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/account_balance/_partials/breadcrumbs.html:24
-msgid "Баланс рахунку "
-msgstr "Account balance "
-
-#: apps/account/templates/accounts/account_balance/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/account_balance/index.html:4
-#: apps/account/templates/accounts/account_balance_deposit/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/account_balance_deposit/index.html:5
-#: apps/account/templates/accounts/dashboard/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/dashboard/index.html:4
-#: apps/account/templates/accounts/messages/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/messages/list.html:4
-#: apps/account/templates/accounts/orders/detail/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/orders/detail/index.html:6
-#: apps/account/templates/accounts/settings/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/settings/index.html:5
-#: apps/account/templates/accounts/views_history/_partials/breadcrumbs.html:20
-#: apps/account/templates/accounts/views_history/index.html:4
-#: templates/_partials/header.html:158
-msgid "Мій кабінет"
-msgstr "My account"
-
-#: apps/account/templates/accounts/account_balance/index.html:4
-#: apps/account/templates/accounts/account_balance_deposit/index.html:5
-#: apps/account/templates/accounts/dashboard/index.html:27
-msgid "Баланс рахунку"
-msgstr "Account balance"
-
-#: apps/account/templates/accounts/account_balance/index.html:20
-#: apps/account/templates/accounts/account_balance_deposit/index.html:20
-msgid "Поточний баланс рахунку"
-msgstr "Current balance"
-
-#: apps/account/templates/accounts/account_balance/index.html:20
-#: apps/account/templates/accounts/account_balance/index.html:50
-#: apps/account/templates/accounts/account_balance/index.html:53
-#: apps/account/templates/accounts/account_balance_deposit/index.html:20
-#: apps/account/templates/accounts/dashboard/index.html:28
-#: apps/search/templates/search/detail/paid_access_conformation.html:26
-msgid "грн"
-msgstr "uah"
-
-#: apps/account/templates/accounts/account_balance/index.html:21
-#: apps/search/templates/search/detail/paid_access_conformation.html:27
-msgid "Поповнити рахунок"
-msgstr "Deposit balance"
-
-#: apps/account/templates/accounts/account_balance/index.html:31
-msgid "Операції"
-msgstr "Operations"
-
-#: apps/account/templates/accounts/account_balance/index.html:39
-#: apps/account/templates/accounts/views_history/index.html:36
-msgid "Дата"
-msgstr "Date"
-
-#: apps/account/templates/accounts/account_balance/index.html:40
-msgid "Значення"
-msgstr "Value"
-
-#: apps/account/templates/accounts/account_balance/index.html:41
-#: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:29
-#: apps/search/templates/search/detail/inv_um/detail.html:31
-#: apps/search/templates/search/detail/ld/_partials/sidebar.html:29
-#: apps/search/templates/search/detail/ld/detail.html:31
-msgid "Опис"
-msgstr "Description"
-
-#: apps/account/templates/accounts/account_balance/index.html:51
-msgid "Отримання доступу до даних заявки"
-msgstr "Accessing application data"
-
-#: apps/account/templates/accounts/account_balance/index.html:54
-msgid "Поповнення балансу"
-msgstr "Deposit balance"
-
-#: apps/account/templates/accounts/account_balance/index.html:63
-msgid "Операції відсутні"
-msgstr "There are no operations"
-
-#: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:7
-#: apps/search/templates/search/detail/_partials/license_confirmation.html:7
-msgid "Помилка"
-msgstr "Error"
-
-#: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:9
-msgid "Поповнення рахунку можливе лише після погодження з умовами"
-msgstr "Replenishment is only possible after agreeing to the terms"
-
-#: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:10
-msgid "ліцензійної угоди"
-msgstr "of license"
-
-#: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:13
-#: apps/search/templates/search/detail/_partials/license_confirmation.html:13
-msgid "Погоджуюсь"
-msgstr "Agree"
-
-#: apps/account/templates/accounts/account_balance_deposit/_partials/license_confirmation.html:23
-#: apps/search/templates/search/detail/_partials/license_confirmation.html:23
-msgid "Текст ліцензії"
-msgstr "License text"
-
-#: apps/account/templates/accounts/account_balance_deposit/index.html:30
-msgid "Сформувати рахунок"
-msgstr "Create bill"
-
-#: apps/account/templates/accounts/dashboard/index.html:22
-msgid "Користувач"
-msgstr "User"
-
-#: apps/account/templates/accounts/messages/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/messages/_partials/breadcrumbs.html:24
-#: apps/account/templates/accounts/messages/list.html:4
-#: apps/account/templates/accounts/messages/list.html:18
-msgid "Системні повідомлення"
-msgstr "System messages"
-
-#: apps/account/templates/accounts/messages/list.html:29
-msgid "Відмітити як прочитане"
-msgstr "Mark as read"
-
-#: apps/account/templates/accounts/orders/detail/_partials/breadcrumbs.html:10
-#: apps/account/templates/accounts/orders/detail/index.html:6
-#: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:10
-#: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:28
-#: apps/payments/templates/payments/order_detail/index.html:5
-msgid "Замовлення"
-msgstr "Orders"
-
-#: apps/account/templates/accounts/orders/detail/_partials/breadcrumbs.html:24
-#: apps/account/templates/accounts/orders/detail/index.html:21
-#: apps/payments/templates/payments/order_detail/index.html:14
-msgid "Деталі замовлення"
-msgstr "Order details"
-
-#: apps/account/templates/accounts/orders/detail/index.html:24
-#, python-format
-msgid ""
-"Рахунок на поповнення на <strong>%(value)s грн.</strong> успішно сформовано, "
-"ви можете сплатити його за допомогою сервісу \"Приват24\", скориставшись "
-"кнопкою нижче."
-msgstr ""
-
-#: apps/account/templates/accounts/orders/detail/index.html:30
-msgid "Сплатити у Приват24"
-msgstr "Pay with Privat24"
-
-#: apps/account/templates/accounts/settings/_partials/license.html:8
-msgid "Текст договору про надання інформаційних послуг"
-msgstr "The text of the information service agreement"
-
-#: apps/account/templates/accounts/settings/index.html:27
-msgid "Зберегти"
-msgstr "Save"
-
-#: apps/account/templates/accounts/views_history/index.html:28
-msgid "Перегляди заявок"
-msgstr "Application views"
-
-#: apps/account/templates/accounts/views_history/index.html:37
-msgid "№ заявки"
-msgstr "Application number"
-
-#: apps/account/templates/accounts/views_history/index.html:53
-msgid "Перегляди заявок відсутні"
-msgstr "There are no payments"
-
-#: apps/account/views.py:123
-msgid "Повідомлення відмічене як прочитане"
-msgstr "The message has been marked as read"
-
-#: apps/account/views.py:134
-msgid "Дані успішно збережено"
-msgstr "Data has been successfully saved"
-
-#: apps/account/views.py:170
-msgid "Ви погодилися з умовами ліцензії"
-msgstr "You have agreed with license terms"
 
 #: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:10
 #: apps/bulletin/templates/bulletin/index/_partials/breadcrumbs.html:20
@@ -342,6 +83,7 @@ msgstr "You have agreed with license terms"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:561
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:583
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:605
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:623
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:13
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:13
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:36
@@ -538,6 +280,7 @@ msgstr "Date from which the certificate is considered invalid"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:263
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:475
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:595
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:631
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:151
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:186
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:240
@@ -576,6 +319,11 @@ msgstr "Name"
 msgid "Тема повідомлення"
 msgstr "Subject"
 
+#: apps/contacts/templates/contacts/_partials/form.html:24
+#: templates/_partials/header.html:170
+msgid "Повідомлення"
+msgstr "Message"
+
 #: apps/contacts/templates/contacts/_partials/form.html:31
 msgid "Відправити повідомлення"
 msgstr "Send"
@@ -586,25 +334,31 @@ msgstr "Send"
 msgid "Вибране"
 msgstr "Favorites"
 
-#: apps/favorites/templates/favorites/index/_partials/import_results_btn.html:9
-#: apps/search/templates/search/advanced/_partials/import_results_btn.html:9
-#: apps/search/templates/search/advanced/_partials/import_results_btn.html:18
-#: apps/search/templates/search/simple/_partials/import_results_btn.html:9
-#: apps/search/templates/search/simple/_partials/import_results_btn.html:18
-#: apps/search/templates/search/transactions/_partials/import_results_btn.html:9
-#: apps/search/templates/search/transactions/_partials/import_results_btn.html:18
-msgid "Завантажити результати пошуку (.xls)"
-msgstr "Download search results (.xls)"
-
+#: apps/favorites/templates/favorites/index/_partials/import_results_btn.html:6
 #: apps/favorites/templates/favorites/index/_partials/import_results_btn.html:11
-msgid ""
-"Завантаження результатів можливе, якщо кількість елементів менша або рівна "
-"5000"
-msgstr "Downloading is possible when search result count is less or equal 5000"
+#: apps/search/templates/search/advanced/_partials/import_results_btn.html:6
+#: apps/search/templates/search/advanced/_partials/import_results_btn.html:11
+#: apps/search/templates/search/simple/_partials/import_results_btn.html:6
+#: apps/search/templates/search/simple/_partials/import_results_btn.html:11
+#: apps/search/templates/search/transactions/_partials/import_results_btn.html:6
+#: apps/search/templates/search/transactions/_partials/import_results_btn.html:11
+#, fuzzy
+#| msgid "Всього результатів"
+msgid "Експорт результатів"
+msgstr "Results"
 
-#: apps/favorites/templates/favorites/index/_partials/import_results_btn.html:18
-msgid "Завантажити результати (.xls)"
-msgstr "Download results (.xls)"
+#: apps/favorites/templates/favorites/index/_partials/import_results_btn.html:7
+#: apps/search/templates/search/advanced/_partials/import_results_btn.html:7
+#: apps/search/templates/search/simple/_partials/import_results_btn.html:7
+#: apps/search/templates/search/transactions/_partials/import_results_btn.html:7
+#, fuzzy
+#| msgid ""
+#| "Завантаження результатів можливе, якщо кількість елементів менша або "
+#| "рівна 5000"
+msgid ""
+"завантаження результатів можливе, якщо кількість елементів менша або рівна "
+"500"
+msgstr "Downloading is possible when search result count is less or equal 5000"
 
 #: apps/favorites/templates/favorites/index/_partials/results.html:10
 #: apps/search/templates/search/advanced/_partials/results.html:20
@@ -639,7 +393,7 @@ msgstr ""
 "There are no documents in the favorites list at the moment. You can do <a "
 "href=\"%(simple_search_url)s\">search</a> and fill it with documents."
 
-#: apps/favorites/views.py:92
+#: apps/favorites/views.py:90
 msgid "Список вибраного успішно очищено."
 msgstr "The favorites list was cleared."
 
@@ -710,57 +464,57 @@ msgstr "There is no information."
 msgid "Авторизація"
 msgstr "Authorization"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:39
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:42
 msgid "Оберіть ЦСК"
 msgstr "Select key certification center"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:47
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:54
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:50
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:57
 msgid "Особистий ключ"
 msgstr "Personal key"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:58
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:79
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:61
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:82
 msgid "Огляд"
 msgstr "Browse"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:68
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:75
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:71
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:78
 msgid "Сертифікат(и)"
 msgstr "Certificate(s)"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:83
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:86
 msgid "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)"
 msgstr ""
 "Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:90
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:93
 msgid "Пароль захисту ключа"
 msgstr "Key password"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:108
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:72
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:111
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:77
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:77
 msgid "Запам'ятати"
 msgstr "Remember me"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:115
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:116
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:78
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:118
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_ds.html:119
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:83
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:82
 #: templates/_partials/header.html:190
 msgid "Вхід"
 msgstr "Enter"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:32
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:36
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:37
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:41
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:39
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:43
 msgid "Логін"
 msgstr "Username"
 
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:48
-#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:54
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:53
+#: apps/my_auth/templates/my_auth/login/_partials/form_login_password.html:59
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:54
 #: apps/my_auth/templates/my_auth/login_simple/login_simple.html:60
 msgid "Пароль"
@@ -885,6 +639,16 @@ msgstr "Fax:"
 msgid "Сплата зборів"
 msgstr "Fees payment"
 
+#: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:10
+#: apps/payments/templates/payments/order_detail/_partials/breadcrumbs.html:28
+#: apps/payments/templates/payments/order_detail/index.html:5
+msgid "Замовлення"
+msgstr "Orders"
+
+#: apps/payments/templates/payments/order_detail/index.html:14
+msgid "Деталі замовлення"
+msgstr "Order details"
+
 #: apps/payments/templates/payments/order_detail/index.html:17
 msgid "Дякуємо, замовлення було сплачено."
 msgstr "Thank you, your order was successfully paid."
@@ -963,7 +727,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
-#: apps/search/utils.py:1263
+#: apps/search/utils.py:1249
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -991,14 +755,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1321
+#: apps/search/utils.py:1307
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1321
+#: apps/search/utils.py:1307
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -1010,51 +774,51 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/services/services.py:82
+#: apps/search/services/services.py:83
 #: apps/search/templatetags/search_extras.py:446
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/services/services.py:88 apps/search/services/services.py:232
-#: apps/search/services/services.py:317
+#: apps/search/services/services.py:89 apps/search/services/services.py:233
+#: apps/search/services/services.py:318
 #: apps/search/templatetags/search_extras.py:293
 #: apps/search/templatetags/search_extras.py:371
 #: apps/search/templatetags/search_extras.py:452
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/services/services.py:94
+#: apps/search/services/services.py:95
 #: apps/search/templatetags/search_extras.py:458
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/services/services.py:100 apps/search/services/services.py:236
+#: apps/search/services/services.py:101 apps/search/services/services.py:237
 #: apps/search/templatetags/search_extras.py:297
 #: apps/search/templatetags/search_extras.py:464
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/services/services.py:105
+#: apps/search/services/services.py:106
 #: apps/search/templatetags/search_extras.py:469
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/services/services.py:111 apps/search/services/services.py:240
+#: apps/search/services/services.py:112 apps/search/services/services.py:241
 #: apps/search/templatetags/search_extras.py:301
 #: apps/search/templatetags/search_extras.py:475
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/services/services.py:117 apps/search/services/services.py:244
-#: apps/search/services/services.py:325
+#: apps/search/services/services.py:118 apps/search/services/services.py:245
+#: apps/search/services/services.py:326
 #: apps/search/templatetags/search_extras.py:305
 #: apps/search/templatetags/search_extras.py:379
 #: apps/search/templatetags/search_extras.py:481
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/services/services.py:124 apps/search/services/services.py:248
-#: apps/search/services/services.py:329
+#: apps/search/services/services.py:125 apps/search/services/services.py:249
+#: apps/search/services/services.py:330
 #: apps/search/templatetags/search_extras.py:309
 #: apps/search/templatetags/search_extras.py:383
 #: apps/search/templatetags/search_extras.py:488
@@ -1065,22 +829,22 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/services/services.py:228
+#: apps/search/services/services.py:229
 #: apps/search/templatetags/search_extras.py:289
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/services/services.py:313
+#: apps/search/services/services.py:314
 #: apps/search/templatetags/search_extras.py:367
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/services/services.py:321
+#: apps/search/services/services.py:322
 #: apps/search/templatetags/search_extras.py:375
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/tasks.py:44 apps/search/tasks.py:239 apps/search/tasks.py:299
+#: apps/search/tasks.py:45 apps/search/tasks.py:228 apps/search/tasks.py:288
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -1219,7 +983,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1264
+#: apps/search/utils.py:1250
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1262,17 +1026,9 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1274
+#: apps/search/utils.py:1260
 msgid "МКПЗ"
 msgstr "ICID"
-
-#: apps/search/templates/search/advanced/_partials/import_results_btn.html:11
-#: apps/search/templates/search/simple/_partials/import_results_btn.html:11
-#: apps/search/templates/search/transactions/_partials/import_results_btn.html:11
-msgid ""
-"Завантаження результатів можливе, якщо кількість результатів пошуку менша "
-"або рівна 5000"
-msgstr "Downloading is possible when search result count is less or equal 5000"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:21
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:21
@@ -1305,7 +1061,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1272
+#: apps/search/utils.py:1258
 msgid "МПК"
 msgstr "IPC"
 
@@ -1510,7 +1266,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1273
+#: apps/search/utils.py:1259
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1565,8 +1321,16 @@ msgid "Бібліографічні дані"
 msgstr "Bibliographic data"
 
 #: apps/search/templates/search/detail/_partials/biblio_header.html:11
+msgid "Експорт в MS Word (.docx)"
+msgstr ""
+
+#: apps/search/templates/search/detail/_partials/biblio_header.html:16
 msgid "Роздрукувати бібліографічні дані об'єкта"
 msgstr "Print bibliographic data"
+
+#: apps/search/templates/search/detail/_partials/license_confirmation.html:7
+msgid "Помилка"
+msgstr "Error"
 
 #: apps/search/templates/search/detail/_partials/license_confirmation.html:9
 msgid "Перегляд даних заявки можливий лише після погодження з умовами"
@@ -1576,6 +1340,14 @@ msgstr ""
 #: apps/search/templates/search/detail/_partials/license_confirmation.html:10
 msgid "договору про надання інформаційних послуг"
 msgstr "information service agreement"
+
+#: apps/search/templates/search/detail/_partials/license_confirmation.html:13
+msgid "Погоджуюсь"
+msgstr "Agree"
+
+#: apps/search/templates/search/detail/_partials/license_confirmation.html:23
+msgid "Текст ліцензії"
+msgstr "License text"
 
 #: apps/search/templates/search/detail/agreement/_partials/blblio_data/biblio.html:8
 #: apps/search/templates/search/detail/copyright/_partials/blblio_data/biblio.html:8
@@ -1649,14 +1421,14 @@ msgstr "Notifications"
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:14
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:14
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:14
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:16
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
 msgid "Вихідні документи"
 msgstr "Outcoming documents"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:16
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:16
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:16
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:16
 msgid "Вхідні документи"
 msgstr "Incoming documents"
 
@@ -1834,6 +1606,13 @@ msgstr "Download PDF"
 msgid "Формула"
 msgstr "Claim"
 
+#: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:29
+#: apps/search/templates/search/detail/inv_um/detail.html:31
+#: apps/search/templates/search/detail/ld/_partials/sidebar.html:29
+#: apps/search/templates/search/detail/ld/detail.html:31
+msgid "Опис"
+msgstr "Description"
+
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:36
 #: apps/search/templates/search/detail/inv_um/detail.html:39
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:36
@@ -1997,6 +1776,7 @@ msgstr "Expiration date"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:577
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:599
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:617
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:639
 msgid "Причина"
 msgstr "Reason"
 
@@ -2011,7 +1791,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1269
+#: apps/search/utils.py:1255
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2056,6 +1836,14 @@ msgstr "The claim of the utility model as a result of a court decision"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:591
 msgid "Дата публікації відомостей про видачу патенту"
 msgstr "Date of publication of information on the grant of a patent"
+
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:627
+msgid "Номер реєстрації, що є номером патенту"
+msgstr "Registration number, which is a patent number"
+
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:635
+msgid "Імꞌя або повне найменування та адреса володільця патенту"
+msgstr "Name or full name and address of the patent owner"
 
 #: apps/search/templates/search/detail/inv_um/detail.html:47
 #: apps/search/templates/search/detail/ld/detail.html:47
@@ -2104,6 +1892,14 @@ msgstr ""
 #: apps/search/templates/search/detail/paid_access_conformation.html:26
 msgid "Ваш поточний баланс рахунку"
 msgstr "Your current account balance state"
+
+#: apps/search/templates/search/detail/paid_access_conformation.html:26
+msgid "грн"
+msgstr "uah"
+
+#: apps/search/templates/search/detail/paid_access_conformation.html:27
+msgid "Поповнити рахунок"
+msgstr "Deposit balance"
 
 #: apps/search/templates/search/detail/paid_access_conformation.html:35
 msgid "Я згоден та хочу продовжити перегляд"
@@ -2282,43 +2078,43 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1261
+#: apps/search/utils.py:1247
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1262
+#: apps/search/utils.py:1248
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1265
+#: apps/search/utils.py:1251
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1266
+#: apps/search/utils.py:1252
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1267
+#: apps/search/utils.py:1253
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1268
+#: apps/search/utils.py:1254
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1270
+#: apps/search/utils.py:1256
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1271
+#: apps/search/utils.py:1257
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1275
+#: apps/search/utils.py:1261
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1276
+#: apps/search/utils.py:1262
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2371,9 +2167,25 @@ msgstr "Count of documents"
 msgid "Перейти до списку вибраних документів"
 msgstr "Go to the favorites list"
 
+#: templates/_partials/header.html:158
+msgid "Мій кабінет"
+msgstr "My account"
+
+#: templates/_partials/header.html:164
+msgid "Мій рахунок (баланс)"
+msgstr "My account balance"
+
 #: templates/_partials/header.html:167
 msgid "Історія переглядів"
 msgstr "Applications views history"
+
+#: templates/_partials/header.html:173
+msgid "Налаштування"
+msgstr "Settings"
+
+#: templates/_partials/header.html:178 templates/_partials/header.html:187
+msgid "Вихід"
+msgstr "Exit"
 
 #: templates/templatetags/footer_contacts.html:4
 msgid "Зв'язок з нами"
@@ -2382,6 +2194,119 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Сума поповнення"
+#~ msgstr "Credit value"
+
+#~ msgid "Ваш контактний E-Mail"
+#~ msgstr "Contact E-Mail"
+
+#~ msgid "Я погоджуюсь з умовами договору про надання інформаційних послуг"
+#~ msgstr "I agree to the terms of the information service agreement"
+
+#~ msgid ""
+#~ "Перегляд матеріалів заявок з обмеженим доступом можливий лише на умовах "
+#~ "<a href=\"#\" data-toggle=\"modal\" data-target=\"#modal1\">цього "
+#~ "договору</a>"
+#~ msgstr ""
+#~ "You can only view paid application materials under <a href=\"#\" data-"
+#~ "toggle=\"modal\" data-target=\"#modal\">this license</a>"
+
+#~ msgid "Надання доступу до інформації про заявку"
+#~ msgstr "Providing access to application information"
+
+#~ msgid "Поповнення рахунку"
+#~ msgstr "Deposit balance"
+
+#~ msgid "Загальна інформація"
+#~ msgstr "Dashboard"
+
+#~ msgid "Історія переглядів заявок"
+#~ msgstr "Applications views history"
+
+#~ msgid "Баланс рахунку "
+#~ msgstr "Account balance "
+
+#~ msgid "Баланс рахунку"
+#~ msgstr "Account balance"
+
+#~ msgid "Поточний баланс рахунку"
+#~ msgstr "Current balance"
+
+#~ msgid "Операції"
+#~ msgstr "Operations"
+
+#~ msgid "Дата"
+#~ msgstr "Date"
+
+#~ msgid "Значення"
+#~ msgstr "Value"
+
+#~ msgid "Отримання доступу до даних заявки"
+#~ msgstr "Accessing application data"
+
+#~ msgid "Поповнення балансу"
+#~ msgstr "Deposit balance"
+
+#~ msgid "Операції відсутні"
+#~ msgstr "There are no operations"
+
+#~ msgid "Поповнення рахунку можливе лише після погодження з умовами"
+#~ msgstr "Replenishment is only possible after agreeing to the terms"
+
+#~ msgid "ліцензійної угоди"
+#~ msgstr "of license"
+
+#~ msgid "Сформувати рахунок"
+#~ msgstr "Create bill"
+
+#~ msgid "Користувач"
+#~ msgstr "User"
+
+#~ msgid "Системні повідомлення"
+#~ msgstr "System messages"
+
+#~ msgid "Відмітити як прочитане"
+#~ msgstr "Mark as read"
+
+#~ msgid "Сплатити у Приват24"
+#~ msgstr "Pay with Privat24"
+
+#~ msgid "Текст договору про надання інформаційних послуг"
+#~ msgstr "The text of the information service agreement"
+
+#~ msgid "Зберегти"
+#~ msgstr "Save"
+
+#~ msgid "Перегляди заявок"
+#~ msgstr "Application views"
+
+#~ msgid "№ заявки"
+#~ msgstr "Application number"
+
+#~ msgid "Перегляди заявок відсутні"
+#~ msgstr "There are no payments"
+
+#~ msgid "Повідомлення відмічене як прочитане"
+#~ msgstr "The message has been marked as read"
+
+#~ msgid "Дані успішно збережено"
+#~ msgstr "Data has been successfully saved"
+
+#~ msgid "Ви погодилися з умовами ліцензії"
+#~ msgstr "You have agreed with license terms"
+
+#~ msgid "Завантажити результати пошуку (.xls)"
+#~ msgstr "Download search results (.xls)"
+
+#~ msgid "Завантажити результати (.xls)"
+#~ msgstr "Download results (.xls)"
+
+#~ msgid ""
+#~ "Завантаження результатів можливе, якщо кількість результатів пошуку менша "
+#~ "або рівна 5000"
+#~ msgstr ""
+#~ "Downloading is possible when search result count is less or equal 5000"
 
 #~ msgid "Технічні питання"
 #~ msgstr "Technical questions"
