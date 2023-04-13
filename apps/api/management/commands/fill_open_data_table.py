@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.core.mail import mail_admins
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
@@ -69,6 +70,7 @@ class Command(BaseCommand):
             i = 0
 
         # Добавление/обновление данных
+        updated_count = 0
         for d in apps:
             if options['verbose']:
                 i += 1
@@ -112,5 +114,11 @@ class Command(BaseCommand):
                 else:
                     open_data_record.obj_state = 1
                 open_data_record.save()
+                updated_count += 1
+
+        mail_admins(
+            "API SIS",
+            f"API updated. Total count: {updated_count}",
+        )
 
         self.stdout.write(self.style.SUCCESS(f'Finished'))

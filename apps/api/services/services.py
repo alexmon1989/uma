@@ -281,9 +281,9 @@ def opendata_prepare_filters(query_params: dict) -> dict:
     return res
 
 
-def opendata_get_list_queryset(filters: dict) -> QuerySet[OpenData]:
-    """Возвращает Queryset (с применением фильтров) для API."""
-    queryset = OpenData.objects.select_related('obj_type').order_by('pk').all()
+def opendata_get_ids_queryset(filters: dict) -> QuerySet[OpenData]:
+    """Возвращает Queryset (с применением фильтров) с id заявок для API."""
+    queryset = OpenData.objects.order_by('pk').all()
 
     # Стан об'єкта
     if filters.get('obj_state'):
@@ -321,4 +321,24 @@ def opendata_get_list_queryset(filters: dict) -> QuerySet[OpenData]:
     if filters.get('app_number'):
         queryset = queryset.filter(app_number=filters['app_number'])
 
-    return queryset
+    return queryset.values_list('id', flat=True)
+
+
+def opendata_get_applications(ids: List[int]) -> List[dict]:
+    """Возвращает список данных заявок по их идентификаторам."""
+    apps = OpenData.objects.select_related('obj_type').filter(pk__in=ids).values(
+        'id',
+        'obj_type_id',
+        'obj_state',
+        'app_number',
+        'app_date',
+        'registration_number',
+        'registration_date',
+        'last_update',
+        'data',
+        'data_docs',
+        'data_payments',
+        'obj_type__obj_type_ua',
+        'files_path',
+    )
+    return list(apps)
