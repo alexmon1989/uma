@@ -71,9 +71,17 @@ class OpenDataListViewV1(generics.ListAPIView):
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(services.opendata_get_applications(page), many=True)
+            return self.get_paginated_response(serializer.data)
+
     def get_queryset(self):
         filters = services.opendata_prepare_filters(self.request.query_params)
-        queryset = services.opendata_get_list_queryset(filters)
+        queryset = services.opendata_get_ids_queryset(filters)
         return queryset
 
 
@@ -96,7 +104,21 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
         return queryset
 
     def get_object(self):
-        qs = self.get_queryset().filter(app_number=self.kwargs['app_number'])
+        qs = self.get_queryset().filter(app_number=self.kwargs['app_number']).values(
+            'id',
+            'obj_type_id',
+            'obj_state',
+            'app_number',
+            'app_date',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+            'data_docs',
+            'data_payments',
+            'obj_type__obj_type_ua',
+            'files_path',
+        )
 
         if qs.count() > 0:
             return qs.first()
@@ -169,6 +191,22 @@ class SearchListView(generics.ListAPIView):
                 queryset = queryset.filter(app_number__contains_ft=f'"*{app_number}*"')
             if registration_number:
                 queryset = queryset.filter(registration_number__contains_ft=f'"*{registration_number}*"')
+
+        queryset = queryset.values(
+            'id',
+            'obj_type_id',
+            'obj_state',
+            'app_number',
+            'app_date',
+            'registration_number',
+            'registration_date',
+            'last_update',
+            'data',
+            'data_docs',
+            'data_payments',
+            'obj_type__obj_type_ua',
+            'files_path',
+        )
 
         return queryset[:20]
 
