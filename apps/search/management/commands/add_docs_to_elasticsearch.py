@@ -12,6 +12,7 @@ import json
 import os
 import datetime
 import uuid
+import re
 
 
 class Command(BaseCommand):
@@ -245,12 +246,12 @@ class Command(BaseCommand):
                     if type(res['TRANSACTIONS']['TRANSACTION']) is dict:
                         res['TRANSACTIONS']['TRANSACTION'] = [res['TRANSACTIONS']['TRANSACTION']]
                     for transaction in res['TRANSACTIONS']['TRANSACTION']:
-                        bulletin = transaction['BULLETIN'].split(', ')
+                        bul_date = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', transaction['BULLETIN'])
                         try:
-                            transaction['BULLETIN_DATE'] = datetime.datetime.strptime(
-                                bulletin[1], '%d.%m.%Y'
-                            ).strftime('%Y-%m-%d')
-                        except (ValueError, IndexError):  # Строка бюлетня не содержит дату
+                            bul_date_groups = bul_date.groups()
+                            d = f"{bul_date_groups[2]}-{bul_date_groups[1]}-{bul_date_groups[0]}"
+                            transaction['BULLETIN_DATE'] = d
+                        except (ValueError, IndexError, AttributeError):  # Строка бюлетня не содержит дату
                             pass
 
                 # Поисковые данные (для сортировки и т.д.)
