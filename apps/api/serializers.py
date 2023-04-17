@@ -61,7 +61,7 @@ class OpenDataSerializer(serializers.ModelSerializer):
                 except (KeyError, TypeError):
                     pass
 
-        if ret['data_docs']:
+        if ret['data_docs'] and ret['data_docs'] != 'null':
             ret['data_docs'] = json.loads(ret['data_docs'])
             if instance['obj_type_id'] in (1, 2, 3):
                 ret['data_docs'] = search_services.application_filter_documents_im_um_ld(ret['data'], ret['data_docs'])
