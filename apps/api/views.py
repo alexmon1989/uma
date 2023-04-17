@@ -5,7 +5,6 @@ from .models import OpenData
 from apps.search.models import ObjType
 from apps.api.services import services
 
-from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
 import datetime
@@ -59,7 +58,6 @@ class OpenDataListView(generics.ListAPIView):
 
         return queryset
 
-    @method_decorator(cache_page(60 * 60 * 2))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
@@ -67,7 +65,6 @@ class OpenDataListView(generics.ListAPIView):
 class OpenDataListViewV1(generics.ListAPIView):
     serializer_class = OpenDataSerializerV1
 
-    @method_decorator(cache_page(60 * 60 * 2))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
@@ -124,7 +121,6 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
             return qs.first()
         raise Http404
 
-    @method_decorator(cache_page(60 * 60 * 2))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
@@ -155,7 +151,6 @@ class OpenDataDocsView(generics.RetrieveAPIView):
             return qs.first()
         raise Http404
 
-    @method_decorator(cache_page(60 * 60 * 2))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
@@ -210,6 +205,5 @@ class SearchListView(generics.ListAPIView):
 
         return queryset[:20]
 
-    @method_decorator(cache_page(60 * 60 * 2))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
