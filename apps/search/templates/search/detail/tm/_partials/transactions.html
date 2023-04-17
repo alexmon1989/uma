@@ -761,6 +761,48 @@
                                 <li><span class="g-font-weight-600">{% trans "Реєстраційний номер рішення" %}:</span> {{ transaction.TransactionBody.DecisionNumber }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction|get:"@type" == 'WrongRegistrationCertificateWithdrawal' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.PublicationDetails %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Дата публікації та номер бюлетеня" %}:</span>
+                                    {{ transaction.TransactionBody.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}, {{ transaction.TransactionBody.PublicationDetails.Publication.PublicationNumber }}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% elif transaction|get:"@type" == 'WrongRegistrationDecisionWithdrawal' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.RegisterDate %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Номер та дата рішення" %}:</span>
+                                    {{ transaction.TransactionBody.RegisterDate|parse_date|date:"d.m.Y" }}, {{ transaction.TransactionBody.RegisterNumber }}
+                                </li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}
