@@ -440,12 +440,29 @@ class Command(BaseCommand):
                 ))
 
                 for transaction in res['TradeMark']['Transactions']['Transaction']:
+                    # fix структуры
+                    if 'PublicationDate' in transaction['TransactionBody'] \
+                            or 'PublicationNumber' in transaction['TransactionBody']:
+                        transaction['TransactionBody']['PublicationDetails'] = {
+                            'Publication': {
+                                'PublicationDate': transaction['TransactionBody'].pop('PublicationDate', None),
+                                'PublicationNumber': transaction['TransactionBody'].pop('PublicationNumber', None),
+                            }
+                        }
+
                     # fix дат
                     try:
                         d = transaction['TransactionBody']['PublicationDetails']['Publication'][
                             'PublicationDate']
                         transaction['TransactionBody']['PublicationDetails']['Publication'][
                             'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
+                    except:
+                        pass
+                    try:
+                        d = transaction['TransactionBody']['RegisterDate']
+                        transaction['TransactionBody']['RegisterDate'] = datetime.datetime.strptime(
+                            d, '%d.%m.%Y'
+                        ).strftime('%Y-%m-%d')
                     except:
                         pass
 
