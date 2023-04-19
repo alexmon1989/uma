@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-29 13:53+0300\n"
+"POT-Creation-Date: 2023-04-19 12:22+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -84,6 +84,10 @@ msgstr "Home"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:583
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:605
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:623
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:649
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:671
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:689
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:711
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:13
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:13
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:36
@@ -113,6 +117,8 @@ msgstr "Home"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:669
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:705
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:723
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:767
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:788
 #: templates/_partials/footer.html:55 templates/_partials/header.html:87
 msgid "Бюлетень"
 msgstr "Bulletin"
@@ -280,7 +286,7 @@ msgstr "Date from which the certificate is considered invalid"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:263
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:475
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:595
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:631
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:635
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:151
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:186
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:240
@@ -698,6 +704,11 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:431
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:467
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:509
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:631
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:657
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:679
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:697
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:719
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:21
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:21
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:44
@@ -727,6 +738,8 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:677
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:713
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:775
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:796
 #: apps/search/utils.py:1249
 msgid "Номер заявки"
 msgstr "Application number"
@@ -1145,6 +1158,8 @@ msgstr "Certificate of Ukraine on topography (layout) of IC"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:673
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:709
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:727
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:771
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:792
 msgid "Номер свідоцтва"
 msgstr "Certificate number"
 
@@ -1520,6 +1535,7 @@ msgstr "There are no credited payments"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:506
 #: apps/search/templates/search/detail/qi/_partials/transactions.html:11
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:497
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:780
 msgid "Дата публікації та номер бюлетеня"
 msgstr "Date of publication and bulletin number"
 
@@ -1747,6 +1763,7 @@ msgstr "Transaction date"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:175
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:323
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:369
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:701
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:25
 msgid "Дата припинення дії"
 msgstr "Expiration date"
@@ -1776,8 +1793,12 @@ msgstr "Expiration date"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:577
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:599
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:617
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:639
-msgid "Причина"
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:643
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:665
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:683
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:705
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:723
+msgid "Підстава"
 msgstr "Reason"
 
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:211
@@ -1838,10 +1859,15 @@ msgid "Дата публікації відомостей про видачу п
 msgstr "Date of publication of information on the grant of a patent"
 
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:627
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:653
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:675
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:693
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:715
 msgid "Номер реєстрації, що є номером патенту"
 msgstr "Registration number, which is a patent number"
 
-#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:635
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:639
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:661
 msgid "Імꞌя або повне найменування та адреса володільця патенту"
 msgstr "Name or full name and address of the patent owner"
 
@@ -1972,6 +1998,10 @@ msgid ""
 msgstr ""
 "Date of publication of information on the issuance of a license to issue a "
 "sign and bulletin number"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:801
+msgid "Номер та дата рішення"
+msgstr "Number and date of the decision"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
@@ -2194,6 +2224,9 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "Причина"
+#~ msgstr "Reason"
 
 #~ msgid "Сума поповнення"
 #~ msgstr "Credit value"
