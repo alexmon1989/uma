@@ -441,30 +441,31 @@ class Command(BaseCommand):
 
                 for transaction in res['TradeMark']['Transactions']['Transaction']:
                     # fix структуры
-                    if 'PublicationDate' in transaction['TransactionBody'] \
-                            or 'PublicationNumber' in transaction['TransactionBody']:
-                        transaction['TransactionBody']['PublicationDetails'] = {
-                            'Publication': {
-                                'PublicationDate': transaction['TransactionBody'].pop('PublicationDate', None),
-                                'PublicationNumber': transaction['TransactionBody'].pop('PublicationNumber', None),
+                    if 'TransactionBody' in transaction:
+                        if 'PublicationDate' in transaction['TransactionBody'] \
+                                or 'PublicationNumber' in transaction['TransactionBody']:
+                            transaction['TransactionBody']['PublicationDetails'] = {
+                                'Publication': {
+                                    'PublicationDate': transaction['TransactionBody'].pop('PublicationDate', None),
+                                    'PublicationNumber': transaction['TransactionBody'].pop('PublicationNumber', None),
+                                }
                             }
-                        }
 
-                    # fix дат
-                    try:
-                        d = transaction['TransactionBody']['PublicationDetails']['Publication'][
-                            'PublicationDate']
-                        transaction['TransactionBody']['PublicationDetails']['Publication'][
-                            'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
-                    except:
-                        pass
-                    try:
-                        d = transaction['TransactionBody']['RegisterDate']
-                        transaction['TransactionBody']['RegisterDate'] = datetime.datetime.strptime(
-                            d, '%d.%m.%Y'
-                        ).strftime('%Y-%m-%d')
-                    except:
-                        pass
+                        # fix дат
+                        try:
+                            d = transaction['TransactionBody']['PublicationDetails']['Publication'][
+                                'PublicationDate']
+                            transaction['TransactionBody']['PublicationDetails']['Publication'][
+                                'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
+                        except:
+                            pass
+                        try:
+                            d = transaction['TransactionBody']['RegisterDate']
+                            transaction['TransactionBody']['RegisterDate'] = datetime.datetime.strptime(
+                                d, '%d.%m.%Y'
+                            ).strftime('%Y-%m-%d')
+                        except:
+                            pass
 
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
@@ -967,7 +968,7 @@ class Command(BaseCommand):
 
         # Не включать в список результатов заявки, по которым выдан патент
         qs = filter_bad_apps(qs)
-        
+
         # Количество документов в индексе
         s = Search(using=self.es, index=settings.ELASTIC_INDEX_NAME).query(qs)
         self.indexation_process.documents_in_index = s.count()
