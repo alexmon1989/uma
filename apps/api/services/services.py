@@ -141,6 +141,27 @@ def app_get_documents(app_data: dict) -> Optional[Union[dict, List]]:
         return None
 
 
+def app_get_tm_biblio_for_opendata(app_data: dict) -> dict:
+    """Возвращает словарь с минимумом данных заявки на ТМ для публикации в API"""
+    return {
+        'ApplicationNumber': app_data['search_data']['app_number'],
+        'ApplicationDate': app_data['search_data']['app_date'],
+        'MarkImageDetails': app_data['TradeMark']['TrademarkDetails'].get('MarkImageDetails'),
+        'WordMarkSpecification': app_data['TradeMark']['TrademarkDetails'].get('WordMarkSpecification'),
+        'GoodsServicesDetails': app_data['TradeMark']['TrademarkDetails'].get('GoodsServicesDetails'),
+        'stages': app_data['TradeMark']['TrademarkDetails'].get('stages'),
+    }
+
+
+def app_get_tm_app_status(app_data: dict) -> str:
+    """Возвращает статус заявки на ТМ."""
+    mark_status_code = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+    is_stopped = app_data['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
+                 or mark_status_code == 8000 \
+                 or app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('application_status') == 'stopped'
+    return 'stopped' if is_stopped else 'active'
+
+
 def app_get_biblio_data(app_data: dict) -> Optional[dict]:
     """Возвращает библиографические данные заявки."""
     # Библ. данные заявок без установленной даты подачи на изобретения не публикуются
@@ -159,43 +180,25 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
 
     # Свидетельства на знаки для товаров и услуг
     elif app_data['Document']['idObjType'] == 4:
-        can_be_published = True  # Может ли заявка быть опубликована
-        data_biblio = {}
-
-        if app_data['TradeMark']['TrademarkDetails'].get('Code_441') is None:
-            # Поле 441 (дата опубликования заявки)
-            e_bulletin_app = EBulletinData.objects.filter(
-                app_number=app_data['TradeMark']['TrademarkDetails']['ApplicationNumber']
-            ).first()
-            if e_bulletin_app:
-                # 441 код найден - заявка может публиковаться
-                code_441 = str(e_bulletin_app.publication_date)
-                data_biblio['Code_441'] = code_441
-            else:
-                # Если это заявка
-                if app_data['search_data']['obj_state'] == 1:
-                    mark_status = search_services.application_get_tm_fixed_mark_status_code(app_data)
-                    # и её дата подачи после 18.07.2020, то публиковать её нельзя
-                    app_date = app_data['TradeMark']['TrademarkDetails'].get('ApplicationDate')
-                    if not app_date \
-                            or datetime.strptime(app_date[:10], '%Y-%m-%d') > datetime.strptime('2020-07-17', '%Y-%m-%d') \
-                            or mark_status < 2000:
-                        can_be_published = False
-
-        if can_be_published:
-            data_biblio.update(app_data['TradeMark']['TrademarkDetails'])
-
-            if app_data['search_data']['obj_state'] == 1:
-                # Статус заявки
-                mark_status_code = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
-                is_stopped = app_data['Document'].get(
-                    'RegistrationStatus') == 'Діловодство за заявкою припинено' or mark_status_code == 8000
-                if is_stopped:
-                    data_biblio['application_status'] = 'stopped'
-                else:
-                    data_biblio['application_status'] = 'active'
+        # Если есть свидетельство или 441 код - публикуется вся библиография
+        if app_data['search_data']['obj_state'] == 2 or 'Code_441' in app_data['TradeMark']['TrademarkDetails']:
+            data_biblio = app_data['TradeMark']['TrademarkDetails']
         else:
-            data_biblio = None
+            app_date = app_data['TradeMark']['TrademarkDetails'].get('ApplicationDate')
+            mark_status = search_services.application_get_tm_fixed_mark_status_code(app_data)
+            # Если заявка до 18.07.2020 - проверяется MarkCurrentStatusCodeType
+            if app_date \
+                    and datetime.strptime(app_date[:10], '%Y-%m-%d') < datetime.strptime('2020-07-18', '%Y-%m-%d') \
+                    and mark_status >= 2000:
+                # Публикуется вся библиография
+                data_biblio = app_data['TradeMark']['TrademarkDetails']
+            else:
+                # Публикуется часть библиографии для API
+                data_biblio = app_get_tm_biblio_for_opendata(app_data)
+
+        # Статус заявки
+        if data_biblio and app_data['search_data']['obj_state'] == 1:
+            data_biblio['application_status'] = app_get_tm_app_status(app_data)
 
     # Свидетельства на КЗПТ
     elif app_data['Document']['idObjType'] == 5:
