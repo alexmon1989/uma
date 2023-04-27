@@ -421,9 +421,10 @@ class ReportItemDocxTM(ReportItemDocx):
                 for item in goods:
                     self._paragraph.add_run('\r')
                     self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
-                    terms = item['ClassificationTermDetails']['ClassificationTerm']
-                    values_str = '; '.join([x['ClassificationTermText'] for x in terms])
-                    self._paragraph.add_run(values_str)
+                    if 'ClassificationTermDetails' in item:
+                        terms = item['ClassificationTermDetails']['ClassificationTerm']
+                        values_str = '; '.join([x['ClassificationTermText'] for x in terms])
+                        self._paragraph.add_run(values_str)
                 self._paragraph.add_run('\r')
 
     def _write_441(self) -> None:
