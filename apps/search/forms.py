@@ -16,7 +16,7 @@ def get_param_type_choices():
 
 def validate_query_elasticsearch(query, field):
     """Отправляет запрос на валидацию в ElasticSearch."""
-    query = prepare_query(query, field.field_type)
+    query = prepare_query(query, field)
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     i = Index(settings.ELASTIC_INDEX_NAME, using=client).validate_query(body={
         'query': Q(
