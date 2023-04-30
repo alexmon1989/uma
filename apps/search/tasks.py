@@ -57,7 +57,7 @@ def perform_simple_search(user_id, get_params):
         if s:
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
-                query = prepare_query(s['value'], elastic_field.field_type)
+                query = prepare_query(s['value'], elastic_field)
 
                 if elastic_field.field_type == 'text':
                     fields = [
@@ -565,7 +565,7 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
         for s in formset.cleaned_data:
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
-                query = prepare_query(s['value'], elastic_field.field_type)
+                query = prepare_query(s['value'], elastic_field)
 
                 if elastic_field.field_type == 'text':
                     fields = [
@@ -672,7 +672,7 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
         for s in formset.cleaned_data:
             elastic_field = SimpleSearchField.objects.get(pk=s['param_type']).elastic_index_field
             if elastic_field:
-                query = prepare_query(s['value'], elastic_field.field_type)
+                query = prepare_query(s['value'], elastic_field)
 
                 if elastic_field.field_type == 'text':
                     fields = [

@@ -50,9 +50,9 @@ def get_search_groups(search_data):
     return list(search_groups)
 
 
-def prepare_query(query, field_type):
+def prepare_query(query, elastic_field):
     """Обрабатывает строку расширенного запроса пользователя."""
-    if field_type == 'date':
+    if elastic_field.field_type == 'date':
         # Форматирование дат
         query = re.sub(r'(\d{1,2})\.(\d{1,2})\.(\d{4})', '\\3-\\2-\\1', query)
 
@@ -63,18 +63,28 @@ def prepare_query(query, field_type):
             query = f"[{dates[0]} TO {dates[1]}]"
         except IndexError:
             pass
+    else:
+        # Текстовое поле
+        query = query.replace(
+            " ТА ", " AND "
+        ).replace(
+            " АБО ", " OR "
+        ).replace(
+            " НЕ ", " NOT "
+        ).replace(
+            "/", "\\/"
+        ).replace(
+            ":", "\\:"
+        )
 
-    query = query.replace(
-        " ТА ", " AND "
-    ).replace(
-        " АБО ", " OR "
-    ).replace(
-        " НЕ ", " NOT "
-    ).replace(
-        "/", "\\/"
-    ).replace(
-        ":", "\\:"
-    )
+        # Точный поиск
+        matches = re.findall(r'(".*?")', query)
+        if matches:
+            field_name = elastic_field.field_name.replace('*', '\\*')
+            for match in matches:
+                pos = query.index(match)
+                if pos == 0 or any(word in query[pos-5:pos] for word in [' AND ', ' OR ', ' NOT ']):
+                    query = query.replace(match, f'{field_name}.exact:{match}')
     return query
 
 
@@ -96,7 +106,7 @@ def get_elastic_results(search_groups, user):
 
                 # Проверка доступно ли поле для поиска
                 if inid_schedule.enable_search and inid_schedule.elastic_index_field is not None:
-                    query = prepare_query(search_param['value'], inid_schedule.elastic_index_field.field_type)
+                    query = prepare_query(search_param['value'], inid_schedule.elastic_index_field)
 
                     if inid_schedule.elastic_index_field.field_type == 'text':
                         fields = [
