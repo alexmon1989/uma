@@ -252,14 +252,6 @@
                 </tr>
             {% endif %}
 
-            {% get_field '554' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
-                </tr>
-            {% endif %}
-
             {% get_field '731' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                 <tr>
@@ -352,6 +344,26 @@
                             <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
                         </span>
                         </a>
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '554' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkFeature == '3-D' %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% trans 'Так' %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '556' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkFeature == 'Sound' %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% trans 'Так' %}
                     </td>
                 </tr>
             {% endif %}
