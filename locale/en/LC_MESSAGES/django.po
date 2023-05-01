@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-19 12:22+0300\n"
+"POT-Creation-Date: 2023-05-01 12:28+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -176,7 +176,7 @@ msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:387
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:397
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:142
 msgid "Показати"
 msgstr "Show"
@@ -740,7 +740,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:775
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:796
-#: apps/search/utils.py:1249
+#: apps/search/utils.py:1259
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -768,14 +768,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1307
+#: apps/search/utils.py:1317
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1307
+#: apps/search/utils.py:1317
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -996,7 +996,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1260
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1039,7 +1039,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1260
+#: apps/search/utils.py:1270
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1074,7 +1074,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1268
 msgid "МПК"
 msgstr "IPC"
 
@@ -1281,7 +1281,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1259
+#: apps/search/utils.py:1269
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1812,7 +1812,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1255
+#: apps/search/utils.py:1265
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -1979,6 +1979,10 @@ msgstr "partly"
 msgid "Кл.:"
 msgstr "Cl."
 
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:364
+msgid "Так"
+msgstr "Yes"
+
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:461
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:582
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:637
@@ -2108,43 +2112,43 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/utils.py:1247
+#: apps/search/utils.py:1257
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1248
+#: apps/search/utils.py:1258
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1251
+#: apps/search/utils.py:1261
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1252
+#: apps/search/utils.py:1262
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1253
+#: apps/search/utils.py:1263
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1254
+#: apps/search/utils.py:1264
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1256
+#: apps/search/utils.py:1266
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1257
+#: apps/search/utils.py:1267
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1261
+#: apps/search/utils.py:1271
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1262
+#: apps/search/utils.py:1272
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
