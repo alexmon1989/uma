@@ -431,6 +431,13 @@ class Command(BaseCommand):
                 except:
                     pass
 
+            # Fix ExhibitionPriorityDetails
+            if 'ExhibitionPriorityDetails' in res['TradeMark']['TrademarkDetails'] \
+                    and type(res['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']) == list:
+                res['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails'] = {
+                    'ExhibitionPriority': res['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']
+                }
+
             # fix оповещений
             if res['TradeMark'].get('Transactions', {}).get('Transaction'):
                 # Удаление чужих оповещений
