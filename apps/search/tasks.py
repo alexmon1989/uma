@@ -173,10 +173,11 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
         if hit['search_data']['obj_state'] == 2:
             extend_doc_flow(hit)
 
-        hit['DOCFLOW']['DOCUMENTS'] = search_services.application_filter_documents_im_um_ld(
-            hit['biblio_data'],
-            hit.get('DOCFLOW', {}).get('DOCUMENTS', [])
-        )
+        if 'DOCFLOW' in hit and 'DOCUMENTS' in hit['DOCFLOW']:
+            hit['DOCFLOW']['DOCUMENTS'] = search_services.application_filter_documents_im_um_ld(
+                hit['biblio_data'],
+                hit['DOCFLOW']['DOCUMENTS']
+            )
 
     elif hit['Document']['idObjType'] == 4:
         hit['TradeMark']['TrademarkDetails'] = search_services.application_prepare_biblio_data_tm(
