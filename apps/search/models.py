@@ -15,7 +15,7 @@ class IpcAppList(models.Model):
     id_parent = models.IntegerField(db_column='idParent', blank=True, null=True)
     id_claim = models.IntegerField(db_column='idClaim', blank=True, null=True)
     obj_type = models.ForeignKey('ObjType', db_column='idObjType', blank=True, null=True, on_delete=models.CASCADE)
-    changescount = models.IntegerField(db_column='ChangesCount')
+    changescount = models.IntegerField(db_column='ChangesCount', default=0)
     lastupdate = models.DateTimeField(db_column='LastUpdate', blank=True, null=True)
     idstatus = models.IntegerField(db_column='idStatus', blank=True, null=True)
     app_date = models.DateTimeField(db_column='APP_Date', blank=True, null=True)
@@ -385,3 +385,25 @@ class PaidServicesSettings(models.Model):
     class Meta:
         verbose_name = 'Налаштування платних послуг'
         verbose_name_plural = 'Налаштування платних послуг'
+
+
+class FvCicImporter(models.Model):
+    """Модель таблицы fv_cic_importer базы данных prod-erp-cms-import"""
+    id = models.BigAutoField(primary_key=True)
+    claim_id = models.BigIntegerField()
+    claim_number = models.CharField(max_length=30, blank=True, null=True)
+    claim_od_number = models.CharField(max_length=30, blank=True, null=True)
+    is_censored = models.TextField(blank=True, null=True)  # This field type is a guess.
+    claim_state = models.BigIntegerField()
+    app_set_date = models.DateTimeField(blank=True, null=True)
+    app_input_date = models.DateTimeField()
+    od_publication_date = models.DateTimeField(blank=True, null=True)
+    json_cic = models.TextField(blank=True, null=True)
+    json_files_info = models.TextField(blank=True, null=True)
+    is_exported = models.TextField(blank=True, null=True)
+    is_exported_datetime = models.DateTimeField(blank=True, null=True)
+    type_code = models.CharField(max_length=64)
+
+    class Meta:
+        managed = False
+        db_table = 'fv_cic_importer'

@@ -1,0 +1,90 @@
+{% load i18n %}
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="row">
+    {% with 'Outcoming Incoming' as direction_list %}
+        {% for direction in direction_list.split %}
+            <div class="col-md-12 g-mb-40">
+                <!-- Striped Rows -->
+                <div class="card g-brd-primary rounded-0">
+                    <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                        <i class="fa fa-list g-mr-5"></i>
+                        {% if direction == 'Outcoming' %}
+                            {% trans "Вихідні документи" %}
+                        {% else %}
+                            {% trans "Вхідні документи" %}
+                        {% endif %}
+                    </h3>
+
+                    <div class="table-responsive">
+                        <form action="{% url "search:download_docs_zipped" %}" method="post" class="documents-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="id_app_number" value="{{ hit.meta.id }}">
+                            <table class="table table-striped table-bordered u-table--v1 mb-0">
+                                <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="select-all-documents"></th>
+                                    <th>#</th>
+                                    <th class="text-nowrap text-center">{% trans "Дата реєстрації" %}</th>
+                                    <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
+                                    <th class="text-nowrap text-center">{% trans "Реєстраційний номер" %}</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for doc in hit.Geo.DocFlow.Documents|filter_tm_id_docs_direction:direction %}
+                                    <tr>
+                                        <td>
+                                            {% if doc.DocRecord.DocIdDocCEAD %}
+                                                <input type="checkbox" name="cead_id"
+                                                       value="{{ doc.DocRecord.DocIdDocCEAD }}">
+                                            {% endif %}
+                                        </td>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <td class="text-center">
+                                            {% if doc.DocRecord.DocRegDate %}
+                                                {{ doc.DocRecord.DocRegDate|parse_date|date:"d.m.Y" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ doc.DocRecord.DocType }}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if doc.DocRecord.DocRegNumber %}
+                                                {{ doc.DocRecord.DocRegNumber }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if doc.DocRecord.DocIdDocCEAD %}
+                                                <button class="btn btn-xs btn-primary download-doc"
+                                                        title="{% trans "Сформувати посилання для завантаження" %}"
+                                                        data-task-create-url="{% url 'search:download_doc' id_app_number=hit.meta.id id_cead_doc=doc.DocRecord.DocIdDocCEAD %}"
+                                                ><i class="fa fa-download"></i></button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="7" class="g-bg-white">
+                                        {% if hit.Geo.DocFlow.Documents|filter_tm_id_docs_direction:direction|length > 0 %}
+                                            <button class="btn btn-primary"
+                                                    type="submit"><i
+                                                    class="fa fa-download"></i>&nbsp;{% trans "Завантажити обрані" %}
+                                            </button>
+                                        {% else %}
+                                            {% trans "Документи відсутні" %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <!-- End Striped Rows -->
+            </div>
+        {% endfor %}
+    {% endwith %}
+</div>

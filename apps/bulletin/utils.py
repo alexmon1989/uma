@@ -117,7 +117,8 @@ def prepare_tm_data(record):
     # 540 - зображення знака
     biblio_data['code_540'] = {
         'title': '(540) Зображення знака',
-        'value': None
+        'value': None,
+        'type': 'image'
     }
     if data.get('MarkImageDetails', {}).get('MarkImage', {}):
         image_name = data['MarkImageDetails']['MarkImage']['MarkImageFilename']
@@ -308,7 +309,8 @@ def prepare_madrid_tm_data(app_number, record):
     # (540) Зображення торговельної марки
     biblio_data['code_540'] = {
         'title': '(540) Зображення торговельної марки',
-        'value': ''
+        'value': '',
+        'type': 'image'
     }
     splitted_path = hit['Document']['filesPath'].replace("\\", "/").split('/')
     splitted_path_len = len(splitted_path)
@@ -347,5 +349,131 @@ def prepare_madrid_tm_data(app_number, record):
                 res += f"<strong>:</strong> {c['GSTERMFR']}"
             res += "<br>"
         biblio_data['code_511']['value'] = res
+
+    return biblio_data
+
+
+def prepare_kzpt_data(record):
+    """Подлготавливет данные о КЗПТ для отображения в бюлетне."""
+    hit = record.to_dict()
+    data = hit['Geo']['GeoDetails']
+    biblio_data = dict()
+
+    # (210) Номер заявки
+    url = reverse("search:detail", args=(record.meta.id,))
+    biblio_data['code_210'] = {
+        'title': 'Номер заявки',
+        'value': f"<a href=\"{url}\" target=\"_blank\">{data['ApplicationNumber']}</a>"
+    }
+
+    # 220 - Дата подання заявки
+    biblio_data['code_220'] = {
+        'title': 'Дата подання заявки',
+        'value': datetime.datetime.strptime(hit['search_data']['app_date'][:10], '%Y-%m-%d').strftime('%d.%m.%Y')
+    }
+
+    # 441 - Дата публікації заявки
+    date_441 = datetime.datetime.strptime(
+        data['ApplicationPublicationDetails']['PublicationDate'],
+        '%Y-%m-%d'
+    ).strftime('%d.%m.%Y')
+    biblio_data['code_441'] = {
+        'title': 'Дата публікації відомостей про заявку та номер бюлетня',
+        'value': f"{date_441}, бюл. № {data['ApplicationPublicationDetails']['PublicationIdentifier']}"
+    }
+
+    # 740 - представник (ім'я, повне найменування та реєстраційний номер представника
+    # у справах інтелектуальної влсності (патентного повіреного) або іншої довіреної особи)
+    biblio_data['code_740'] = {
+        'title': 'Ім\'я та адреса представника',
+        'value': None
+    }
+    if data.get('RepresentativeDetails', {}).get('Representative'):
+        representatives = []
+        for representative in data['RepresentativeDetails']['Representative']:
+            res = representative.get(
+                'RepresentativeAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Name', {}
+            ).get(
+                'FreeFormatName', {}
+            ).get(
+                'FreeFormatNameDetails', {}
+            ).get(
+                'FreeFormatNameLine', ''
+            )
+            res += '<br>'
+            res += representative.get(
+                'RepresentativeAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Address', {}
+            ).get(
+                'FreeFormatAddress', {}
+            ).get(
+                'FreeFormatAddressLine', ''
+            )
+            res += '<br>'
+            res += representative.get(
+                'RepresentativeAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Address', {}
+            ).get(
+                'AddressCountryCode', ''
+            )
+
+            representatives.append(res)
+        biblio_data['code_740']['value'] = ";<br>".join(representatives)
+
+    # 750 - адресат (адреса для листування)
+    biblio_data['code_750'] = {
+        'title': 'Адреса для листування',
+        'value': ''
+    }
+    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
+            'Name', {}).get('FreeFormatName'):
+        biblio_data['code_750']['value'] = data['CorrespondenceAddress']['CorrespondenceAddressBook'][
+            'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
+        biblio_data['code_750']['value'] += '<br>'
+    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
+            'Address', {}).get('FreeFormatAddress', {}).get('FreeFormatAddressLine'):
+        biblio_data['code_750']['value'] += data['CorrespondenceAddress']['CorrespondenceAddressBook'][
+            'FormattedNameAddress']['Address']['FreeFormatAddress']['FreeFormatAddressLine']
+        biblio_data['code_750']['value'] += '<br>'
+    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
+            'Address', {}).get('AddressCountryCode'):
+        biblio_data['code_750']['value'] += data['CorrespondenceAddress']['CorrespondenceAddressBook'][
+            'FormattedNameAddress']['Address']['AddressCountryCode']
+
+    # Держава реєстрації КЗПТ
+    biblio_data['code_190'] = {
+        'title': 'Держава реєстрації КЗПТ',
+        'value': '; '.join(data['RegistrationOriginCountry'])
+    }
+
+    # Назва КЗПТ
+    biblio_data['code_539'] = {
+        'title': 'Назва КЗПТ',
+        'value': data['Indication']
+    }
+
+    # Назва товару
+    biblio_data['code_540'] = {
+        'title': 'Назва товару',
+        'value': data['ProductName']
+    }
+
+    # Межі географічного місця, з яким пов’язуються особливі властивості,
+    # певні якості, репутація або інші характеристики товару
+    biblio_data['code_529'] = {
+        'title': 'Межі географічного місця, з яким пов’язуються особливі властивості, '
+                 'певні якості, репутація або інші характеристики товару',
+        'value': data['Area']
+    }
 
     return biblio_data

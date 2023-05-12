@@ -430,6 +430,12 @@ def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
         for doc in hit['TradeMark']['DocFlow']['Documents']:
             if doc['DocRecord'].get('DocIdDocCEAD'):
                 hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+
+    elif hit['Document']['idObjType'] == 5:
+        for doc in hit['Geo']['DocFlow']['Documents']:
+            if doc['DocRecord'].get('DocIdDocCEAD'):
+                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
+
     elif hit['Document']['idObjType'] == 6:
         for doc in hit['Design']['DocFlow']['Documents']:
             if doc['DocRecord'].get('DocIdDocCEAD'):
