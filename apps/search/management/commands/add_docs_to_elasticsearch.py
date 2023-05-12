@@ -659,6 +659,16 @@ class Command(BaseCommand):
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
+            # Запись в таблицу с 441 кодом (для бюллетеня)
+            if 'ApplicationPublicationDetails' in res['Geo']['GeoDetails']:
+                EBulletinData.objects.update_or_create(
+                    app_number=res['Geo']['GeoDetails'].get('ApplicationNumber'),
+                    unit_id=3,
+                    defaults={
+                        'publication_date': res['Geo']['GeoDetails']['ApplicationPublicationDetails']['PublicationDate']
+                    }
+                )
+
     def process_madrid_tm(self, doc):
         """Обрабатывает документ типа "мадридские тм"."""
         # Считывание данных из файла

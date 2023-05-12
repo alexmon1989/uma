@@ -1985,6 +1985,26 @@ def filter_app_data(app_data, user):
                 }})
                 return res
 
+        elif app_data['Document']['idObjType'] == 5 and 'Code_441' not in app_data['Geo']:  # КЗПТ
+            res = {
+                'meta': app_data['meta'],
+                'Document': app_data['Document'],
+                'Geo': {
+                    'GeoDetails': {
+                        'stages': app_data['Geo'].get('GeoDetails', {}).get('stages', []),
+                        'application_status': app_data['Geo'].get('GeoDetails', {}).get(
+                            'application_status'
+                        )
+                    },
+                    'DocFlow': app_data['Geo'].get('DocFlow'),
+                },
+                'search_data': {
+                    'app_number': app_data['search_data']['app_number'],
+                    'obj_state': app_data['search_data']['obj_state'],
+                }
+            }
+            return res
+
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             res = {
                 'meta': app_data['meta'],

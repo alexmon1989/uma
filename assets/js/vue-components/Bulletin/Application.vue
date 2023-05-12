@@ -19,7 +19,7 @@
                            class="mr-4 g-pa-5"
                            tag="strong"
                     >{{ app_data[code].title }}:</v-col>
-                    <v-col v-if="app_data[code].value && code === 'code_540'"
+                    <v-col v-if="app_data[code].value && code === 'code_540' && app_data[code].type === 'image'"
                            class="g-pa-5"
                     ><img :src="app_data[code].value" class="img-fluid"></v-col>
                     <v-col v-else
@@ -54,6 +54,7 @@
             codes: [
                 'code_111',
                 'code_151',
+                'code_190',
                 'code_210',
                 'code_220',
                 'code_230',
@@ -63,8 +64,10 @@
                 'code_441',
                 'code_450',
                 'code_531',
+                'code_539',
                 'code_891',
                 'code_540',
+                'code_529',
                 'code_591',
                 'code_731',
                 'code_740',

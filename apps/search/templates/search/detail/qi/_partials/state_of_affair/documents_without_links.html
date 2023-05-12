@@ -1,0 +1,60 @@
+{% load i18n %}
+{% load uma_extras %}
+{% load search_extras %}
+
+<div class="row">
+    {% with 'Outcoming Incoming' as direction_list %}
+        {% for direction in direction_list.split %}
+            <div class="col-md-12 g-mb-40">
+                <!-- Striped Rows -->
+                <div class="card g-brd-primary rounded-0">
+                    <h3 class="card-header g-bg-primary g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                        <i class="fa fa-list g-mr-5"></i>
+                        {% if direction == 'Outcoming' %}
+                            {% trans "Вихідні документи" %}
+                        {% else %}
+                            {% trans "Вхідні документи" %}
+                        {% endif %}
+                    </h3>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered u-table--v1 mb-0">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="text-nowrap text-center">{% trans "Дата реєстрації" %}</th>
+                                <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
+                                <th class="text-nowrap text-center">{% trans "Реєстраційний номер" %}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for doc in hit.Geo.DocFlow.Documents|filter_tm_id_docs_direction:direction %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td class="text-center">
+                                        {% if doc.DocRecord.DocRegDate %}
+                                            {{ doc.DocRecord.DocRegDate|parse_date|date:"d.m.Y" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if doc.DocRecord.DocType %}
+                                            {{ doc.DocRecord.DocType }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if doc.DocRecord.DocRegNumber %}
+                                            {{ doc.DocRecord.DocRegNumber }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- End Striped Rows -->
+            </div>
+        {% endfor %}
+    {% endwith %}
+</div>

@@ -393,6 +393,43 @@ def app_stages_id(app):
     }
 
 
+@register.inclusion_tag('search/templatetags/app_stages_kzpt.html')
+def app_stages_kzpt(app):
+    """Отображает стадии заявки (градусник) для знаков для КЗПТ."""
+    if app['search_data']['obj_state'] == 1:
+        stages_statuses = app['Geo']['GeoDetails']['stages']
+    else:
+        stages_statuses = [{'status': 'done'} for x in range(5)]
+    stages = [
+        {
+            'title': _('Географічне зазначення зареєстровано'),
+            'status': stages_statuses[4]['status'],
+        },
+        {
+            'title': _('Підготовка до державної реєстрації та публікації'),
+            'status': stages_statuses[3]['status'],
+        },
+        {
+            'title': _('Експертиза заявки'),
+            'status': stages_statuses[2]['status'],
+        },
+        {
+            'title': _('Встановлення дати подання'),
+            'status': stages_statuses[1]['status'],
+        },
+        {
+            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
+            'status': stages_statuses[0]['status'],
+        },
+    ]
+
+    return {
+        'stages': stages,
+        'is_stopped': app['Geo']['GeoDetails'].get('application_status') == 'stopped',
+        'obj_state': app['search_data']['obj_state'],
+    }
+
+
 @register.inclusion_tag('search/templatetags/app_stages_inv_um.html')
 def app_stages_inv_um(app):
     """Отображает стадии заявки (градусник) для изобретений и полезных моделей."""

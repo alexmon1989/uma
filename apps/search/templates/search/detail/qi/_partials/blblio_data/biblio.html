@@ -64,6 +64,17 @@
                 </tr>
             {% endif %}
 
+            {% get_field '441' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationPublicationDetails.PublicationDate %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {{ hit.Geo.GeoDetails.ApplicationPublicationDetails.PublicationDate|parse_date|date:"d.m.Y" }},
+                        {% trans 'бюл. №' %} {{ hit.Geo.GeoDetails.ApplicationPublicationDetails.PublicationIdentifier }}
+                    </td>
+                </tr>
+            {% endif %}
+
             {% get_field '539.I' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
                 <tr>
@@ -81,26 +92,26 @@
             {% endif %}
 
             {% get_field '529.A' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Geo.Area %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Area %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="kzpt-geo">{{ hit.Geo.Area|safe }}</td>
+                    <td class="kzpt-geo">{{ hit.Geo.GeoDetails.Area|safe }}</td>
                 </tr>
             {% endif %}
 
             {% get_field '539.D' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Geo.ProductDesc %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ProductDesc %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         <div class="kzpt-desc-short">
-                            {{ hit.Geo.ProductDesc|safe|truncatechars_html:300 }}
-                            {% if hit.Geo.ProductDesc|length > 300 %}
+                            {{ hit.Geo.GeoDetails.ProductDesc|safe|truncatechars_html:300 }}
+                            {% if hit.Geo.GeoDetails.ProductDesc|length > 300 %}
                                 <a href="#" class="show">{% trans "показати все" %}</a>
                             {% endif %}
                         </div>
                         <div class="kzpt-desc-full" style="display: none">
-                            {{ hit.Geo.ProductDesc|safe }}
+                            {{ hit.Geo.GeoDetails.ProductDesc|safe }}
                             <a href="#" class="hide">{% trans "сховати" %}</a>
                         </div>
                     </td>
