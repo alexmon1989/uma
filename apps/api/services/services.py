@@ -8,7 +8,6 @@ from rest_framework import exceptions
 from apps.search.models import IpcAppList
 import apps.search.services as search_services
 from apps.api.models import OpenData
-from apps.bulletin.models import EBulletinData
 
 from typing import List, Optional, Union
 from datetime import datetime
@@ -18,8 +17,6 @@ def app_get_api_list(options: dict) -> List:
     """Возвращает список объектов для добавления в API"""
     apps = IpcAppList.objects.filter(
         elasticindexed=1
-    ).exclude(
-        obj_type_id__in=(5,), registration_date__isnull=True
     ).exclude(
         obj_type_id__in=(9, 14)
     ).annotate(
@@ -124,6 +121,10 @@ def app_get_documents(app_data: dict) -> Optional[Union[dict, List]]:
     elif app_data['Document']['idObjType'] == 4:
         return app_data['TradeMark'].get('DocFlow', {}).get('Documents')
 
+    # КЗПТ
+    elif app_data['Document']['idObjType'] == 5:
+        return app_data['Geo'].get('DocFlow', {}).get('Documents')
+
     # Документы по пром. образцам
     elif app_data['Document']['idObjType'] == 6:
         return app_data['Design'].get('DocFlow', {}).get('Documents')
@@ -200,15 +201,18 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
         if data_biblio and app_data['search_data']['obj_state'] == 1:
             data_biblio['application_status'] = app_get_tm_app_status(app_data)
 
-    # Свидетельства на КЗПТ
+    # КЗПТ
     elif app_data['Document']['idObjType'] == 5:
-        data_biblio = app_data['Geo']['GeoDetails']
+        if app_data['search_data']['obj_state'] == 1 \
+                and 'ApplicationPublicationDetails' not in app_data['Geo']['GeoDetails']:
+            data_biblio = None
+        else:
+            data_biblio = app_data['Geo']['GeoDetails']
 
     # Патенты на пром. образцы
     elif app_data['Document']['idObjType'] == 6:
         # Записывается только библиография патентов
         data_biblio = app_data['Design']['DesignDetails'] if app_data['search_data']['obj_state'] == 2 else None
-        data_biblio = data_biblio
 
     # Авторське право
     elif app_data['Document']['idObjType'] in (10, 13):
