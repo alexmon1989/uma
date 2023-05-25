@@ -1985,7 +1985,8 @@ def filter_app_data(app_data, user):
                 }})
                 return res
 
-        elif app_data['Document']['idObjType'] == 5 and 'Code_441' not in app_data['Geo']:  # КЗПТ
+        # КЗПТ
+        elif app_data['Document']['idObjType'] == 5 and 'ApplicationPublicationDetails' not in app_data['Geo']['GeoDetails']:
             res = {
                 'meta': app_data['meta'],
                 'Document': app_data['Document'],

@@ -451,10 +451,11 @@ def prepare_kzpt_data(record):
             'FormattedNameAddress']['Address']['AddressCountryCode']
 
     # Держава реєстрації КЗПТ
-    biblio_data['code_190'] = {
-        'title': 'Держава реєстрації КЗПТ',
-        'value': '; '.join(data['RegistrationOriginCountry'])
-    }
+    if 'RegistrationOriginCountry' in data:
+        biblio_data['code_190'] = {
+            'title': 'Держава реєстрації КЗПТ',
+            'value': '; '.join(data['RegistrationOriginCountry'])
+        }
 
     # Назва КЗПТ
     biblio_data['code_539'] = {
@@ -474,6 +475,18 @@ def prepare_kzpt_data(record):
         'title': 'Межі географічного місця, з яким пов’язуються особливі властивості, '
                  'певні якості, репутація або інші характеристики товару',
         'value': data['Area']
+    }
+
+    # Опис основних особливих властивостей, певних якостей або інших характеристик товару
+    biblio_data['code_539'] = {
+        'title': 'Опис основних особливих властивостей, певних якостей або інших характеристик товару',
+        'value': data['ProductDesc']
+    }
+
+    # Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням
+    biblio_data['code_4573'] = {
+        'title': 'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+        'value': data['DescriptionOfTheRelationship']
     }
 
     return biblio_data

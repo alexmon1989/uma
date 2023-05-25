@@ -632,6 +632,10 @@ class Command(BaseCommand):
             # Секция Geo
             res['Geo'] = data.get('Geo')
 
+            # Fix ProductDesc
+            if 'ProductDescription' in res['Geo']['GeoDetails']:
+                res['Geo']['GeoDetails']['ProductDesc'] = res['Geo']['GeoDetails'].pop('ProductDescription')
+
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
