@@ -76,6 +76,14 @@
             {% endif %}
 
             {% get_field '539.I' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Indication %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.Indication }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '540' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicationDate %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
@@ -83,11 +91,17 @@
                 </tr>
             {% endif %}
 
-            {% get_field '540' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Indication %}
+            {% get_field '4551' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Qualification %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Geo.GeoDetails.Indication }}</td>
+                    <td>
+                        {% if hit.Geo.GeoDetails.Qualification == 'appellation-of-origin' %}
+                            {% trans 'Назва місця походження товару' %}
+                        {% elif hit.Geo.GeoDetails.Qualification == 'geographical-indication' %}
+                            {% trans 'Географічне зазначення' %}
+                        {% endif %}
+                    </td>
                 </tr>
             {% endif %}
 

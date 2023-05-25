@@ -382,74 +382,6 @@ def prepare_kzpt_data(record):
         'value': f"{date_441}, бюл. № {data['ApplicationPublicationDetails']['PublicationIdentifier']}"
     }
 
-    # 740 - представник (ім'я, повне найменування та реєстраційний номер представника
-    # у справах інтелектуальної влсності (патентного повіреного) або іншої довіреної особи)
-    biblio_data['code_740'] = {
-        'title': 'Ім\'я та адреса представника',
-        'value': None
-    }
-    if data.get('RepresentativeDetails', {}).get('Representative'):
-        representatives = []
-        for representative in data['RepresentativeDetails']['Representative']:
-            res = representative.get(
-                'RepresentativeAddressBook', {}
-            ).get(
-                'FormattedNameAddress', {}
-            ).get(
-                'Name', {}
-            ).get(
-                'FreeFormatName', {}
-            ).get(
-                'FreeFormatNameDetails', {}
-            ).get(
-                'FreeFormatNameLine', ''
-            )
-            res += '<br>'
-            res += representative.get(
-                'RepresentativeAddressBook', {}
-            ).get(
-                'FormattedNameAddress', {}
-            ).get(
-                'Address', {}
-            ).get(
-                'FreeFormatAddress', {}
-            ).get(
-                'FreeFormatAddressLine', ''
-            )
-            res += '<br>'
-            res += representative.get(
-                'RepresentativeAddressBook', {}
-            ).get(
-                'FormattedNameAddress', {}
-            ).get(
-                'Address', {}
-            ).get(
-                'AddressCountryCode', ''
-            )
-
-            representatives.append(res)
-        biblio_data['code_740']['value'] = ";<br>".join(representatives)
-
-    # 750 - адресат (адреса для листування)
-    biblio_data['code_750'] = {
-        'title': 'Адреса для листування',
-        'value': ''
-    }
-    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
-            'Name', {}).get('FreeFormatName'):
-        biblio_data['code_750']['value'] = data['CorrespondenceAddress']['CorrespondenceAddressBook'][
-            'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
-        biblio_data['code_750']['value'] += '<br>'
-    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
-            'Address', {}).get('FreeFormatAddress', {}).get('FreeFormatAddressLine'):
-        biblio_data['code_750']['value'] += data['CorrespondenceAddress']['CorrespondenceAddressBook'][
-            'FormattedNameAddress']['Address']['FreeFormatAddress']['FreeFormatAddressLine']
-        biblio_data['code_750']['value'] += '<br>'
-    if data.get('CorrespondenceAddress', {}).get('CorrespondenceAddressBook', {}).get('FormattedNameAddress', {}).get(
-            'Address', {}).get('AddressCountryCode'):
-        biblio_data['code_750']['value'] += data['CorrespondenceAddress']['CorrespondenceAddressBook'][
-            'FormattedNameAddress']['Address']['AddressCountryCode']
-
     # Держава реєстрації КЗПТ
     if 'RegistrationOriginCountry' in data:
         biblio_data['code_190'] = {
@@ -457,9 +389,9 @@ def prepare_kzpt_data(record):
             'value': '; '.join(data['RegistrationOriginCountry'])
         }
 
-    # Назва КЗПТ
-    biblio_data['code_539'] = {
-        'title': 'Назва КЗПТ',
+    # Географічне зазначення
+    biblio_data['code_539_i'] = {
+        'title': 'Географічне зазначення',
         'value': data['Indication']
     }
 
@@ -469,17 +401,27 @@ def prepare_kzpt_data(record):
         'value': data['ProductName']
     }
 
-    # Межі географічного місця, з яким пов’язуються особливі властивості,
-    # певні якості, репутація або інші характеристики товару
+    # Вид географічного зазначення
+    qualification = data.get('Qualification')
+    if qualification:
+        biblio_data['code_4551'] = {
+            'title': 'Кваліфікація географічного зазначення',
+            'value': ''
+        }
+        if qualification == 'appellation-of-origin':
+            biblio_data['code_4551']['value'] = 'Назва місця походження товару'
+        elif qualification == 'geographical-indication':
+            biblio_data['code_4551']['value'] = 'Географічне зазначення'
+
+    # Опис меж географічного місця
     biblio_data['code_529'] = {
-        'title': 'Межі географічного місця, з яким пов’язуються особливі властивості, '
-                 'певні якості, репутація або інші характеристики товару',
+        'title': 'Опис меж географічного місця',
         'value': data['Area']
     }
 
-    # Опис основних особливих властивостей, певних якостей або інших характеристик товару
+    # Опис товару, для якого географічне зазначення заявляється на реєстрацію
     biblio_data['code_539'] = {
-        'title': 'Опис основних особливих властивостей, певних якостей або інших характеристик товару',
+        'title': 'Опис товару, для якого географічне зазначення заявляється на реєстрацію',
         'value': data['ProductDesc']
     }
 

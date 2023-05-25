@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-01 12:28+0300\n"
+"POT-Creation-Date: 2023-05-25 14:31+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -168,6 +168,7 @@ msgstr "Open in new window"
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:155
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:30
+#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:73
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:236
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:56
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:64
@@ -176,7 +177,7 @@ msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:397
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:399
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:142
 msgid "Показати"
 msgstr "Show"
@@ -348,8 +349,6 @@ msgstr "Favorites"
 #: apps/search/templates/search/simple/_partials/import_results_btn.html:11
 #: apps/search/templates/search/transactions/_partials/import_results_btn.html:6
 #: apps/search/templates/search/transactions/_partials/import_results_btn.html:11
-#, fuzzy
-#| msgid "Всього результатів"
 msgid "Експорт результатів"
 msgstr "Results"
 
@@ -357,14 +356,10 @@ msgstr "Results"
 #: apps/search/templates/search/advanced/_partials/import_results_btn.html:7
 #: apps/search/templates/search/simple/_partials/import_results_btn.html:7
 #: apps/search/templates/search/transactions/_partials/import_results_btn.html:7
-#, fuzzy
-#| msgid ""
-#| "Завантаження результатів можливе, якщо кількість елементів менша або "
-#| "рівна 5000"
 msgid ""
 "завантаження результатів можливе, якщо кількість елементів менша або рівна "
 "500"
-msgstr "Downloading is possible when search result count is less or equal 5000"
+msgstr "Downloading is possible when search result count is less or equal 500"
 
 #: apps/favorites/templates/favorites/index/_partials/results.html:10
 #: apps/search/templates/search/advanced/_partials/results.html:20
@@ -445,10 +440,6 @@ msgid "Розділ"
 msgstr "Section"
 
 #: apps/help/templates/help/search/search.html:54
-#, fuzzy
-#| msgid ""
-#| "Жодна довідкова сторінка не відповідає вашому пошуку. Повторіть пошук "
-#| "знову або перегляньте наші <a href=\"/help\">категорії довідки</a>."
 msgid ""
 "Жодна довідкова сторінка не відповідає вашому пошуковому запиту. Повторіть "
 "пошук знову або перегляньте наші <a href=\"/help\">категорії довідки</a>."
@@ -565,6 +556,8 @@ msgstr ""
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents_without_links.html:22
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:26
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:22
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:31
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents_without_links.html:27
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:31
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:27
 msgid "Реєстраційний номер"
@@ -608,13 +601,15 @@ msgid "ПІБ, Я-А"
 msgstr "Name, desc"
 
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:11
-#: apps/search/templates/search/advanced/_partials/qi_item.html:67
+#: apps/search/templates/search/advanced/_partials/qi_item.html:79
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:29
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:25
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:23
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents_without_links.html:19
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:23
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:19
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:29
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents_without_links.html:25
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:29
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:25
 msgid "Дата реєстрації"
@@ -663,7 +658,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/advanced/_partials/id_item.html:64
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:110
 #: apps/search/templates/search/advanced/_partials/ld_item.html:74
-#: apps/search/templates/search/advanced/_partials/qi_item.html:43
+#: apps/search/templates/search/advanced/_partials/qi_item.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:74
 #: apps/search/templates/search/detail/id/_partials/transactions.html:21
 #: apps/search/templates/search/detail/id/_partials/transactions.html:39
@@ -764,7 +759,7 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/id_item.html:59
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
 #: apps/search/templates/search/advanced/_partials/ld_item.html:69
-#: apps/search/templates/search/advanced/_partials/qi_item.html:38
+#: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
@@ -788,7 +783,7 @@ msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
 #: apps/search/services/services.py:83
-#: apps/search/templatetags/search_extras.py:446
+#: apps/search/templatetags/search_extras.py:483
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
@@ -796,29 +791,30 @@ msgstr "Patent registered"
 #: apps/search/services/services.py:318
 #: apps/search/templatetags/search_extras.py:293
 #: apps/search/templatetags/search_extras.py:371
-#: apps/search/templatetags/search_extras.py:452
+#: apps/search/templatetags/search_extras.py:409
+#: apps/search/templatetags/search_extras.py:489
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
 #: apps/search/services/services.py:95
-#: apps/search/templatetags/search_extras.py:458
+#: apps/search/templatetags/search_extras.py:495
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
 #: apps/search/services/services.py:101 apps/search/services/services.py:237
 #: apps/search/templatetags/search_extras.py:297
-#: apps/search/templatetags/search_extras.py:464
+#: apps/search/templatetags/search_extras.py:501
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
 #: apps/search/services/services.py:106
-#: apps/search/templatetags/search_extras.py:469
+#: apps/search/templatetags/search_extras.py:506
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
 #: apps/search/services/services.py:112 apps/search/services/services.py:241
 #: apps/search/templatetags/search_extras.py:301
-#: apps/search/templatetags/search_extras.py:475
+#: apps/search/templatetags/search_extras.py:512
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
@@ -826,7 +822,8 @@ msgstr "Formal examination"
 #: apps/search/services/services.py:326
 #: apps/search/templatetags/search_extras.py:305
 #: apps/search/templatetags/search_extras.py:379
-#: apps/search/templatetags/search_extras.py:481
+#: apps/search/templatetags/search_extras.py:417
+#: apps/search/templatetags/search_extras.py:518
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
@@ -834,7 +831,8 @@ msgstr "According of the filling date"
 #: apps/search/services/services.py:330
 #: apps/search/templatetags/search_extras.py:309
 #: apps/search/templatetags/search_extras.py:383
-#: apps/search/templatetags/search_extras.py:488
+#: apps/search/templatetags/search_extras.py:421
+#: apps/search/templatetags/search_extras.py:525
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -854,10 +852,11 @@ msgstr "Registered industrial design"
 
 #: apps/search/services/services.py:322
 #: apps/search/templatetags/search_extras.py:375
+#: apps/search/templatetags/search_extras.py:413
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/tasks.py:45 apps/search/tasks.py:228 apps/search/tasks.py:288
+#: apps/search/tasks.py:45 apps/search/tasks.py:229 apps/search/tasks.py:289
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -951,7 +950,7 @@ msgstr "Full list of applicants"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:54
 #: apps/search/templates/search/advanced/_partials/ld_item.html:86
-#: apps/search/templates/search/advanced/_partials/qi_item.html:56
+#: apps/search/templates/search/advanced/_partials/qi_item.html:68
 #: apps/search/templates/search/advanced/_partials/tm_item.html:88
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:32
 msgid "Свідоцтво"
@@ -987,6 +986,7 @@ msgstr "Patent of Ukraine for industrial design"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:36
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:47
+#: apps/search/templates/search/advanced/_partials/qi_item.html:39
 #: apps/search/templates/search/advanced/_partials/tm_item.html:45
 msgid "Для даної заявки можливий перегляд лише її стану діловодства."
 msgstr "For this application, it is possible to review only its status."
@@ -994,7 +994,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/id_item.html:70
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:116
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
-#: apps/search/templates/search/advanced/_partials/qi_item.html:50
+#: apps/search/templates/search/advanced/_partials/qi_item.html:62
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
 #: apps/search/utils.py:1260
 msgid "Дата подання заявки"
@@ -1016,7 +1016,7 @@ msgstr "Date from which the industrial design rights are valid"
 #: apps/search/templates/search/advanced/_partials/id_item.html:94
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:139
 #: apps/search/templates/search/advanced/_partials/ld_item.html:101
-#: apps/search/templates/search/advanced/_partials/qi_item.html:72
+#: apps/search/templates/search/advanced/_partials/qi_item.html:84
 #: apps/search/templates/search/advanced/_partials/tm_item.html:106
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:50
 msgid "Власник(и)"
@@ -1025,7 +1025,7 @@ msgstr "Owner(s)"
 #: apps/search/templates/search/advanced/_partials/id_item.html:101
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:146
 #: apps/search/templates/search/advanced/_partials/ld_item.html:108
-#: apps/search/templates/search/advanced/_partials/qi_item.html:79
+#: apps/search/templates/search/advanced/_partials/qi_item.html:91
 #: apps/search/templates/search/advanced/_partials/tm_item.html:113
 msgid "Повний список власників"
 msgstr "Full list of owners"
@@ -1169,20 +1169,24 @@ msgstr ""
 "Date from which the rights certified by the certificate come into force"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:20
+msgid "Заявка на реєстрацію географічного зазначення"
+msgstr "Application for registration of a geographical indication"
+
+#: apps/search/templates/search/advanced/_partials/qi_item.html:23
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:17
 msgid "Свідоцтво на використання географічного зазначення"
 msgstr "Certificate of using of a geographical indications"
 
-#: apps/search/templates/search/advanced/_partials/qi_item.html:22
+#: apps/search/templates/search/advanced/_partials/qi_item.html:25
 #: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:19
 msgid "Свідоцтво на географічне зазначення"
 msgstr "Certificate of geographical indication"
 
-#: apps/search/templates/search/advanced/_partials/qi_item.html:33
+#: apps/search/templates/search/advanced/_partials/qi_item.html:45
 msgid "Назва товару"
 msgstr "Product name"
 
-#: apps/search/templates/search/advanced/_partials/qi_item.html:61
+#: apps/search/templates/search/advanced/_partials/qi_item.html:73
 msgid "Номер реєстрації"
 msgstr "Registration number"
 
@@ -1415,6 +1419,8 @@ msgstr "Application"
 #: apps/search/templates/search/detail/inv_um/detail.html:71
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:64
 #: apps/search/templates/search/detail/ld/detail.html:71
+#: apps/search/templates/search/detail/qi/_partials/sidebar.html:21
+#: apps/search/templates/search/detail/qi/detail.html:23
 #: apps/search/templates/search/detail/tm/_partials/sidebar.html:21
 #: apps/search/templates/search/detail/tm/detail.html:22
 msgid "Стан діловодства"
@@ -1426,8 +1432,8 @@ msgstr "State of affairs"
 #: apps/search/templates/search/detail/inv_um/detail.html:89
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:71
 #: apps/search/templates/search/detail/ld/detail.html:85
-#: apps/search/templates/search/detail/qi/_partials/sidebar.html:21
-#: apps/search/templates/search/detail/qi/detail.html:23
+#: apps/search/templates/search/detail/qi/_partials/sidebar.html:28
+#: apps/search/templates/search/detail/qi/detail.html:36
 #: apps/search/templates/search/detail/tm/_partials/sidebar.html:28
 #: apps/search/templates/search/detail/tm/detail.html:37
 msgid "Сповіщення"
@@ -1435,6 +1441,8 @@ msgstr "Notifications"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:14
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:14
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:14
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents_without_links.html:14
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:14
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:14
 msgid "Вихідні документи"
@@ -1442,6 +1450,8 @@ msgstr "Outcoming documents"
 
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:16
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:16
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:16
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents_without_links.html:16
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:16
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:16
 msgid "Вхідні документи"
@@ -1455,6 +1465,8 @@ msgstr "Incoming documents"
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/collections.html:22
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:25
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents_without_links.html:21
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:30
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents_without_links.html:26
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:30
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents_without_links.html:26
 msgid "Назва документа"
@@ -1463,6 +1475,7 @@ msgstr "Protective document"
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:62
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:59
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:61
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:62
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:62
 msgid "Сформувати посилання для завантаження"
 msgstr "Create url for downloading"
@@ -1470,6 +1483,7 @@ msgstr "Create url for downloading"
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:74
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:71
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:73
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:74
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:74
 msgid "Завантажити обрані"
 msgstr "Download selected"
@@ -1477,6 +1491,7 @@ msgstr "Download selected"
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:77
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:73
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:75
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:77
 #: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:77
 msgid "Документи відсутні"
 msgstr "There are no documents"
@@ -1958,17 +1973,17 @@ msgstr "To continue the work is necessary"
 msgid "авторизуватися"
 msgstr "to authorize"
 
-#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:99
-msgid "показати все"
-msgstr "show all"
+#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:100
+msgid "Назва місця походження товару"
+msgstr "The name of the place of origin"
 
-#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:104
-msgid "сховати"
-msgstr "hide"
+#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:102
+msgid "Географічне зазначення"
+msgstr "Geographical indication"
 
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:37
 msgid "Дата надходження матеріалів заявки до НОІВ"
-msgstr ""
+msgstr "Date of receipt of application materials to the UANIPIO"
 
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:83
 msgid "частково"
@@ -1979,7 +1994,8 @@ msgstr "partly"
 msgid "Кл.:"
 msgstr "Cl."
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:364
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:356
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:366
 msgid "Так"
 msgstr "Yes"
 
@@ -2016,18 +2032,21 @@ msgstr "Simple search"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:7
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:6
+#: apps/search/templates/search/templatetags/app_stages_kzpt.html:6
 #: apps/search/templates/search/templatetags/app_stages_tm.html:6
 msgid "Стадії"
 msgstr "Stages"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:19
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:18
+#: apps/search/templates/search/templatetags/app_stages_kzpt.html:18
 #: apps/search/templates/search/templatetags/app_stages_tm.html:18
 msgid "Позначення"
 msgstr "Legend"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:25
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:24
+#: apps/search/templates/search/templatetags/app_stages_kzpt.html:24
 #: apps/search/templates/search/templatetags/app_stages_tm.html:24
 msgid ""
 "Стадія, на якій припинено діловодство за заявкою (вважається неподаною, "
@@ -2038,12 +2057,14 @@ msgstr ""
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:29
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:28
+#: apps/search/templates/search/templatetags/app_stages_kzpt.html:28
 #: apps/search/templates/search/templatetags/app_stages_tm.html:28
 msgid "Поточна стадія"
 msgstr "Current stage"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:36
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:34
+#: apps/search/templates/search/templatetags/app_stages_kzpt.html:35
 #: apps/search/templates/search/templatetags/app_stages_tm.html:35
 msgid "Пройдена стадія"
 msgstr "Passed stage"
@@ -2111,6 +2132,10 @@ msgstr "Transaction search"
 #: apps/search/templates/search/transactions/_partials/breadcrumbs.html:24
 msgid "По сповіщенням"
 msgstr "Transaction search"
+
+#: apps/search/templatetags/search_extras.py:405
+msgid "Географічне зазначення зареєстровано"
+msgstr "The geographical indication is registered"
 
 #: apps/search/utils.py:1257
 msgid "Тип об'єкта промислової власності"
@@ -2228,6 +2253,12 @@ msgstr "Contact us"
 #: templates/templatetags/footer_contacts.html:8
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
+
+#~ msgid "показати все"
+#~ msgstr "show all"
+
+#~ msgid "сховати"
+#~ msgstr "hide"
 
 #~ msgid "Причина"
 #~ msgstr "Reason"
@@ -2374,9 +2405,6 @@ msgstr "Database administrator"
 
 #~ msgid "Платежі"
 #~ msgstr "Payments"
-
-#~ msgid "Свідоцтво на кваліфіковане зазначення походження товару"
-#~ msgstr "Certificate of qualified indication of origin of goods"
 
 #~ msgid "Адміністратор бази даних"
 #~ msgstr "Database administrator"
