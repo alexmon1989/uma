@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-25 14:31+0300\n"
+"POT-Creation-Date: 2023-05-31 17:16+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -38,7 +38,7 @@ msgstr ""
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:42
 #: apps/search/templates/search/detail/ld/_partials/breadcrumbs.html:27
-#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:27
+#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:31
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/detail/tm_madrid/_partials/breadcrumbs.html:27
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:16
@@ -1169,16 +1169,17 @@ msgstr ""
 "Date from which the rights certified by the certificate come into force"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:20
+#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:17
 msgid "Заявка на реєстрацію географічного зазначення"
 msgstr "Application for registration of a geographical indication"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:23
-#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:17
+#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:20
 msgid "Свідоцтво на використання географічного зазначення"
 msgstr "Certificate of using of a geographical indications"
 
 #: apps/search/templates/search/advanced/_partials/qi_item.html:25
-#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:19
+#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:22
 msgid "Свідоцтво на географічне зазначення"
 msgstr "Certificate of geographical indication"
 
@@ -1408,7 +1409,7 @@ msgstr "Object details"
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:31
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:46
 #: apps/search/templates/search/detail/ld/_partials/breadcrumbs.html:31
-#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:31
+#: apps/search/templates/search/detail/qi/_partials/breadcrumbs.html:35
 #: apps/search/templates/search/detail/tm/_partials/breadcrumbs.html:31
 msgid "Заявка №"
 msgstr "Application"

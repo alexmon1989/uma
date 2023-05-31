@@ -13,10 +13,14 @@
                 </h1>
 
                 <div class="g-mt-5 g-color-white-opacity-0_9 g-font-size-13">
-                    {% if '/' in hit.search_data.protective_doc_number %}
-                        {% trans "Свідоцтво на використання географічного зазначення" %}
-                    {% else %}
-                        {% trans "Свідоцтво на географічне зазначення" %}
+                    {% if hit.search_data.obj_state == 1 %}
+                        {% trans "Заявка на реєстрацію географічного зазначення" %}
+                    {% elif hit.search_data.obj_state == 2 %}
+                        {% if '/' in hit.search_data.protective_doc_number %}
+                            {% trans "Свідоцтво на використання географічного зазначення" %}
+                        {% else %}
+                            {% trans "Свідоцтво на географічне зазначення" %}
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

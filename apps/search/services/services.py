@@ -672,6 +672,27 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Географічні зазначення (заявки)
+        inid_data = [
+            InidCode(5, '190', 'Держава реєстрації КЗПТ', 1, True),
+            InidCode(5, '210', 'Номер заявки', 1, True),
+            InidCode(5, '220', 'Дата подання заявки', 1, True),
+            InidCode(5,
+                     '441',
+                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Географічне зазначення', 1, True),
+            InidCode(5, '540', 'Назва товару', 1, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
+            InidCode(5, '529.A', 'Опис меж географічного місця', 1, True),
+            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 1, True),
+            InidCode(5, '4573',
+                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+                     1, True),
+        ]
+        res.extend(inid_data)
+
         # Географічні зазначення (регистрации)
         inid_data = [
             InidCode(5, '111', 'Номер реєстрації', 2, True),
@@ -679,10 +700,19 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '190', 'Держава реєстрації КЗПТ', 2, True),
             InidCode(5, '210', 'Номер заявки', 2, True),
             InidCode(5, '220', 'Дата подання заявки', 2, True),
-            InidCode(5, '539.I', 'Назва КЗПТ', 2, True),
+            InidCode(5,
+                     '441',
+                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
+                     2,
+                     True),
+            InidCode(5, '539.I', 'Географічне зазначення', 2, True),
             InidCode(5, '540', 'Назва товару', 2, True),
-            InidCode(5, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
-            InidCode(5, '750', 'Адреса для листування', 2, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 2, True),
+            InidCode(5, '529.A', 'Опис меж географічного місця', 2, True),
+            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 2, True),
+            InidCode(5, '4573',
+                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+                     2, True),
         ]
         res.extend(inid_data)
 
@@ -896,6 +926,27 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Географічні зазначення (заявки)
+        inid_data = [
+            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 1, True),
+            InidCode(5, '210', 'Application number', 1, True),
+            InidCode(5, '220', 'Date of filing of the application', 1, True),
+            InidCode(5,
+                     '441',
+                     'Application publication date, bulletin number',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Geographical indication', 1, True),
+            InidCode(5, '540', 'Name of the product', 1, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
+            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 1, True),
+            InidCode(5, '539.D', 'Description of the product for which the geographical indication is applied for registration', 1, True),
+            InidCode(5, '4573',
+                     'Description of the product\'s relationship with the geographic environment or geographic place of origin',
+                     1, True),
+        ]
+        res.extend(inid_data)
+
         # Географічні зазначення (регистрации)
         inid_data = [
             InidCode(5, '111', 'Registration number', 2, True),
@@ -903,10 +954,21 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 2, True),
             InidCode(5, '210', 'Application number', 2, True),
             InidCode(5, '220', 'Date of filing of the application', 2, True),
-            InidCode(5, '539.I', 'Title of the qualified indication of origin of the product', 2, True),
+            InidCode(5,
+                     '441',
+                     'Application publication date, bulletin number',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Geographical indication', 2, True),
             InidCode(5, '540', 'Name of the product', 2, True),
-            InidCode(5, '732', 'Name and address of the holder of the registration', 2, True),
-            InidCode(5, '750', 'Address for correspondence', 2, True),
+            InidCode(5, '4551', 'Qualification of geographical indication', 1, True),
+            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 1, True),
+            InidCode(5, '539.D', 'Description of the product for which the geographical indication '
+                                 'is applied for registration', 1, True),
+            InidCode(5, '4573',
+                     'Description of the product\'s relationship with the geographic environment '
+                     'or geographic place of origin',
+                     1, True),
         ]
         res.extend(inid_data)
 

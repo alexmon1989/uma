@@ -1207,80 +1207,6 @@ class ReportItemDocxGeo(ReportItemDocx):
             self._paragraph.add_run(indication).bold = True
             self._paragraph.add_run('\r')
 
-    def _write_732(self) -> None:
-        """Записывает в документ данные об
-        ИНИД (732) Ім'я та адреса володільця реєстрації."""
-        inid = self._get_inid(self.obj_type_id, '732', self.application_data['search_data']['obj_state'])
-        holders = self.application_data['Geo']['GeoDetails'].get('HolderDetails', {}).get('Holder')
-        if inid and inid.visible and holders:
-            self._paragraph.add_run(f"{inid.title}:\n")
-            for holder in holders:
-                try:
-                    self._paragraph.add_run(
-                        holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                            'FreeFormatNameDetails']['FreeFormatNameLine']
-                    ).bold = True
-                except KeyError:
-                    pass
-
-                self._paragraph.add_run('\r')
-                try:
-                    self._paragraph.add_run(
-                        holder['HolderAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
-                            'FreeFormatAddressLine']
-                    )
-                except KeyError:
-                    pass
-
-                try:
-                    country = holder['HolderAddressBook']['FormattedNameAddress']['Address']['AddressCountryCode']
-                    self._paragraph.add_run(
-                        f" ({country})"
-                    )
-                except KeyError:
-                    pass
-            self._paragraph.add_run('\r')
-
-    def _write_750(self) -> None:
-        """
-        Записывает в документ
-        данные об ИНИД (750) Адреса для листування
-        """
-        inid = self._get_inid(self.obj_type_id, '750', self.application_data['search_data']['obj_state'])
-        correspondence = self.application_data['Geo']['GeoDetails'].get(
-            'CorrespondenceAddress', {}
-        ).get(
-            'CorrespondenceAddressBook', {}
-        ).get(
-            'FormattedNameAddress'
-        )
-        if inid and inid.visible and correspondence:
-            self._paragraph.add_run(f"{inid.title}:")
-            self._paragraph.add_run('\r')
-            try:
-                self._paragraph.add_run(
-                    correspondence['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
-                ).bold = True
-            except KeyError:
-                pass
-
-            self._paragraph.add_run('\r')
-            try:
-                self._paragraph.add_run(
-                    correspondence['Address']['FreeFormatAddress']['FreeFormatAddressLine']
-                )
-            except KeyError:
-                pass
-
-            try:
-                country = correspondence['Address']['AddressCountryCode']
-                self._paragraph.add_run(
-                    f" ({country})"
-                )
-            except KeyError:
-                pass
-        self._paragraph.add_run('\r')
-
     def write(self, document: Document) -> Paragraph:
         """Записывает информацию о геогр в абзац и возвращает его."""
         self.document = document
@@ -1293,8 +1219,6 @@ class ReportItemDocxGeo(ReportItemDocx):
         self._write_220()
         self._write_539i()
         self._write_540()
-        self._write_732()
-        self._write_750()
 
         return self._paragraph
 
@@ -2035,9 +1959,15 @@ class ReportWriterDocx(ReportWriter):
         },
         {
             'obj_type_id': 5,
+            'obj_state': 1,
+            'ua': 'Заявка на реєстрацію географічного зазначення',
+            'en': 'Application for registration of a geographical indication',
+        },
+        {
+            'obj_type_id': 5,
             'obj_state': 2,
             'ua': 'Свідоцтво на використання географічного зазначення',
-            'en': 'Certificate of using of a geographical indications',
+            'en': 'Certificate of using of a geographical indication',
         },
         {
             'obj_type_id': 6,
