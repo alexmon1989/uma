@@ -1187,6 +1187,23 @@ class ReportItemDocxGeo(ReportItemDocx):
             self._paragraph.add_run(app_date).bold = True
             self._paragraph.add_run('\r')
 
+    def _write_441(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (441) Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня"""
+        inid = self._get_inid(self.obj_type_id, '441', self.application_data['search_data']['obj_state'])
+        app_pub_details = self.application_data['Geo']['GeoDetails'].get('ApplicationPublicationDetails')
+        if inid and inid.visible and app_pub_details:
+            code_441 = datetime.strptime(app_pub_details['PublicationDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(code_441).bold = True
+            if self.lang_code == 'ua':
+                self._paragraph.add_run(', бюл. № ').bold = True
+            else:
+                self._paragraph.add_run(', bul. № ').bold = True
+            self._paragraph.add_run(app_pub_details['PublicationIdentifier']).bold = True
+            self._paragraph.add_run()
+            self._paragraph.add_run('\r')
+
     def _write_539i(self) -> None:
         """Записывает в документ данные об
         ИНИД (539.I) Назва КЗПТ."""
@@ -1207,6 +1224,55 @@ class ReportItemDocxGeo(ReportItemDocx):
             self._paragraph.add_run(indication).bold = True
             self._paragraph.add_run('\r')
 
+    def _write_4551(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (4551) Кваліфікація географічного зазначення."""
+        inid = self._get_inid(self.obj_type_id, '4551', self.application_data['search_data']['obj_state'])
+        qualification = self.application_data['Geo']['GeoDetails'].get('Qualification')
+        if inid and inid.visible and qualification:
+            self._paragraph.add_run(f"{inid.title}: ")
+            if qualification == 'appellation-of-origin':
+                if self.lang_code == 'ua':
+                    self._paragraph.add_run('Назва місця походження товару').bold = True
+                else:
+                    self._paragraph.add_run('The name of the place of origin').bold = True
+            else:
+                if self.lang_code == 'ua':
+                    self._paragraph.add_run('Географічне зазначення').bold = True
+                else:
+                    self._paragraph.add_run('Geographical indication').bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_529a(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (529A) Опис меж географічного місця."""
+        inid = self._get_inid(self.obj_type_id, '529.A', self.application_data['search_data']['obj_state'])
+        area = self.application_data['Geo']['GeoDetails'].get('Area')
+        if inid and inid.visible and area:
+            self._paragraph.add_run(f"{inid.title}:\r")
+            self._paragraph.add_run(area)
+            self._paragraph.add_run('\r')
+
+    def _write_539d(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (539.D) Опис товару, для якого географічне зазначення заявляється на реєстрацію."""
+        inid = self._get_inid(self.obj_type_id, '539.D', self.application_data['search_data']['obj_state'])
+        desc = self.application_data['Geo']['GeoDetails'].get('ProductDesc')
+        if inid and inid.visible and desc:
+            self._paragraph.add_run(f"{inid.title}:\r")
+            self._paragraph.add_run(desc)
+            self._paragraph.add_run('\r')
+
+    def _write_4573(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (4573) Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням."""
+        inid = self._get_inid(self.obj_type_id, '4573', self.application_data['search_data']['obj_state'])
+        desc = self.application_data['Geo']['GeoDetails'].get('DescriptionOfTheRelationship')
+        if inid and inid.visible and desc:
+            self._paragraph.add_run(f"{inid.title}:\r")
+            self._paragraph.add_run(desc)
+            self._paragraph.add_run('\r')
+
     def write(self, document: Document) -> Paragraph:
         """Записывает информацию о геогр в абзац и возвращает его."""
         self.document = document
@@ -1217,8 +1283,13 @@ class ReportItemDocxGeo(ReportItemDocx):
         self._write_190()
         self._write_210()
         self._write_220()
+        self._write_441()
         self._write_539i()
         self._write_540()
+        self._write_4551()
+        self._write_529a()
+        self._write_539d()
+        self._write_4573()
 
         return self._paragraph
 

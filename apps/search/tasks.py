@@ -988,7 +988,10 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     os.makedirs(str(directory_path), exist_ok=True)
 
     # Имя файла с результатами поиска
-    file_name = f"{get_unique_filename(hit['search_data']['app_number'])}.docx"
+    if hit['search_data']['app_number'] is not None:
+        file_name = f"{get_unique_filename(hit['search_data']['app_number'])}.docx"
+    else:
+        file_name = f"{get_unique_filename(hit['search_data']['protective_doc_number'])}.docx"
     file_path = directory_path / file_name
 
     # Генерация отчёта
