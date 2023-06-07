@@ -8,12 +8,13 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, OrderDocument
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
-                    prepare_data_for_search_report, create_search_res_doc, user_has_access_to_docs, sort_doc_flow,
+                    prepare_data_for_search_report, create_search_res_doc, sort_doc_flow,
                     filter_app_data, filter_bad_apps)
+from .dataclasses import ServiceExecuteResult, ServiceExecuteResultError
 from apps.search.services.reports import ReportWriterDocxCreator
 from uma.utils import get_unique_filename, get_user_or_anonymous
 from .forms import AdvancedSearchForm, SimpleSearchForm, get_search_form
@@ -21,9 +22,11 @@ import apps.search.services as search_services
 import os
 import json
 import time
+import dataclasses
 from zipfile import ZipFile
 from pathlib import Path
 from datetime import timedelta
+from typing import List
 
 
 @shared_task
@@ -390,107 +393,14 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
 
 
 @shared_task
-def get_order_documents(user_id, id_app_number, id_cead_doc, ip_user):
+def get_order_documents(user_id: int, id_app_number: int, id_cead_doc: int | List[int], ip_user: str,
+                        lang_code: str) -> str:
     """Возвращает название файла документа или архива с документами, заказанного(ых) через "стол заказов"."""
-    # Получение документа (заявки) из ElasticSearch
-    client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-    q = Q(
-        'bool',
-        must=[Q('match', _id=id_app_number)],
-    )
-
-    user = get_user_or_anonymous(user_id)
-
-    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
-    if not s:
-        return {}
-    hit = s[0].to_dict()
-
-    # Список id cead
-    hit_id_cead_list = []
-    if hit['Document']['idObjType'] in (1, 2, 3):
-        for doc in hit['DOCFLOW']['DOCUMENTS']:
-            if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
-                hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
-
-        # Если это охранный документ, то нужно ещё добавить в список документы заявки
-        if hit['search_data']['obj_state'] == 2:
-            q = Q(
-                'query_string',
-                query=f"search_data.obj_state:1 AND search_data.app_number:{hit['search_data']['app_number']}",
-            )
-            s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).execute()
-            if s:
-                app_hit = s[0].to_dict()
-                for doc in app_hit.get('DOCFLOW', {}).get('DOCUMENTS', []):
-                    if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
-                        hit_id_cead_list.append(doc['DOCRECORD']['DOCIDDOCCEAD'])
-
-    elif hit['Document']['idObjType'] == 4:
-        for doc in hit['TradeMark']['DocFlow']['Documents']:
-            if doc['DocRecord'].get('DocIdDocCEAD'):
-                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
-
-    elif hit['Document']['idObjType'] == 5:
-        for doc in hit['Geo']['DocFlow']['Documents']:
-            if doc['DocRecord'].get('DocIdDocCEAD'):
-                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
-
-    elif hit['Document']['idObjType'] == 6:
-        for doc in hit['Design']['DocFlow']['Documents']:
-            if doc['DocRecord'].get('DocIdDocCEAD'):
-                hit_id_cead_list.append(doc['DocRecord']['DocIdDocCEAD'])
-
-    # Входит ли id_cead_doc в список документов заявки
-    if isinstance(id_cead_doc, list):
-        is_in_list = set(list(map(int, id_cead_doc))).issubset(set(hit_id_cead_list))
-    else:
-        is_in_list = id_cead_doc in hit_id_cead_list
-
-    if is_in_list and user_has_access_to_docs(user, hit):
-        # Создание заказа
-        order = OrderService(
-            # user=request.user,
-            user_id=user_id,
-            ip_user=ip_user,
-            app_id=id_app_number
-        )
-        order.save()
-        if isinstance(id_cead_doc, list):
-            for item in id_cead_doc:
-                OrderDocument.objects.create(order=order, id_cead_doc=item)
-        else:
-            OrderDocument.objects.create(order=order, id_cead_doc=id_cead_doc)
-        order = get_completed_order(order.id)
-
-        if order:
-            file_zip_name = f"docs_{order.id}.zip"
-            file_path_zip = os.path.join(
-                settings.ORDERS_ROOT,
-                str(order.user_id),
-                str(order.id),
-                file_zip_name
-            )
-            with ZipFile(file_path_zip, 'w') as zip_:
-                for document in order.orderdocument_set.all():
-                    zip_.write(
-                        os.path.join(
-                            settings.DOCUMENTS_MOUNT_FOLDER,
-                            'OrderService',
-                            str(order.user_id),
-                            str(order.id),
-                            document.file_name),
-                        f"{document.file_name}"
-                    )
-            return os.path.join(
-                settings.MEDIA_URL,
-                'OrderService',
-                str(order.user_id),
-                str(order.id),
-                file_zip_name
-            )
-
-    return False
+    if isinstance(id_cead_doc, int):
+        id_cead_doc = [id_cead_doc]
+    download_service = search_services.DownloadDocumentsService()
+    res = download_service.execute(id_cead_doc, id_app_number, user_id, ip_user, lang_code)
+    return json.dumps(dataclasses.asdict(res))
 
 
 @shared_task
@@ -532,7 +442,7 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
             # Формирование выписки и сохранение её на диск
             create_selection_inv_um_ld(json.loads(order.external_doc_body), get_data, file_path)
         else:
-            return False
+            return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
     # Знаки для товаров и услуг
     elif app.obj_type_id == 4:
@@ -545,18 +455,27 @@ def create_selection(id_app_number, user_id, user_ip, get_data):
             # Формирование выписки и сохранение её на диск
             create_selection_tm(data, get_data, file_path)
         else:
-            return False
+            return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
     else:
-        return False
+        return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
     # Возврат url сформированного файла с выпиской
-    return os.path.join(
-        settings.MEDIA_URL,
-        'OrderService',
-        str(user_id),
-        'selections',
-        str(id_app_number),
-        f"{id_app_number}.docx"
+    return json.dumps(
+        dataclasses.asdict(
+            ServiceExecuteResult(
+                status='success',
+                data={
+                    'file_path': os.path.join(
+                        settings.MEDIA_URL,
+                        'OrderService',
+                        str(user_id),
+                        'selections',
+                        str(id_app_number),
+                        f"{id_app_number}.docx"
+                    )
+                }
+            )
+        )
     )
 
 
@@ -663,8 +582,15 @@ def create_simple_search_results_file_docx(user_id, get_params, lang_code):
 
             # Возврат url сформированного файла с результатами поиска
             res = Path(settings.MEDIA_URL) / 'search_results' / file_name
-            return str(res)
-    return False
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': str(res)}
+                    )
+                )
+            )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -770,7 +696,7 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
                 'search_results',
                 file_name
             )
-    return False
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -833,8 +759,15 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
 
             # Возврат url сформированного файла с результатами поиска
             res = Path(settings.MEDIA_URL) / 'search_results' / file_name
-            return str(res)
-    return False
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': str(res)}
+                    )
+                )
+            )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -898,12 +831,20 @@ def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
             create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
-            return os.path.join(
+            res = os.path.join(
                 settings.MEDIA_URL,
                 'search_results',
                 file_name
             )
-    return False
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': res}
+                    )
+                )
+            )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -931,8 +872,15 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
 
             # Возврат url сформированного файла с результатами поиска
             res = Path(settings.MEDIA_URL) / 'search_results' / file_name
-            return str(res)
-    return False
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': str(res)}
+                    )
+                )
+            )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -967,12 +915,20 @@ def create_transactions_search_results_file_xlsx(get_params, lang_code):
             create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
-            return os.path.join(
+            res = os.path.join(
                 settings.MEDIA_URL,
                 'search_results',
                 file_name
             )
-    return False
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': res}
+                    )
+                )
+            )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -980,7 +936,7 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     """Создаёт файл docx с библиографическими данными объекта пром. собственности."""
     hit = search_services.application_get_app_elasticsearch_data(id_app_number)
     if not hit:
-        return {}
+        return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
     hit['meta'] = {'id': id_app_number}
 
     user = get_user_or_anonymous(user_id)
@@ -1004,7 +960,14 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
 
     # Возврат url сформированного файла с результатами поиска
     res = Path(settings.MEDIA_URL) / 'search_results' / file_name
-    return str(res)
+    return json.dumps(
+        dataclasses.asdict(
+            ServiceExecuteResult(
+                status='success',
+                data={'file_path': str(res)}
+            )
+        )
+    )
 
 
 @shared_task
@@ -1013,7 +976,7 @@ def create_shared_docs_archive(id_app_number):
     try:
         app = IpcAppList.objects.get(id=id_app_number, registration_number__gt=0, obj_type_id__in=(1, 2, 3))
     except IpcAppList.DoesNotExist:
-        return False
+        return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
     directory_path = os.path.join(
         settings.MEDIA_ROOT,
@@ -1041,10 +1004,18 @@ def create_shared_docs_archive(id_app_number):
     zip_.close()
 
     # Возврат url сформированного файла
-    return os.path.join(
+    res = os.path.join(
         settings.MEDIA_URL,
         'shared_docs',
         file_name
+    )
+    return json.dumps(
+        dataclasses.asdict(
+            ServiceExecuteResult(
+                status='success',
+                data={'file_path': res}
+            )
+        )
     )
 
 

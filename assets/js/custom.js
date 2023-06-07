@@ -49,15 +49,18 @@ function updateURLParameter(url, param, paramVal)
 }
 
 function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries = 20) {
-    const recaptchaEnabled = !!JSON.parse(document.getElementById('recaptcha-enabled').textContent);
-
     let onAjaxSuccess = function (data) {
         if (data.state === 'SUCCESS') {
-            if (data.result === false) {
-                toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+            let res = JSON.parse(data.result)
+            if (res.status === 'error') {
+                if (res.error.message) {
+                    toastr.error(res.error.message);
+                } else {
+                    toastr.error(gettext('Виникла помилка. Будь-ласка, спробуйте пізніше.'));
+                }
             } else {
                 toastr.success(gettext('Файл було сформовано.'));
-                saveAs(data.result, data.result.split('/').pop());
+                saveAs(res.data.file_path, res.data.file_path.split('/').pop());
             }
             onSuccess(data);
         } else {
@@ -77,27 +80,13 @@ function downloadFileAfterTaskExec(taskId, onSuccess, onError, retries = 20) {
         onError();
     };
 
-    if (recaptchaEnabled) {
-        let siteKey = document.querySelector("meta[name='site-key']").getAttribute("content");
-
-        grecaptcha.execute(siteKey, {action: 'downloadfile'}).then(function (token) {
-            $.ajax({
-                type: 'get',
-                url: '/search/get-task-info/',
-                data: {'task_id': taskId, 'token': token},
-                success: onAjaxSuccess,
-                error: onAjaxError,
-            });
-        });
-    } else {
-        $.ajax({
-            type: 'get',
-            url: '/search/get-task-info/',
-            data: {'task_id': taskId},
-            success: onAjaxSuccess,
-            error: onAjaxError,
-        });
-    }
+    $.ajax({
+        type: 'get',
+        url: '/search/get-task-info/',
+        data: {'task_id': taskId},
+        success: onAjaxSuccess,
+        error: onAjaxError,
+    });
 }
 
 /**
@@ -282,7 +271,7 @@ $(function () {
         });
     });
 
-    // Обработчтк события нажатия на кнопку формирования ссылки на документ
+    // Обработчик события нажатия на кнопку формирования ссылки на документ
     $(document).on('click', '.documents-form button.download-doc', function (e) {
         e.preventDefault();
         let $this = $(this);
@@ -293,7 +282,8 @@ $(function () {
             downloadFileAfterTaskExec(
                 data.task_id,
                 function (data) {
-                    if (data.result === false) {
+                    let res = JSON.parse(data.result);
+                    if (res.status === 'error') {
                         $this.removeAttr('disabled')
                             .find('i').first()
                             .removeClass('fa-spinner')
@@ -310,7 +300,7 @@ $(function () {
                         $this.attr('onclick', '').unbind('click').click(function (e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            saveAs(data.result, data.result.split('/').pop());
+                            saveAs(res.data.file_path, res.data.file_path.split('/').pop());
                         });
                     }
                 },

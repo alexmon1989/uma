@@ -407,3 +407,31 @@ class FvCicImporter(models.Model):
     class Meta:
         managed = False
         db_table = 'fv_cic_importer'
+
+
+class DeliveryDateCead(models.Model):
+    """Модель таблицы ls_delivery_dates базы данных EArchive. Содержит информацию о  """
+    id = models.AutoField(db_column='idDelivery', primary_key=True)
+    id_doc_cead = models.IntegerField(db_column='idDoc', blank=True, null=True)
+    send_date = models.DateTimeField(blank=True, null=True)
+    valid_send_date = models.BooleanField(blank=True, null=True)
+    receive_date = models.DateTimeField(blank=True, null=True)  # дата получения документа заявителем
+    valid_receive_date = models.BooleanField(blank=True, null=True)
+    return_date = models.DateTimeField(blank=True, null=True)
+    valid_return_date = models.BooleanField(blank=True, null=True)
+    return_why = models.CharField(max_length=300, blank=True, null=True)
+    iddoc_techn_sys = models.IntegerField(blank=True, null=True)
+    date_send_to_cancelary = models.DateTimeField(blank=True, null=True)
+    is_error = models.CharField(max_length=250, blank=True, null=True)
+    exchange_command = models.CharField(max_length=250, blank=True, null=True)
+    is_worked_techsys = models.IntegerField(blank=True, null=True)
+    is_electronic = models.IntegerField(blank=True, null=True)
+    is_bug = models.IntegerField(blank=True, null=True)
+    retread_date = models.DateTimeField(blank=True, null=True)
+    retread_why = models.CharField(max_length=250, blank=True, null=True)
+    manual_insert = models.IntegerField(blank=True, null=True)
+    exported_441_code = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ls_delivery_dates'

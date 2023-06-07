@@ -5,12 +5,15 @@ from celery import shared_task
 from django.conf import settings
 
 import os
+import json
+import dataclasses
 from typing import List
 from pathlib import Path
 
 from ..search.utils import sort_results, prepare_data_for_search_report, create_search_res_doc, filter_app_data
 from ..search.services.reports import ReportWriterDocxCreator
 from ..search.services import services as search_services
+from ..search.dataclasses import ServiceExecuteResult
 from uma.utils import get_unique_filename, get_user_or_anonymous
 
 
@@ -49,12 +52,20 @@ def create_favorites_results_file_xlsx(user_id, favorites_ids, get_params, lang_
         create_search_res_doc(data, file_path)
 
         # Возврат url сформированного файла с результатами поиска
-        return os.path.join(
+        res = os.path.join(
             settings.MEDIA_URL,
             'search_results',
             file_name
         )
-    return False
+        return json.dumps(
+            dataclasses.asdict(
+                ServiceExecuteResult(
+                    status='success',
+                    data={'file_path': res}
+                )
+            )
+        )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
 
 @shared_task
@@ -99,5 +110,12 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
 
         # Возврат url сформированного файла с результатами поиска
         res = Path(settings.MEDIA_URL) / 'search_results' / file_name
-        return str(res)
-    return False
+        return json.dumps(
+            dataclasses.asdict(
+                ServiceExecuteResult(
+                    status='success',
+                    data={'file_path': str(res)}
+                )
+            )
+        )
+    return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
