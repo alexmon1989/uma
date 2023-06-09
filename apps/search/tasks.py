@@ -691,10 +691,18 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
             create_search_res_doc(data, file_path)
 
             # Возврат url сформированного файла с результатами поиска
-            return os.path.join(
+            res = os.path.join(
                 settings.MEDIA_URL,
                 'search_results',
                 file_name
+            )
+            return json.dumps(
+                dataclasses.asdict(
+                    ServiceExecuteResult(
+                        status='success',
+                        data={'file_path': res}
+                    )
+                )
             )
     return json.dumps(dataclasses.asdict(ServiceExecuteResult(status='error')))
 
