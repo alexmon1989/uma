@@ -636,6 +636,12 @@ class Command(BaseCommand):
             if 'ProductDescription' in res['Geo']['GeoDetails']:
                 res['Geo']['GeoDetails']['ProductDesc'] = res['Geo']['GeoDetails'].pop('ProductDescription')
 
+            applicant = None
+            if res['Geo']['GeoDetails'].get('ApplicantDetails'):
+                applicant = [{'name': x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                    'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
+                             res['Geo']['GeoDetails']['ApplicantDetails']['Applicant']]
+
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
@@ -643,6 +649,7 @@ class Command(BaseCommand):
                 'app_date': res['Geo']['GeoDetails'].get('ApplicationDate'),
                 'protective_doc_number': res['Geo']['GeoDetails'].get('RegistrationNumber'),
                 'rights_date': res['Geo']['GeoDetails'].get('RegistrationDate'),
+                'applicant': applicant,
                 'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                               'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Geo']['GeoDetails']['HolderDetails']['Holder']]

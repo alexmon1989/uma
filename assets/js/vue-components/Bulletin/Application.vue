@@ -22,6 +22,10 @@
                     <v-col v-if="app_data[code].value && code === 'code_540' && app_data[code].type === 'image'"
                            class="g-pa-5"
                     ><img :src="app_data[code].value" class="img-fluid"></v-col>
+                    <v-col v-else-if="app_data[code].value && code === 'code_9441'"
+                           class="g-pa-5"
+                    ><a :href="app_data[code].value"
+                        target="_blank"><i class="fa fa-external-link g-mr-5"></i>Відкрити</a></v-col>
                     <v-col v-else
                            class="g-pa-5"
                            v-html="app_data[code].value"
@@ -76,6 +80,7 @@
                 'code_740',
                 'code_750',
                 'code_511',
+                'code_9441',
             ]
         }),
 

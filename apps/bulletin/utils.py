@@ -431,4 +431,59 @@ def prepare_kzpt_data(record):
         'value': data['DescriptionOfTheRelationship']
     }
 
+    # 731 - заявник (ім'я або повне найменування та адреса заявника (заявників))
+    biblio_data['code_731'] = {
+        'title': '(731) Заявник (ім\'я або повне найменування та адреса заявника (заявників))',
+        'value': None
+    }
+    if data.get('ApplicantDetails', {}).get('Applicant'):
+        applicants = []
+        for applicant in data['ApplicantDetails']['Applicant']:
+            res = applicant.get(
+                'ApplicantAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Name', {}
+            ).get(
+                'FreeFormatName', {}
+            ).get(
+                'FreeFormatNameDetails', {}
+            ).get(
+                'FreeFormatNameLine', ''
+            )
+            res += '<br>'
+            res += applicant.get(
+                'ApplicantAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Address', {}
+            ).get(
+                'FreeFormatAddress', {}
+            ).get(
+                'FreeFormatAddressLine', ''
+            )
+            res += '<br>'
+            res += applicant.get(
+                'ApplicantAddressBook', {}
+            ).get(
+                'FormattedNameAddress', {}
+            ).get(
+                'Address', {}
+            ).get(
+                'AddressCountryCode', ''
+            )
+
+            applicants.append(res)
+        biblio_data['code_731']['value'] = ";<br>".join(applicants)
+
+    # Специфікація
+    specification = data.get('Specification')
+    if specification:
+        biblio_data['code_9441'] = {
+            'title': 'Специфікація товару',
+            'value': specification
+        }
+
     return biblio_data

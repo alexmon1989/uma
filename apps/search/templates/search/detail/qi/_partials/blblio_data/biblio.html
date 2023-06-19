@@ -105,29 +105,23 @@
                 </tr>
             {% endif %}
 
-            {% get_field '529.A' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Area %}
+
+
+            {% get_field '731' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.ApplicantDetails.Applicant %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td class="kzpt-geo">{{ hit.Geo.GeoDetails.Area|safe }}</td>
-                </tr>
-            {% endif %}
-
-            {% get_field '539.D' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view %}
-                {% if hit.Geo.GeoDetails.ProductDescription or hit.Geo.GeoDetails.ProductDesc %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td>{{ hit.Geo.GeoDetails.ProductDesc }}</td>
-                    </tr>
-                {% endif %}
-            {% endif %}
-
-            {% get_field '4573' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Geo.GeoDetails.DescriptionOfTheRelationship %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.Geo.GeoDetails.DescriptionOfTheRelationship }}</td>
+                    <td class="text-justify">
+                        {% for applicant in hit.Geo.GeoDetails.ApplicantDetails.Applicant %}
+                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            <br>
+                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                            {% endif %}
+                            {% if not forloop.last %};<br>{% endif %}
+                        {% endfor %}
+                    </td>
                 </tr>
             {% endif %}
 
@@ -177,6 +171,43 @@
                         {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}<br>
                         {{ hit.Geo.GeoDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.AddressLine }}
                     </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '9441' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Specification %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        <a href="{{ hit.Geo.GeoDetails.Specification }}"
+                           target="_blank"><i class="fa fa-external-link g-mr-5"></i>{% trans 'Відкрити' %}</a>
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '529.A' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.Area %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="kzpt-geo">{{ hit.Geo.GeoDetails.Area|safe }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '539.D' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view %}
+                {% if hit.Geo.GeoDetails.ProductDescription or hit.Geo.GeoDetails.ProductDesc %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.Geo.GeoDetails.ProductDesc }}</td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+
+            {% get_field '4573' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Geo.GeoDetails.DescriptionOfTheRelationship %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Geo.GeoDetails.DescriptionOfTheRelationship }}</td>
                 </tr>
             {% endif %}
 

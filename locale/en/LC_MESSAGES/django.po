@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-07 14:51+0300\n"
+"POT-Creation-Date: 2023-06-19 14:20+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -856,15 +856,19 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1224
+#: apps/search/services/services.py:1227
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
-msgstr "Downloading is not possible because the document has not been received by the addressee."
+msgstr ""
+"Downloading is not possible because the document has not been received by "
+"the addressee."
 
-#: apps/search/services/services.py:1226
+#: apps/search/services/services.py:1229
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
-msgstr "Downloading is not possible because there are document(s) in the download list that have not been received by the addressee:"
+msgstr ""
+"Downloading is not possible because there are document(s) in the download "
+"list that have not been received by the addressee:"
 
 #: apps/search/tasks.py:48 apps/search/tasks.py:232 apps/search/tasks.py:292
 msgid "Некоректні умови пошуку"
@@ -1991,6 +1995,10 @@ msgstr "The name of the place of origin"
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:102
 msgid "Географічне зазначення"
 msgstr "Geographical indication"
+
+#: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:183
+msgid "Відкрити"
+msgstr "Open"
 
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:37
 msgid "Дата надходження матеріалів заявки до НОІВ"
