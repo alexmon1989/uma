@@ -695,6 +695,8 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '4573',
                      'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
                      1, True),
+            InidCode(5, '731', 'Відомості про заявника', 1, True),
+            InidCode(5, '9441', 'Специфікація товару', 1, True),
         ]
         res.extend(inid_data)
 
@@ -718,6 +720,8 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '4573',
                      'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
                      2, True),
+            InidCode(5, '731', 'Відомості про заявника', 2, True),
+            InidCode(5, '9441', 'Специфікація товару', 2, True),
         ]
         res.extend(inid_data)
 
@@ -949,6 +953,8 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '4573',
                      'Description of the product\'s relationship with the geographic environment or geographic place of origin',
                      1, True),
+            InidCode(5, '731', 'Information about applicant', 1, True),
+            InidCode(5, '9441', 'Specification', 1, True),
         ]
         res.extend(inid_data)
 
@@ -966,14 +972,16 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                      True),
             InidCode(5, '539.I', 'Geographical indication', 2, True),
             InidCode(5, '540', 'Name of the product', 2, True),
-            InidCode(5, '4551', 'Qualification of geographical indication', 1, True),
-            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 1, True),
+            InidCode(5, '4551', 'Qualification of geographical indication', 2, True),
+            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 2, True),
             InidCode(5, '539.D', 'Description of the product for which the geographical indication '
-                                 'is applied for registration', 1, True),
+                                 'is applied for registration', 2, True),
             InidCode(5, '4573',
                      'Description of the product\'s relationship with the geographic environment '
                      'or geographic place of origin',
-                     1, True),
+                     2, True),
+            InidCode(5, '731', 'Information about applicant', 2, True),
+            InidCode(5, '9441', 'Specification', 2, True),
         ]
         res.extend(inid_data)
 

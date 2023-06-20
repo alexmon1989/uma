@@ -1273,6 +1273,61 @@ class ReportItemDocxGeo(ReportItemDocx):
             self._paragraph.add_run(desc)
             self._paragraph.add_run('\r')
 
+    def _write_731(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (731) Відомості щодо заявника
+        """
+        inid = self._get_inid(self.obj_type_id, '731', self.application_data['search_data']['obj_state'])
+        applicants = self.application_data['Geo']['GeoDetails'].get(
+            'ApplicantDetails', {}
+        ).get(
+            'Applicant'
+        )
+        if inid and inid.visible and applicants:
+            self._paragraph.add_run(f"{inid.title}:")
+            for applicant in applicants:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        applicant['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                if self.application_data['search_data']['obj_state'] == 2:
+                    self._paragraph.add_run('\r')
+                    try:
+                        self._paragraph.add_run(
+                            applicant['ApplicantAddressBook']['FormattedNameAddress']['Address']['FreeFormatAddress'][
+                                'FreeFormatAddressLine']
+                        )
+                    except KeyError:
+                        pass
+
+                    try:
+                        country = applicant['ApplicantAddressBook']['FormattedNameAddress']['Address'][
+                            'AddressCountryCode']
+                        self._paragraph.add_run(
+                            f" ({country})"
+                        )
+                    except KeyError:
+                        pass
+            self._paragraph.add_run('\r')
+
+    def _write_9441(self) -> None:
+        """
+        Записывает в документ
+        данные об ИНИД (9441) Специфікація товару
+        """
+        inid = self._get_inid(self.obj_type_id, '9441', self.application_data['search_data']['obj_state'])
+        specification = self.application_data['Geo']['GeoDetails'].get('Specification')
+        if inid and inid.visible and specification:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(specification)
+            self._paragraph.add_run('\r')
+
     def write(self, document: Document) -> Paragraph:
         """Записывает информацию о геогр в абзац и возвращает его."""
         self.document = document
@@ -1286,10 +1341,12 @@ class ReportItemDocxGeo(ReportItemDocx):
         self._write_441()
         self._write_539i()
         self._write_540()
+        self._write_731()
         self._write_4551()
         self._write_529a()
         self._write_539d()
         self._write_4573()
+        self._write_9441()
 
         return self._paragraph
 
