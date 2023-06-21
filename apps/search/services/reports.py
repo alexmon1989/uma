@@ -469,6 +469,16 @@ class ReportItemDocxTM(ReportItemDocx):
             self._paragraph.add_run()
             self._paragraph.add_run('\r')
 
+    def _write_526(self) -> None:
+        """Записывает в документ данные об ИНИД (526) Вилучення з охорони окремих елементів торговельної марки."""
+        inid = self._get_inid(self.obj_type_id, '526', self.application_data['search_data']['obj_state'])
+        declamation = self.application_data['TradeMark']['TrademarkDetails'].get('Declamation')
+        if inid and inid.visible and declamation:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}: ")
+            self._paragraph.add_run(declamation).bold = True
+            self._paragraph.add_run('\r')
+
     def write(self, document: Document) -> Paragraph:
         """Записывает информацию о ТМ в абзац и возвращает его."""
         self.document = document
@@ -491,6 +501,7 @@ class ReportItemDocxTM(ReportItemDocx):
         self._write_732()
         self._write_740()
         self._write_750()
+        self._write_526()
         self._write_591()
         self._write_511()
 

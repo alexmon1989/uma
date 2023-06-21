@@ -528,6 +528,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Адреса для листування', 2, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
+            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 2, True),
         ]
         res.extend(inid_data)
 
@@ -546,6 +547,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Адреса для листування', 1, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
+            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 1, True),
         ]
         res.extend(inid_data)
 
@@ -777,6 +779,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 2, True),
             InidCode(4, '511', 'Nice Classification indexes', 2, True),
+            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 2, True),
         ]
         res.extend(inid_data)
 
@@ -795,6 +798,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 1, True),
             InidCode(4, '511', 'Nice Classification indexes', 1, True),
+            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 1, True),
         ]
         res.extend(inid_data)
 
