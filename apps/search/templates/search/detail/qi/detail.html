@@ -13,10 +13,23 @@
         <div class="col-md-9">
             <!-- Tab panes -->
             <div id="nav-1-1-primary-ver" class="tab-content">
-                <div class="tab-pane fade show active" id="nav-1-1-primary-ver--1" role="tabpanel">
+                <div class="tab-pane fade {% if hit.search_data.obj_state == 2 or hit.Geo.GeoDetails.ApplicationNumber %}show active{% endif %}" id="nav-1-1-primary-ver--1" role="tabpanel">
                     {% include 'search/detail/_partials/biblio_header.html' %}
 
                     {% include 'search/detail/qi/_partials/blblio_data/biblio.html' %}
+                </div>
+
+                <div class="tab-pane fade {% if hit.search_data.obj_state == 1 and not hit.Geo.GeoDetails.ApplicationNumber %}show active{% endif %}" id="nav-1-1-primary-ver--3" role="tabpanel">
+                    <h3 class="g-pb-20">{% trans "Стан діловодства" %}</h3>
+
+                    {% app_stages_kzpt hit %}
+
+                    {% user_has_access_to_docs request.user hit as user_has_access_to_docs %}
+                    {% if user_has_access_to_docs %}
+                        {% include 'search/detail/qi/_partials/state_of_affair/documents.html' %}
+                    {% else %}
+                        {% include 'search/detail/qi/_partials/state_of_affair/documents_without_links.html' %}
+                    {% endif %}
                 </div>
 
                 <div class="tab-pane fade" id="nav-1-1-primary-ver--2" role="tabpanel">

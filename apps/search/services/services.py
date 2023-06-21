@@ -2,17 +2,22 @@ import datetime
 from typing import List, Optional
 import time
 import copy
+import os
+from zipfile import ZipFile
 
 from django.utils.translation import gettext as _
 from django.conf import settings
+from django.utils import translation
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
-from apps.search.models import IpcAppList
+from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument
 from apps.bulletin import services as bulletin_services
-from apps.search.utils import filter_bad_apps
-from apps.search.dataclasses import InidCode
+from apps.search.utils import filter_bad_apps, user_has_access_to_docs
+from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
+
+from uma.utils import get_user_or_anonymous
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -672,6 +677,29 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Географічні зазначення (заявки)
+        inid_data = [
+            InidCode(5, '190', 'Держава реєстрації КЗПТ', 1, True),
+            InidCode(5, '210', 'Номер заявки', 1, True),
+            InidCode(5, '220', 'Дата подання заявки', 1, True),
+            InidCode(5,
+                     '441',
+                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Географічне зазначення', 1, True),
+            InidCode(5, '540', 'Назва товару', 1, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
+            InidCode(5, '529.A', 'Опис меж географічного місця', 1, True),
+            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 1, True),
+            InidCode(5, '4573',
+                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+                     1, True),
+            InidCode(5, '731', 'Відомості про заявника', 1, True),
+            InidCode(5, '9441', 'Специфікація товару', 1, True),
+        ]
+        res.extend(inid_data)
+
         # Географічні зазначення (регистрации)
         inid_data = [
             InidCode(5, '111', 'Номер реєстрації', 2, True),
@@ -679,10 +707,21 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '190', 'Держава реєстрації КЗПТ', 2, True),
             InidCode(5, '210', 'Номер заявки', 2, True),
             InidCode(5, '220', 'Дата подання заявки', 2, True),
-            InidCode(5, '539.I', 'Назва КЗПТ', 2, True),
+            InidCode(5,
+                     '441',
+                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
+                     2,
+                     True),
+            InidCode(5, '539.I', 'Географічне зазначення', 2, True),
             InidCode(5, '540', 'Назва товару', 2, True),
-            InidCode(5, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
-            InidCode(5, '750', 'Адреса для листування', 2, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 2, True),
+            InidCode(5, '529.A', 'Опис меж географічного місця', 2, True),
+            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 2, True),
+            InidCode(5, '4573',
+                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+                     2, True),
+            InidCode(5, '731', 'Відомості про заявника', 2, True),
+            InidCode(5, '9441', 'Специфікація товару', 2, True),
         ]
         res.extend(inid_data)
 
@@ -896,6 +935,29 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Географічні зазначення (заявки)
+        inid_data = [
+            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 1, True),
+            InidCode(5, '210', 'Application number', 1, True),
+            InidCode(5, '220', 'Date of filing of the application', 1, True),
+            InidCode(5,
+                     '441',
+                     'Application publication date, bulletin number',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Geographical indication', 1, True),
+            InidCode(5, '540', 'Name of the product', 1, True),
+            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
+            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 1, True),
+            InidCode(5, '539.D', 'Description of the product for which the geographical indication is applied for registration', 1, True),
+            InidCode(5, '4573',
+                     'Description of the product\'s relationship with the geographic environment or geographic place of origin',
+                     1, True),
+            InidCode(5, '731', 'Information about applicant', 1, True),
+            InidCode(5, '9441', 'Specification', 1, True),
+        ]
+        res.extend(inid_data)
+
         # Географічні зазначення (регистрации)
         inid_data = [
             InidCode(5, '111', 'Registration number', 2, True),
@@ -903,10 +965,23 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 2, True),
             InidCode(5, '210', 'Application number', 2, True),
             InidCode(5, '220', 'Date of filing of the application', 2, True),
-            InidCode(5, '539.I', 'Title of the qualified indication of origin of the product', 2, True),
+            InidCode(5,
+                     '441',
+                     'Application publication date, bulletin number',
+                     1,
+                     True),
+            InidCode(5, '539.I', 'Geographical indication', 2, True),
             InidCode(5, '540', 'Name of the product', 2, True),
-            InidCode(5, '732', 'Name and address of the holder of the registration', 2, True),
-            InidCode(5, '750', 'Address for correspondence', 2, True),
+            InidCode(5, '4551', 'Qualification of geographical indication', 2, True),
+            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 2, True),
+            InidCode(5, '539.D', 'Description of the product for which the geographical indication '
+                                 'is applied for registration', 2, True),
+            InidCode(5, '4573',
+                     'Description of the product\'s relationship with the geographic environment '
+                     'or geographic place of origin',
+                     2, True),
+            InidCode(5, '731', 'Information about applicant', 2, True),
+            InidCode(5, '9441', 'Specification', 2, True),
         ]
         res.extend(inid_data)
 
@@ -941,3 +1016,255 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             ]
             res.extend(inid_data)
     return res
+
+
+def document_get_receive_date_cead(id_doc_cead: int) -> datetime.datetime | None:
+    """Получает (из ЦЕАД) дату получения документа заявителем."""
+    item = DeliveryDateCead.objects.using('e_archive').filter(id_doc_cead=id_doc_cead).first()
+    if item:
+        return item.receive_date
+    return None
+
+
+class DownloadDocumentsService:
+    """Сервис, который скачивает документы из EArchive для пользователя."""
+    cead_ids: List[int]  # список идентификаторов документов ЦЕАД для скачивания
+    application_id: int  # идентификатор заявки (поле idAPPNumber из таблицы IPC_APPList базы данных UMA)
+    application_data: dict
+    user_id: int  # идентификатор пользователя
+    user_ip_address: str  # ip адрес пользователя
+    documents: List[ApplicationDocument] = []  # Список всех документов заявки
+    documents_wo_receive_date: List[ApplicationDocument] = []  # Список документов без даты получения
+    es_client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    order: OrderService
+
+    # Типы документов для проверки есть ли у них дата доставки
+    _doc_types_to_check = ['Т-8', 'Т-19', 'П-8', 'П-19', 'Т8', 'Т19', 'П8', 'П19']
+
+    def _set_application(self) -> None:
+        """Получает данные заявки из ElasticSearch."""
+        q = Q(
+            'bool',
+            must=[Q('match', _id=self.application_id)],
+        )
+        s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es_client).query(q).execute()
+        if not s:
+            self.application_data = {}
+        else:
+            self.application_data = s[0].to_dict()
+
+    def _set_application_documents(self) -> None:
+        """Устанавливает список всех документов заявки."""
+        documents = []
+        if self.application_data['Document']['idObjType'] in (1, 2, 3):
+            for doc in self.application_data['DOCFLOW']['DOCUMENTS']:
+                if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                    documents.append(
+                        ApplicationDocument(
+                            title=doc['DOCRECORD'].get('DOCTYPE'),
+                            reg_number=doc['DOCRECORD'].get('DOCREGNUMBER'),
+                            id_doc_cead=doc['DOCRECORD'].get('DOCIDDOCCEAD'),
+                        )
+                    )
+
+            # Если это охранный документ, то нужно ещё добавить в список документы заявки
+            if self.application_data['search_data']['obj_state'] == 2:
+                q = Q(
+                    'query_string',
+                    query=f"search_data.obj_state:1 AND search_data.app_number:{self.application_data['search_data']['app_number']}",
+                )
+                s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es_client).query(q).execute()
+                if s:
+                    app_hit = s[0].to_dict()
+                    for doc in app_hit.get('DOCFLOW', {}).get('DOCUMENTS', []):
+                        if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                            documents.append(
+                                ApplicationDocument(
+                                    title=doc['DOCRECORD'].get('DOCTYPE'),
+                                    reg_number=doc['DOCRECORD'].get('DOCREGNUMBER'),
+                                    id_doc_cead=doc['DOCRECORD'].get('DOCIDDOCCEAD'),
+                                )
+                            )
+
+        elif self.application_data['Document']['idObjType'] == 4:
+            for doc in self.application_data['TradeMark']['DocFlow']['Documents']:
+                if doc['DocRecord'].get('DocIdDocCEAD'):
+                    documents.append(
+                        ApplicationDocument(
+                            title=doc['DocRecord'].get('DocType'),
+                            reg_number=doc['DocRecord'].get('DocRegNumber'),
+                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                        )
+                    )
+
+        elif self.application_data['Document']['idObjType'] == 5:
+            for doc in self.application_data['Geo']['DocFlow']['Documents']:
+                if doc['DocRecord'].get('DocIdDocCEAD'):
+                    documents.append(
+                        ApplicationDocument(
+                            title=doc['DocRecord'].get('DocType'),
+                            reg_number=doc['DocRecord'].get('DocRegNumber'),
+                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                        )
+                    )
+
+        elif self.application_data['Document']['idObjType'] == 6:
+            for doc in self.application_data['Design']['DocFlow']['Documents']:
+                if doc['DocRecord'].get('DocIdDocCEAD'):
+                    documents.append(
+                        ApplicationDocument(
+                            title=doc['DocRecord'].get('DocType'),
+                            reg_number=doc['DocRecord'].get('DocRegNumber'),
+                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                        )
+                    )
+
+        self.documents = documents
+
+    def _check_correct_cead_ids(self) -> bool:
+        """Проверяет, все ли документы для скачивания принадлежат заявке."""
+        application_documents_cead_ids = [int(x.id_doc_cead) for x in self.documents]
+        for id_doc_cead in self.cead_ids:
+            if int(id_doc_cead) not in application_documents_cead_ids:
+                return False
+        return True
+
+    def _set_docs_wo_receive_date(self) -> None:
+        """Проверяет, все ли документы для скачивания имеют дату получения.
+        Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19'"""
+        self.documents_wo_receive_date = []
+        for id_doc_cead in self.cead_ids:
+            for doc in self.documents:
+                if int(doc.id_doc_cead) == int(id_doc_cead) \
+                        and any([x in doc.title for x in self._doc_types_to_check]):
+                    receive_date = document_get_receive_date_cead(id_doc_cead)
+                    if not receive_date:
+                        self.documents_wo_receive_date.append(doc)
+
+    def _create_order(self) -> None:
+        """Создаёт заказ на получение документов для внешнего сервиса Стол Заказов."""
+        self.order = OrderService(
+            user_id=self.user_id,
+            ip_user=self.user_ip_address,
+            app_id=self.application_id
+        )
+        self.order.save()
+        for cead_id in self.cead_ids:
+            OrderDocument.objects.create(order=self.order, id_cead_doc=cead_id)
+
+    def _wait_order_completed(self, attempts=10, timeout=2) -> bool:
+        """Ждёт выполнения заказа внешним сервисом Стол Заказов."""
+        completed = False
+        counter = 0
+        while completed is False:
+            self.order.refresh_from_db()
+            if self.order.order_completed:
+                return True
+            else:
+                if counter == attempts:
+                    return False
+                counter += 1
+                time.sleep(timeout)
+
+    def _create_zip(self) -> str:
+        """Создаёт архив с документами отработанного заказа."""
+        file_zip_name = f"docs_{self.order.id}.zip"
+        file_path_zip = os.path.join(
+            settings.ORDERS_ROOT,
+            str(self.order.user_id),
+            str(self.order.id),
+            file_zip_name
+        )
+        with ZipFile(file_path_zip, 'w') as zip_:
+            for document in self.order.orderdocument_set.all():
+                zip_.write(
+                    os.path.join(
+                        settings.DOCUMENTS_MOUNT_FOLDER,
+                        'OrderService',
+                        str(self.order.user_id),
+                        str(self.order.id),
+                        document.file_name),
+                    f"{document.file_name}"
+                )
+        return os.path.join(
+            settings.MEDIA_URL,
+            'OrderService',
+            str(self.order.user_id),
+            str(self.order.id),
+            file_zip_name
+        )
+
+    def execute(self, cead_ids: List[int], application_id: int, user_id: int,
+                user_ip_address: str, lang_code: str) -> ServiceExecuteResult:
+        translation.activate(lang_code)
+        self.cead_ids = cead_ids
+        self.application_id = application_id
+        self.user_id = user_id
+        self.user_ip_address = user_ip_address
+
+        # Получение данных заявки
+        self._set_application()
+
+        # Проверка есть ли доступ у пользователя к этой заявке
+        user = get_user_or_anonymous(user_id)
+        if not user_has_access_to_docs(user, self.application_data):
+            return ServiceExecuteResult(
+                status='error',
+                error=ServiceExecuteResultError(
+                    error_type='no_access'
+                )
+            )
+
+        # Получение списка всех документов заявки
+        self._set_application_documents()
+
+        # Проверка все ли документы, запрошенные пользователем, входят в список документов заявки
+        if not self._check_correct_cead_ids():
+            return ServiceExecuteResult(
+                status='error',
+                error=ServiceExecuteResultError(
+                    error_type='wrong_id_doc_cead_list'
+                )
+            )
+
+        # Проверка все ли документы, запрошенные пользователем, доступны для загрузки
+        if self.application_data['search_data']['obj_state'] == 1:
+            self._set_docs_wo_receive_date()
+            if len(self.documents_wo_receive_date) > 0:
+                if len(self.cead_ids) == 1:
+                    message = _('Завантаження неможливе, оскільки документ не був отриманий адресатом.')
+                else:
+                    message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
+                                'що не був(ли) отримані адресатом:')
+                    for doc in self.documents_wo_receive_date:
+                        message = f"{message}<br>- {doc.title} ({doc.reg_number})"
+
+                return ServiceExecuteResult(
+                    status='error',
+                    error=ServiceExecuteResultError(
+                        error_type='no_receive_date',
+                        message=message
+                    )
+                )
+
+        # Создание заказа
+        self._create_order()
+        order_result = self._wait_order_completed()
+        if not order_result:
+            return ServiceExecuteResult(
+                status='error',
+                error=ServiceExecuteResultError(
+                    error_type='order_fail'
+                )
+            )
+
+        # Формирование архива с документами
+        zip_path = self._create_zip()
+
+        # Возврат успешного результата
+        return ServiceExecuteResult(
+            status='success',
+            data={
+                'file_path': zip_path
+            }
+        )

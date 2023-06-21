@@ -309,7 +309,10 @@ def download_docs_zipped(request):
     if request.POST.getlist('cead_id'):
         # Создание асинхронной задачи для получения архива с документами
         task = tasks.get_order_documents.delay(
-            request.user.pk, request.POST['id_app_number'], request.POST.getlist('cead_id'), get_client_ip(request)
+            request.user.pk, request.POST['id_app_number'],
+            request.POST.getlist('cead_id'),
+            get_client_ip(request),
+            request.LANGUAGE_CODE
         )
         return JsonResponse({'task_id': task.id})
     else:
@@ -319,7 +322,9 @@ def download_docs_zipped(request):
 def download_doc(request, id_app_number, id_cead_doc):
     """Возвращает JSON с id асинхронной задачи на заказ документа."""
     # Создание асинхронной задачи для получения документа
-    task = tasks.get_order_documents.delay(request.user.pk, id_app_number, id_cead_doc, get_client_ip(request))
+    task = tasks.get_order_documents.delay(
+        request.user.pk, id_app_number, id_cead_doc, get_client_ip(request), request.LANGUAGE_CODE
+    )
     return JsonResponse({'task_id': task.id})
 
 

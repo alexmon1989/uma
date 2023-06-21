@@ -28,6 +28,7 @@ django-cors-headers = "^3.11.0"
 urllib3 = "^1.26.9"
 django-bootstrap4 = "^22.1"
 redis = "^4.5.1"
+psycopg2 = "^2.9.6"
 
 [tool.poetry.dev-dependencies]
 

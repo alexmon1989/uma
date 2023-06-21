@@ -11,7 +11,7 @@ from ...utils import get_registration_status_color, filter_bad_apps
 import json
 import os
 import datetime
-import uuid
+import shutil
 import re
 
 
@@ -477,14 +477,11 @@ class Command(BaseCommand):
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
 
-            # Переименование изображения
-            self.rename_image_tm(doc, res)
+            # Fix image
+            self._fix_tm_image(doc, res)
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
-
-            # Очистка каталога
-            self.clear_tm_folder(doc, res)
 
     def process_id(self, doc):
         """Добавляет документ типа "пром. образец" ElasticSearch."""
@@ -632,6 +629,16 @@ class Command(BaseCommand):
             # Секция Geo
             res['Geo'] = data.get('Geo')
 
+            # Fix ProductDesc
+            if 'ProductDescription' in res['Geo']['GeoDetails']:
+                res['Geo']['GeoDetails']['ProductDesc'] = res['Geo']['GeoDetails'].pop('ProductDescription')
+
+            applicant = None
+            if res['Geo']['GeoDetails'].get('ApplicantDetails'):
+                applicant = [{'name': x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                    'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
+                             res['Geo']['GeoDetails']['ApplicantDetails']['Applicant']]
+
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
@@ -639,6 +646,7 @@ class Command(BaseCommand):
                 'app_date': res['Geo']['GeoDetails'].get('ApplicationDate'),
                 'protective_doc_number': res['Geo']['GeoDetails'].get('RegistrationNumber'),
                 'rights_date': res['Geo']['GeoDetails'].get('RegistrationDate'),
+                'applicant': applicant,
                 'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                               'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                           res['Geo']['GeoDetails']['HolderDetails']['Holder']]
@@ -658,6 +666,16 @@ class Command(BaseCommand):
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
+
+            # Запись в таблицу с 441 кодом (для бюллетеня)
+            if 'ApplicationPublicationDetails' in res['Geo']['GeoDetails']:
+                EBulletinData.objects.update_or_create(
+                    app_number=res['Geo']['GeoDetails'].get('ApplicationNumber'),
+                    unit_id=3,
+                    defaults={
+                        'publication_date': res['Geo']['GeoDetails']['ApplicationPublicationDetails']['PublicationDate']
+                    }
+                )
 
     def process_madrid_tm(self, doc):
         """Обрабатывает документ типа "мадридские тм"."""
@@ -807,6 +825,28 @@ class Command(BaseCommand):
             # Запись в индекс
             self.write_to_es_index(doc, res)
 
+    def _fix_tm_image(self, doc: dict, body: dict) -> None:
+        """Исправляет название файла на диске, если оно отличается от того что в JSON."""
+        try:
+            image_name_json = body['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+        except KeyError:
+            pass
+        else:
+            file_path = self.get_doc_files_path(doc)
+            image_json_path = os.path.join(file_path, image_name_json)
+            if not os.path.exists(image_json_path):
+                # Получение текущего имени файла
+                q = Q(
+                    'bool',
+                    must=[Q('match', _id=doc['id'])],
+                )
+                s = Search(index='uma8').using(self.es).query(q).execute()
+                if s:
+                    data = s[0].to_dict()
+                    image_name_old = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+                    image_old_path = os.path.join(file_path, image_name_old)
+                    shutil.copyfile(image_old_path, image_json_path)
+
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
         try:
@@ -860,45 +900,6 @@ class Command(BaseCommand):
         for res in results:
             ids.append(res.meta.id)
         IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
-
-    def rename_image_tm(self, doc, data):
-        """Переименовывает изображение ТМ."""
-        try:
-            mark_image = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
-            app_number = data['TradeMark']['TrademarkDetails']['ApplicationNumber']
-        except KeyError:
-            pass
-        else:
-            doc_files_path = self.get_doc_files_path(doc)
-            old_file = os.path.join(doc_files_path, mark_image['MarkImageFilename'])
-
-            # Проверка было ли изображение уже переименовано
-            if os.path.exists(old_file):  # не переименовано - первоначальный файл найден на диске
-                new_file_name = mark_image['MarkImageFilename'].replace(app_number, str(uuid.uuid4()))
-
-                # Переименование файла на диске
-                new_file = os.path.join(doc_files_path, new_file_name)
-                os.rename(old_file, new_file)
-
-                mark_image['MarkImageFilename'] = new_file_name
-            else:
-                ext = old_file.split('.')[1]
-                for file in os.listdir(doc_files_path):
-                    if file.endswith(ext):
-                        mark_image['MarkImageFilename'] = file
-                        break
-
-    def clear_tm_folder(self, doc, data):
-        """Очищает каталог ТМ от ненужных файлов. Остаются только изображение и json."""
-        try:
-            mark_image_file_name = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
-            doc_files_path = self.get_doc_files_path(doc)
-            ext = mark_image_file_name.split('.')[1]
-            files_to_remove = [f for f in os.listdir(doc_files_path) if f.endswith(ext) and f != mark_image_file_name]
-            for f in files_to_remove:
-                os.remove(os.path.join(doc_files_path, f))
-        except KeyError:
-            pass
 
     def handle(self, *args, **options):
         # Инициализация клиента ElasticSearch
