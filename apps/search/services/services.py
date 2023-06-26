@@ -497,6 +497,19 @@ def application_get_app_elasticsearch_data(app_id: int) -> dict:
     return s[0].to_dict()
 
 
+def application_tm_censored_image_in_data(data: dict) -> bool:
+    """Проверяет, содержит ли изображение ТМ запрещённые элементы."""
+    censored_notices_types_list = (
+        'CONTAINS_OBSCENE_WORDS_AND_EXPRESSIONS',  # Містить нецензурні слова та вислови
+        'CONTAINS_PORNOGRAFIC_IMAGES',  # 'Містить порнографічні зображення',
+        'CONTAINS_PROPAGANDA_OF_NATIONAL_ENMITY',  # 'Містить пропагування національної ворожнечі',
+        'CONTAINS_PROPAGANDA_OF_RELIGIOUS_ENMITY',  # 'Містить пропагування релігійної ворожнечі',
+        'CONTAINS_THE_PROMOTION_OF_FASCISM_AND_NEOFASHISM',  # 'Містить пропагування фашизму та неофашизму'
+    )
+    notice_type = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'].get('MarkImageTypeNotice')
+    return notice_type and notice_type in censored_notices_types_list
+
+
 def inid_code_get_list(lang: str) -> List[InidCode]:
     """
     Возвращает список ИНИД-кодов объектов пром собств.
@@ -528,6 +541,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Адреса для листування', 2, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
+            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 2, True),
         ]
         res.extend(inid_data)
 
@@ -546,6 +560,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Адреса для листування', 1, True),
             InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
             InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
+            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 1, True),
         ]
         res.extend(inid_data)
 
@@ -777,6 +792,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 2, True),
             InidCode(4, '511', 'Nice Classification indexes', 2, True),
+            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 2, True),
         ]
         res.extend(inid_data)
 
@@ -795,6 +811,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(4, '750', 'Address for correspondence', 1, True),
             InidCode(4, '591', 'Information concerning colors claimed', 1, True),
             InidCode(4, '511', 'Nice Classification indexes', 1, True),
+            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 1, True),
         ]
         res.extend(inid_data)
 

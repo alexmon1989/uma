@@ -6,6 +6,7 @@ from django.utils import timezone
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
+from apps.search.services import services as search_services
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 from ...utils import get_registration_status_color, filter_bad_apps
 import json
@@ -477,8 +478,12 @@ class Command(BaseCommand):
             # Fix id_doc_cead
             self.fix_id_doc_cead(res['TradeMark'].get('DocFlow', {}).get('Documents', []))
 
-            # Fix image
-            self._fix_tm_image(doc, res)
+            # Проверка, содержит ли изображение недопустимые символы
+            if search_services.application_tm_censored_image_in_data(res):
+                self._censor_tm_image(doc, res)
+            else:
+                # Исправляет название файла на диске, если оно отлично от номера свидетельства или заявки
+                self._fix_tm_image(doc, res)
 
             # Запись в индекс
             self.write_to_es_index(doc, res)
@@ -826,7 +831,7 @@ class Command(BaseCommand):
             self.write_to_es_index(doc, res)
 
     def _fix_tm_image(self, doc: dict, body: dict) -> None:
-        """Исправляет название файла на диске, если оно отличается от того что в JSON."""
+        """Исправляет название файла на диске, если оно отличается от того что в исходном JSON."""
         try:
             image_name_json = body['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
         except KeyError:
@@ -836,16 +841,19 @@ class Command(BaseCommand):
             image_json_path = os.path.join(file_path, image_name_json)
             if not os.path.exists(image_json_path):
                 # Получение текущего имени файла
-                q = Q(
-                    'bool',
-                    must=[Q('match', _id=doc['id'])],
-                )
-                s = Search(index='uma8').using(self.es).query(q).execute()
-                if s:
-                    data = s[0].to_dict()
+                data = search_services.application_get_app_elasticsearch_data(doc['id'])
+                if data:
                     image_name_old = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
                     image_old_path = os.path.join(file_path, image_name_old)
                     shutil.copyfile(image_old_path, image_json_path)
+
+    def _censor_tm_image(self, doc: dict, body: dict) -> None:
+        """Подменяет файл с изображением на изображение-заглушку."""
+        image_name_json = body['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+        file_path = self.get_doc_files_path(doc)
+        image_json_path = os.path.join(file_path, image_name_json)
+        censored_image_path = os.path.join(settings.BASE_DIR, 'assets', 'img', 'censored.jpg')
+        shutil.copyfile(censored_image_path, image_json_path)
 
     def write_to_es_index(self, doc, body):
         """Записывает в индекс ES."""
