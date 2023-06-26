@@ -497,6 +497,19 @@ def application_get_app_elasticsearch_data(app_id: int) -> dict:
     return s[0].to_dict()
 
 
+def application_tm_censored_image_in_data(data: dict) -> bool:
+    """Проверяет, содержит ли изображение ТМ запрещённые элементы."""
+    censored_notices_types_list = (
+        'CONTAINS_OBSCENE_WORDS_AND_EXPRESSIONS',  # Містить нецензурні слова та вислови
+        'CONTAINS_PORNOGRAFIC_IMAGES',  # 'Містить порнографічні зображення',
+        'CONTAINS_PROPAGANDA_OF_NATIONAL_ENMITY',  # 'Містить пропагування національної ворожнечі',
+        'CONTAINS_PROPAGANDA_OF_RELIGIOUS_ENMITY',  # 'Містить пропагування релігійної ворожнечі',
+        'CONTAINS_THE_PROMOTION_OF_FASCISM_AND_NEOFASHISM',  # 'Містить пропагування фашизму та неофашизму'
+    )
+    notice_type = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'].get('MarkImageTypeNotice')
+    return notice_type and notice_type in censored_notices_types_list
+
+
 def inid_code_get_list(lang: str) -> List[InidCode]:
     """
     Возвращает список ИНИД-кодов объектов пром собств.
