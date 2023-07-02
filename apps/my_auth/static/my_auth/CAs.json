@@ -90,7 +90,8 @@
 	},
 	{
 		"issuerCNs": 				["КНЕДП АЦСК АТ \"Альфа-Банк\"",
-									"Акредитований центр сертифікації ключів АТ \"Альфа-Банк\""],
+									"Акредитований центр сертифікації ключів АТ \"Альфа-Банк\"",
+									"КНЕДП АТ \"СЕНС БАНК\""],
 		"address": 					"ca.alfabank.kiev.ua",
 		"ocspAccessPointAddress":	"ca.alfabank.kiev.ua/services/ocsp/",
 		"ocspAccessPointPort":		"80",
@@ -99,14 +100,15 @@
 		"tspAddressPort":			"80"
 	},
 	{
-		"issuerCNs": 				["КНЕДП АТ \"СЕНС БАНК\""],
+		"issuerCNs": 				["КНЕДП АТ \"СЕНС БАНК\"",
+									"КНЕДП АЦСК АТ \"Альфа-Банк\"",
+									"Акредитований центр сертифікації ключів АТ \"Альфа-Банк\""],
 		"address": 					"ca.sensebank.com.ua",
 		"ocspAccessPointAddress":	"ca.sensebank.com.ua/services/ocsp/",
 		"ocspAccessPointPort":		"80",
 		"cmpAddress":				"ca.sensebank.com.ua",
 		"tspAddress":				"ca.sensebank.com.ua",
-		"tspAddressPort":			"80",
-		"cmpCompatibility":			1
+		"tspAddressPort":			"80"
 	},
 	{
 		"issuerCNs": 				["КНЕДП Акціонерного товариства “КРЕДІ АГРІКОЛЬ БАНК”",
@@ -279,6 +281,16 @@
 		"tspAddress":				"ca.gp.gov.ua/tsp",
 		"tspAddressPort":			"80",
 		"certsInKey":				true,
+		"cmpCompatibility":			1
+	},
+	{
+		"issuerCNs":				["КНЕДП СБ України"],
+		"address": 					"va1-knedp.ssu.gov.ua",
+		"ocspAccessPointAddress":	"va1-knedp.ssu.gov.ua/services/ocsp/",
+		"ocspAccessPointPort":		"80",
+		"cmpAddress":				"va1-knedp.ssu.gov.ua/services/cmp/",
+		"tspAddress":				"va1-knedp.ssu.gov.ua/services/tsp/",
+		"tspAddressPort":			"80",
 		"cmpCompatibility":			3
 	},
 	{
@@ -329,6 +341,6 @@
 		"tspAddress":				"qca.ukrgasbank.com/tsp",
 		"tspAddressPort":			"80",
 		"certsInKey":				true,
-		"cmpCompatibility":			3
+		"cmpCompatibility":			1
 	}
 ]
