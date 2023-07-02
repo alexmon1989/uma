@@ -845,7 +845,10 @@ class Command(BaseCommand):
                 if data:
                     image_name_old = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
                     image_old_path = os.path.join(file_path, image_name_old)
-                    shutil.copyfile(image_old_path, image_json_path)
+                    try:
+                        shutil.copyfile(image_old_path, image_json_path)
+                    except FileNotFoundError:
+                        pass
 
     def _censor_tm_image(self, doc: dict, body: dict) -> None:
         """Подменяет файл с изображением на изображение-заглушку."""
