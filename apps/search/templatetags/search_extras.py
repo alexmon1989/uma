@@ -543,7 +543,11 @@ def app_stages_inv_um(app):
                     else:
                         stages[i]['status'] = 'stopped'
                 else:
-                    stages[i-1]['status'] = 'current'
+                    if stages[i-1]['status'] == 'not-used':
+                        # Для полезных моделей пропускаются два неиспользуемых этапа
+                        stages[i-3]['status'] = 'current'
+                    else:
+                        stages[i-1]['status'] = 'current'
             break
 
     return {

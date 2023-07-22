@@ -803,6 +803,43 @@
                                 </li>
                             {% endif %}
                         </ul>
+                    {% elif transaction|get:"@type" == 'ArmaManagement' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.ManagementInstallerName %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Імʼя або повне найменування та адреса установника управління" %}:</span>
+                                    {{ transaction.TransactionBody.ManagementInstallerName }}{% if transaction.TransactionBody.ManagementInstallerName %}, {{ transaction.TransactionBody.ManagementInstallerAddress }}{% endif %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.ManagerName %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Імʼя або повне найменування та адреса управителя" %}:</span>
+                                    {{ transaction.TransactionBody.ManagerName }}{% if transaction.TransactionBody.ManagerAddress %}, {{ transaction.TransactionBody.ManagerAddress }}{% endif %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.ManagementContractNumber %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Дата та номер договору управління майном, строк дії договору" %}:</span>
+                                    {{ transaction.TransactionBody.ManagementContractNumber }}
+                                    {% if transaction.TransactionBody.ManagementContractDate %}{% trans "від" %} {{ transaction.TransactionBody.ManagementContractDate }}{% endif %}
+                                    {% if transaction.TransactionBody.ManagementContractValidTo %}{% trans "до" %} {{ transaction.TransactionBody.ManagementContractValidTo }}{% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}
