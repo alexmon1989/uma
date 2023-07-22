@@ -221,7 +221,7 @@ def filter_bad_apps(qs):
     # Не показывать заявки, по которым выдан охранный документ
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     today = datetime.datetime.now().strftime('%Y-%m-%d')
-    qs &= ~Q('query_string', query=f"_exists_:Claim.I_11 OR Claim.I_45.D:[{today} TO *]")
+    qs &= ~Q('query_string', query=f"_exists_:Claim.I_11 OR Claim.I_45.D:[* TO '{today}']")
 
     return qs
 
