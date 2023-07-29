@@ -13,7 +13,7 @@ def set_key_center_settings(eu_interface, key_center):
     eu_interface.Initialize()
     ca_settings = {
         'szPath': settings.EUSIGN_FILESTORE_PATH,
-        'bCheckCRLs': True,
+        'bCheckCRLs': False,
         'bAutoRefresh': True,
         'bOwnCRLsOnly': True,
         'bFullAndDeltaCRLs': True,
