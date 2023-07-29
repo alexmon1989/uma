@@ -1,9 +1,9 @@
 ﻿//=============================================================================
 
-var EU_PTR_SIZE				=4;
-var EU_INT_SIZE				=4;
-var EU_DWORD_SIZE			=4;
-var EU_BOOL_SIZE			=4;
+var EU_PTR_SIZE				= 4;
+var EU_INT_SIZE				= 4;
+var EU_DWORD_SIZE			= 4;
+var EU_BOOL_SIZE			= 4;
 
 var EU_TRUE 				= 1;
 var EU_FALSE 				= 0;
@@ -304,11 +304,11 @@ function EUPointerSignerInfo(context) {
 				{
 					if (context != null)
 					{
-						Module._EUCtxFreeSignerInfo(
+						Module._EUCtxFreeSignInfo(
 							context | 0, pPtr.ptr);
 					}
 					else
-						Module._EUFreeSignerInfo(pPtr.ptr);
+						Module._EUFreeSignInfo(pPtr.ptr);
 				}
 			},
 			context);
@@ -340,7 +340,7 @@ function EUPointerCertificateInfo() {
 			EU_CERT_INFO_SIZE, false, 
 			function (pPtr) {
 				if ((pPtr.ptr | 0) != 0)
-					Module._EUFreeCertInfo(pPtr.ptr);
+					Module._EUFreeCertificateInfo(pPtr.ptr);
 			},
 			null);
 }
@@ -359,7 +359,7 @@ function EUPointerKeyMedia(typeIndex, devIndex, password) {
 		
 		var strArr = UTF8ToCP1251Array(password);
 		if (strArr.length > EU_PASS_MAX_LENGTH)
-			throw { message: "Invalid parameter"}
+			throw { message: "Invalid parameter"};
 		Module.writeArrayToMemory(strArr, pCurPtr);
 	} catch (e) {
 		pPtr.raiseError(e);
@@ -379,36 +379,38 @@ function EUPointerEndUserInfo(euInfo) {
 		var SetString = function(str, strMaxLength) {
 			var strArr = UTF8ToCP1251Array(str);
 			if (strArr.length > strMaxLength) {
-				throw { message: "Invalid parameter"}
+				throw { message: "Invalid parameter"};
 			}
 
 			Module.writeArrayToMemory(strArr, pCurPtr);
 			pCurPtr += strMaxLength;
 		};
 
-		Module.setValue(pCurPtr, euInfo.version | 0, "i32");
+		Module.setValue(pCurPtr, euInfo.GetVersion() | 0, "i32");
 		pCurPtr += EU_INT_SIZE;
 
-		SetString(euInfo.commonName, EU_COMMON_NAME_MAX_LENGTH);
-		SetString(euInfo.locality, EU_LOCALITY_MAX_LENGTH);
-		SetString(euInfo.state, EU_STATE_MAX_LENGTH);
-		SetString(euInfo.organiztion, EU_ORGANIZATION_MAX_LENGTH);
-		SetString(euInfo.orgUnit, EU_ORG_UNIT_MAX_LENGTH);
-		SetString(euInfo.title, EU_TITLE_MAX_LENGTH);
-		SetString(euInfo.street, EU_STREET_MAX_LENGTH);
-		SetString(euInfo.phone, EU_PHONE_MAX_LENGTH);
-		SetString(euInfo.surname, EU_SURNAME_MAX_LENGTH);
-		SetString(euInfo.givenname, EU_GIVENNAME_MAX_LENGTH);
-		SetString(euInfo.eMail, EU_EMAIL_MAX_LENGTH);
-		SetString(euInfo.dns, EU_ADDRESS_MAX_LENGTH);
-		SetString(euInfo.edrpouCode, EU_EDRPOU_MAX_LENGTH);
-		SetString(euInfo.drfoCode, EU_DRFO_MAX_LENGTH);
-		SetString(euInfo.nbuCode, EU_NBU_MAX_LENGTH);
-		SetString(euInfo.spfmCode, EU_SPFM_MAX_LENGTH);
-		SetString(euInfo.oCode, EU_O_CODE_MAX_LENGTH);
-		SetString(euInfo.ouCode, EU_OU_CODE_MAX_LENGTH);
-		SetString(euInfo.userCode, EU_USER_CODE_MAX_LENGTH);
-		SetString(euInfo.upn, EU_UPN_MAX_LENGTH);
+		SetString(euInfo.GetCommonName(), EU_COMMON_NAME_MAX_LENGTH);
+		SetString(euInfo.GetLocality(), EU_LOCALITY_MAX_LENGTH);
+		SetString(euInfo.GetState(), EU_STATE_MAX_LENGTH);
+		SetString(euInfo.GetOrganization(), EU_ORGANIZATION_MAX_LENGTH);
+		SetString(euInfo.GetOrgUnit(), EU_ORG_UNIT_MAX_LENGTH);
+		SetString(euInfo.GetTitle(), EU_TITLE_MAX_LENGTH);
+		SetString(euInfo.GetStreet(), EU_STREET_MAX_LENGTH);
+		SetString(euInfo.GetPhone(), EU_PHONE_MAX_LENGTH);
+		SetString(euInfo.GetSurname(), EU_SURNAME_MAX_LENGTH);
+		SetString(euInfo.GetGivenname(), EU_GIVENNAME_MAX_LENGTH);
+		SetString(euInfo.GetEMail(), EU_EMAIL_MAX_LENGTH);
+		SetString(euInfo.GetDNS(), EU_ADDRESS_MAX_LENGTH);
+		SetString(euInfo.GetEDRPOUCode(), EU_EDRPOU_MAX_LENGTH);
+		SetString(euInfo.GetDRFOCode(), EU_DRFO_MAX_LENGTH);
+		SetString(euInfo.GetNBUCode(), EU_NBU_MAX_LENGTH);
+		SetString(euInfo.GetSPFMCode(), EU_SPFM_MAX_LENGTH);
+		SetString(euInfo.GetOCode(), EU_O_CODE_MAX_LENGTH);
+		SetString(euInfo.GetOUCode(), EU_OU_CODE_MAX_LENGTH);
+		SetString(euInfo.GetUserCode(), EU_USER_CODE_MAX_LENGTH);
+		SetString(euInfo.GetUPN(), EU_UPN_MAX_LENGTH);
+		SetString(euInfo.GetUNZR(), EU_UNZR_MAX_LENGTH);
+		SetString(euInfo.GetCountry(), EU_COUNTRY_MAX_LENGTH);
 	} catch (e) {
 		pPtr.raiseError(e);
 		return null;
@@ -681,9 +683,9 @@ var Module = {
 
 var EUSignCP = NewClass({
 	"Vendor": "JSC IIT",
-	"ClassVersion": "1.3.40",
+	"ClassVersion": "1.3.59",
 	"ClassName": "EUSignCP",
-	"BaseLibraryVersion": "1.3.1.52",
+	"BaseLibraryVersion": "1.3.1.123",
 	"errorLangCode": EU_DEFAULT_LANG,
 	"privKeyOwnerInfo": null,
 	"isFileSyncAPISupported": false,
@@ -767,12 +769,16 @@ function() {
 		throw this.MakeError(errorCode);
 	},
 //-----------------------------------------------------------------------------
+	GetVersion: function() {
+		return this.ClassVersion + '(' + this.BaseLibraryVersion + ')';
+	},
+//-----------------------------------------------------------------------------
 	Initialize: function() {
 		var error;
 
 		try {
 			this.isFileSyncAPISupported =
-				IsFileSyncSupported() & EUFS.staticInit();;
+				IsFileSyncSupported() & EUFS.staticInit();
 			this.isFileASyncAPISupported = IsFileASyncSupported();
 
 			error = Module._EUInitialize();
@@ -815,6 +821,23 @@ function() {
 		return isInitialized;
 	},
 	SetErrorMessageLanguage: function(langCode) {
+		if (typeof langCode == 'string') {
+			langCode = langCode.toLocaleLowerCase();
+			switch (langCode) {
+				case 'en':
+					langCode = EU_EN_LANG;
+					break;
+				case 'ru':
+					langCode = EU_RU_LANG;
+					break;
+					
+				case 'uk':
+				case 'ua':
+				default:
+					langCode = EU_UA_LANG;
+					break;
+			}
+		}
 		this.errorLangCode = langCode;
 		Module.errorLanguage = langCode;
 	},
@@ -888,12 +911,12 @@ function() {
 				this.stringEncoder.javaCompliant);
 			this.stringEncoder = encoder;
 		} catch (e) {
-			this.RaiseError(EU_BAD_PARAMETER);
+			this.RaiseError(EU_ERROR_BAD_PARAMETER);
 		}
 	},
 	GetCharset: function() {
 		if (this.stringEncoder == null)
-			this.RaiseError(EU_BAD_PARAMETER);
+			this.RaiseError(EU_ERROR_BAD_PARAMETER);
 
 		return this.stringEncoder.charset;
 	},
@@ -937,7 +960,7 @@ function() {
 
 		if (useASyncAPI) {
 			var pThis = this;
-			function _onSuccess(evt) {
+			var _onSuccess = function(evt) {
 				if (evt.target.readyState != FileReader.DONE)
 					return;
 
@@ -955,9 +978,9 @@ function() {
 				}
 			};
 
-			function _onError(e) {
+			var _onError = function(e) {
 				onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
-			}
+			};
 
 			var fileReader = new FileReader();
 			fileReader.onloadend = _onSuccess;
@@ -1089,6 +1112,22 @@ function() {
 	},
 	AddXMLHTTPDirectAccessAddress: function(address) {
 		XMLHTTPDirectAccessAddresses.push(address);
+	},
+	InitializeMandatorySettings: function() {
+		var fs = this.CreateFileStoreSettings();
+		this.SetFileStoreSettings(fs);
+
+		var proxy = this.CreateProxySettings();
+		this.SetProxySettings(proxy);
+
+		var tsp = this.CreateTSPSettings();
+		this.SetTSPSettings(tsp);
+		
+		var ocsp = this.CreateOCSPSettings();
+		this.SetOCSPSettings(ocsp);
+		
+		var ldap = this.CreateLDAPSettings();
+		this.SetLDAPSettings(ldap);	
 	},
 	CreateFileStoreSettings:function() {
 		return EndUserFileStoreSettings("/certificates", 
@@ -1319,6 +1358,21 @@ function() {
 
 		intPtr.free();
 	},
+	SetOCSPResponseExpireTime:function(expireTime) {
+		var error;
+		
+		try {
+			error = Module.ccall('EUSetOCSPResponseExpireTime',
+				'number',
+				['number'],
+				[expireTime]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE)
+			this.RaiseError(error);
+	},
 //-----------------------------------------------------------------------------
 	SaveCertificate: function(certificate) {
 		var error;
@@ -1347,6 +1401,28 @@ function() {
 				'number',
 				['array', 'number'],
 				[certificates, certificates.length]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE)
+			this.RaiseError(error);
+	},
+	SaveCertificatesEx: function(certificates, trustedStore) {
+		var error;
+
+		this.CheckMaxDataSize(certificates);
+		if (trustedStore)
+			this.CheckMaxDataSize(trustedStore);
+
+		try {
+			error = Module.ccall('EUSaveCertificatesEx',
+				'number',
+				['array', 'number', 
+					trustedStore ? 'array' : 'number', 'number'],
+				[certificates, certificates.length,
+					trustedStore ? trustedStore : 0, 
+					trustedStore ? trustedStore.length : 0]);
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
 		}
@@ -1399,6 +1475,26 @@ function() {
 			return pPtr.toString(true);
 		else 
 			return pPtr.toArray();
+	},
+	GetCertificates: function() {
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetCertificates',
+				'number',
+				['number', 'number'],
+				[pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		return pPtr.toArray();
 	},
 	GetCertificatesByKeyInfo: function(keyInfo, cmpServers) {
 		this.CheckMaxDataSize(keyInfo);
@@ -1473,9 +1569,35 @@ function() {
 			this.RaiseError(error);
 		}
 
-		infoPtr = pPtr.toPtr();
+		var infoPtr = pPtr.toPtr();
 		var info = new EndUserCertificateInfoEx(infoPtr);
 		Module._EUFreeCertificateInfoEx(infoPtr);
+
+		return info;
+	},
+	GetCRInfo: function(request) {
+		this.CheckMaxDataSize(request);
+
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetCRInfo',
+				'number',
+				['array', 'number', 'number'],
+				[request, request.length, pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		var infoPtr = pPtr.toPtr();
+		var info = new EndUserRequestInfo(infoPtr);
+		Module._EUFreeCRInfo(infoPtr);
 
 		return info;
 	},
@@ -1656,16 +1778,52 @@ function() {
 			this.RaiseError(error);
 		}
 
-		infoPtr = pPtr.toPtr();
+		var infoPtr = pPtr.toPtr();
 		var info = new EndUserCertificateInfoEx(infoPtr);
 		Module._EUFreeCertificateInfoEx(infoPtr);
 
 		return info;
 	},
+	GetOwnCertificate: function(keyType, keyUsage) {
+		var pThis = this;
+		var index = 0;
+		var certInfoEx = null;
+		while (true) {
+			certInfoEx = pThis.EnumOwnCertificates(index);
+			if (certInfoEx == null)
+				break;
+
+			if ((certInfoEx.GetPublicKeyType() == keyType) && 
+				((certInfoEx.GetKeyUsageType() & keyUsage) == keyUsage))
+			{
+				break;
+			}
+
+			index++;
+		}
+	
+		if (certInfoEx == null)
+			return null;
+		
+		var cert = pThis.GetCertificate(
+			certInfoEx.GetIssuer(), certInfoEx.GetSerial())
+
+		return new EndUserCertificate(certInfoEx, cert);
+	},
 	GeneratePrivateKey: function(password,
 		uaKeysType, uaDSKeysSpec, useDSKeyAsKEP, uaKEPKeysSpec,
 		internationalKeysType, internationalKeysSpec, 
 		userInfo, extKeyUsages) {
+		return this.GeneratePrivateKey2(password,
+			uaKeysType, uaDSKeysSpec, useDSKeyAsKEP, uaKEPKeysSpec,
+			internationalKeysType, internationalKeysSpec, 0,
+			userInfo, extKeyUsages);
+	},
+	GeneratePrivateKey2: function(password,
+		uaKeysType, uaDSKeysSpec, useDSKeyAsKEP, uaKEPKeysSpec,
+		internationalKeysType, rsaKeysSpec, ecdsaKeysSpec,
+		userInfo, extKeyUsages) {
+		var error;
 
 		var kmPtr = EUPointerKeyMedia(0, 0, password);
 		if (kmPtr == null)
@@ -1695,12 +1853,18 @@ function() {
 			}
 		}
 
-		var intReqPtr = null, intReqNamePtr = null;
-		if (internationalKeysType != EU_KEYS_TYPE_NONE) {
-			intReqPtr = EUPointerArray();
-			intReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
+		var rsaReqPtr = null, rsaReqNamePtr = null;
+		if (internationalKeysType & EU_KEYS_TYPE_RSA_WITH_SHA) {
+			rsaReqPtr = EUPointerArray();
+			rsaReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
 		}
 
+		var ecdsaReqPtr = null, ecdsaReqNamePtr = null;
+		if (internationalKeysType & EU_KEYS_TYPE_ECDSA_WITH_SHA) {
+			ecdsaReqPtr = EUPointerArray();
+			ecdsaReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
+		}
+		
 		var _free = function() {
 			kmPtr.free();
 			pkPtr.free();
@@ -1715,27 +1879,33 @@ function() {
 				uaKEPReqPtr.free();
 			if (uaKEPReqNamePtr != null)
 				uaKEPReqNamePtr.free();
-			if (intReqPtr != null)
-				intReqPtr.free();
-			if (intReqNamePtr != null)
-				intReqNamePtr.free();
-		}
+			if (rsaReqPtr != null)
+				rsaReqPtr.free();
+			if (rsaReqNamePtr != null)
+				rsaReqNamePtr.free();
+			if (ecdsaReqPtr != null)
+				ecdsaReqPtr.free();
+			if (ecdsaReqNamePtr != null)
+				ecdsaReqNamePtr.free();
+		};
 
 		try {
-			error = Module.ccall('EUGeneratePrivateKeyEx',
+			error = Module.ccall('EUGeneratePrivateKey2',
 				'number',
 				['number', 'number', 
 				 'number', 'number', 'number', 'number',
-				  'number', 'number', 'number',
+				  'number', 'number', 'number', 'number', 'number',
+				  'number', 
+				  (extKeyUsages != null) ? 'array' : 'number',
 				  'number', 'number',
 				  'number', 'number',
-				  'number', 'number',
 				  'number', 'number', 'number',
 				  'number', 'number', 'number',
-				  'number', 'number', 'number',],
+				  'number', 'number', 'number',
+				  'number', 'number', 'number'],
 				[kmPtr.ptr, EU_FALSE, 
 				 uaKeysType, uaDSKeysSpec, uaKEPKeysSpec, null,
-				 internationalKeysType, internationalKeysSpec, null,
+				 internationalKeysType, rsaKeysSpec, null, ecdsaKeysSpec, null,
 				 (userInfo != null) ? 
 					userInfoPtr.ptr : null, 
 				 (extKeyUsages != null) ? 
@@ -1748,9 +1918,12 @@ function() {
 				 (uaKEPReqPtr != null) ? uaKEPReqPtr.ptr : null,
 				 (uaKEPReqPtr != null) ? uaKEPReqPtr.lengthPtr : null,
 				 (uaKEPReqNamePtr != null) ? uaKEPReqNamePtr.ptr : null,
-				 (intReqPtr != null) ? intReqPtr.ptr : null,
-				 (intReqPtr != null) ? intReqPtr.lengthPtr : null,
-				 (intReqNamePtr != null) ? intReqNamePtr.ptr : null]);
+				 (rsaReqPtr != null) ? rsaReqPtr.ptr : null,
+				 (rsaReqPtr != null) ? rsaReqPtr.lengthPtr : null,
+				 (rsaReqNamePtr != null) ? rsaReqNamePtr.ptr : null,
+				 (ecdsaReqPtr != null) ? ecdsaReqPtr.ptr : null,
+				 (ecdsaReqPtr != null) ? ecdsaReqPtr.lengthPtr : null,
+				 (ecdsaReqNamePtr != null) ? ecdsaReqNamePtr.ptr : null]);
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
 		}
@@ -1763,20 +1936,22 @@ function() {
 		var _toString = function(strPtr) {
 			var str = CP1251PointerToUTF8(strPtr);
 			var lastInd = str.lastIndexOf("/");
-			if (lastInd <= 0)
+			if (lastInd < 0)
 				return str;
 
 			return str.substring(lastInd + 1, str.length);
-		}
+		};
 		
-		var euPrivateKey = EndUserPrivateKey(
+		var euPrivateKey = new EndUserPrivateKey(
 			pkPtr.toArray(), pkInfoPtr.toArray(),
 			(uaReqPtr != null) ? uaReqPtr.toArray() : null,
 			(uaReqNamePtr != null) ? _toString(uaReqNamePtr.ptr) : null,
 			(uaKEPReqPtr != null) ? uaKEPReqPtr.toArray() : null,
 			(uaKEPReqNamePtr != null) ? _toString(uaKEPReqNamePtr.ptr) : null,
-			(intReqPtr != null) ? intReqPtr.toArray() : null,
-			(intReqNamePtr != null) ? _toString(intReqNamePtr.ptr) : null);
+			(rsaReqPtr != null) ? rsaReqPtr.toArray() : null,
+			(rsaReqNamePtr != null) ? _toString(rsaReqNamePtr.ptr) : null,
+			(ecdsaReqPtr != null) ? ecdsaReqPtr.toArray() : null,
+			(ecdsaReqNamePtr != null) ? _toString(ecdsaReqNamePtr.ptr) : null);
 
 		_free();
 
@@ -1787,8 +1962,9 @@ function() {
 		internationalKeysType, internationalKeysSpec, 
 		newPrivateKeyPassword) {
 		this.CheckMaxDataSize(privateKey);
-
+		
 		var pkPtr = EUPointerArray();
+		var error;
 
 		try {
 			error = Module.ccall('EUMakeNewCertificate',
@@ -2138,10 +2314,10 @@ function() {
 		try {
 			error = Module.ccall('EUCtxGetCertificateFromPrivateKey',
 				'number',
-				['number', 'array',
+				['number', 'array', 
 					'number', 'number', 'number'],
 				[privateKeyContext.GetContext(), 
-					UTF8ToCP1251Array(password),
+					UTF8ToCP1251Array(keyID),
 					pCertInfoExPtr.ptr, 
 					certArrPtr.ptr, certArrPtr.lengthPtr]);
 		} catch (e) {
@@ -2163,6 +2339,151 @@ function() {
 			privateKeyContext.GetContext()|0, certInfoExPtr);
 
 		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	CtxChangeOwnCertificatesStatus: function(
+		privateKeyContext, requestType, revocationReason) {
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxChangeOwnCertificatesStatus',
+				'number',
+				['number', 'number', 'number'],
+				[privateKeyContext.GetContext(), 
+					requestType, revocationReason]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			this.RaiseError(error);
+		}
+	},
+	CtxGetOwnEUserParams: function(privateKeyContext) {
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxGetOwnEUserParams',
+				'number',
+				['number', 'number'],
+				[privateKeyContext.GetContext(), pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		var paramsPtr = pPtr.toPtr();
+		var info = new EndUserParams(paramsPtr);
+
+		Module._EUCtxFreeEUserParams(
+			privateKeyContext.GetContext() | 0, paramsPtr);
+
+		return info;
+	},
+	CtxModifyOwnEUserParams: function(
+		privateKeyContext, phone, email) {
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxModifyOwnEUserParams',
+				'number',
+				['number', 'array', 'array'],
+				[privateKeyContext.GetContext(),
+					UTF8ToCP1251Array(phone), 
+					UTF8ToCP1251Array(email)]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+	},
+	CtxMakeDeviceCertificate: function(
+		privateKeyContext, deviceName, 
+		uaRequest, uaKEPRequest, 
+		internationalRequest, ecdsaRequest,
+		cmpAddress, cmpPort) {
+		var pkCtx = privateKeyContext.GetContext();
+		var uaCertPtr = null, uaKEPCertPtr = null, 
+			intCertPtr = null, ecdsaCertPtr = null;
+		
+		if (uaRequest != null)
+			uaCertPtr = EUPointerArray(pkCtx);
+		if (uaKEPRequest != null)
+			uaKEPCertPtr = EUPointerArray(pkCtx);
+		if (internationalRequest != null)
+			intCertPtr = EUPointerArray(pkCtx);
+		if (ecdsaRequest != null)
+			ecdsaCertPtr = EUPointerArray(pkCtx);
+
+		try {
+			error = Module.ccall('EUCtxMakeDeviceCertificate',
+				'number',
+				['number', 'array', 
+				(uaRequest != null) ? 'array' : 'number', 'number', 
+				(uaKEPRequest != null) ? 'array' : 'number', 'number',
+				(internationalRequest != null) ? 'array' : 'number', 'number', 
+				(ecdsaRequest != null) ? 'array' : 'number', 'number',
+				(cmpAddress != null) ? 'array' : 'number', 
+				(cmpPort != null) ? 'array' : 'number', 
+				'number', 'number', 'number', 'number',
+				'number', 'number', 'number', 'number'],
+				[pkCtx, UTF8ToCP1251Array(deviceName),
+					(uaRequest != null) ? uaRequest : 0,
+					(uaRequest != null) ? uaRequest.length : 0,
+					(uaKEPRequest != null) ? uaKEPRequest : 0,
+					(uaKEPRequest != null) ? uaKEPRequest.length : 0,
+					(internationalRequest != null) ? 
+						internationalRequest : 0,
+					(internationalRequest != null) ? 
+						internationalRequest.length : 0,
+					(ecdsaRequest != null) ? ecdsaRequest : 0,
+					(ecdsaRequest != null) ? ecdsaRequest.length : 0,
+					(cmpAddress != null) ? UTF8ToCP1251Array(cmpAddress) : 0,
+					(cmpPort != null) ? UTF8ToCP1251Array(cmpPort) : 0,
+					(uaCertPtr != null) ? uaCertPtr.ptr : 0,
+					(uaCertPtr != null) ? uaCertPtr.lengthPtr : 0,
+					(uaKEPCertPtr != null) ? uaKEPCertPtr.ptr : 0,
+					(uaKEPCertPtr != null) ? uaKEPCertPtr.lengthPtr : 0,
+					(intCertPtr != null) ? intCertPtr.ptr : 0,
+					(intCertPtr != null) ? intCertPtr.lengthPtr : 0,
+					(ecdsaCertPtr != null) ? ecdsaCertPtr.ptr : 0,
+					(ecdsaCertPtr != null) ? ecdsaCertPtr.lengthPtr : 0	
+				]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			if (uaCertPtr != null)
+				uaCertPtr.free();
+			if (uaKEPCertPtr != null)
+				uaKEPCertPtr.free();
+			if (intCertPtr != null)
+				intCertPtr.free();
+			if (ecdsaCertPtr != null)
+				ecdsaCertPtr.free();
+			this.RaiseError(error);
+		}
+		
+		var certificates = [];
+		if (uaCertPtr != null)
+			certificates.push(uaCertPtr.toArray());
+		if (uaKEPCertPtr != null)
+			certificates.push(uaKEPCertPtr.toArray());
+		if (intCertPtr != null)
+			certificates.push(intCertPtr.toArray());
+		if (ecdsaCertPtr != null)
+			certificates.push(ecdsaCertPtr.toArray());
+
+		return certificates;
 	},
 //-----------------------------------------------------------------------------
 	HashData: function(data, asBase64String) {
@@ -2204,33 +2525,43 @@ function() {
 
 		if (certificate != null)
 			this.CheckMaxDataSize(certificate);
-		this.CheckMaxDataSize(data);
 
-		var pPtr = EUPointerArray(context.GetContext());
-		var error;
+		var hashContext = null;
 
 		try {
-			error = Module.ccall('EUCtxHashData',
-				'number',
-				['number', 'number', 'array', 'number', 
-					'array', 'number', 'number', 'number'],
-				[context.GetContext(), hashAlgo, 
-					(certificate != null) ? certificate : 0,
-					(certificate != null) ? certificate.length : 0,
-					data, data.length, pPtr.ptr, pPtr.lengthPtr]);
+			var hash = null;
+			var chunkMaxSize = EU_MAX_DATA_SIZE_MB;
+			var offset = 0;
+
+			hashContext =  this.CtxHashDataBegin(
+				context, hashAlgo, certificate);
+
+			while (true) {
+				var chunkSize = (data.length - offset);
+				if (chunkSize > chunkMaxSize)
+					chunkSize = chunkMaxSize;
+	
+				var chunk = data.slice(
+					offset, offset + chunkSize);
+				this.CtxHashDataContinue(hashContext, chunk);
+				offset += chunkSize;
+				if (offset < data.length)
+					continue;
+				break;
+			}
+
+			hash = this.CtxHashDataEnd(
+				hashContext, asBase64String);
+
+			this.CtxFreeHash(hashContext);
+			hashContext = null;
+
+			return hash;
 		} catch (e) {
-			error = EU_ERROR_UNKNOWN;
+			if (hashContext != null)
+				this.CtxFreeHash(hashContext);
+			throw e;
 		}
-
-		if (error != EU_ERROR_NONE) {
-			pPtr.free();
-			this.RaiseError(error);
-		}
-
-		if (asBase64String)
-			return this.Base64Encode(pPtr.toArray());
-		else
-			return pPtr.toArray();
 	},
 	CtxHashDataBegin: function(context, hashAlgo, certificate) {
 		if (certificate != null)
@@ -2242,7 +2573,9 @@ function() {
 		try {
 			error = Module.ccall('EUCtxHashDataBegin',
 				'number',
-				['number', 'number', 'array', 'number', 'number'],
+				['number', 'number', 
+					certificate != null ? 'array' : 'number', 
+					'number', 'number'],
 				[context.GetContext(), hashAlgo, 
 					(certificate != null) ? certificate : 0,
 					(certificate != null) ? certificate.length : 0,
@@ -2313,11 +2646,13 @@ function() {
 		var pThis = this;
 
 		if (certificate != null)
-			this.CheckMaxDataSize(certificate);
+			pThis.CheckMaxDataSize(certificate);
 
 		if (pThis.isFileSyncAPISupported) {
 			if (!EUFS.link(file)) {
-				onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+				setTimeout(function() {
+					onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+				}, 1);
 				return;
 			} 
 
@@ -2327,7 +2662,8 @@ function() {
 			try {
 				error = Module.ccall('EUCtxHashFile',
 					'number',
-					['number', 'number', 'array', 'number',
+					['number', 'number', 
+						certificate != null ? 'array' : 'number', 'number',
 						'array', 'number', 'number'],
 					[context.GetContext(), hashAlgo, 
 						(certificate != null) ? certificate : 0,
@@ -2342,19 +2678,25 @@ function() {
 				EUFS.unlink(file);
 				pPtr.free();
 
-				onError(pThis.MakeError(error));
+				setTimeout(function() {
+					onError(pThis.MakeError(error));
+				}, 1);
 				return;
 			}
 
 			EUFS.unlink(file);
 
 			try {
-				if (asBase64String)
-					onSuccess(this.Base64Encode(pPtr.toArray()));
-				else
-					onSuccess(pPtr.toArray());
+				var data = asBase64String ? 
+					pThis.Base64Encode(pPtr.toArray()) : 
+					pPtr.toArray();
+				setTimeout(function() {
+					onSuccess(data);
+				}, 1);
 			} catch (e) {
-				onError(e);
+				setTimeout(function() {
+					onError(e);
+				}, 1);
 			}
 		} else {
 			var _onSuccess = function(fileReaded) {
@@ -2369,7 +2711,7 @@ function() {
 				}
 			};
 
-			pThis.ReadFile(signedFile, _onSuccess, onError);
+			pThis.ReadFile(file, _onSuccess, onError);
 		}
 	},
 //-----------------------------------------------------------------------------
@@ -2396,16 +2738,12 @@ function() {
 	CheckFileStruct: function(file, onSuccess, onError) {
 		var pThis = this;
 
-		if ((typeof data) == 'string')
-			data = this.Base64Decode(data);
-
 		if (pThis.isFileSyncAPISupported) {
 			if (!EUFS.link(file)) {
 				onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
 				return;
 			} 
 
-			var pPtr = EUPointerArray(context.GetContext());
 			var error;
 
 			try {
@@ -2419,7 +2757,6 @@ function() {
 
 			if (error != EU_ERROR_NONE) {
 				EUFS.unlink(file);
-				pPtr.free();
 
 				onError(pThis.MakeError(error));
 				return;
@@ -2439,8 +2776,39 @@ function() {
 				}
 			};
 
-			pThis.ReadFile(signedFile, _onSuccess, onError);
+			pThis.ReadFile(file, _onSuccess, onError);
 		}
+	},
+	GetSignType: function(signIndex, sign) {
+		this.CheckMaxDataSize(sign);
+
+		var isSignStr = ((typeof sign) == 'string');
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetSignType',
+				'number',
+				['number', 
+					isSignStr ? 'array' : 'number',
+					(!isSignStr) ? 'array' : 'number',
+					'number', 'number'],
+				[signIndex,
+					isSignStr ? StringToCString(sign) : 0,
+					!isSignStr ? sign : 0,
+					!isSignStr ? sign.length : 0,
+					intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
 	},
 	IsDataInSignedDataAvailable: function(sign) {
 		this.CheckMaxDataSize(sign);
@@ -2522,7 +2890,7 @@ function() {
 		}
 
 		if (error != EU_ERROR_NONE) {
-			pCertInfoExPtr.free();
+			pTimeInfoPtr.free();
 
 			this.RaiseError(error);
 		}
@@ -2535,7 +2903,8 @@ function() {
 
 		return timeInfo;
 	},
-	GetFileSignTimeInfo: function(signIndex, signedFile) {
+	GetFileSignTimeInfo: function(signIndex, signedFile, 
+		onSuccess, onError) {
 		var pThis = this;
 
 		if (pThis.isFileSyncAPISupported) {
@@ -2938,7 +3307,7 @@ function() {
 					'number',
 					isSignStr ? 'array' : 'number',
 					!isSignStr ? 'array' : 'number', 'number', 
-					'number', 'number',, 'number', 'number'],
+					'number', 'number', 'number', 'number'],
 				[isHashStr ? StringToCString(hash) : 0, 
 					!isHashStr ? hash : 0, 
 					!isHashStr ? hash.length : 0,
@@ -2973,6 +3342,40 @@ function() {
 		infoPtr.free();
 
 		return info;
+	},
+	SignHashRSA: function (hash, asBase64String) {
+		this.CheckMaxDataSize(hash);
+
+		var isHashStr = ((typeof hash) == 'string');
+		var pPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUSignHashRSA',
+				'number',
+				[isHashStr ? 'array' : 'number',
+					!isHashStr ? 'array' : 'number', 'number', 
+					'number', 'number', 'number'],
+				[isHashStr ? StringToCString(hash) : 0, 
+					!isHashStr ? hash : 0, 
+					!isHashStr ? hash.length : 0, 
+					asBase64String ? pPtr.ptr : 0,
+					!asBase64String ? pPtr.ptr : 0,
+					!asBase64String ? pPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return pPtr.toString(true);
+		else 
+			return pPtr.toArray();
 	},
 	SignDataRSA: function(data, appendCert, 
 		externalSgn, asBase64String) {
@@ -3165,7 +3568,7 @@ function() {
 
 			try {
 				timeInfo = pThis._GetFileSignTimeInfoSync(
-					signIndex, fileWithSign);
+					0, fileWithSign);
 			} catch (e) {
 				onError(e);
 				return;
@@ -3253,7 +3656,7 @@ function() {
 
 			try {
 				timeInfo = pThis._GetFileSignTimeInfoSync(
-					signIndex, signedFile);
+					0, signedFile);
 			} catch (e) {
 				onError(e);
 				return;
@@ -3281,11 +3684,132 @@ function() {
 			pThis.ReadFile(signedFile, _onSuccess, onError);
 		}
 	},
+	VerifyFileOnTimeEx: function(signIndex, fileWithSign, 
+		file, onTime, offline, noCRL, onSuccess, onError) {
+		var pThis = this;
+
+		var internal = (file == null) || (typeof file === 'string');
+
+		if (pThis.isFileSyncAPISupported) {
+			var dataFile = (file != null) ?
+				file :
+				(fileWithSign.name + MakeUID(10));
+			
+			if (internal) {
+				if (!EUFS.link(dataFile, (file == null))) {
+					onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+					return;
+				}
+			} else {
+				if (!EUFS.link(dataFile)) {
+					onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+					return;
+				}
+			}
+
+			if (!EUFS.link(fileWithSign)) {
+				EUFS.unlink(dataFile);
+
+				onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+				return;
+			}
+
+			var onTimePtr = (onTime != null) ? 
+				EUPointerSystemtime(onTime) : 0;
+			var infoPtr = EUPointerSignerInfo();
+			var timeInfo;
+			var error;
+
+			try {
+				error = Module.ccall('EUCheckFileStruct',
+					'number',
+					['array'],
+					[UTF8ToCP1251Array(EUFS.getFilePath(fileWithSign))]);
+				if (error == EU_ERROR_NONE) {
+					error = Module.ccall('EUVerifyFileOnTimeEx',
+						'number',
+						['number', 'array', 'array', 
+						'number', 'number', 'number',
+						'number'],
+						[signIndex, 
+							UTF8ToCP1251Array(EUFS.getFilePath(fileWithSign)), 
+							UTF8ToCP1251Array(EUFS.getFilePath(dataFile)),
+							(onTime != null) ? onTimePtr.ptr : 0,
+							IntFromBool(offline), IntFromBool(noCRL),
+							infoPtr.ptr]);
+				}
+			} catch (e) {
+				error = EU_ERROR_UNKNOWN;
+			}
+
+			if (onTime != null)
+				onTimePtr.free();
+			
+			if (error != EU_ERROR_NONE) {
+				EUFS.unlink(fileWithSign);
+				EUFS.unlink(dataFile);
+
+				onError(pThis.MakeError(error));
+				return;
+			}
+
+			var data = (internal && (file != null)) ?
+				EUFS.readFileAsUint8Array(dataFile) :
+				null;
+
+			EUFS.unlink(fileWithSign);
+			EUFS.unlink(dataFile);
+			
+			try {
+				timeInfo = pThis._GetFileSignTimeInfoSync(
+					signIndex, fileWithSign);
+			} catch (e) {
+				onError(e);
+				return;
+			}
+
+			var info = new EndUserSignInfo(infoPtr.ptr, 
+				data, timeInfo);
+			infoPtr.free();
+
+			onSuccess(info);
+		} else {
+			var _onSuccess= function(files) {
+				try {
+					var info;
+
+					if (internal) {
+						info = pThis.VerifyDataInternalOnTimeEx(
+							signIndex, files[0].data,
+							onTime, offline, noCRL);
+						if (file == null)
+							info.data = null;
+					} else {
+						info = pThis.VerifyDataOnTimeEx(
+							files[0].data, signIndex, files[1].data,
+							onTime, offline, noCRL);
+						info.data = null;
+					}
+
+					onSuccess(info);
+				} catch (e) {
+					onError(e);
+				}
+			};
+
+			var files = [];
+			if (!internal)
+				files.push(file);
+			files.push(fileWithSign);
+
+			pThis.ReadFiles(files, 
+				_onSuccess, onError);
+		}
+	},
 	CreateEmptySign: function (data, asBase64String) {
+		var isInternalSign = (data != null);
 		if (isInternalSign)
 			this.CheckMaxDataSize(data);
-
-		var isInternalSign = (data != null);
 		if (isInternalSign) {
 			if ((typeof data) == 'string')
 				data = this.StringToArray(data);
@@ -3363,13 +3887,14 @@ function() {
 		var isPrevSignStr = ((typeof prevSign) == 'string');
 		var signPtr = asBase64String ? 
 			EUPointer() : EUPointerArray();
+		var error;
 
 		try {
 			error = Module.ccall('EUAppendSigner',
 				'number',
 				[isSignerStr ? 'array' : 'number',
 					!isSignerStr ? 'array' : 'number', 'number',
-					certificate ? 'array' : 'number', 'number', 
+					certificate != null ? 'array' : 'number', 'number',
 					isPrevSignStr ? 'array' : 'number', 
 					!isPrevSignStr ? 'array' : 'numer', 'number',
 					'number', 'number', 'number'],
@@ -3397,6 +3922,81 @@ function() {
 			return signPtr.toString(true);
 		else
 			return signPtr.toArray();
+	},
+	GetSigner: function(signIndex, sign, asBase64String) {
+		this.CheckMaxDataSize(sign);
+
+		var isSignStr = ((typeof sign) == 'string');
+		var signerPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetSigner',
+				'number',
+				['number', 
+					isSignStr ? 'array' : 'number', 
+					!isSignStr ? 'array' : 'number', 'number',
+					'number', 'number', 'number'],
+				[signIndex, 
+					isSignStr ? StringToCString(sign) : 0,
+					!isSignStr ? sign : 0,
+					!isSignStr ? sign.length : 0,
+					asBase64String ? signerPtr.ptr : 0,
+					!asBase64String ? signerPtr.ptr : 0,
+					!asBase64String ? signerPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			signerPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return signerPtr.toString(true);
+		else
+			return signerPtr.toArray();
+	},
+	AppendValidationDataToSigner: function (prevSigner, certificate, asBase64String) {
+		this.CheckMaxDataSize(prevSigner);
+		if (certificate != null)
+			this.CheckMaxDataSize(certificate);
+
+		var isPrevSignerStr = ((typeof prevSigner) == 'string');
+		var signerPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUAppendValidationDataToSigner',
+				'number',
+				[isPrevSignerStr ? 'array' : 'number',
+					!isPrevSignerStr ? 'array' : 'number', 'number',
+					certificate != null ? 'array' : 'number', 'number', 
+					'number', 'number', 'number'],
+				[isPrevSignerStr ? StringToCString(prevSigner) : 0, 
+					!isPrevSignerStr ? prevSigner : 0,
+					!isPrevSignerStr ? prevSigner.length : 0,
+					(certificate != null) ? certificate : 0,
+					(certificate != null) ? certificate.length : 0,
+					asBase64String ? signerPtr.ptr : 0,
+					!asBase64String ? signerPtr.ptr : 0,
+					!asBase64String ? signerPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			signerPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return signerPtr.toString(true);
+		else
+			return signerPtr.toArray();
 	},
 	RawSignData: function(data, asBase64String) {
 		if ((typeof data) == 'string')
@@ -3838,7 +4438,6 @@ function() {
 				return;
 			}
 
-			var infoPtr = EUPointerSignerInfo();
 			var error;
 
 			try {
@@ -3877,7 +4476,7 @@ function() {
 
 					signedData = pThis.CtxSignData(
 						privateKeyContext, signAlgo, 
-						fileReaded.data, external, appendCert)
+						fileReaded.data, external, appendCert);
 
 					onSuccess(signedData);
 				} catch (e) {
@@ -3885,7 +4484,7 @@ function() {
 				}
 			};
 
-			pThis.ReadFile(dataFile, _onSuccess, onError);
+			pThis.ReadFile(file, _onSuccess, onError);
 		}
 	},
 	CtxIsAlreadySigned: function(privateKeyContext, signAlgo, sign) {
@@ -4123,7 +4722,7 @@ function() {
 			error = Module.ccall('EUCtxAppendSigner',
 				'number',
 				['number', 'number', 'array', 'number',
-					certificate ? 'array' : 'number',
+					certificate != null ? 'array' : 'number',
 					'number', 'array', 'number',
 					'number', 'number'],
 				[context.GetContext(), signAlgo,
@@ -4250,7 +4849,7 @@ function() {
 					var signsCount; 
 
 					signsCount = pThis.CtxGetSignsCount(
-						context, fileReaded.data)
+						context, fileReaded.data);
 
 					onSuccess(signsCount);
 				} catch (e) {
@@ -4312,7 +4911,7 @@ function() {
 					var signerInfo; 
 
 					signerInfo = pThis.CtxGetSignerInfo(
-						context, signIndex, fileReaded.data)
+						context, signIndex, fileReaded.data);
 
 					onSuccess(signerInfo);
 				} catch (e) {
@@ -4406,13 +5005,15 @@ function() {
 		} else {
 			var _onSuccess= function(files) {
 				try {
+					var info;
+
 					if (internal) {
-						var info = pThis.CtxVerifyDataInternal(
+						info = pThis.CtxVerifyDataInternal(
 							context, signIndex, files[0].data);
 						if (file == null)
 							info.data = null;
 					} else {
-						var info = pThis.CtxVerifyData(
+						info = pThis.CtxVerifyData(
 							context, files[0].data, 
 							signIndex, files[1].data);
 						info.data = null;
@@ -4433,7 +5034,103 @@ function() {
 				_onSuccess, onError);
 		}
 	},
+	GetTSPByAccessInfo: function(
+		hashAlgo, hash, accessInfo, accessInfoPort, 
+		asBase64String) {
+		this.CheckMaxDataSize(hash);
+
+		var isHashStr = ((typeof hash) == 'string');
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetTSPByAccessInfo',
+				'number',
+				['number', 
+					isHashStr ? 'array' : 'number',
+					!isHashStr ? 'array' : 'number', 'number',
+					accessInfo ? 'array' : 'number',
+					accessInfoPort ? 'array' : 'number',
+					'number', 'number'],
+				[hashAlgo,
+					isHashStr ? StringToCString(hash) : 0, 
+					!isHashStr ? hash : 0, 
+					!isHashStr ? hash.length : 0, 
+					accessInfo ? UTF8ToCP1251Array(accessInfo) : 0,
+					accessInfoPort ? UTF8ToCP1251Array(accessInfoPort) : 0,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CheckTSP: function(
+		tsp, hashAlgo, hash) {
+		var error;
+
+		this.CheckMaxDataSize(tsp);
+		tsp = ((typeof tsp) == 'string') ?
+			this.Base64Decode(tsp) : tsp;
+
+		if (hash) {
+			this.CheckMaxDataSize(hash);
+			hash = ((typeof hash) == 'string') ?
+				this.Base64Decode(hash) : hash;
+		}
+
+		try {
+			error = Module.ccall('EUCheckTSP',
+				'number',
+				['array', 'number',
+					'number', 'number',
+					hash ? 'array' : 'number', 'number'],
+				[tsp, tsp.length,
+					hashAlgo, 0, 
+					hash ? hash : 0, 
+					hash ? hash.length : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			this.RaiseError(error);
+		}
+	},
 //-----------------------------------------------------------------------------
+	IsEnvelopedData: function(enveloped) {
+		this.CheckMaxDataSize(enveloped);
+
+		if ((typeof enveloped) == 'string')
+			enveloped = this.Base64Decode(enveloped);
+
+		var isEnveloped = false;
+		var error;
+
+		try {
+			isEnveloped = (Module.ccall('EUIsEnvelopedData',
+				'number',
+				['array', 'number'],
+				[enveloped, enveloped.length]) != EU_FALSE);
+			error = EU_ERROR_NONE;
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			this.RaiseError(error);
+		}
+
+		return isEnveloped;
+	},
 	EnvelopDataEx: function (recipientCertIssuers, recipientCertSerials, 
 		signData, data, asBase64String) {
 		if ((typeof data) == 'string')
@@ -4674,6 +5371,49 @@ function() {
 		devDataPtr.free();
 
 		return info;
+	},
+	CtxEnvelopDataWithDynamicKey: function (privateKeyContext,
+		recipientCertificates, recipientAppendType,
+		signData, appendCert, data, asBase64String) {
+		if ((typeof data) == 'string')
+			data = this.StringToArray(data);
+
+		this.CheckMaxDataSize(data);
+
+		var pPtr = EUPointer(privateKeyContext.GetContext());
+		var recipientCertsArray = 
+			new EUArrayFromArrayOfArray(recipientCertificates);
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxEnvelopDataWithDynamicKey',
+				'number',
+				['number', 'number', 'number', 'number',
+					'number', 'number', 'number',
+					'array', 'number', 'number', 'number'],
+				[privateKeyContext.GetContext(),
+					recipientCertsArray.count,
+					recipientCertsArray.arraysPtr,
+					recipientCertsArray.arraysLengthPtr,
+					recipientAppendType, 
+					IntFromBool(signData), IntFromBool(appendCert),
+					data, data.length, pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			recipientCertsArray.free();
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		recipientCertsArray.free();
+		
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
 	},
 	CtxGetSenderInfo: function(context, data, recipientCert) {
 		this.CheckMaxDataSize(data);
@@ -5074,7 +5814,7 @@ function() {
 		}
 
 		return new EndUserSession(pPtr.toPtr(), null);
-	},	
+	},
 	SessionEncrypt: function(session, data, asBase64String) {
 		if ((typeof data) == 'string')
 			data = this.StringToArray(data);
@@ -5204,7 +5944,7 @@ function() {
 			this.RaiseError(error);
 		}
 		
-		var context = EndUserContext(pPtr.toPtr());
+		var context = new EndUserContext(pPtr.toPtr());
 
 		return context;
 	},
@@ -5304,7 +6044,6 @@ function() {
 		
 		if (error != EU_ERROR_NONE) {
 			unprotDataPtr.free();
-			infoPtr.free();
 			this.RaiseError(error);
 		}
 
@@ -5315,13 +6054,15 @@ function() {
 		}
 	},
 //-----------------------------------------------------------------------------
-	QRCodeEncode: function(data) {
+	QRCodeEncode: function(data, scale) {
 		var arrPtr = null;
 		var arrLenPtr = null;
 		var imgArray = null;
 		var error = EU_ERROR_NONE;
 
 		this.CheckMaxDataSize(data);
+
+		scale = scale || 1;
 
 		var _free = function() {
 			try {
@@ -5343,8 +6084,8 @@ function() {
 
 			var isSuccess = Module.ccall('QRCodeEncode',
 				'number',
-				['array', 'number', 'number', 'number'],
-				[data, data.length, arrPtr, arrLenPtr]);
+				['array', 'number', 'number', 'number', 'number'],
+				[data, data.length, scale, arrPtr, arrLenPtr]);
 			if (isSuccess) {
 				var imgData = Module.getValue(arrPtr, "i8*");
 				var imgDataLength = Module.getValue(arrLenPtr, "i32");
@@ -5404,7 +6145,7 @@ function() {
 //-----------------------------------------------------------------------------
 	ParseTransportHeader: function(data) {
 		if ((typeof data) == 'string')
-			data = Base64Decode(data);
+			data = this.Base64Decode(data);
 
 		this.CheckMaxDataSize(data);
 
@@ -5462,7 +6203,7 @@ function() {
 //-----------------------------------------------------------------------------
 	ParseCryptoHeader: function(data) {
 		if ((typeof data) == 'string')
-			data = Base64Decode(data);
+			data = this.Base64Decode(data);
 
 		this.CheckMaxDataSize(data);
 
@@ -5500,6 +6241,308 @@ function() {
 			caType, headerTypePtr.toNumber(), 
 			headerSizePtr.toNumber(),
 			resultDataPtr.toArray());
+	},
+//-----------------------------------------------------------------------------
+	SServerClientSignHashAsync: function(
+		serverAddress, serverPort, clientID, originatorDescription,
+		hashDescription, hash, signAlgorithmName) {
+		var isPort = serverPort != null && serverPort != "";
+		var isHashStr = ((typeof hash) == 'string');
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUSServerClientSignHashAsync',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 'array', 
+					originatorDescription ? 'array' : 'number', 
+					'array', 
+					isHashStr ? 'array' : 'number',
+					(!isHashStr) ? 'array' : 'number',
+						'number', 'array', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					originatorDescription ? UTF8ToCP1251Array(originatorDescription) : 0,
+					UTF8ToCP1251Array(hashDescription),
+					isHashStr ? StringToCString(hash) : 0,
+					!isHashStr ? hash : 0,
+					!isHashStr ? hash.length : 0,
+					UTF8ToCP1251Array(signAlgorithmName),
+					pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		return pPtr.toString(true);
+	},
+	SServerClientCheckSignHashStatus: function(
+		serverAddress, serverPort, clientID, 
+		operationID, asBase64String) {
+		var isPort = serverPort != null && serverPort != "";
+		var pPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUSServerClientCheckSignHashStatus',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 'array', 'array', 
+					'number', 'number', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					UTF8ToCP1251Array(operationID),
+					asBase64String ? pPtr.ptr : 0,
+					!asBase64String ? pPtr.ptr : 0,
+					!asBase64String ? pPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		var sign = asBase64String ? 
+			pPtr.toString(true) : pPtr.toArray();
+		return sign && (sign.length > 0) ? sign : null;
+	},
+	SServerClientSignHashesAsync: function(
+		serverAddress, serverPort, clientID, originatorDescription,
+		operationDescription, hashesDescriptions, hashes, signAlgorithmName) {
+		var isPort = serverPort != null && serverPort != "";
+		var hashesDescr = hashesDescriptions != null ? 
+			intArrayFromStrings(hashesDescriptions) : 0;
+		var isHashesStr = (typeof hashes[0]) == 'string';
+		var hashesValues = isHashesStr ? 
+			intArrayFromStrings(hashes) : 
+			new EUArrayFromArrayOfArray(hashes);
+		
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUSServerClientSignHashesAsync',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 'array', 
+					originatorDescription ? 'array' : 'number', 
+					'array', 
+					hashesDescr ? 'array' : 'number',
+					isHashesStr ? 'array' : 'number',
+					'number', 'number', 'number',
+					'array', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					originatorDescription ? UTF8ToCP1251Array(originatorDescription) : 0,
+					UTF8ToCP1251Array(operationDescription),
+					hashesDescr ? hashesDescr : 0,
+					isHashesStr ? hashesValues : 0,
+					!isHashesStr ? hashesValues.count : 0,
+					!isHashesStr ? hashesValues.arraysPtr : 0,
+					!isHashesStr ? hashesValues.arraysLengthPtr : 0,
+					UTF8ToCP1251Array(signAlgorithmName),
+					pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		return pPtr.toString(true);
+	},
+	SServerClientCheckSignHashesStatus: function(
+		serverAddress, serverPort, clientID, operationID) {
+		var isPort = serverPort != null && serverPort != "";
+		var pPtr = EUPointer();
+		var intPtr = EUPointerDWORD();
+		var error;
+		try {
+			error = Module.ccall('EUSServerClientCheckSignHashesStatus',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 'array', 'array', 
+					'number', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					UTF8ToCP1251Array(operationID),
+					pPtr.ptr, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		var itemsPtr = pPtr.toPtr();
+		var itemsCount = intPtr.toNumber();
+		var results = [];
+		try {
+			for (var i = 0; i < itemsCount; i++) {
+				var pCurPtr = Module.getValue(
+					(itemsPtr + i * EU_PTR_SIZE) | 0, "i8*");
+				
+				results.push(new EndUserSSSignHashResult(pCurPtr));
+			}
+		} catch (e) {
+			Module._EUSServerClientFreeSignHashesResults(itemsPtr);
+			this.RaiseError(EU_ERROR_UNKNOWN);
+		}
+
+		Module._EUSServerClientFreeSignHashesResults(itemsPtr);
+
+		return results;
+	},
+	SServerClientGeneratePrivateKeyAsync: function(
+		serverAddress, serverPort, clientID, 
+		originatorDescription, privateKeyDescription, 
+		uaAlgorithmName, uaDSKeyLength, useDSKeyAsKEP, uaKEPKeyLength,
+		internationalAlgorithmName, internationalKeyLength) {
+		var isPort = serverPort != null && serverPort != "";
+		var isUAAlgorithmName = 
+			((typeof uaAlgorithmName) == 'string');
+		var isIntAlgorithmName = 
+			((typeof internationalAlgorithmName) == 'string');
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUSServerClientGeneratePrivateKeyAsync',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 'array', 
+					originatorDescription ? 'array' : 'number',
+					'array', 
+					isUAAlgorithmName ? 'array' : 'number',
+					'number', 'number', 'number',
+					isIntAlgorithmName ? 'array' : 'number',
+					'number', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					originatorDescription ? UTF8ToCP1251Array(originatorDescription) : 0,
+					UTF8ToCP1251Array(privateKeyDescription),
+					isUAAlgorithmName ? 
+						UTF8ToCP1251Array(uaAlgorithmName) : 0,
+					uaDSKeyLength, 
+					useDSKeyAsKEP ? 1 : 0,
+					uaKEPKeyLength, 
+					isIntAlgorithmName ? 
+						UTF8ToCP1251Array(internationalAlgorithmName) : 0,
+					internationalKeyLength,
+					pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		return pPtr.toString(true);
+	},
+	SServerClientCheckGeneratePrivateKeyStatus: function(
+		serverAddress, serverPort, clientID, operationID) {
+		var isPort = serverPort != null && serverPort != "";
+		var uaReqPtr = EUPointerArray();
+		var uaReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
+		var uaKEPReqPtr = EUPointerArray();
+		var uaKEPReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
+		var intReqPtr = EUPointerArray();
+		var intReqNamePtr = EUPointerMemory(EU_PATH_MAX_LENGTH);
+		var error;
+
+		var _free = function() {
+			uaReqPtr.free();
+			uaReqNamePtr.free();
+			uaKEPReqPtr.free();
+			uaKEPReqNamePtr.free();
+			intReqPtr.free();
+			intReqNamePtr.free();
+		};
+
+		try {
+			error = Module.ccall(
+				'EUSServerClientCheckGeneratePrivateKeyStatus',
+				'number',
+				['array', 
+					isPort ? 'array' : 'number', 
+					'array', 'array', 
+					'number', 'number', 'number',
+					'number', 'number', 'number',
+					'number', 'number', 'number'],
+				[UTF8ToCP1251Array(serverAddress),
+					isPort ? UTF8ToCP1251Array(serverPort) : 0,
+					UTF8ToCP1251Array(clientID),
+					UTF8ToCP1251Array(operationID),
+					uaReqPtr.ptr, uaReqPtr.lengthPtr,
+					uaReqNamePtr.ptr, 
+					uaKEPReqPtr.ptr, uaKEPReqPtr.lengthPtr, 
+					uaKEPReqNamePtr.ptr,
+					intReqPtr.ptr, intReqPtr.lengthPtr, 
+					intReqNamePtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			_free();
+			this.RaiseError(error);
+		}
+
+		var _toString = function(strPtr) {
+			var str = CP1251PointerToUTF8(strPtr);
+			var lastInd = str.lastIndexOf("/");
+			if (lastInd < 0)
+				return str;
+
+			return str.substring(lastInd + 1, str.length);
+		};
+		
+		var _toArray = function(arrPtr) {
+			var arr = arrPtr.toArray();
+			return (arr && (arr.length > 0)) ? arr : null;
+		};
+
+		var uaReq = _toArray(uaReqPtr);
+		var uaReqName = _toString(uaReqNamePtr.ptr);
+		var uaKEPReq = _toArray(uaKEPReqPtr);
+		var uaKEPReqName = _toString(uaKEPReqNamePtr.ptr);
+		var intReq = _toArray(intReqPtr);
+		var intReqName = _toString(intReqNamePtr.ptr);
+
+		if ((uaReq == null) && 
+			(uaKEPReq == null) && 
+			(intReq == null)) {
+			return null;
+		}
+
+		var euPrivateKey = new EndUserPrivateKey(
+			null, null, uaReq, uaReqName, 
+			uaKEPReq, uaKEPReqName, 
+			intReq, intReqName, null, null);
+
+		_free();
+
+		return euPrivateKey;
 	}
 });
 

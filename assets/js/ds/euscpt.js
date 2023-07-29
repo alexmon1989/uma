@@ -6,6 +6,10 @@ if ((typeof navigator) == 'undefined') {
 	};
 }
 
+if (!Uint8Array.prototype.slice) {
+	Uint8Array.prototype.slice = Uint8Array.prototype.subarray;
+}
+
 //=============================================================================
 
 var EU_ONE_MB = 1024 * 1024;
@@ -42,6 +46,7 @@ var EU_SUBJECT_CA_SERVER_SUB_TYPE_OCSP			= 3;
 var EU_CERT_KEY_TYPE_UNKNOWN	= 0x00;
 var EU_CERT_KEY_TYPE_DSTU4145	= 0x01;
 var EU_CERT_KEY_TYPE_RSA		= 0x02;
+var EU_CERT_KEY_TYPE_ECDSA		= 0x04;
 
 //-----------------------------------------------------------------------------
 
@@ -72,6 +77,7 @@ var EU_CTX_HASH_ALGO_SHA256 = 4;
 var EU_CTX_SIGN_UNKNOWN = 0;
 var EU_CTX_SIGN_DSTU4145_WITH_GOST34311 = 1;
 var EU_CTX_SIGN_RSA_WITH_SHA = 2;
+var EU_CTX_SIGN_ECDSA_WITH_SHA = 3;
 
 //-----------------------------------------------------------------------------
 
@@ -163,7 +169,7 @@ var EU_CRL_DETAILED_INFO_SIZE = 60;
 var EU_TIME_INFO_SIZE = 8 + EU_SYSTEMTIME_SIZE;
 
 var EU_KEY_MEDIA_SIZE = 73;
-var EU_USER_INFO_SIZE = 1536;
+var EU_USER_INFO_SIZE = 1554;
 var EU_SYSTEMTIME_SIZE = 16;
 
 var EU_PASS_MAX_LENGTH = 65;
@@ -189,10 +195,15 @@ var EU_O_CODE_MAX_LENGTH = 33;
 var EU_OU_CODE_MAX_LENGTH = 33;
 var EU_USER_CODE_MAX_LENGTH = 33;
 var EU_UPN_MAX_LENGTH = 257;
+var EU_COUNTRY_MAX_LENGTH = 3;
+var EU_UNZR_MAX_LENGTH = 15;
+var EU_INFORMATION_MAX_LENGTH = 513;
+var EU_PASS_PHRASE_MAX_LENGTH = 129;
 
 var EU_KEYS_TYPE_NONE = 0;
 var EU_KEYS_TYPE_DSTU_AND_ECDH_WITH_GOST = 1;
 var EU_KEYS_TYPE_RSA_WITH_SHA = 2;
+var EU_KEYS_TYPE_ECDSA_WITH_SHA = 4;
 
 var EU_KEYS_LENGTH_DS_UA_191 = 1;
 var EU_KEYS_LENGTH_DS_UA_257 = 2;
@@ -206,6 +217,11 @@ var EU_KEYS_LENGTH_DS_RSA_1024 = 1;
 var EU_KEYS_LENGTH_DS_RSA_2048 = 2;
 var EU_KEYS_LENGTH_DS_RSA_3072 = 3;
 var EU_KEYS_LENGTH_DS_RSA_4096 = 4;
+
+var EU_KEYS_LENGTH_DS_ECDSA_192 = 1;
+var EU_KEYS_LENGTH_DS_ECDSA_256 = 2;
+var EU_KEYS_LENGTH_DS_ECDSA_384 = 3;
+var EU_KEYS_LENGTH_DS_ECDSA_521 = 4;
 
 var EU_CONTENT_ENC_ALGO_TDES_CBC = 4;
 var EU_CONTENT_ENC_ALGO_AES_256_CBC = 7;
@@ -227,6 +243,11 @@ var EU_SIGN_TYPE_CADES_BES = 1;
 var EU_SIGN_TYPE_CADES_T = 4;
 var EU_SIGN_TYPE_CADES_C = 8;
 var EU_SIGN_TYPE_CADES_X_LONG = 16;
+var EU_SIGN_TYPE_CADES_X_LONG_TRUSTED = 128;
+
+var EU_KEYS_REQUEST_TYPE_UA_DS = 1;
+var EU_KEYS_REQUEST_TYPE_UA_KEP = 2;
+var EU_KEYS_REQUEST_TYPE_INTERNATIONAL = 3;
 
 //=============================================================================
 
@@ -235,6 +256,7 @@ var EU_MAKE_PKEY_PFX_CONTAINER_PARAMETER = 'MakePKeyPFXContainer';
 var EU_SIGN_INCLUDE_CONTENT_TIME_STAMP_PARAMETER = 'SignIncludeContentTimeStamp';
 var EU_SIGN_TYPE_PARAMETER = 'SignType';
 var EU_SIGN_INCLUDE_CA_CERTIFICATES_PARAMETER = 'SignIncludeCACertificates';
+var EU_FORCE_USE_TSP_FROM_SETTINGS_PARAMETER = 'ForceUseTSPFromSettings';
 
 var UA_OID_EXT_KEY_USAGE_STAMP = "1.2.804.2.1.1.1.3.9";
 
@@ -270,13 +292,13 @@ var CP1251Table = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9,
 	1092: 244, 8224: 134, 1093: 245, 8470: 185, 1094: 246, 1054: 206, 1095: 247, 1096: 248, 8249: 139, 
 	1097: 249, 1098: 250, 1044: 196, 1099: 251, 1111: 191, 1055: 207, 1100: 252, 1038: 161, 8220: 147,
 	1101: 253, 8250: 155, 1102: 254, 8216: 145, 1103: 255, 1043: 195, 1105: 184, 1039: 143, 1026: 128, 
-	1106: 144, 8218: 130, 1107: 131, 8217: 146, 1108: 186, 1109: 190}
+	1106: 144, 8218: 130, 1107: 131, 8217: 146, 1108: 186, 1109: 190};
 
 var UTF8Table = unescape(
 	"%u0402%u0403%u201A%u0453%u201E%u2026%u2020%u2021%u20AC%u2030%u0409%u2039%u040A%u040C%u040B%u040F"+
 	"%u0452%u2018%u2019%u201C%u201D%u2022%u2013%u2014%u0000%u2122%u0459%u203A%u045A%u045C%u045B%u045F"+
 	"%u00A0%u040E%u045E%u0408%u00A4%u0490%u00A6%u00A7%u0401%u00A9%u0404%u00AB%u00AC%u00AD%u00AE%u0407"+
-	"%u00B0%u00B1%u0406%u0456%u0491%u00B5%u00B6%u00B7%u0451%u2116%u0454%u00BB%u0458%u0405%u0455%u0457")
+	"%u00B0%u00B1%u0406%u0456%u0491%u00B5%u00B6%u00B7%u0451%u2116%u0454%u00BB%u0458%u0405%u0455%u0457");
 
 //=============================================================================
 
@@ -288,7 +310,7 @@ var EU_ERRORS_STRINGS_EN = [];
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_LIBRARY_LOAD] = 'Виникла помилка при завантаженні криптографічної бібліотеки';
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_BROWSER_NOT_SUPPORTED] = 'Браузер не підтримується';
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_LIBRARY_NOT_INITIALIZED] = 'Криптографічна бібліотека не ініціалізована';
-EU_ERRORS_STRINGS_UA[EU_ERROR_JS_LIBRARY_ERROR] = 'Виникла помилка при взаємодії з криптографічною бібліотекою. Будь ласка, перезавантажте веб-сторінку';
+EU_ERRORS_STRINGS_UA[EU_ERROR_JS_LIBRARY_ERROR] = 'Виникла помилка при взаємодії з криптографічною бібліотекою. Будь ласка, перезавантажте web-сторінку';
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_OPEN_FILE] = 'Виникла помилка при відкритті файлу';
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_READ_FILE] = 'Виникла помилка при зчитуванні файлу';
 EU_ERRORS_STRINGS_UA[EU_ERROR_JS_WRITE_FILE] = 'Виникла помилка при записі файлу';
@@ -296,7 +318,7 @@ EU_ERRORS_STRINGS_UA[EU_ERROR_JS_WRITE_FILE] = 'Виникла помилка п
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_LIBRARY_LOAD] = 'Возникла ошибка при загрузке криптографической библиотеки';
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_BROWSER_NOT_SUPPORTED] = 'Браузер не поддерживается';
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_LIBRARY_NOT_INITIALIZED] = 'Криптографическая библиотека не инициализирована';
-EU_ERRORS_STRINGS_RU[EU_ERROR_JS_LIBRARY_ERROR] = 'Возникла ошибка при взаимодействии с криптографической библиотекой. Пожалуйста, перезагрузите веб-страницу';
+EU_ERRORS_STRINGS_RU[EU_ERROR_JS_LIBRARY_ERROR] = 'Возникла ошибка при взаимодействии с криптографической библиотекой. Пожалуйста, перезагрузите web-страницу';
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_OPEN_FILE] = 'Возникла ошибка при открытии файла';
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_READ_FILE] = 'Возникла ошибка при чтении файла';
 EU_ERRORS_STRINGS_RU[EU_ERROR_JS_WRITE_FILE] = 'Возникла ошибка при записи файла';
@@ -327,15 +349,15 @@ eu_wait = function(first){
 				self.deferred[0].apply(self, args); 
 				self.deferred.shift(); 
 			}
-		}
+		};
 		this.deferred = [];
 		this.eu_wait = function(run){
 			this.deferred.push(run); 
 			return self; 
-		}
+		};
 		first(callback);
 	});
-}
+};
 
 //=============================================================================
 
@@ -387,6 +409,9 @@ function ArrayToString(arr) {
 
 function UTF8ToCP1251Array(s) {
 	var L = [];
+	if (s.normalize)
+		s = s.normalize();
+
 	for (var i = 0; i < s.length; i++) {
 		var ord = s.charCodeAt(i);
 		if (!(ord in CP1251Table))
@@ -403,6 +428,9 @@ function CP1251PointerToUTF8(ptr) {
 	var t;
 	var i = 0;
 	var ret = '';
+
+	if (ptr == 0)
+		return '';
 
 	var code2char = function(code) {
 		if(code >= 0xC0 && code <= 0xFF)
@@ -428,6 +456,9 @@ function StringToUTF16LEArray(str, zero) {
 	var L = [];
 	var c;
 
+	if (str.normalize)
+		str = str.normalize();
+
 	for (var i = 0; i < str.length; i++) {
 		c = str.charCodeAt(i);
 		L.push(c & 0xFF);
@@ -443,7 +474,6 @@ function StringToUTF16LEArray(str, zero) {
 }
 
 function UTF16LEArrayToString(arr) {
-	var t1, t2;
 	var i = 0;
 	var ret = '';
 	var length;
@@ -469,11 +499,13 @@ function UTF16LEArrayToString(arr) {
 //=============================================================================
 
 var StringEncoder = function (charset, javaCompliant) {
+	charset = charset.toUpperCase();
+
 	this.charset = charset;
 	this.javaCompliant = javaCompliant;
 	
 	if (!StringEncoder.isSupported(charset))
-		throw exeption ("String charset not supported");
+		throw Error("String charset not supported");
 	
 	if (charset == "UTF-16LE") {
 		this.encode = function(str) {
@@ -488,11 +520,11 @@ var StringEncoder = function (charset, javaCompliant) {
 				var arr = StringToArray(str);
 				arr.push(0);
 				return arr;
-			}
+			};
 		}
 		this.decode = ArrayToString;
 	}
-}
+};
 
 StringEncoder.isSupported = function(charset) {
 	if (charset != "UTF-16LE" && 
@@ -501,7 +533,7 @@ StringEncoder.isSupported = function(charset) {
 	}
 
 	return true;
-}
+};
 
 //=============================================================================
 
@@ -513,7 +545,7 @@ function SetClassID(className, classVersion, classPtr) {
 
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 function intArrayFromStrings(strArr) {
 	if (strArr.length == 0)
@@ -521,7 +553,7 @@ function intArrayFromStrings(strArr) {
 
 	var resArray = [];
 	for (var i = 0; i < strArr.length; i++) {
-		var cp1251Arr = UTF8ToCP1251Array(strArr[i])
+		var cp1251Arr = UTF8ToCP1251Array(strArr[i]);
 		resArray = resArray.concat(cp1251Arr);
 	}
 
@@ -596,9 +628,9 @@ function ClassSetDefaultValues(classPtr, variables) {
 		} else if (variables[key] == 'word' || 
 			variables[key] == 'int' || 
 			variables[key] == 'long') {
-			classPtr[key] = 0
+			classPtr[key] = 0;
 		} else if (variables[key] == 'boolean') {
-			classPtr[key] = false
+			classPtr[key] = false;
 		} else {
 			classPtr[key] = null;
 		}
@@ -650,7 +682,7 @@ function StructureToClass(classPtr, structPtr, variables) {
 		}
 	} catch(e) {
 		console.error("Error: function: %s class: %s ex: %s", 
-			"StructureToClass", className, e.toString());
+			"StructureToClass", classPtr.className, e.toString());
 		classPtr.isFilled = false;
 	}
 }
@@ -665,52 +697,36 @@ var MakeClass = function() {
 		}
 		else return new arguments.callee( arguments );
 	};
-}
+};
 
 var NewClass = function( variables, constructor, functions ) {
 	var retn = MakeClass();
-	for( var key in variables ) {
+	var key;
+	for(key in variables) {
 		retn.prototype[key] = variables[key];
 	}
-	for( var key in functions ) {
+	for(key in functions) {
 		retn.prototype[key] = functions[key];
 	}
 	retn.prototype.__construct = constructor;
 	return retn;
-}
+};
 
 //=============================================================================
 
-function GetTransferableObject(object, unconvertableFieldsIDs) {
-	var unconvertableFields = [];
-	var transferableObject = null;
-	var length = unconvertableFieldsIDs.length;
-	var fieldID;
-
-	if (unconvertableFieldsIDs != null) {
-		for (var i = 0; i < length; i++) {
-			fieldID = unconvertableFieldsIDs[i];
-			unconvertableFields.push(object[fieldID]);
-			object[fieldID] = null;
-		}
-	}
-
+function ObjectToTransferableObject(classPtr, obj, variables) {
 	try {
-		transferableObject = 
-			JSON.parse(JSON.stringify(object));
-	} catch (e) {
-	
-	}
-
-	if (transferableObject != null) {
-		for (var i = 0; i < length; i++) {
-			fieldID = unconvertableFieldsIDs[i];
-			object[fieldID] = unconvertableFields[i];
-				transferableObject[fieldID] = unconvertableFields[i];
+		for (var key in variables) {
+			if (classPtr[key] && classPtr[key].GetTransferableObject)
+				obj[key] = classPtr[key].GetTransferableObject();
+			else
+				obj[key] = classPtr[key];
 		}
-	}
 
-	return transferableObject;
+		return obj;
+	} catch(e) {
+		return null;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -718,8 +734,6 @@ function GetTransferableObject(object, unconvertableFieldsIDs) {
 function TransferableObjectToClass(classPtr, obj, variables) {
 	try {
 		for (var key in variables) {
-			var funcName = key.capitalize();
-
 			if (variables[key] == 'time') {
 				classPtr[key] = new Date(obj[key]);
 			} else if (variables[key] == 'ownerInfo') {
@@ -731,14 +745,21 @@ function TransferableObjectToClass(classPtr, obj, variables) {
 			} else if (variables[key] == 'EndUserCertificateInfoEx') {
 				classPtr[key] = new EndUserCertificateInfoEx(null);
 				classPtr[key].SetTransferableObject(obj[key]);
-			}
-			else {
+			} else {
 				classPtr[key] = obj[key];
 			}
 		}
 	} catch(e) {
-		this.isFilled = false;
+		classPtr.isFilled = false;
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+function EndUserInitFromTransferableObject(obj, objConstructor) {
+	var newObj = new objConstructor();
+	newObj.SetTransferableObject(obj);
+	return newObj;
 }
 
 //=============================================================================
@@ -760,13 +781,13 @@ ClassInitializeMethods(EndUserFile, EndUserFileFields, false);
 
 EndUserFile.prototype.SetTransferableObject = function(obj) {
 	TransferableObjectToClass(this, obj,  EndUserFileFields);
-}
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserFile.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['file', 'data']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserFileFields);
+};
 
 //=============================================================================
 
@@ -810,13 +831,13 @@ ClassInitializeMethods(EndUserOwnerInfo, EndUserOwnerInfoFields, false);
 
 EndUserOwnerInfo.prototype.SetTransferableObject = function(obj) {
 	TransferableObjectToClass(this, obj,  EndUserOwnerInfoFields);
-}
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserOwnerInfo.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, []);
-}
+	return ObjectToTransferableObject(this, {}, EndUserOwnerInfoFields);
+};
 
 //=============================================================================
 
@@ -847,13 +868,13 @@ ClassInitializeMethods(EndUserTimeInfo, EndUserTimeInfoFields, false);
 
 EndUserTimeInfo.prototype.SetTransferableObject = function(obj) {
 	TransferableObjectToClass(this, obj,  EndUserTimeInfoFields);
-}
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserTimeInfo.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, []);
-}
+	return ObjectToTransferableObject(this, {}, EndUserTimeInfoFields);
+};
 
 //=============================================================================
 
@@ -885,21 +906,21 @@ ClassInitializeMethods(EndUserSignInfo, EndUserSignInfoFields, false);
 
 EndUserSignInfo.prototype.GetData = function() {
 	return this.data;
-}
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserSignInfo.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserSignInfoFields);
-
-	this.data = obj.data;
-}
+	TransferableObjectToClass(this, obj, EndUserSignInfoFields);
+	TransferableObjectToClass(this, obj, {"data": "array"});
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserSignInfo.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['data']);
-}
+	var obj = ObjectToTransferableObject(this, {}, EndUserSignInfoFields);
+	return ObjectToTransferableObject(this, obj, {"data": "array"});
+};
 
 //=============================================================================
 
@@ -929,21 +950,21 @@ ClassInitializeMethods(EndUserSenderInfo, EndUserSenderInfoFields, false);
 
 EndUserSenderInfo.prototype.GetData = function() {
 	return this.data;
-}
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserSenderInfo.prototype.SetTransferableObject = function(obj) {
 	TransferableObjectToClass(this, obj,  EndUserSenderInfoFields);
-
-	this.data = obj.data;
-}
+	TransferableObjectToClass(this, obj, {"data": "array"});
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserSenderInfo.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['data']);
-}
+	var obj = ObjectToTransferableObject(this, {}, EndUserSenderInfoFields);
+	return ObjectToTransferableObject(this, obj, {"data": "array"});
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1026,13 +1047,13 @@ ClassInitializeMethods(EndUserCertificateInfo,
 //-----------------------------------------------------------------------------
 
 EndUserCertificateInfo.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserCertificateInfoFields);
+	TransferableObjectToClass(this, obj, EndUserCertificateInfoFields);
 };
 
 //-----------------------------------------------------------------------------
 
 EndUserCertificateInfo.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, []);
+	return ObjectToTransferableObject(this, {}, EndUserCertificateInfoFields);
 };
 
 //-----------------------------------------------------------------------------
@@ -1113,13 +1134,19 @@ var EndUserCertificateInfoExFields = {
 
 	"subjUNZR" : "string",
 
-	"subjCountry" : "string"
+	"subjCountry" : "string",
+
+	"fingerprint" : "string",
+
+	"isQSCD" : 'boolean',
+
+	"subjUserID": "string"
 };
 
 //-----------------------------------------------------------------------------
 
 var EndUserCertificateInfoEx = function(pInfo) {
-	SetClassID('EndUserCertificateInfoEx', '1.0.5', this);
+	SetClassID('EndUserCertificateInfoEx', '1.0.8', this);
 
 	if ((typeof pInfo != 'undefined') && (pInfo != null) &&
 			IsStructureFilled(this, pInfo, EndUserCertificateInfoExFields)) {
@@ -1135,14 +1162,106 @@ ClassInitializeMethods(EndUserCertificateInfoEx,
 //-----------------------------------------------------------------------------
 
 EndUserCertificateInfoEx.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserCertificateInfoExFields);
-}
+	TransferableObjectToClass(this, obj, EndUserCertificateInfoExFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserCertificateInfoEx.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, []);
-}
+	return ObjectToTransferableObject(this, {}, EndUserCertificateInfoExFields);
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserRequestInfoFields = {
+	"isFilled": "boolean",
+
+	"version": "long",
+
+	"isSimple": "boolean",
+	
+	"subject" : "string",
+	"subjCN" : "string",
+	"subjOrg" : "string",
+	"subjOrgUnit" : "string",
+	"subjTitle" : "string",
+	"subjState" : "string",
+	"subjLocality" : "string",
+	"subjFullName" : "string",
+	"subjAddress" : "string",
+	"subjPhone" : "string",
+	"subjEMail" : "string",
+	"subjDNS" : "string",
+	"subjEDRPOUCode" : "string",
+	"subjDRFOCode" : "string",
+	"subjNBUCode" : "string",
+	"subjSPFMCode" : "string",
+	"subjOCode" : "string",
+	"subjOUCode" : "string",
+	"subjUserCode" : "string",
+	
+	"isCertTimesAvail" : "boolean",
+	"certBeginTime" : "time",
+	"certEndTime" : "time",
+	"isPrivKeyTimesAvail" : "boolean",
+	"privKeyBeginTime" : "time",
+	"privKeyEndTime" : "time",
+	
+	"publicKeyType" : "long",
+	
+	"publicKeyBits" : "long",
+	"publicKey" : "string",
+	"RSAModul" : "string",
+	"RSAExponent" : "string",
+	"publicKeyID" : "string",
+	
+	"extKeyUsages" : "string",
+	
+	"crlDistribPoint1" : "string",
+	"crlDistribPoint2" : "string",
+
+	"isSubjTypeAvail" : "boolean",
+	"subjType" : "long",
+	"subjSubType" : "long",
+
+	"isSelfSigned" : "boolean",
+	"signIssuer" : "string",
+	"signSerial" : "string",
+
+	"subjUNZR" : "string",
+
+	"subjCountry" : "string",
+
+	"isQSCD" : 'boolean'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserRequestInfo = function(pInfo) {
+	SetClassID('EndUserRequestInfoFields', '1.0.4', this);
+
+	if ((typeof pInfo != 'undefined') && (pInfo != null) &&
+			IsStructureFilled(this, pInfo, EndUserRequestInfoFields)) {
+		StructureToClass(this, pInfo, EndUserRequestInfoFields);
+	} else {
+		ClassSetDefaultValues(this, EndUserRequestInfoFields);
+	}
+};
+
+ClassInitializeMethods(EndUserRequestInfo, 
+	EndUserRequestInfoFields, false);
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserRequestInfoFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserRequestInfoFields);
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1555,241 +1674,345 @@ function(issuerCN, address, port) {
 
 //=============================================================================
 
-var EndUserInfo = NewClass({
-	"Vendor": "JSC IIT",
-	"ClassVersion": "1.0.0",
-	"ClassName": "EndUserInfo",
-	"version": "1",
-	"commonName": "",
-	"locality": "",
-	"state": "",
-	"organiztion": "",
-	"orgUnit": "",
-	"title": "",
-	"street": "",
-	"phone": "",
-	"surname": "",
-	"givenname": "",
-	"eMail": "",
-	"dns": "",
-	"edrpouCode": "",
-	"drfoCode": "",
-	"nbuCode": "",
-	"spfmCode": "",
-	"oCode": "",
-	"ouCode": "",
-	"userCode": "",
-	"upn": "",
-},
-function() {
-},
-{
-	GetCommonName: function() {
-		return this.commonName;
-	},
-	SetCommonName: function(commonName) {
-		this.commonName = commonName;
-	},
-	GetLocality: function() {
-		return this.locality;
-	},
-	SetLocality: function(locality) {
-		this.locality = locality;
-	},
-	GetState: function() {
-		return this.state;
-	},
-	SetState: function(state) {
-		this.state = state;
-	},
-	GetOrganiztion: function() {
-		return this.organiztion;
-	},
-	SetOrganiztion: function(organiztion) {
-		this.organiztion = organiztion;
-	},
-	GetOrgUnit: function() {
-		return this.orgUnit;
-	},
-	SetOrgUnit: function(orgUnit) {
-		this.orgUnit = orgUnit;
-	},
-	GetTitle: function() {
-		return this.title;
-	},
-	SetTitle: function(title) {
-		this.title = title;
-	},
-	GetStreet: function() {
-		return this.street;
-	},
-	SetStreet: function(street) {
-		this.street = street;
-	},
-	GetPhone: function() {
-		return this.phone;
-	},
-	SetPhone: function(phone) {
-		this.phone = phone;
-	},
-	GetSurname: function() {
-		return this.surname;
-	},
-	SetSurname: function(surname) {
-		this.surname = surname;
-	},
-	GetGivenname: function() {
-		return this.givenname;
-	},
-	SetGivenname: function(givenname) {
-		this.givenname = givenname;
-	},
-	GetEMail: function() {
-		return this.eMail;
-	},
-	SetEMail: function(eMail) {
-		this.eMail = eMail;
-	},
-	GetDNS: function() {
-		return this.dns;
-	},
-	SetDNS: function(dns) {
-		this.dns = dns;
-	},
-	GetEDRPOUCode: function() {
-		return this.edrpouCode;
-	},
-	SetEDRPOUCode: function(edrpouCode) {
-		this.edrpouCode = edrpouCode;
-	},
-	GetDRFOCode: function() {
-		return this.drfoCode;
-	},
-	SetDRFOCode: function(drfoCode) {
-		this.drfoCode = drfoCode;
-	},
-	GetNBUCode: function() {
-		return this.nbuCode;
-	},
-	SetNBUCode: function(nbuCode) {
-		this.nbuCode = nbuCode;
-	},
-	GetSPFMCode: function() {
-		return this.spfmCode;
-	},
-	SetSPFMCode: function(spfmCode) {
-		this.spfmCode = spfmCode;
-	},
-	GetOCode: function() {
-		return this.oCode;
-	},
-	SetOCode: function(oCode) {
-		this.oCode = oCode;
-	},
-	GetOUCode: function() {
-		return this.ouCode;
-	},
-	SetOUCode: function(ouCode) {
-		this.ouCode = ouCode;
-	},
-	GetUserCode: function() {
-		return this.userCode;
-	},
-	SetUserCode: function(userCode) {
-		this.userCode = userCode;
-	},
-	GetUPN: function() {
-		return this.upn;
-	},
-	SetUPN: function(upn) {
-		this.upn = upn;
-	}
-});
+var EndUserInfoFields = {
+	'version': 'long',
+	'commonName': 'string', 
+	'locality': 'string', 
+	'state': 'string', 
+	'organization': 'string', 
+	'orgUnit': 'string', 
+	'title': 'string', 
+	'street': 'string', 
+	'phone': 'string', 
+	'surname': 'string', 
+	'givenname': 'string', 
+	'EMail': 'string', 
+	'DNS': 'string', 
+	'EDRPOUCode': 'string', 
+	'DRFOCode': 'string', 
+	'NBUCode': 'string', 
+	'SPFMCode': 'string', 
+	'OCode': 'string', 
+	'OUCode': 'string', 
+	'userCode': 'string', 
+	'UPN': 'string', 
+	'UNZR': 'string', 
+	'country': 'string'
+};
 
 //-----------------------------------------------------------------------------
 
-var EndUserPrivateKey = NewClass({
-	"Vendor": "JSC IIT",
-	"ClassVersion": "1.0.0",
-	"ClassName": "EndUserPrivateKey",
-	"privateKey": null,
-	"privateKeyName": "Key-6.dat",
-	"privateKeyInfo": null,
-	"privateKeyInfoName": "Key-11.dat",
-	"uaRequest": null,
-	"uaRequestName": "",
-	"uaKEPRequest": null,
-	"uaKEPRequestName": "",
-	"internationalRequest": null,
-	"internationalRequestName": ""
-},
-function(privateKey, privateKeyInfo,
+var _EndUserInfo = function() {
+	SetClassID('EndUserParams', '1.0.3', this);
+
+	ClassSetDefaultValues(this, EndUserInfoFields);
+
+	this.version = 3;
+};
+
+ClassInitializeMethods(_EndUserInfo, EndUserInfoFields, true);
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserInfoFields);
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserInfoFields);
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetOrganiztion = function() {
+	return this.organization;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetOrganiztion = function(organization) {
+	this.organization = organization;
+};
+
+//-----------------------------------------------------------------------------
+
+function EndUserInfo() {
+	return new _EndUserInfo();
+}
+
+//=============================================================================
+
+var EndUserParamsFields = {
+	'SN': 'int',
+	'commonName': 'string',
+	'locality': 'string',
+	'state': 'string',
+	'organization': 'string',
+	'orgUnit': 'string',
+	'title': 'string',
+	'street': 'string',
+	'phone': 'string',
+	'surname': 'string',
+	'givenname': 'string',
+	'EMail': 'string',
+	'DNS': 'string',
+	'EDRPOUCode': 'string',
+	'DRFOCode': 'string',
+	'NBUCode': 'string',
+	'SPFMCode': 'string',
+	'information': 'string',
+	'passPhrase': 'string',
+	'isPublishCertificate': 'boolean',
+	'RAAdminSN': 'int'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserParams = function(pParams) { 
+	SetClassID('EndUserParams', '1.0.1', this);
+
+	ClassSetDefaultValues(this, EndUserParamsFields);
+
+	if ((typeof pParams != 'undefined') && (pParams != null)) {
+		var pCurPtr = pParams | 0;
+
+		var GetInt = function() {
+			var val = Module.getValue(pCurPtr, "i32") | 0;
+			pCurPtr += 4;
+			return val;
+		};
+		var GetBoolean = function() {
+			var val = (Module.getValue(
+				pCurPtr, "i32") == EU_TRUE) ? true : false;
+			pCurPtr += 4;
+			return val;
+		};
+		
+		var GetString = function(maxLength) {
+			var val = CP1251PointerToUTF8(pCurPtr);
+			pCurPtr += maxLength;
+			return val;
+		};
+		
+		this.SN = GetInt();
+		this.commonName = GetString(EU_COMMON_NAME_MAX_LENGTH);
+		this.locality = GetString(EU_LOCALITY_MAX_LENGTH);
+		this.state = GetString(EU_STATE_MAX_LENGTH);
+		this.organization = GetString(EU_ORGANIZATION_MAX_LENGTH);
+		this.orgUnit = GetString(EU_ORG_UNIT_MAX_LENGTH);
+		this.title = GetString(EU_TITLE_MAX_LENGTH);
+		this.street = GetString(EU_STREET_MAX_LENGTH);
+		this.phone = GetString(EU_PHONE_MAX_LENGTH);
+		this.surname = GetString(EU_SURNAME_MAX_LENGTH);
+		this.givenname = GetString(EU_GIVENNAME_MAX_LENGTH);
+		this.EMail = GetString(EU_EMAIL_MAX_LENGTH);
+		this.DNS = GetString(EU_ADDRESS_MAX_LENGTH);
+		this.EDRPOUCode = GetString(EU_EDRPOU_MAX_LENGTH);
+		this.DRFOCode = GetString(EU_DRFO_MAX_LENGTH);
+		this.NBUCode = GetString(EU_NBU_MAX_LENGTH);
+		this.SPFMCode = GetString(EU_SPFM_MAX_LENGTH);
+		this.information = GetString(EU_INFORMATION_MAX_LENGTH);
+		this.passPhrase = GetString(EU_PASS_PHRASE_MAX_LENGTH);
+		this.publishCertificate = GetBoolean();
+		this.RAAdminSN = GetInt();
+	}
+};
+
+ClassInitializeMethods(EndUserParams, EndUserParamsFields, true);
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserParamsFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserParamsFields);
+};
+
+//=============================================================================
+
+var EndUserJKSPrivateKeyFields = {
+	"privateKey": "array",
+	"privateKeyName": "string",
+	"privateKeyInfo": "array",
+	"privateKeyInfoName": "string",
+	"uaRequest": "array",
+	"uaRequestName": "string",
+	"uaKEPRequest": "array",
+	"uaKEPRequestName": "string",
+	"rsaRequest": "array",
+	"rsaRequestName": "string",
+	"ecdsaRequest": "array",
+	"ecdsaRequestName": "string"
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserPrivateKey = function(privateKey, privateKeyInfo,
 	uaRequest, uaRequestName, uaKEPRequest, uaKEPRequestName,
-	internationalRequest, internationalRequestName) {
+	rsaRequest, rsaRequestName, ecdsaRequest, ecdsaRequestName) {
+	SetClassID('EndUserPrivateKey', '1.0.1', this);
+
 	this.privateKey = privateKey;
+	this.privateKeyName = "Key-6.pfx";
 	this.privateKeyInfo = privateKeyInfo;
+	this.privateKeyInfoName = "Key-11.dat";
 	this.uaRequest = uaRequest;
 	this.uaRequestName = uaRequestName;
 	this.uaKEPRequest = uaKEPRequest;
 	this.uaKEPRequestName = uaKEPRequestName;
-	this.internationalRequest = internationalRequest;
-	this.internationalRequestName = internationalRequestName;
-},
-{
-	GetPrivateKey: function() {
-		return this.privateKey;
-	},
-	GetPrivateKeyName: function() {
-		return this.privateKeyName;
-	},
-	GetPrivateKeyInfo: function() {
-		return this.privateKeyInfo;
-	},
-	GetPrivateKeyInfoName: function() {
-		return this.privateKeyInfoName;
-	},
-	GetUARequest: function() {
-		return this.uaRequest;
-	},
-	GetUARequestName: function() {
-		return this.uaRequestName;
-	},
-	GetUAKEPRequest: function() {
-		return this.uaKEPRequest;
-	},
-	GetUAKEPRequestName: function() {
-		return this.uaKEPRequestName;
-	},
-	GetInternationalRequest: function() {
-		return this.internationalRequest;
-	},
-	GetInternationalRequestName: function() {
-		return this.internationalRequestName;
-	}
-});
+	this.rsaRequest = rsaRequest;
+	this.rsaRequestName = rsaRequestName;
+	this.ecdsaRequest = ecdsaRequest;
+	this.ecdsaRequestName = ecdsaRequestName;
+
+	/**
+	 * @deprecated
+	 */
+	this.internationalRequest = rsaRequest;
+	this.internationalRequestName = rsaRequestName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserPrivateKeyFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserPrivateKeyFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetPrivateKey = function() {
+	return this.privateKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetPrivateKeyName = function() {
+	return this.privateKeyName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetPrivateKeyInfo = function() {
+	return this.privateKeyInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetPrivateKeyInfoName = function() {
+	return this.privateKeyInfoName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetUARequest = function() {
+	return this.uaRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetUARequestName = function() {
+	return this.uaRequestName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetUAKEPRequest = function() {
+	return this.uaKEPRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetUAKEPRequestName = function() {
+	return this.uaKEPRequestName;
+};
+
+//-----------------------------------------------------------------------------
+
+/**
+ * @deprecated. Use GetRSARequest()
+ */
+EndUserPrivateKey.prototype.GetInternationalRequest = function() {
+	return this.rsaRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+/**
+ * @deprecated. Use GetRSARequestName()
+ */
+EndUserPrivateKey.prototype.GetInternationalRequestName = function() {
+	return this.rsaRequestName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetRSARequest = function() {
+	return this.rsaRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetRSARequestName = function() {
+	return this.rsaRequestName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetECDSARequest = function() {
+	return this.ecdsaRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKey.prototype.GetECDSARequestName = function() {
+	return this.ecdsaRequestName;
+};
 
 //=============================================================================
 
-var EndUserContext = NewClass({
-	"Vendor": "JSC IIT",
-	"ClassVersion": "1.0.0",
-	"ClassName": "EndUserContext",
-	"context": ""
-},
-function(context) {
+var EndUserContextFields = {
+	'context': 'long'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserContext = function(context) { 
+	SetClassID('EndUserContext', '1.0.1', this);
+
 	this.context = context;
-},
-{
-	GetContext: function() {
-		return this.context;
-	}
-});
+};
+
+ClassInitializeMethods(EndUserContext, EndUserContextFields, false);
+
+//-----------------------------------------------------------------------------
+
+EndUserContext.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj,  EndUserContextFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserContext.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserContextFields);
+};
 
 //=============================================================================
 
 var EndUserPrivateKeyContextFields = {
-	'context': 'number',
-	'ownerInfo': 'ownderInfo'
+	'context': 'long',
+	'ownerInfo': 'ownerInfo'
 };
 
 //-----------------------------------------------------------------------------
@@ -1807,14 +2030,14 @@ ClassInitializeMethods(EndUserPrivateKeyContext,
 //-----------------------------------------------------------------------------
 
 EndUserPrivateKeyContext.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserPrivateKeyContextFields);
-}
+	TransferableObjectToClass(this, obj, EndUserPrivateKeyContextFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserPrivateKeyContext.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, []);
-}
+	return ObjectToTransferableObject(this, {}, EndUserPrivateKeyContextFields);
+};
 
 //=============================================================================
 
@@ -1886,14 +2109,14 @@ ClassInitializeMethods(EndUserCertificate, EndUserCertificateFields, false);
 //-----------------------------------------------------------------------------
 
 EndUserCertificate.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserCertificateFields);
-}
+	TransferableObjectToClass(this, obj, EndUserCertificateFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserCertificate.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['data']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserCertificateFields);
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1957,7 +2180,7 @@ function(infoType, issuer, serial, publicKeyID) {
 //=============================================================================
 
 var EndUserSessionFields = {
-	"handle": "number",
+	"handle": "long",
 	"data": "array"
 };
 
@@ -1975,19 +2198,19 @@ ClassInitializeMethods(EndUserSession, EndUserSessionFields, true);
 //-----------------------------------------------------------------------------
 
 EndUserSession.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserSessionFields);
-}
+	TransferableObjectToClass(this, obj, EndUserSessionFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserSession.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['data']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserSessionFields);
+};
 
 //=============================================================================
 
 var EndUserTransportHeaderFields = {
-	"receiptNumber": "number",
+	"receiptNumber": "long",
 	"cryptoData": "array"
 };
 
@@ -1998,34 +2221,38 @@ var EndUserTransportHeader = function(receiptNumber, cryptoData) {
 
 	this.receiptNumber = receiptNumber;
 	this.cryptoData = cryptoData;
+};
 
-	this.GetReceiptNumber = function() {
-		return this.receiptNumber;
-	};
+//-----------------------------------------------------------------------------
 
-	this.GetCryptoData = function() {
-		return this.cryptoData;
-	};
-}
+EndUserTransportHeader.prototype.GetReceiptNumber = function() {
+	return this.receiptNumber;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTransportHeader.prototype.GetCryptoData = function() {
+	return this.cryptoData;
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserTransportHeader.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserTransportHeader);
-}
+	TransferableObjectToClass(this, obj, EndUserTransportHeader);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserTransportHeader.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['cryptoData']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserTransportHeader);
+};
 
 //=============================================================================
 
 var EndUserCryptoHeaderFields = {
 	"CAType": "string",
-	"headerType": "number",
-	"headerSize": "number",
+	"headerType": "long",
+	"headerSize": "long",
 	"cryptoData": "array"
 };
 
@@ -2046,14 +2273,14 @@ ClassInitializeMethods(EndUserCryptoHeader, EndUserCryptoHeaderFields, false);
 //-----------------------------------------------------------------------------
 
 EndUserCryptoHeader.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserCryptoHeaderFields);
-}
+	TransferableObjectToClass(this, obj, EndUserCryptoHeaderFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserCryptoHeader.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['cryptoData']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserCryptoHeaderFields);
+};
 
 //=============================================================================
 
@@ -2086,7 +2313,7 @@ EndUserJKSPrivateKey.prototype.GetCertificatesCount = function() {
 
 //-----------------------------------------------------------------------------
 
-EndUserJKSPrivateKey.prototype.GetCertificate = function() {
+EndUserJKSPrivateKey.prototype.GetCertificate = function(index) {
 	if (index < 0 || index >= this.certificates.length)
 		return null;
 
@@ -2096,13 +2323,51 @@ EndUserJKSPrivateKey.prototype.GetCertificate = function() {
 //-----------------------------------------------------------------------------
 
 EndUserJKSPrivateKey.prototype.SetTransferableObject = function(obj) {
-	TransferableObjectToClass(this, obj,  EndUserJKSPrivateKeyFields);
-}
+	TransferableObjectToClass(this, obj, EndUserJKSPrivateKeyFields);
+};
 
 //-----------------------------------------------------------------------------
 
 EndUserJKSPrivateKey.prototype.GetTransferableObject = function() {
-	return GetTransferableObject(this, ['privateKey', 'certificates']);
-}
+	return ObjectToTransferableObject(this, {}, EndUserJKSPrivateKeyFields);
+};
+
+//=============================================================================
+
+var EndUserSSSignHashResultFields = {
+	"version": "long",
+	"error": "long",
+	"hash": "string",
+	"signature": "string",
+	"statusCode": "long",
+	"status": "string"
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserSSSignHashResult = function(pInfo) {
+	SetClassID('EndUserSSSignHashResult', '1.0.1', this);
+
+	if ((typeof pInfo != 'undefined') && (pInfo != null)) {
+		StructureToClass(this, pInfo, EndUserSSSignHashResultFields);
+	} else {
+		ClassSetDefaultValues(this, EndUserSSSignHashResultFields);
+	}
+};
+
+ClassInitializeMethods(EndUserSSSignHashResult, 
+	EndUserSSSignHashResultFields, false);
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserSSSignHashResultFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserSSSignHashResultFields);
+};
 
 //=============================================================================
