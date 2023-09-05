@@ -26,3 +26,12 @@ class OpenData(models.Model):
     class Meta:
         verbose_name = 'Відкриті дані'
         verbose_name_plural = 'Відкриті дані'
+
+
+class Person(models.Model):
+    person_name = models.CharField('Найменування особи', max_length=1024)
+    open_data = models.ForeignKey(OpenData, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Особа'
+        verbose_name_plural = 'Особи'

@@ -4,6 +4,7 @@ from django.core.mail import mail_admins
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
+from apps.search.utils import is_app_limited
 import apps.api.services as api_services
 from ...models import OpenData
 from datetime import datetime
@@ -114,6 +115,15 @@ class Command(BaseCommand):
                 else:
                     open_data_record.obj_state = 1
                 open_data_record.save()
+
+                # Обновление списка наименований субъектов
+                if not is_app_limited(data):
+                    open_data_record.person_set.all().delete()
+                    for person_name in api_services.app_get_unique_subjects_from_data(data):
+                        open_data_record.person_set.create(
+                            person_name=person_name
+                        )
+
                 updated_count += 1
 
         mail_admins(

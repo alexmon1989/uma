@@ -9,7 +9,7 @@ from apps.search.models import IpcAppList
 import apps.search.services as search_services
 from apps.api.models import OpenData
 
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Set
 from datetime import datetime
 
 
@@ -243,6 +243,19 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
     return data_biblio
 
 
+def app_get_unique_subjects_from_data(data: dict) -> Set[str]:
+    """Возвращает множество с наименованиями субъектов, которые имеют отношение к заявке."""
+    res = set()
+    for person_type in ('applicant', 'inventor', 'owner', 'agent'):
+        try:
+            if data['search_data'].get(person_type):
+                for person in data['search_data'][person_type]:
+                    res.add(person['name'])
+        except KeyError:
+            pass
+    return res
+
+
 def opendata_prepare_filters(query_params: dict) -> dict:
     """Возвращает провалидированные значения фильтров."""
     res = {}
@@ -284,6 +297,12 @@ def opendata_prepare_filters(query_params: dict) -> dict:
     # Номер заявки
     if query_params.get('app_number'):
         res['app_number'] = query_params['app_number']
+
+    # Имя субъекта
+    if query_params.get('subject_name'):
+        if len(query_params['subject_name']) > 255:
+            raise exceptions.ParseError(f"Параметр subject_name має бути не більшим за 255 символів")
+        res['subject_name'] = query_params['subject_name']
 
     return res
 
@@ -328,7 +347,11 @@ def opendata_get_ids_queryset(filters: dict) -> QuerySet[OpenData]:
     if filters.get('app_number'):
         queryset = queryset.filter(app_number=filters['app_number'])
 
-    return queryset.values_list('id', flat=True)
+    # Имя субъекта
+    if filters.get('subject_name'):
+        queryset = queryset.filter(person__person_name__contains_ft=' AND '.join(filters['subject_name'].split()))
+
+    return queryset.distinct().values_list('id', flat=True)
 
 
 def opendata_get_applications(ids: List[int]) -> List[dict]:

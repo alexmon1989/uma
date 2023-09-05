@@ -1322,7 +1322,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
         obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
         obj_state = obj_states[h.search_data.obj_state - 1]
 
-        if is_app_limited(h.to_dict(), user):
+        if is_app_limited_for_user(h.to_dict(), user):
             # Если библиографические данные заявки не публикуются
             data.append([
                 obj_type,
@@ -2031,9 +2031,9 @@ def filter_app_data(app_data, user):
     return app_data
 
 
-def is_app_limited(app_data, user):
-    """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
-    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+def is_app_limited(app_data: dict):
+    """Является ли заявка такой, библиографические данные которой не должны публиковаться"""
+    if app_data['search_data']['obj_state'] == 1:
         if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
             return True
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
@@ -2042,13 +2042,7 @@ def is_app_limited(app_data, user):
             # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
             mark_status = get_fixed_mark_status_code(app_data)
             app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
-            if app_data['TradeMark']['TrademarkDetails'].get('Code_441'):
-                date_441 = datetime.datetime.strptime(
-                    app_data['TradeMark']['TrademarkDetails'].get('Code_441'),
-                    '%Y-%m-%d'
-                )
-            else:
-                date_441 = None
+            date_441 = app_data['TradeMark']['TrademarkDetails'].get('Code_441')
             date_441_start = datetime.datetime.strptime('2020-08-18', '%Y-%m-%d')
 
             # Условие, которое определяет установлена ли дата подачи заявки
@@ -2056,6 +2050,11 @@ def is_app_limited(app_data, user):
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             return True
     return False
+
+
+def is_app_limited_for_user(app_data, user):
+    """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
+    return is_app_limited(app_data) or user_has_access_to_docs(user, app_data)
 
 
 def get_ipc_codes_with_schedules(lang_code):
