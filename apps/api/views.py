@@ -1,12 +1,9 @@
 from django.http import Http404
 from rest_framework import generics, exceptions
-from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataDocsSerializer
+from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataSerializerNacpV1, OpenDataDocsSerializer
 from .models import OpenData
 from apps.search.models import ObjType
 from apps.api.services import services
-
-from django.utils.decorators import method_decorator
-
 import datetime
 
 
@@ -63,7 +60,12 @@ class OpenDataListView(generics.ListAPIView):
 
 
 class OpenDataListViewV1(generics.ListAPIView):
-    serializer_class = OpenDataSerializerV1
+
+    def get_serializer_class(self):
+        data_format = self.request.GET.get('biblio_format')
+        if data_format and data_format == 'nacp':
+            return OpenDataSerializerNacpV1
+        return OpenDataSerializerV1
 
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)

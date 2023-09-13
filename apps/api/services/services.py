@@ -8,9 +8,12 @@ from rest_framework import exceptions
 from apps.search.models import IpcAppList
 import apps.search.services as search_services
 from apps.api.models import OpenData
+from apps.bulletin import services as bulletin_services
 
 from typing import List, Optional, Union, Set
 from datetime import datetime
+from abc import ABC, abstractmethod
+import json
 
 
 def app_get_api_list(options: dict) -> List:
@@ -256,6 +259,19 @@ def app_get_unique_subjects_from_data(data: dict) -> Set[str]:
     return res
 
 
+def app_get_short_biblio(data: dict) -> dict:
+    app_get_short_biblio_tm(data)
+    return {}
+
+
+def app_get_short_biblio_tm(data: dict) -> dict:
+    return {}
+
+
+def app_get_short_biblio_id(data: dict) -> dict:
+    return {}
+
+
 def opendata_prepare_filters(query_params: dict) -> dict:
     """Возвращает провалидированные значения фильтров."""
     res = {}
@@ -372,3 +388,191 @@ def opendata_get_applications(ids: List[int]) -> List[dict]:
         'files_path',
     )
     return list(apps)
+
+
+class BiblioDataPresenter(ABC):
+    """Готовит библиографические данные к отображению в API."""
+    _application_data: dict
+
+    @property
+    def _files_dir(self) -> str:
+        """Возвращает путь к каталогу с файлами заявки."""
+        return self._application_data['files_path'].replace(
+            '\\\\bear\share\\', settings.MEDIA_URL
+        ).replace('\\', '/')
+
+    def set_application_data(self, application_data: dict):
+        self._application_data = application_data
+
+    @abstractmethod
+    def get_prepared_biblio(self) -> dict:
+        pass
+
+
+class BiblioDataFullPresenter(BiblioDataPresenter):
+    """Готовит полные библиографические данные к отображению в API."""
+    files_dir = None
+    _raw_biblio: dict
+    _prepare_methods: dict
+
+    def __init__(self):
+        self._prepare_methods = {
+            4: self._prepare_biblio_tm,
+            6: self._prepare_biblio_id,
+            10: self._prepare_biblio_copyright,
+            11: self._prepare_biblio_copyright,
+            12: self._prepare_biblio_copyright,
+            13: self._prepare_biblio_copyright,
+        }
+
+    def _prepare_biblio_tm(self) -> None:
+        """Готовит полные библиографические данные для ТМ."""
+        bulletin_date_until = datetime.strptime(
+            settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE,
+            '%d.%m.%Y'
+        )
+        # Fix случая когда приходил неверный номер бюлетня
+        if 'Code_441_BulNumber' in self._raw_biblio \
+                and 'Code_441' in self._raw_biblio \
+                and self._application_data['last_update'] < bulletin_date_until:
+            self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(
+                self._raw_biblio['Code_441']
+            )
+
+        # Полные пути к изображениям
+        try:
+            image_name = self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f"{self._files_dir}{image_name}"
+        except (KeyError, TypeError):
+            pass
+
+    def _prepare_biblio_id(self) -> None:
+        """Готовит полные библиографические данные для пром. образца."""
+        # Фильтрация библиографических данных
+        if 'DesignerDetails' in self._raw_biblio and 'Designer' in self._raw_biblio['DesignerDetails']:
+            for i, designer in enumerate(self._raw_biblio['DesignerDetails']['Designer']):
+                # Значение поля Publicated - признак того надо ли публиковать автора
+                if 'Publicated' in designer and not designer['Publicated']:
+                    del self._raw_biblio['DesignerDetails']['Designer'][i]
+
+        # Полные пути к изображениям
+        try:
+            images = self._raw_biblio['DesignSpecimenDetails'][0]['DesignSpecimen']
+            for image in images:
+                image['SpecimenFilename'] = f"{self._files_dir}{image['SpecimenFilename']}"
+        except (KeyError, TypeError):
+            pass
+
+    def _prepare_biblio_copyright(self):
+        """Готовит полные библиографические данные для авторского права."""
+        # Удаление DocBarCode
+        try:
+            doc_flow = self._raw_biblio['DocFlow']['Documents']
+            for doc in doc_flow:
+                del doc['DocRecord']['DocBarCode']
+        except (KeyError, TypeError):
+            pass
+
+    def get_prepared_biblio(self) -> dict:
+        self._raw_biblio = json.loads(self._application_data['data'])
+
+        # Подготовка данных в зависимости от типа объекта
+        if self._application_data['obj_type_id'] in self._prepare_methods:
+            self._prepare_methods[self._application_data['obj_type_id']]()
+
+        return self._raw_biblio
+
+
+class BiblioDataNacpPresenter(BiblioDataPresenter):
+    """Готовит библиографические данные к отображению в API (для НАЗК)."""
+    def __init__(self):
+        self._prepare_methods = {
+            1: self._prepare_biblio_id_um_ld,
+            2: self._prepare_biblio_id_um_ld,
+            3: self._prepare_biblio_id_um_ld,
+            4: self._prepare_biblio_tm,
+            5: self._prepare_biblio_geo,
+            6: self._prepare_biblio_id,
+            10: self._prepare_biblio_copyright,
+            11: self._prepare_biblio_agreement,
+            12: self._prepare_biblio_agreement,
+            13: self._prepare_biblio_copyright,
+        }
+
+    def _prepare_biblio_geo(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные длягеогр. зазначень"""
+        return {
+            'Indication': raw_biblio.get('Indication'),
+            'HolderDetails': raw_biblio.get('HolderDetails'),
+            'RepresentativeDetails': raw_biblio.get('RepresentativeDetails'),
+        }
+
+    def _prepare_biblio_copyright(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные для авт. права."""
+        return {
+            'Name': raw_biblio.get('Name'),
+            'AuthorDetails': raw_biblio.get('AuthorDetails'),
+        }
+
+    def _prepare_biblio_agreement(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные для договоров авт. права."""
+        return {
+            'Name': raw_biblio.get('Name'),
+            'AuthorDetails': raw_biblio.get('AuthorDetails'),
+            'LicensorDetails': raw_biblio.get('LicensorDetails'),
+            'LicenseeDetails': raw_biblio.get('LicenseeDetails'),
+        }
+
+    def _prepare_biblio_id_um_ld(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные для изобретений, полезных моделей, топографий."""
+        return {
+            'I_54': raw_biblio.get('I_54'),
+            'I_71': raw_biblio.get('I_71'),
+            'I_72': raw_biblio.get('I_72'),
+            'I_73': raw_biblio.get('I_73'),
+            'I_74': raw_biblio.get('I_74'),
+            'I_98': raw_biblio.get('I_98'),
+        }
+
+    def _prepare_biblio_tm(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные для ТМ."""
+        data = {
+            'ApplicantDetails': raw_biblio.get('ApplicantDetails'),
+            'HolderDetails': raw_biblio.get('HolderDetails'),
+            'RepresentativeDetails': raw_biblio.get('RepresentativeDetails'),
+            'CorrespondenceAddress': raw_biblio.get('CorrespondenceAddress'),
+            'MarkImageDetails': raw_biblio.get('MarkImageDetails'),
+            'WordMarkSpecification': raw_biblio.get('WordMarkSpecification'),
+        }
+
+        # Полные пути к изображениям
+        try:
+            image_name = data['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            data['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f"{self._files_dir}{image_name}"
+        except (KeyError, TypeError):
+            pass
+
+        return data
+
+    def _prepare_biblio_id(self, raw_biblio: dict) -> dict:
+        """Возвращает библиографические данные для пром. образца."""
+        data = {
+            'ApplicantDetails': raw_biblio.get('ApplicantDetails'),
+            'HolderDetails': raw_biblio.get('HolderDetails'),
+            'DesignerDetails': raw_biblio.get('DesignerDetails'),
+            'RepresentativeDetails': raw_biblio.get('RepresentativeDetails'),
+            'CorrespondenceAddress': raw_biblio.get('CorrespondenceAddress'),
+            'DesignTitle': raw_biblio.get('DesignTitle'),
+        }
+
+        if 'DesignerDetails' in data and 'Designer' in data['DesignerDetails']:
+            for i, designer in enumerate(data['DesignerDetails']['Designer']):
+                # Значение поля Publicated - признак того надо ли публиковать автора
+                if 'Publicated' in designer and not designer['Publicated']:
+                    del data['DesignerDetails']['Designer'][i]
+
+        return data
+
+    def get_prepared_biblio(self) -> dict:
+        raw_biblio = json.loads(self._application_data['data'])
+        return self._prepare_methods[self._application_data['obj_type_id']](raw_biblio)
