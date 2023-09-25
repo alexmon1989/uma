@@ -1322,9 +1322,15 @@ def prepare_data_for_search_report(s, lang_code, user=None):
         obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
         obj_state = obj_states[h.search_data.obj_state - 1]
 
-        print(is_app_limited_for_user(h.to_dict(), user))
+        nice_indexes = get_app_nice_indexes(h)
+
         if is_app_limited_for_user(h.to_dict(), user):
             # Если библиографические данные заявки не публикуются
+            if h.Document.idObjType == 4:
+                image = get_tm_image_path(h)
+            else:
+                image = ''
+
             data.append([
                 obj_type,
                 obj_state,
@@ -1338,7 +1344,10 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                 '',
                 '',
                 '',
+                nice_indexes,
                 '',
+                '',
+                image
             ])
         else:
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
@@ -1354,7 +1363,6 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             else:
                 agent = ''
             ipc_indexes = get_app_ipc_indexes(h)
-            nice_indexes = get_app_nice_indexes(h)
             icid = get_app_icid(h)
             if h.Document.idObjType in (4, 9, 14):
                 code_441 = get_441_code(h)
