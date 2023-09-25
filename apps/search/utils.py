@@ -1322,6 +1322,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
         obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
         obj_state = obj_states[h.search_data.obj_state - 1]
 
+        print(is_app_limited_for_user(h.to_dict(), user))
         if is_app_limited_for_user(h.to_dict(), user):
             # Если библиографические данные заявки не публикуются
             data.append([
@@ -2054,7 +2055,7 @@ def is_app_limited(app_data: dict):
 
 def is_app_limited_for_user(app_data, user):
     """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
-    return is_app_limited(app_data) or user_has_access_to_docs(user, app_data)
+    return is_app_limited(app_data) and not user_has_access_to_docs(user, app_data)
 
 
 def get_ipc_codes_with_schedules(lang_code):
