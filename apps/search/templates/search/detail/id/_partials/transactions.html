@@ -184,8 +184,15 @@
                                 <li>
                                     <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіара" %}:</span>
                                     <br>
-                                    {{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
-                                    <br>{{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% if transaction.TransactionBody.LicensorDetails.Licensor|is_list %}
+                                        {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
+                                            {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            <br>{{ licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                                        <br>{{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% endif %}
                                 </li>
                             {% endif %}
 
@@ -193,13 +200,27 @@
                                 <li>
                                     <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіата" %}:</span>
                                     <br>
-                                    {{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
-                                    <br>{{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% if transaction.TransactionBody.LicenseeDetails.Licensee|is_list %}
+                                        {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
+                                            {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            <br>{{ licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                                        <br>{{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% endif %}
                                 </li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.LicenceKind %}
-                                <li><span class="g-font-weight-600">{% trans 'Вид ліцензії' %}:</span> {{ transaction.TransactionBody.LicenceKind  }}</li>
+                                <li>
+                                    <span class="g-font-weight-600">{% trans 'Вид ліцензії' %}:</span>
+                                    {% if transaction.TransactionBody.LicenceKind == 'Exclusive' %}
+                                        {% trans 'Виключна' %}
+                                    {% elif transaction.TransactionBody.LicenceKind == 'Nonexclusive' %}
+                                        {% trans 'Невиключна' %}
+                                    {% endif %}
+                                </li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails.Decision.Number %}

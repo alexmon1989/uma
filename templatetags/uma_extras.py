@@ -4,6 +4,8 @@ from datetime import datetime
 import urllib.parse
 from apps.contacts.models import ContactsPage
 import json
+from typing import Any
+
 
 register = template.Library()
 
@@ -85,3 +87,8 @@ def footer_contacts(context):
 @register.simple_tag
 def json_to_dict(value):
     return json.loads(value)
+
+
+@register.filter
+def is_list(value: Any) -> bool:
+    return type(value) == list
