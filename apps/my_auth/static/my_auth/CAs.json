@@ -1,5 +1,4 @@
 [
-
       {
             "issuerCNs": [
                   "КНЕДП ДПС",
@@ -90,6 +89,7 @@
       },
       {
             "issuerCNs": [
+                  "КНЕДП АЦСК АТ КБ \"ПРИВАТБАНК\"",
                   "АЦСК АТ КБ «ПРИВАТБАНК»",
                   "АЦСК ПАТ КБ «ПРИВАТБАНК»",
                   "АЦСК «ПРИВАТБАНК»"
@@ -236,6 +236,19 @@
       },
       {
             "issuerCNs": [
+                  "КНЕДП Служби зовнішньої розвідки України",
+                  "QTSP of Foreign Intelligence Service of Ukraine"
+            ],
+            "address": "ca.szru.gov.ua",
+            "ocspAccessPointAddress": "ca.szru.gov.ua/services/ocsp/",
+            "ocspAccessPointPort": "80",
+            "cmpAddress": "ca.szru.gov.ua",
+            "tspAddress": "ca.szru.gov.ua",
+            "tspAddressPort": "80",
+            "directAccess": true
+      },
+      {
+            "issuerCNs": [
                   "АЦСК Національного банку України",
                   "National Bank of Ukraine Certificate authority ECDSA"
             ],
@@ -304,6 +317,7 @@
       },
       {
             "issuerCNs": [
+                  "КНЕДП АТ \"Ощадбанк\"",
                   "КНЕДП ЦСК АТ \"Ощадбанк\"",
                   "КНЕДП ЦСК АТ «Ощадбанк»",
                   "Акредитований центр сертифікації ключів АТ \"Ощадбанк\""
@@ -312,7 +326,7 @@
             "ocspAccessPointAddress": "ca.oschadbank.ua/public/ocsp",
             "ocspAccessPointPort": "80",
             "cmpAddress": "",
-            "tspAddress": "ca.oschadbank.ua/public/tsa",
+            "tspAddress": "ca.oschadbank.ua/public/tsp",
             "tspAddressPort": "80",
             "certsInKey": true,
             "cmpCompatibility": 0
@@ -402,5 +416,4 @@
             "certsInKey": true,
             "cmpCompatibility": 1
       }
-
 ]
