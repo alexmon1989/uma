@@ -191,55 +191,53 @@ class TMJsonSchemaTestCase(TestCase):
     def testExhibitionPriorityDetails(self) -> None:
         instance = {
             "data": {
-                "ExhibitionPriorityDetails": {
-                    "ExhibitionPriority": [
-                        {
-                            "ExhibitionCountryCode": "UA",
-                            "ExhibitionDate": "14.11.2001",
-                            "ExhibitionPartialIndicator": "true",
-                            "ExhibitionPartialGoodsServices": {
-                                "ClassDescriptionDetails": {
-                                    "ClassDescription": {
-                                        "ClassDescriptionDetails": {
-                                            "ClassDescription": [
-                                                {
-                                                    "ClassNumber": 32,
-                                                    "ClassificationTermDetails": {
-                                                        "ClassificationTerm": [
-                                                            {
-                                                                "ClassificationTermLanguageCode": "uk",
-                                                                "ClassificationTermText": "столові води (газовані)"
-                                                            },
-                                                            {
-                                                                "ClassificationTermLanguageCode": "uk",
-                                                                "ClassificationTermText": "столові води (негазовані)"
-                                                            }
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "ClassNumber": 33,
-                                                    "ClassificationTermDetails": {
-                                                        "ClassificationTerm": [
-                                                            {
-                                                                "ClassificationTermLanguageCode": "uk",
-                                                                "ClassificationTermText": "столові води (газовані)"
-                                                            },
-                                                            {
-                                                                "ClassificationTermLanguageCode": "uk",
-                                                                "ClassificationTermText": "столові води (негазовані)"
-                                                            }
-                                                        ]
-                                                    }
-                                                },
-                                            ]
-                                        }
+                "ExhibitionPriorityDetails": [
+                    {
+                        "ExhibitionCountryCode": "UA",
+                        "ExhibitionDate": "2001-11-14",
+                        "ExhibitionPartialIndicator": True,
+                        "ExhibitionPartialGoodsServices": {
+                            "ClassDescriptionDetails": {
+                                "ClassDescription": {
+                                    "ClassDescriptionDetails": {
+                                        "ClassDescription": [
+                                            {
+                                                "ClassNumber": 32,
+                                                "ClassificationTermDetails": {
+                                                    "ClassificationTerm": [
+                                                        {
+                                                            "ClassificationTermLanguageCode": "uk",
+                                                            "ClassificationTermText": "столові води (газовані)"
+                                                        },
+                                                        {
+                                                            "ClassificationTermLanguageCode": "uk",
+                                                            "ClassificationTermText": "столові води (негазовані)"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "ClassNumber": 33,
+                                                "ClassificationTermDetails": {
+                                                    "ClassificationTerm": [
+                                                        {
+                                                            "ClassificationTermLanguageCode": "uk",
+                                                            "ClassificationTermText": "столові води (газовані)"
+                                                        },
+                                                        {
+                                                            "ClassificationTermLanguageCode": "uk",
+                                                            "ClassificationTermText": "столові води (негазовані)"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                        ]
                                     }
                                 }
                             }
                         }
-                    ]
-                }
+                    }
+                ]
             }
         }
         validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
@@ -350,6 +348,16 @@ class TMJsonSchemaTestCase(TestCase):
                                 ]
                             }
                         },
+                        "MarkImageColourClaimedText": [
+                            {
+                                "@sequenceNumber": "1",
+                                "#text": "червоний"
+                            },
+                            {
+                                "@sequenceNumber": "2",
+                                "#text": " білий"
+                            }
+                        ],
                         "MarkImageFileFormat": "JPEG",
                         "MarkImageFilename": "/media/TRADE_MARKS/2021/m202105223/337843.jpeg"
                     }
@@ -368,7 +376,48 @@ class TMJsonSchemaTestCase(TestCase):
                             "PriorityCountryCode": "PL",
                             "PriorityNumber": "Z-343967",
                             "PriorityDate": "23.07.2008",
-                            "PriorityPartialIndicator": "false"
+                            "PriorityPartialIndicator": False
+                        }
+                    ]
+                }
+            }
+        }
+        validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+
+        instance = {
+            "data": {
+                "PriorityDetails": {
+                    "Priority": [
+                        {
+                            "PriorityNumber": "m 2018 18268",
+                            "PriorityDate": "03.08.2018",
+                            "PriorityPartialIndicator": "true",
+                            "PriorityPartialGoodsServices": {
+                                "ClassDescriptionDetails": {
+                                    "ClassDescription": {
+                                        "ClassDescriptionDetails": {
+                                            "ClassDescription": [
+                                                {
+                                                    "ClassNumber": 5,
+                                                    "ClassificationTermDetails": {
+                                                        "ClassificationTerm": [
+                                                            {
+                                                                "ClassificationTermLanguageCode": "uk",
+                                                                "ClassificationTermText": "Дієтичні харчові продукти і речовини, призначені для медичного використання"
+                                                            },
+                                                            {
+                                                                "ClassificationTermLanguageCode": "uk",
+                                                                "ClassificationTermText": "дієтичні добавки для людей"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            "PriorityCountryCode": "UA"
                         }
                     ]
                 }
@@ -383,6 +432,108 @@ class TMJsonSchemaTestCase(TestCase):
                     {
                         "PublicationDate": "2023-09-27",
                         "PublicationIdentifier": "39/2023"
+                    }
+                ]
+            }
+        }
+        validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+
+    def testRepresentativeDetails(self) -> None:
+        instance = {
+            "data": {
+                "RepresentativeDetails": {
+                    "Representative": [
+                        {
+                            "RepresentativeAddressBook": {
+                                "FormattedNameAddress": {
+                                    "Name": {
+                                        "FreeFormatName": {
+                                            "FreeFormatNameDetails": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Сердюк Олексій Володимирович"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "Address": {
+                                        "AddressCountryCode": "UA",
+                                        "FreeFormatAddress": {
+                                            "FreeFormatAddressLine": "*"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+
+    def testUssrApplicationDetails(self) -> None:
+        instance = {
+            "data": {
+                "UssrApplicationDetails": {
+                    "UssrApplication": {
+                        "UssrApplicationNumber": "93020247",
+                        "UssrApplicationDate": "1993-02-04"
+                    }
+                }
+            }
+        }
+        validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+
+    def testWordMarkSpecification(self) -> None:
+        instance = {
+            "data": {
+                "WordMarkSpecification": {
+                    "MarkSignificantVerbalElement": [
+                        {
+                            "#text": "georgian legion",
+                            "@sequenceNumber": "1"
+                        },
+                        {
+                            "#text": "georgian",
+                            "@sequenceNumber": "2"
+                        },
+                        {
+                            "#text": "legion",
+                            "@sequenceNumber": "3"
+                        }
+                    ]
+
+                }
+            }
+        }
+        validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+
+    def testStages(self) -> None:
+        instance = {
+            "data": {
+                "stages": [
+                    {
+                        "title": "Торговельну марку зареєстровано",
+                        "status": "done"
+                    },
+                    {
+                        "title": "Підготовка до державної реєстрації та публікації",
+                        "status": "done"
+                    },
+                    {
+                        "title": "Кваліфікаційна експертиза",
+                        "status": "done"
+                    },
+                    {
+                        "title": "Формальна експертиза",
+                        "status": "done"
+                    },
+                    {
+                        "title": "Встановлення дати подання",
+                        "status": "done"
+                    },
+                    {
+                        "title": "Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних",
+                        "status": "done"
                     }
                 ]
             }

@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://sis.nipo.gov.ua/api/v1/open-data/trademark.schema.json",
   "title": "Trademark",
   "description": "Trademark data from the SIS API",
   "type": "object",
@@ -18,14 +17,14 @@
       "type": "string"
     },
     "app_date": {
-      "type": "string",
+      "type":  ["string", "null"],
       "format": "date-time"
     },
     "registration_number": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "registration_date": {
-      "type": "string",
+      "type":  ["string", "null"],
       "format": "date-time"
     },
     "last_update": {
@@ -43,53 +42,58 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "FormattedNameAddress": {
+                  "ApplicantAddressBook": {
                     "type": "object",
                     "properties": {
-                      "Address": {
+                      "FormattedNameAddress": {
                         "type": "object",
                         "properties": {
-                          "AddressCountryCode": {
-                            "type": "string"
-                          },
-                          "FreeFormatAddress": {
+                          "Address": {
                             "type": "object",
                             "properties": {
-                              "FreeFormatAddressLine": {
+                              "AddressCountryCode": {
                                 "type": "string"
                               },
-                              "FreeFormatAddressLineOriginal": {
-                                "type": "string"
-                              },
-                              "FreeFormatNameLineOriginal": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "Name": {
-                        "type": "object",
-                        "properties": {
-                          "FreeFormatName": {
-                            "type": "object",
-                            "properties": {
-                              "EDRPOU": {
-                                "type": "string"
-                              },
-                              "FreeFormatNameDetails": {
+                              "FreeFormatAddress": {
                                 "type": "object",
                                 "properties": {
-                                  "FreeFormatNameLine": {
+                                  "FreeFormatAddressLine": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
                                     "type": "string"
                                   },
                                   "FreeFormatNameLineOriginal": {
                                     "type": "string"
                                   }
                                 }
-                              },
-                              "NameKind": {
-                                "type": "string"
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "EDRPOU": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "type": "string"
+                                      },
+                                      "FreeFormatNameLineOriginal": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "type": "string"
+                                  }
+                                }
                               }
                             }
                           }
@@ -98,7 +102,7 @@
                     }
                   },
                   "ApplicantSequenceNumber": {
-                    "type": "integer"
+                    "type": ["integer", "string"]
                   }
                 }
               }
@@ -189,7 +193,7 @@
           "format": "date"
         },
         "Code_441_BulNumber": {
-          "type": "string"
+          "type": ["string", "integer"]
         },
         "CorrespondenceAddress": {
           "type": "object",
@@ -227,64 +231,53 @@
           "type": "string"
         },
         "ExhibitionPriorityDetails": {
-          "type": "object",
-          "properties": {
-            "ExhibitionCountryCode": {
-              "type": "string"
-            },
-            "ExhibitionDate": {
-              "type": "string",
-              "format": "date"
-            },
-            "ExhibitionPartialIndicator": {
-              "type": "boolean"
-            },
-            "ExhibitionPriority": {
-              "type": "array",
-              "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ExhibitionCountryCode": {
+                "type": "string"
+              },
+              "ExhibitionDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "ExhibitionPartialIndicator": {
+                "type": ["boolean", "string"]
+              },
+              "ExhibitionPartialGoodsServices": {
                 "type": "object",
                 "properties": {
-                  "ExhibitionCountryCode": {
-                    "type": "string"
-                  },
-                  "ExhibitionDate": {
-                    "type": "string"
-                  },
-                  "ExhibitionPartialGoodsServices": {
+                  "ClassDescriptionDetails": {
                     "type": "object",
                     "properties": {
-                      "ClassDescriptionDetails": {
+                      "ClassDescription": {
                         "type": "object",
                         "properties": {
-                          "ClassDescription": {
+                          "ClassDescriptionDetails": {
                             "type": "object",
                             "properties": {
-                              "ClassDescriptionDetails": {
-                                "type": "object",
-                                "properties": {
-                                  "ClassDescription": {
-                                    "type": "array",
-                                    "items": {
+                              "ClassDescription": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "ClassNumber": {
+                                      "type": "integer"
+                                    },
+                                    "ClassificationTermDetails": {
                                       "type": "object",
                                       "properties": {
-                                        "ClassNumber": {
-                                          "type": "integer"
-                                        },
-                                        "ClassificationTermDetails": {
-                                          "type": "object",
-                                          "properties": {
-                                            "ClassificationTerm": {
-                                              "type": "array",
-                                              "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                  "ClassificationTermLanguageCode": {
-                                                    "type": "string"
-                                                  },
-                                                  "ClassificationTermText": {
-                                                    "type": "string"
-                                                  }
-                                                }
+                                        "ClassificationTerm": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "ClassificationTermLanguageCode": {
+                                                "type": "string"
+                                              },
+                                              "ClassificationTermText": {
+                                                "type": "string"
                                               }
                                             }
                                           }
@@ -299,9 +292,6 @@
                         }
                       }
                     }
-                  },
-                  "ExhibitionPartialIndicator": {
-                    "type": "string"
                   }
                 }
               }
@@ -309,7 +299,7 @@
           }
         },
         "GoodsServicesDetails": {
-          "type": "object",
+          "type": ["object", "null"],
           "properties": {
             "GoodsServices": {
               "type": "object",
@@ -323,7 +313,7 @@
                         "type": "object",
                         "properties": {
                           "ClassNumber": {
-                            "type": "string"
+                            "type": ["string", "integer"]
                           },
                           "ClassificationTermDetails": {
                             "type": "object",
@@ -424,7 +414,7 @@
                     }
                   },
                   "HolderSequenceNumber": {
-                    "type": "integer"
+                    "type": ["integer", "string"]
                   }
                 }
               }
@@ -452,7 +442,7 @@
                         "CategoryCode": {
                           "type": "array",
                           "items": {
-                            "type": "string"
+                            "type": ["string", "null"]
                           }
                         }
                       }
@@ -460,13 +450,16 @@
                   }
                 },
                 "MarkImageColourClaimedText": {
-                  "type": "object",
-                  "properties": {
-                    "#text": {
-                      "type": "string"
-                    },
-                    "@sequenceNumber": {
-                      "type": "integer"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "#text": {
+                        "type": "string"
+                      },
+                      "@sequenceNumber": {
+                        "type": ["integer", "string"]
+                      }
                     }
                   }
                 },
@@ -491,7 +484,7 @@
                         "type": "object",
                         "properties": {
                           "Height": {
-                            "type": "integer"
+                            "type": ["integer", "string"]
                           },
                           "Resolution": {
                             "type": "integer"
@@ -503,7 +496,7 @@
                             "type": "string"
                           },
                           "Width": {
-                            "type": "integer"
+                            "type":  ["integer", "string"]
                           }
                         }
                       }
@@ -547,22 +540,28 @@
                                 "type": "object",
                                 "properties": {
                                   "ClassDescription": {
-                                    "type": "object",
-                                    "properties": {
-                                      "ClassNumber": {
-                                        "type": "integer"
-                                      },
-                                      "ClassificationTermDetails": {
-                                        "type": "object",
-                                        "properties": {
-                                          "ClassificationTerm": {
-                                            "type": "object",
-                                            "properties": {
-                                              "ClassificationTermLanguageCode": {
-                                                "type": "string"
-                                              },
-                                              "ClassificationTermText": {
-                                                "type": "string"
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "ClassNumber": {
+                                          "type": "integer"
+                                        },
+                                        "ClassificationTermDetails": {
+                                          "type": "object",
+                                          "properties": {
+                                            "ClassificationTerm": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "ClassificationTermLanguageCode": {
+                                                    "type": "string"
+                                                  },
+                                                  "ClassificationTermText": {
+                                                    "type": "string"
+                                                  }
+                                                }
                                               }
                                             }
                                           }
@@ -579,7 +578,7 @@
                     }
                   },
                   "PriorityPartialIndicator": {
-                    "type": "string"
+                    "type": ["boolean", "string"]
                   }
                 }
               }
@@ -595,31 +594,182 @@
           "format": "date"
         },
         "PublicationDetails": {
+          "type": ["array", "object"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "PublicationDate": {
+                "type": "string"
+              },
+              "PublicationIdentifier": {
+                "type": "string"
+              },
+              "PublicationSection": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "RegistrationDate" : {
+          "type": "string",
+          "format": "date"
+        },
+        "RegistrationNumber": {
+          "type": "string"
+        },
+        "RegistrationOfficeCode": {
+          "type": "string"
+        },
+        "RepresentativeDetails": {
           "type": "object",
           "properties": {
-            "Publication": {
-              "type": "object",
+            "Representative": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "RepresentativeAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameDetails": {
+                                        "type": "object",
+                                        "properties": {
+                                          "FreeFormatNameLine": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "TerminationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "UssrApplicationDetails": {
+          "type": "object",
+          "properties": {
+            "UssrApplication": {
               "properties": {
-                "PublicationDate": {
-                  "type": "string"
+                "UssrApplicationDate": {
+                  "type": "string",
+                  "format": "date"
                 },
-                "PublicationIdentifier": {
-                  "type": "string"
-                },
-                "PublicationSection": {
+                "UssrApplicationNumber": {
                   "type": "string"
                 }
               }
-            },
-            "PublicationDate": {
-              "type": "string",
-              "format": "date"
-            },
-            "PublicationIdentifier": {
-              "type": "string"
-            },
-            "PublicationSection": {
-              "type": "string"
+            }
+          }
+        },
+        "UssrRegistrationNumber": {
+          "type": "string"
+        },
+        "WordMarkSpecification": {
+          "type": ["object", "null"],
+          "properties": {
+            "MarkSignificantVerbalElement": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "#text": {
+                    "type": "string"
+                  },
+                  "@sequenceNumber": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "application_status": {
+          "type": "string"
+        },
+        "registration_status_color": {
+          "type": "string"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_docs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "DocRecord": {
+            "type": "object",
+            "properties": {
+              "DocDirection": {
+                "type": "string"
+              },
+              "DocRegNumber": {
+                "type": "string"
+              },
+              "DocIdDocCEAD": {
+                "type": ["integer", "string"]
+              },
+              "DocRegDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "DocType": {
+                "type": "string"
+              }
             }
           }
         }

@@ -191,9 +191,9 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
             app_date = app_data['TradeMark']['TrademarkDetails'].get('ApplicationDate')
             mark_status = search_services.application_get_tm_fixed_mark_status_code(app_data)
             # Если заявка до 18.07.2020 - проверяется MarkCurrentStatusCodeType
-            if app_date \
-                    and datetime.strptime(app_date[:10], '%Y-%m-%d') < datetime.strptime('2020-07-18', '%Y-%m-%d') \
-                    and mark_status >= 2000:
+            if (app_date
+                and datetime.strptime(app_date[:10], '%Y-%m-%d') < datetime.strptime('2020-07-18', '%Y-%m-%d')
+                and mark_status >= 2000) or mark_status >= 3000:
                 # Публикуется вся библиография
                 data_biblio = app_data['TradeMark']['TrademarkDetails']
             else:

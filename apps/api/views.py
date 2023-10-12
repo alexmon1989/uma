@@ -1,10 +1,14 @@
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.conf import settings
+from django.views.decorators.cache import cache_page
 from rest_framework import generics, exceptions
 from .serializers import OpenDataSerializer, OpenDataSerializerV1, OpenDataSerializerNacpV1, OpenDataDocsSerializer
 from .models import OpenData
 from apps.search.models import ObjType
 from apps.api.services import services
 import datetime
+import os
+import json
 
 
 class OpenDataListView(generics.ListAPIView):
@@ -209,3 +213,14 @@ class SearchListView(generics.ListAPIView):
 
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
+
+
+@cache_page(60 * 15)
+def json_schema(request, obj_type: str):
+    """Отображает JSON Schema."""
+    try:
+        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', f'{obj_type}.json')) as f:
+            schema = json.load(f)
+    except FileNotFoundError:
+        raise Http404
+    return JsonResponse(schema)
