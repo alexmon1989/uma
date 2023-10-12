@@ -774,6 +774,44 @@
           }
         }
       }
+    },
+    "data_payments": {
+      "properties": {
+        "Payment": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Comment": {
+                "type": "string"
+              },
+              "PaymentDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "PaymentIdentifier": {
+                "type": "string"
+              },
+              "PaymentFeeDetails": {
+                "type": "object",
+                "properties": {
+                  "FeeAmount": {
+                    "type": "object",
+                    "properties": {
+                      "Amount": {
+                        "type": ["string", "number"]
+                      },
+                      "@currencyCode": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
