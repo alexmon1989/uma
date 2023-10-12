@@ -1,0 +1,165 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Винаходи, корисні моделі, топографії інтегральних мікросхем",
+  "description": "Опис даних API СІС",
+  "type": "object",
+  "properties": {
+    "obj_type": {
+      "type": "string",
+      "description": "Тип об'єкта промислової власності"
+    },
+    "obj_type_id": {
+      "type": "integer",
+      "description": "Ідентифікатор об’єкта промислової власності"
+    },
+    "obj_state": {
+      "type": "integer",
+      "description": "Ідентифікатор стану об’єкта промислової власності (1 - заявка, 2 - охоронний документ)"
+    },
+    "app_number": {
+      "type": "string",
+      "description": "Номер заявки"
+    },
+    "app_date": {
+      "type":  ["string", "null"],
+      "format": "date-time",
+      "description": "Дата подання заявки"
+    },
+    "registration_number": {
+      "type": ["string", "null"],
+      "description": "Номер охоронного документа"
+    },
+    "registration_date": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Дата видачі охоронного документа"
+    },
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата останньої зміни запису"
+    },
+    "data": {
+      "description": "Бібліографічні дані",
+      "type": "object",
+      "properties": {
+        "I_54": {
+          "description": "Назва об`єкта",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "I_54.U": {
+                "description": "Назва об`єкта українською мовою",
+                "type": "string"
+              },
+              "I_54.R": {
+                "description": "Назва об`єкта російською мовою",
+                "type": "string"
+              },
+              "I_54.E": {
+                "description": "Назва об`єкта англійською мовою",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "I_71": {
+          "description": "Дані щодо заявника(ів)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "I_71.N.U": {
+                "description": "Найменування заявника українською мовою",
+                "type": "string"
+              },
+              "I_71.C.U": {
+                "description": "Код країни заявника",
+                "type": "string"
+              },
+              "I_71.N.R": {
+                "description": "Найменування заявника російською мовою",
+                "type": "string"
+              },
+              "I_71.C.R": {
+                "description": "Код країни заявника",
+                "type": "string"
+              },
+              "I_71.N.E": {
+                "description": "Найменування заявника англійською мовою",
+                "type": "string"
+              },
+              "I_71.C.E": {
+                "description": "Код країни заявника",
+                "type": "string"
+              },
+              "EDRPOU": {
+                "description": "ЄДРПОУ",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "I_72": {
+          "description": "Дані щодо винахідника(ів)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "I_72.N.U": {
+                "description": "Найменування винахідника українською мовою",
+                "type": "string"
+              },
+              "I_72.C.U": {
+                "description": "Код країни винахідника",
+                "type": "string"
+              },
+              "I_72.N.R": {
+                "description": "Найменування винахідника російською мовою",
+                "type": "string"
+              },
+              "I_72.C.R": {
+                "description": "Код винахідника заявника",
+                "type": "string"
+              },
+              "I_72.N.E": {
+                "description": "Найменування винахідника англійською мовою",
+                "type": "string"
+              },
+              "I_72.C.E": {
+                "description": "Код країни винахідника",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "I_73": {
+          "description": "Дані щодо власника(ів)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "I_73.N": {
+                "description": "Найменування власника",
+                "type": "string"
+              },
+              "I_73.C": {
+                "description": "Код країни власника",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "I_74": {
+          "description": "Дані щодо представника",
+          "type": "string"
+        },
+        "I_98": {
+          "description": "Адреса для листування",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

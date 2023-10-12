@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sis.nipo.gov.ua/api/v1/open-data/geo.nacp.schema.json",
+  "title": "Географічні зазначення",
+  "description": "Опис даних API СІС",
+  "type": "object",
+  "properties": {
+    "obj_type": {
+      "type": "string",
+      "description": "Тип об'єкта промислової власності"
+    },
+    "obj_type_id": {
+      "type": "integer",
+      "description": "Ідентифікатор об’єкта промислової власності"
+    },
+    "obj_state": {
+      "type": "integer",
+      "description": "Ідентифікатор стану об’єкта промислової власності (1 - заявка, 2 - охоронний документ)"
+    },
+    "app_number": {
+      "type": "string",
+      "description": "Номер заявки"
+    },
+    "app_date": {
+      "type":  ["string", "null"],
+      "format": "date-time",
+      "description": "Дата подання заявки"
+    },
+    "registration_number": {
+      "type": ["string", "null"],
+      "description": "Номер охоронного документа"
+    },
+    "registration_date": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Дата видачі охоронного документа"
+    },
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата останньої зміни запису"
+    },
+    "data": {
+      "description": "Бібліографічні дані",
+      "type": "object",
+      "properties": {
+        "Indication": {
+          "description": "географічне зазначення (назва)"
+        },
+        "HolderDetails": {
+          "description": "власник"
+        },
+        "RepresentativeDetails": {
+          "description": "представник"
+        }
+      }
+    }
+  }
+}

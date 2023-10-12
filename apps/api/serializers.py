@@ -26,9 +26,13 @@ class OpenDataSerializer(serializers.ModelSerializer):
                 ret['data_docs'] = search_services.application_filter_documents_im_um_ld(ret['data'], ret['data_docs'])
             elif instance['obj_type_id'] in (4, 6):
                 ret['data_docs'] = search_services.application_filter_documents_tm_id(ret['data_docs'])
+        else:
+            ret['data_docs'] = []
 
         if ret['data_payments']:
             ret['data_payments'] = json.loads(ret['data_payments'])
+        else:
+            ret['data_payments'] = []
 
         return ret
 
