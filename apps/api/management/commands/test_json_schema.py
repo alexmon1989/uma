@@ -13,11 +13,11 @@ class Command(BaseCommand):
     schema: dict = None
 
     def handle(self, *args, **options):
-        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'trademark.json')) as f:
+        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'cr_agr_nacp.json')) as f:
             self.schema = json.load(f)
 
         apps = OpenData.objects.filter(
-            obj_type_id__in=(4,)
+            obj_type_id__in=(11,12)
         ).select_related(
             'obj_type'
         ).order_by(

@@ -19,6 +19,8 @@ class OpenDataSerializer(serializers.ModelSerializer):
             biblio_data_presenter = api_services.BiblioDataFullPresenter()
             biblio_data_presenter.set_application_data(instance)
             ret['data'] = biblio_data_presenter.get_prepared_biblio()
+        else:
+            ret['data'] = {}
 
         if ret['data_docs'] and ret['data_docs'] != 'null':
             ret['data_docs'] = json.loads(ret['data_docs'])

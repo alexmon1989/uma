@@ -147,6 +147,10 @@
               "I_73.C": {
                 "description": "Код країни власника",
                 "type": "string"
+              },
+              "EDRPOU": {
+                "description": "ЄДРПОУ",
+                "type": "string"
               }
             }
           }

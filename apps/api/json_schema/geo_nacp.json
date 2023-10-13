@@ -45,13 +45,172 @@
       "type": "object",
       "properties": {
         "Indication": {
-          "description": "географічне зазначення (назва)"
+          "description": "Географічне зазначення (назва)",
+          "type": "string"
         },
         "HolderDetails": {
-          "description": "власник"
+          "description": "Дані щодо власника охоронного документа",
+          "type": "object",
+          "properties": {
+            "Holder": {
+              "description": "Список власників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "HolderAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування власника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса власника",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "AddressLine": {
+                                    "description": "Адреса власника",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування власника",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Адреса власника",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "HolderSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку власників",
+                    "type": ["integer", "string"]
+                  }
+                }
+              }
+            }
+          }
         },
         "RepresentativeDetails": {
-          "description": "представник"
+          "description": "Дані щодо представника",
+          "type": "object",
+          "properties": {
+            "Representative": {
+              "description": "Список представників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "RepresentativeAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо найменування та адреси представника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси представника",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса представника",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "AddressLine": {
+                                    "description": "Адреса представника",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування представника",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування представника",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "RepresentativeSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку представників",
+                    "type": ["string", "integer"]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

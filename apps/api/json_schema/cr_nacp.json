@@ -45,10 +45,90 @@
       "type": "object",
       "properties": {
         "Name": {
-          "description": "назва"
+          "description": "Назва",
+          "type": "string"
         },
         "AuthorDetails": {
-          "description": "автор"
+          "description": "Дані щодо автора",
+          "type": "object",
+          "properties": {
+            "Author": {
+              "description": "Список авторів",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "AuthorAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування суб'єкта",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси суб'єкта",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "description": "Дані щодо адреси найменування суб'єкта",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування суб'єкта",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "RepresentNameFormDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "RepresentNameForm": {
+                                        "description": "Найменування суб'єкта",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "AuthorSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку авторів",
+                    "type": ["number", "string"]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
