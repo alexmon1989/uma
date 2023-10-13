@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://sis.nipo.gov.ua/api/v1/open-data/cr_agr.nacp.schema.json",
   "title": "Договори про передачу права",
   "description": "Опис даних API СІС",
   "type": "object",
