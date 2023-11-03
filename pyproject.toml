@@ -29,6 +29,7 @@ urllib3 = "^1.26.9"
 django-bootstrap4 = "^22.1"
 redis = "^4.5.1"
 psycopg2 = "^2.9.6"
+jsonschema = {extras = ["format"], version = "^4.19.1"}
 
 [tool.poetry.dev-dependencies]
 

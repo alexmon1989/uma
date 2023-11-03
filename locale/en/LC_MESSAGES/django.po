@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 14:20+0300\n"
+"POT-Creation-Date: 2023-09-27 13:00+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -119,6 +119,7 @@ msgstr "Home"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:723
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:767
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:788
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:809
 #: templates/_partials/footer.html:55 templates/_partials/header.html:87
 msgid "Бюлетень"
 msgstr "Bulletin"
@@ -177,7 +178,7 @@ msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:399
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:426
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:142
 msgid "Показати"
 msgstr "Show"
@@ -197,10 +198,10 @@ msgstr "Expected expiration date of the patent"
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/id.html:120
 #: apps/search/templates/search/detail/id/_partials/transactions.html:25
 #: apps/search/templates/search/detail/id/_partials/transactions.html:126
-#: apps/search/templates/search/detail/id/_partials/transactions.html:289
-#: apps/search/templates/search/detail/id/_partials/transactions.html:392
-#: apps/search/templates/search/detail/id/_partials/transactions.html:410
-#: apps/search/templates/search/detail/id/_partials/transactions.html:518
+#: apps/search/templates/search/detail/id/_partials/transactions.html:310
+#: apps/search/templates/search/detail/id/_partials/transactions.html:413
+#: apps/search/templates/search/detail/id/_partials/transactions.html:431
+#: apps/search/templates/search/detail/id/_partials/transactions.html:539
 msgid "Дата припинення дії патенту"
 msgstr "Date of termination of the patent"
 
@@ -216,7 +217,7 @@ msgstr "Name or full name and address of the successor of the certificate"
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/id.html:151
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:151
 #: apps/search/templates/search/detail/id/_partials/transactions.html:65
-#: apps/search/templates/search/detail/id/_partials/transactions.html:206
+#: apps/search/templates/search/detail/id/_partials/transactions.html:227
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:329
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:369
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:413
@@ -279,10 +280,10 @@ msgstr "Date from which the certificate is considered invalid"
 
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:293
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:329
-#: apps/search/templates/search/detail/id/_partials/transactions.html:267
-#: apps/search/templates/search/detail/id/_partials/transactions.html:374
-#: apps/search/templates/search/detail/id/_partials/transactions.html:432
-#: apps/search/templates/search/detail/id/_partials/transactions.html:475
+#: apps/search/templates/search/detail/id/_partials/transactions.html:288
+#: apps/search/templates/search/detail/id/_partials/transactions.html:395
+#: apps/search/templates/search/detail/id/_partials/transactions.html:453
+#: apps/search/templates/search/detail/id/_partials/transactions.html:496
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:179
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:263
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:475
@@ -667,21 +668,21 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/id/_partials/transactions.html:122
 #: apps/search/templates/search/detail/id/_partials/transactions.html:140
 #: apps/search/templates/search/detail/id/_partials/transactions.html:180
-#: apps/search/templates/search/detail/id/_partials/transactions.html:220
-#: apps/search/templates/search/detail/id/_partials/transactions.html:234
-#: apps/search/templates/search/detail/id/_partials/transactions.html:263
-#: apps/search/templates/search/detail/id/_partials/transactions.html:285
-#: apps/search/templates/search/detail/id/_partials/transactions.html:303
+#: apps/search/templates/search/detail/id/_partials/transactions.html:241
+#: apps/search/templates/search/detail/id/_partials/transactions.html:255
+#: apps/search/templates/search/detail/id/_partials/transactions.html:284
+#: apps/search/templates/search/detail/id/_partials/transactions.html:306
 #: apps/search/templates/search/detail/id/_partials/transactions.html:324
-#: apps/search/templates/search/detail/id/_partials/transactions.html:338
+#: apps/search/templates/search/detail/id/_partials/transactions.html:345
 #: apps/search/templates/search/detail/id/_partials/transactions.html:359
-#: apps/search/templates/search/detail/id/_partials/transactions.html:388
-#: apps/search/templates/search/detail/id/_partials/transactions.html:406
-#: apps/search/templates/search/detail/id/_partials/transactions.html:424
-#: apps/search/templates/search/detail/id/_partials/transactions.html:446
-#: apps/search/templates/search/detail/id/_partials/transactions.html:471
-#: apps/search/templates/search/detail/id/_partials/transactions.html:489
-#: apps/search/templates/search/detail/id/_partials/transactions.html:514
+#: apps/search/templates/search/detail/id/_partials/transactions.html:380
+#: apps/search/templates/search/detail/id/_partials/transactions.html:409
+#: apps/search/templates/search/detail/id/_partials/transactions.html:427
+#: apps/search/templates/search/detail/id/_partials/transactions.html:445
+#: apps/search/templates/search/detail/id/_partials/transactions.html:467
+#: apps/search/templates/search/detail/id/_partials/transactions.html:492
+#: apps/search/templates/search/detail/id/_partials/transactions.html:510
+#: apps/search/templates/search/detail/id/_partials/transactions.html:535
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:21
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:39
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:61
@@ -735,7 +736,8 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:775
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:796
-#: apps/search/utils.py:1259
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:817
+#: apps/search/utils.py:1260
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -763,14 +765,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:69
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1317
+#: apps/search/utils.py:1318
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
 #: apps/search/templates/search/simple/_partials/sidebar.html:55
-#: apps/search/utils.py:1317
+#: apps/search/utils.py:1318
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -856,13 +858,13 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1227
+#: apps/search/services/services.py:1254
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1229
+#: apps/search/services/services.py:1256
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -1010,7 +1012,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:62
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
-#: apps/search/utils.py:1260
+#: apps/search/utils.py:1261
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1053,7 +1055,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:113
-#: apps/search/utils.py:1270
+#: apps/search/utils.py:1271
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1088,7 +1090,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
-#: apps/search/utils.py:1268
+#: apps/search/utils.py:1269
 msgid "МПК"
 msgstr "IPC"
 
@@ -1104,21 +1106,21 @@ msgstr "Full list of IPC indexes"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:118
 #: apps/search/templates/search/detail/id/_partials/transactions.html:136
 #: apps/search/templates/search/detail/id/_partials/transactions.html:176
-#: apps/search/templates/search/detail/id/_partials/transactions.html:216
-#: apps/search/templates/search/detail/id/_partials/transactions.html:230
-#: apps/search/templates/search/detail/id/_partials/transactions.html:259
-#: apps/search/templates/search/detail/id/_partials/transactions.html:281
-#: apps/search/templates/search/detail/id/_partials/transactions.html:299
+#: apps/search/templates/search/detail/id/_partials/transactions.html:237
+#: apps/search/templates/search/detail/id/_partials/transactions.html:251
+#: apps/search/templates/search/detail/id/_partials/transactions.html:280
+#: apps/search/templates/search/detail/id/_partials/transactions.html:302
 #: apps/search/templates/search/detail/id/_partials/transactions.html:320
-#: apps/search/templates/search/detail/id/_partials/transactions.html:334
+#: apps/search/templates/search/detail/id/_partials/transactions.html:341
 #: apps/search/templates/search/detail/id/_partials/transactions.html:355
-#: apps/search/templates/search/detail/id/_partials/transactions.html:384
-#: apps/search/templates/search/detail/id/_partials/transactions.html:402
-#: apps/search/templates/search/detail/id/_partials/transactions.html:420
-#: apps/search/templates/search/detail/id/_partials/transactions.html:442
-#: apps/search/templates/search/detail/id/_partials/transactions.html:467
-#: apps/search/templates/search/detail/id/_partials/transactions.html:485
-#: apps/search/templates/search/detail/id/_partials/transactions.html:510
+#: apps/search/templates/search/detail/id/_partials/transactions.html:376
+#: apps/search/templates/search/detail/id/_partials/transactions.html:405
+#: apps/search/templates/search/detail/id/_partials/transactions.html:423
+#: apps/search/templates/search/detail/id/_partials/transactions.html:441
+#: apps/search/templates/search/detail/id/_partials/transactions.html:463
+#: apps/search/templates/search/detail/id/_partials/transactions.html:488
+#: apps/search/templates/search/detail/id/_partials/transactions.html:506
+#: apps/search/templates/search/detail/id/_partials/transactions.html:531
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:413
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:427
 msgid "Номер патенту"
@@ -1174,6 +1176,7 @@ msgstr "Certificate of Ukraine on topography (layout) of IC"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:727
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:771
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:792
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:813
 msgid "Номер свідоцтва"
 msgstr "Certificate number"
 
@@ -1300,7 +1303,7 @@ msgstr ""
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
-#: apps/search/utils.py:1269
+#: apps/search/utils.py:1270
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1548,21 +1551,21 @@ msgstr "There are no credited payments"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:132
 #: apps/search/templates/search/detail/id/_partials/transactions.html:145
 #: apps/search/templates/search/detail/id/_partials/transactions.html:172
-#: apps/search/templates/search/detail/id/_partials/transactions.html:212
-#: apps/search/templates/search/detail/id/_partials/transactions.html:226
-#: apps/search/templates/search/detail/id/_partials/transactions.html:255
-#: apps/search/templates/search/detail/id/_partials/transactions.html:277
-#: apps/search/templates/search/detail/id/_partials/transactions.html:295
+#: apps/search/templates/search/detail/id/_partials/transactions.html:233
+#: apps/search/templates/search/detail/id/_partials/transactions.html:247
+#: apps/search/templates/search/detail/id/_partials/transactions.html:276
+#: apps/search/templates/search/detail/id/_partials/transactions.html:298
 #: apps/search/templates/search/detail/id/_partials/transactions.html:316
-#: apps/search/templates/search/detail/id/_partials/transactions.html:330
+#: apps/search/templates/search/detail/id/_partials/transactions.html:337
 #: apps/search/templates/search/detail/id/_partials/transactions.html:351
-#: apps/search/templates/search/detail/id/_partials/transactions.html:380
-#: apps/search/templates/search/detail/id/_partials/transactions.html:398
-#: apps/search/templates/search/detail/id/_partials/transactions.html:416
-#: apps/search/templates/search/detail/id/_partials/transactions.html:438
-#: apps/search/templates/search/detail/id/_partials/transactions.html:463
-#: apps/search/templates/search/detail/id/_partials/transactions.html:481
-#: apps/search/templates/search/detail/id/_partials/transactions.html:506
+#: apps/search/templates/search/detail/id/_partials/transactions.html:372
+#: apps/search/templates/search/detail/id/_partials/transactions.html:401
+#: apps/search/templates/search/detail/id/_partials/transactions.html:419
+#: apps/search/templates/search/detail/id/_partials/transactions.html:437
+#: apps/search/templates/search/detail/id/_partials/transactions.html:459
+#: apps/search/templates/search/detail/id/_partials/transactions.html:484
+#: apps/search/templates/search/detail/id/_partials/transactions.html:502
+#: apps/search/templates/search/detail/id/_partials/transactions.html:527
 #: apps/search/templates/search/detail/qi/_partials/transactions.html:11
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:497
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:780
@@ -1574,7 +1577,7 @@ msgid "Ім'я або повне найменування та адреса пр
 msgstr "Name or full name and address of the successor of the patent owner"
 
 #: apps/search/templates/search/detail/id/_partials/transactions.html:152
-#: apps/search/templates/search/detail/id/_partials/transactions.html:494
+#: apps/search/templates/search/detail/id/_partials/transactions.html:515
 msgid "Слід читати"
 msgstr "Should be read as"
 
@@ -1584,46 +1587,54 @@ msgstr "Should be read as"
 msgid "Ім'я або повне найменування та адреса ліцензіара"
 msgstr "Name or full name and address of the licensor"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:194
+#: apps/search/templates/search/detail/id/_partials/transactions.html:201
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:399
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:747
 msgid "Ім'я або повне найменування та адреса ліцензіата"
 msgstr "Name or full name and address of the licensee"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:202
+#: apps/search/templates/search/detail/id/_partials/transactions.html:217
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:409
 msgid "Вид ліцензії"
 msgstr "License type"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:238
-#: apps/search/templates/search/detail/id/_partials/transactions.html:343
+#: apps/search/templates/search/detail/id/_partials/transactions.html:219
+msgid "Виключна"
+msgstr "Exclusive"
+
+#: apps/search/templates/search/detail/id/_partials/transactions.html:221
+msgid "Невиключна"
+msgstr "Non-exclusive"
+
+#: apps/search/templates/search/detail/id/_partials/transactions.html:259
+#: apps/search/templates/search/detail/id/_partials/transactions.html:364
 msgid "Назва промислового зразка"
 msgstr "Name of the industrial design"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:243
+#: apps/search/templates/search/detail/id/_partials/transactions.html:264
 msgid "Ім'я або повне найменування власника патенту та адреса для листування"
 msgstr "Name or full name of the patent owner and address for correspondence"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:271
+#: apps/search/templates/search/detail/id/_partials/transactions.html:292
 msgid "Дата, від якої патент вважається таким, що не набрав чинності"
 msgstr ""
 "The date from which the patent is deemed not to have entered into force"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:308
+#: apps/search/templates/search/detail/id/_partials/transactions.html:329
 msgid "Ім'я автора"
 msgstr "Author name"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:364
+#: apps/search/templates/search/detail/id/_partials/transactions.html:385
 msgid "Ім'я або повне найменування власника патенту за рішенням суду"
 msgstr "Name or full name of the patent owner according to a court decision"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:428
+#: apps/search/templates/search/detail/id/_partials/transactions.html:449
 msgid "Дата, від якої патент вважається таким, що не набрав чинності частково"
 msgstr ""
 "The date from which the patent is deemed not to have entered into force in "
 "part"
 
-#: apps/search/templates/search/detail/id/_partials/transactions.html:451
+#: apps/search/templates/search/detail/id/_partials/transactions.html:472
 msgid ""
 "Ім'я або повне найменування власника патенту, який встановлений за рішенням "
 "суду"
@@ -1842,7 +1853,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1265
+#: apps/search/utils.py:1266
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2013,8 +2024,8 @@ msgstr "partly"
 msgid "Кл.:"
 msgstr "Cl."
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:356
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:366
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:375
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:393
 msgid "Так"
 msgstr "Yes"
 
@@ -2029,8 +2040,6 @@ msgid "Дата закінчення строку дії свідоцтва"
 msgstr "Expiration date of the certificate"
 
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:757
-#, fuzzy
-#| msgid "Дата публікації відомостей про внесення змін та номер бюлетеня"
 msgid ""
 "Дата публікації відомостей про видачу ліцензії на використання знака та "
 "номер бюлетня"
@@ -2041,6 +2050,26 @@ msgstr ""
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:801
 msgid "Номер та дата рішення"
 msgstr "Number and date of the decision"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:822
+msgid "Імʼя або повне найменування та адреса установника управління"
+msgstr "The name or full name and address"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:829
+msgid "Імʼя або повне найменування та адреса управителя"
+msgstr "Name or full name and address"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:836
+msgid "Дата та номер договору управління майном, строк дії договору"
+msgstr "Date and number of the property management contract, term of validity of the contract"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:838
+msgid "від"
+msgstr "from"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:839
+msgid "до"
+msgstr "to"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
@@ -2156,43 +2185,43 @@ msgstr "Transaction search"
 msgid "Географічне зазначення зареєстровано"
 msgstr "The geographical indication is registered"
 
-#: apps/search/utils.py:1257
+#: apps/search/utils.py:1258
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1259
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1261
+#: apps/search/utils.py:1262
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1262
+#: apps/search/utils.py:1263
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1263
+#: apps/search/utils.py:1264
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1264
+#: apps/search/utils.py:1265
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1266
+#: apps/search/utils.py:1267
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1267
+#: apps/search/utils.py:1268
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1271
+#: apps/search/utils.py:1272
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1272
+#: apps/search/utils.py:1273
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2478,9 +2507,6 @@ msgstr "Database administrator"
 
 #~ msgid "з"
 #~ msgstr "from"
-
-#~ msgid "по"
-#~ msgstr "to"
 
 #~ msgid "Тип об'єкта"
 #~ msgstr "Object type"

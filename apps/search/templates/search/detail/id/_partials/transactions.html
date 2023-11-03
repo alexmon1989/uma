@@ -184,8 +184,15 @@
                                 <li>
                                     <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіара" %}:</span>
                                     <br>
-                                    {{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
-                                    <br>{{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% if transaction.TransactionBody.LicensorDetails.Licensor|is_list %}
+                                        {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
+                                            {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            <br>{{ licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                                        <br>{{ transaction.TransactionBody.LicensorDetails.Licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% endif %}
                                 </li>
                             {% endif %}
 
@@ -193,13 +200,27 @@
                                 <li>
                                     <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіата" %}:</span>
                                     <br>
-                                    {{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
-                                    <br>{{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% if transaction.TransactionBody.LicenseeDetails.Licensee|is_list %}
+                                        {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
+                                            {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            <br>{{ licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }};
+                                        <br>{{ transaction.TransactionBody.LicenseeDetails.Licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
+                                    {% endif %}
                                 </li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.LicenceKind %}
-                                <li><span class="g-font-weight-600">{% trans 'Вид ліцензії' %}:</span> {{ transaction.TransactionBody.LicenceKind  }}</li>
+                                <li>
+                                    <span class="g-font-weight-600">{% trans 'Вид ліцензії' %}:</span>
+                                    {% if transaction.TransactionBody.LicenceKind == 'Exclusive' %}
+                                        {% trans 'Виключна' %}
+                                    {% elif transaction.TransactionBody.LicenceKind == 'Nonexclusive' %}
+                                        {% trans 'Невиключна' %}
+                                    {% endif %}
+                                </li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails.Decision.Number %}
@@ -516,6 +537,38 @@
 
                             {% if transaction.TransactionBody.TerminationDate %}
                                 <li><span class="g-font-weight-600">{% trans 'Дата припинення дії патенту' %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+                        </ul>
+                    {% elif transaction|get:"@type" == 'TotalTerminationByCourt' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span
+                                        class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span
+                                        class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span
+                                        class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.TerminationDate %}
+                                <li><span
+                                        class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.DecisionDetails %}
+                                <li><span
+                                        class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}
+                                </li>
                             {% endif %}
                         </ul>
                     {% else %}

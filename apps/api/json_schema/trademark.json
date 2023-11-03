@@ -1,0 +1,817 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Trademark",
+  "description": "Trademark data from the SIS API",
+  "type": "object",
+  "properties": {
+    "obj_type": {
+      "type": "string"
+    },
+    "obj_type_id": {
+      "type": "integer"
+    },
+    "obj_state": {
+      "type": "integer"
+    },
+    "app_number": {
+      "type": "string"
+    },
+    "app_date": {
+      "type":  ["string", "null"],
+      "format": "date-time"
+    },
+    "registration_number": {
+      "type": ["string", "null"]
+    },
+    "registration_date": {
+      "type":  ["string", "null"],
+      "format": "date-time"
+    },
+    "last_update": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "ApplicantDetails": {
+          "type": "object",
+          "properties": {
+            "Applicant" : {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ApplicantAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLineOriginal": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "EDRPOU": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "type": "string"
+                                      },
+                                      "FreeFormatNameLineOriginal": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ApplicantSequenceNumber": {
+                    "type": ["integer", "string"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ApplicationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "ApplicationNumber": {
+          "type": "string"
+        },
+        "AssociatedRegistrationApplicationDetails": {
+          "type": "object",
+          "properties": {
+            "AssociatedRegistrationApplication": {
+              "type": "object",
+              "properties": {
+                "AssociatedMarkDetails": {
+                  "type": "object",
+                  "properties": {
+                    "AssociatedMark": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "AssociatedApplicationDate": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "AssociatedApplicationNumber": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "AssociatedRegistrationDetails": {
+                  "type": "object",
+                  "properties": {
+                    "DivisionalApplication": {
+                      "type": "array",
+                      "items": {
+                        "AssociatedRegistration": {
+                          "type": "object",
+                          "properties": {
+                            "AssociatedRegistrationDate": {
+                              "type": "string",
+                              "format": "date"
+                            },
+                            "AssociatedRegistrationNumber": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "DivisionalApplicationDetails": {
+                  "type": "object",
+                  "properties": {
+                    "DivisionalApplication": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "InitialApplicationDate": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "InitialApplicationNumber": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Code_441": {
+          "type": "string",
+          "format": "date"
+        },
+        "Code_441_BulNumber": {
+          "type": ["string", "integer"]
+        },
+        "CorrespondenceAddress": {
+          "type": "object",
+          "properties": {
+            "CorrespondenceAddressBook": {
+              "type": "object",
+              "properties": {
+                "Address": {
+                  "type": "object",
+                  "properties": {
+                    "AddressCountryCode": {
+                      "type": "string"
+                    },
+                    "AddressPostcode": {
+                      "type": "string"
+                    },
+                    "FreeFormatAddressLine": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "Name": {
+                  "type": "object",
+                  "properties": {
+                    "FreeFormatNameLine": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Declamation" : {
+          "type": "string"
+        },
+        "ExhibitionPriorityDetails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ExhibitionCountryCode": {
+                "type": "string"
+              },
+              "ExhibitionDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "ExhibitionPartialIndicator": {
+                "type": ["boolean", "string"]
+              },
+              "ExhibitionPartialGoodsServices": {
+                "type": "object",
+                "properties": {
+                  "ClassDescriptionDetails": {
+                    "type": "object",
+                    "properties": {
+                      "ClassDescription": {
+                        "type": "object",
+                        "properties": {
+                          "ClassDescriptionDetails": {
+                            "type": "object",
+                            "properties": {
+                              "ClassDescription": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "ClassNumber": {
+                                      "type": "integer"
+                                    },
+                                    "ClassificationTermDetails": {
+                                      "type": "object",
+                                      "properties": {
+                                        "ClassificationTerm": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "ClassificationTermLanguageCode": {
+                                                "type": "string"
+                                              },
+                                              "ClassificationTermText": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "GoodsServicesDetails": {
+          "type": ["object", "null"],
+          "properties": {
+            "GoodsServices": {
+              "type": "object",
+              "properties": {
+                "ClassDescriptionDetails": {
+                  "type": "object",
+                  "properties": {
+                    "ClassDescription": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ClassNumber": {
+                            "type": ["string", "integer"]
+                          },
+                          "ClassificationTermDetails": {
+                            "type": "object",
+                            "properties": {
+                              "ClassificationTerm": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "ClassificationTermLanguageCode": {
+                                      "type": "string"
+                                    },
+                                    "ClassificationTermText": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "HolderDetails": {
+          "type": "object",
+          "properties": {
+            "Holder": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "HolderAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLine": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLineOriginal": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "EDRPOU": {
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "type": "string"
+                                      },
+                                      "FreeFormatNameLineOriginal": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "HolderSequenceNumber": {
+                    "type": ["integer", "string"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "KindMark" : {
+          "type": "string"
+        },
+        "MarkFeature": {
+          "type": "string"
+        },
+        "MarkImageDetails": {
+          "type": "object",
+          "properties": {
+            "MarkImage": {
+              "type": "object",
+              "properties": {
+                "MarkImageCategory": {
+                  "type": "object",
+                  "properties": {
+                    "CategoryCodeDetails": {
+                      "type": "object",
+                      "properties": {
+                        "CategoryCode": {
+                          "type": "array",
+                          "items": {
+                            "type": ["string", "null"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "MarkImageColourClaimedText": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "#text": {
+                        "type": "string"
+                      },
+                      "@sequenceNumber": {
+                        "type": ["integer", "string"]
+                      }
+                    }
+                  }
+                },
+                "MarkImageColourIndicator": {
+                  "type": "string"
+                },
+                "MarkImageFileFormat": {
+                  "type": "string"
+                },
+                "MarkImageFilename": {
+                  "type": "string"
+                },
+                "MarkImageRepresentationSize": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "MarkImageRenditionColourMode": {
+                        "type": "string"
+                      },
+                      "MarkImageRenditionRepresentationSize": {
+                        "type": "object",
+                        "properties": {
+                          "Height": {
+                            "type": ["integer", "string"]
+                          },
+                          "Resolution": {
+                            "type": "integer"
+                          },
+                          "ResolutionUnit": {
+                            "type": "string"
+                          },
+                          "Unit": {
+                            "type": "string"
+                          },
+                          "Width": {
+                            "type":  ["integer", "string"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "MarkImageTypeNotice": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "PriorityDetails": {
+          "type": "object",
+          "properties": {
+            "Priority": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "PriorityCountryCode": {
+                    "type": "string"
+                  },
+                  "PriorityDate": {
+                    "type": "string"
+                  },
+                  "PriorityNumber": {
+                    "type": "string"
+                  },
+                  "PriorityPartialGoodsServices": {
+                    "type": "object",
+                    "properties": {
+                      "ClassDescriptionDetails": {
+                        "type": "object",
+                        "properties": {
+                          "ClassDescription": {
+                            "type": "object",
+                            "properties": {
+                              "ClassDescriptionDetails": {
+                                "type": "object",
+                                "properties": {
+                                  "ClassDescription": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "ClassNumber": {
+                                          "type": "integer"
+                                        },
+                                        "ClassificationTermDetails": {
+                                          "type": "object",
+                                          "properties": {
+                                            "ClassificationTerm": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "ClassificationTermLanguageCode": {
+                                                    "type": "string"
+                                                  },
+                                                  "ClassificationTermText": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "PriorityPartialIndicator": {
+                    "type": ["boolean", "string"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ProlonagationExpiryDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "ProlongationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "PublicationDetails": {
+          "type": ["array", "object"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "PublicationDate": {
+                "type": "string"
+              },
+              "PublicationIdentifier": {
+                "type": "string"
+              },
+              "PublicationSection": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "RegistrationDate" : {
+          "type": "string",
+          "format": "date"
+        },
+        "RegistrationNumber": {
+          "type": "string"
+        },
+        "RegistrationOfficeCode": {
+          "type": "string"
+        },
+        "RepresentativeDetails": {
+          "type": "object",
+          "properties": {
+            "Representative": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "RepresentativeAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameDetails": {
+                                        "type": "object",
+                                        "properties": {
+                                          "FreeFormatNameLine": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "TerminationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "UssrApplicationDetails": {
+          "type": "object",
+          "properties": {
+            "UssrApplication": {
+              "properties": {
+                "UssrApplicationDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "UssrApplicationNumber": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "UssrRegistrationNumber": {
+          "type": "string"
+        },
+        "WordMarkSpecification": {
+          "type": ["object", "null"],
+          "properties": {
+            "MarkSignificantVerbalElement": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "#text": {
+                    "type": "string"
+                  },
+                  "@sequenceNumber": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "application_status": {
+          "type": "string"
+        },
+        "registration_status_color": {
+          "type": "string"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_docs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "DocRecord": {
+            "type": "object",
+            "properties": {
+              "DocDirection": {
+                "type": "string"
+              },
+              "DocRegNumber": {
+                "type": "string"
+              },
+              "DocIdDocCEAD": {
+                "type": ["integer", "string"]
+              },
+              "DocRegDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "DocType": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_payments": {
+      "properties": {
+        "Payment": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Comment": {
+                "type": "string"
+              },
+              "PaymentDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "PaymentIdentifier": {
+                "type": "string"
+              },
+              "PaymentFeeDetails": {
+                "type": "object",
+                "properties": {
+                  "FeeAmount": {
+                    "type": "object",
+                    "properties": {
+                      "Amount": {
+                        "type": ["string", "number"]
+                      },
+                      "@currencyCode": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

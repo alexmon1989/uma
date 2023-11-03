@@ -278,11 +278,12 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] == 6:
                     template = 'search/detail/id/detail.html'
                 elif context['hit']['Document']['idObjType'] in (9, 14):
-                    bul_num_441 = Bulletin.objects.get(
-                        date_from__lte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441'],
-                        date_to__gte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441']
-                    )
-                    context['code_441_bul_number'] = bul_num_441.bul_number
+                    if 'Code_441' in context['hit']['MadridTradeMark']['TradeMarkDetails']:
+                        bul_num_441 = Bulletin.objects.get(
+                            date_from__lte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441'],
+                            date_to__gte=context['hit']['MadridTradeMark']['TradeMarkDetails']['Code_441']
+                        )
+                        context['code_441_bul_number'] = bul_num_441.bul_number
                     template = 'search/detail/tm_madrid/detail.html'
                 elif context['hit']['Document']['idObjType'] in (10, 13):  # Авторське право
                     template = 'search/detail/copyright/detail.html'

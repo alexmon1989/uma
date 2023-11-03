@@ -108,19 +108,23 @@ class Command(BaseCommand):
                     json_path=json_path,
                     indexation_process=self.indexation_process
                 )
-        except (UnicodeDecodeError, UnicodeError):
-            f = open(json_path, 'r', encoding='utf-8')
+        except (UnicodeDecodeError, UnicodeError):            
             try:
+                f = open(json_path, 'r', encoding='utf-8')
                 data = json.loads(f.read())
             except json.decoder.JSONDecodeError as e:
-                self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
-                IndexationError.objects.create(
-                    app_id=doc['id'],
-                    type='JSONDecodeError',
-                    text=e,
-                    json_path=json_path,
-                    indexation_process=self.indexation_process
-                )
+                try:
+                    f = open(json_path, 'r', encoding='utf-8-sig')
+                    data = json.loads(f.read())
+                except json.decoder.JSONDecodeError as e:
+                    self.stdout.write(self.style.ERROR(f"JSONDecodeError: {e}: {json_path}"))
+                    IndexationError.objects.create(
+                        app_id=doc['id'],
+                        type='JSONDecodeError',
+                        text=e,
+                        json_path=json_path,
+                        indexation_process=self.indexation_process
+                    )
         except FileNotFoundError as e:
             self.stdout.write(self.style.ERROR(f"FileNotFoundError: {e}"))
             IndexationError.objects.create(
@@ -509,6 +513,7 @@ class Command(BaseCommand):
             for item in res['Design']['DesignDetails'].get('IndicationProductDetails', {}):
                 cl = item.get('Class')
                 if cl:
+                    cl = cl.replace('.', '-')
                     cl_l = cl.split('-')
                     if len(cl_l[1]) == 1:
                         cl_l[1] = f"0{cl_l[1]}"
@@ -939,9 +944,9 @@ class Command(BaseCommand):
         if options['status']:
             status = int(options['status'])
             if status == 1:
-                documents = documents.filter(registration_number='')
+                documents = documents.filter(registration_number__isnull=True)
             elif status == 2:
-                documents = documents.exclude(registration_number='')
+                documents = documents.exclude(registration_number__isnull=True)
 
         # Создание процесса индексации в БД
         self.indexation_process = IndexationProcess.objects.create(

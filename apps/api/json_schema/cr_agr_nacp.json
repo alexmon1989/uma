@@ -1,0 +1,311 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Договори про передачу права",
+  "description": "Опис даних API СІС",
+  "type": "object",
+  "properties": {
+    "obj_type": {
+      "type": "string",
+      "description": "Тип об'єкта промислової власності"
+    },
+    "obj_type_id": {
+      "type": "integer",
+      "description": "Ідентифікатор об’єкта промислової власності"
+    },
+    "obj_state": {
+      "type": "integer",
+      "description": "Ідентифікатор стану об’єкта промислової власності (1 - заявка, 2 - охоронний документ)"
+    },
+    "app_number": {
+      "type": "string",
+      "description": "Номер заявки"
+    },
+    "app_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Дата подання заявки"
+    },
+    "registration_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Номер охоронного документа"
+    },
+    "registration_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Дата видачі охоронного документа"
+    },
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата останньої зміни запису"
+    },
+    "data": {
+      "description": "Бібліографічні дані",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "Назва",
+          "type": "string"
+        },
+        "AuthorDetails": {
+          "description": "Дані щодо автора",
+          "type": "object",
+          "properties": {
+            "Author": {
+              "description": "Список авторів",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "AuthorAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування суб'єкта",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси суб'єкта",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "type": "object",
+                            "description": "Дані щодо адреси найменування суб'єкта",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ суб'єкта",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування суб'єкта",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "RepresentNameFormDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "RepresentNameForm": {
+                                        "description": "Найменування суб'єкта",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "AuthorSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку авторів",
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "LicensorDetails": {
+          "description": "Ліцензіар",
+          "type": "object",
+          "properties": {
+            "Licensor": {
+              "description": "Список ліцензіарів",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "LicensorAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування ліцензіара",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси ліцензіара",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса ліцензіара",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування ліцензіара",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування ліцензіара",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "LicensorSequenceNumber": {
+                    "description": "Порядковий номер у списку ліцензіарів",
+                    "type": [
+                      "integer",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "LicenseeDetails": {
+          "description": "Ліцензіат",
+          "type": "object",
+          "properties": {
+            "Licensee": {
+              "description": "Список ліцензіатів",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "LicenseeSequenceNumber": {
+                    "description": "Порядковий номер у списку ліцензіатів",
+                    "type": [
+                      "integer",
+                      "string"
+                    ]
+                  },
+                  "LicenseeAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування ліцензіата",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси ліцензіата",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса ліцензіата",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування ліцензіата",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ ліцензіата",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування ліцензіата",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,554 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Промислові зразки",
+  "description": "Опис даних API СІС",
+  "type": "object",
+  "properties": {
+    "obj_type": {
+      "type": "string",
+      "description": "Тип об'єкта промислової власності"
+    },
+    "obj_type_id": {
+      "type": "integer",
+      "description": "Ідентифікатор об’єкта промислової власності"
+    },
+    "obj_state": {
+      "type": "integer",
+      "description": "Ідентифікатор стану об’єкта промислової власності (1 - заявка, 2 - охоронний документ)"
+    },
+    "app_number": {
+      "type": "string",
+      "description": "Номер заявки"
+    },
+    "app_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Дата подання заявки"
+    },
+    "registration_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Номер охоронного документа"
+    },
+    "registration_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Дата видачі охоронного документа"
+    },
+    "last_update": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата останньої зміни запису"
+    },
+    "data": {
+      "description": "Бібліографічні дані",
+      "type": "object",
+      "properties": {
+        "ApplicantDetails": {
+          "description": "Дані щодо заявника",
+          "type": "object",
+          "properties": {
+            "Applicant": {
+              "description": "Список заявників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ApplicantAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування заяника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса заявника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
+                                    "description": "Адреса заявника мовою оригіналу",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLine": {
+                                    "description": "Найменування заявника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLineOriginal": {
+                                    "description": "Найменування заявника мовою оригіналу",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "AddressPostcode": {
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "type": "string"
+                                  },
+                                  "FormattedAddressCountryCode": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування заявника",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування заявника",
+                                        "type": "string"
+                                      },
+                                      "FreeFormatNameLineOriginal": {
+                                        "description": "Найменування заявника мовою оригіналу",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ApplicantSequenceNumber" : {
+                    "type": ["integer", "string"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "HolderDetails": {
+          "description": "Дані щодо власника охоронного документа",
+          "type": "object",
+          "properties": {
+            "Holder": {
+              "description": "Список власників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "HolderAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування власника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса власника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
+                                    "description": "Адреса власника мовою оригінала",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLine": {
+                                    "description": "Найменування власника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLineOriginal": {
+                                    "description": "Найменування власника мовою оригінала",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "AddressPostcode": {
+                                    "description": "Поштовий індекс",
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ",
+                                    "type": "string"
+                                  },
+                                  "FormattedAddressCountryCode": {
+                                    "description": "Код країни",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "EDRPOU": {
+                                    "description": "Код ЄДРПОУ",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Адреса власника",
+                                        "type": "string"
+                                      },
+                                      "FreeFormatNameLineOriginal": {
+                                        "description": "Адреса власника мовою оригінала",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "HolderSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку власників",
+                    "type": [
+                      "integer",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "DesignerDetails": {
+          "description": "Дані щодо автора",
+          "properties": {
+            "Designer": {
+              "description": "Список авторів",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Publicated": {
+                    "description": "Ознака того чи ппублікується автор",
+                    "type": ["boolean", "string"]
+                  },
+                  "DesignerAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування автора",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси автора",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FormattedAddressCountryCode": {
+                                    "description": "Код країни",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування автора",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування автора",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "DesignerSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку авторів",
+                    "type": [
+                      "integer",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "RepresentativeDetails": {
+          "description": "Дані щодо представника",
+          "type": "object",
+          "properties": {
+            "Representative": {
+              "description": "Список представників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "RepresentativeAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо найменування та адреси представника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси представника",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса власника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatAddressLineOriginal": {
+                                    "description": "Адреса власника мовою оригінала",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLine": {
+                                    "description": "Найменування власника",
+                                    "type": "string"
+                                  },
+                                  "FreeFormatNameLineOriginal": {
+                                    "description": "Найменування власника мовою оригінала",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "FormattedAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "AddressPostcode": {
+                                    "description": "Поштовий індекс",
+                                    "type": "string"
+                                  },
+                                  "EDRPOU": {
+                                    "description": "ЄДРПОУ",
+                                    "type": "string"
+                                  },
+                                  "FormattedAddressCountryCode": {
+                                    "description": "Код країни",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування представника",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування представника",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "NameKind": {
+                                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "RepresentativeSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку представників",
+                    "type": [
+                      "string",
+                      "integer"
+                    ]
+                  },
+                  "RepresentativeLegalEntity": {
+                    "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "CorrespondenceAddress": {
+          "description": "Дані щодо адреси для листування",
+          "type": "object",
+          "properties": {
+            "CorrespondenceAddressBook": {
+              "type": "object",
+              "properties": {
+                "FormattedNameAddress": {
+                  "properties": {
+                    "Address": {
+                      "type": "object",
+                      "properties": {
+                        "AddressCountryCode": {
+                          "description": "Код країни",
+                          "type": "string"
+                        },
+                        "FormattedAddress": {
+                          "type": "object",
+                          "properties": {
+                            "AddressPostcode": {
+                              "description": "Поштовий індекс",
+                              "type": "string"
+                            },
+                            "FormattedAddressCountryCode": {
+                              "description": "Код країни",
+                              "type": "string"
+                            },
+                            "FreeFormatAddress": {
+                              "type": "object",
+                              "properties": {
+                                "FreeFormatAddressLine": {
+                                  "description": "Адреса",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "FreeFormatAddress": {
+                          "type": "object",
+                          "properties": {
+                            "AddressCountryCode": {
+                              "description": "Код країни",
+                              "type": "string"
+                            },
+                            "FreeFormatAddressLine": {
+                              "description": "Адреса",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "Name": {
+                      "type": "object",
+                      "properties": {
+                        "FreeFormatName": {
+                          "type": "object",
+                          "properties": {
+                            "NameKind":{
+                              "description": "Тип суб'єкта (legal_entity, Legal Entity - юр. особа, individual, Natural Person, Natural Entity - фіз. особа, Other - інше)",
+                              "type": "string"
+                            },
+                            "FreeFormatNameDetails": {
+                              "type": "object",
+                              "properties": {
+                                "FreeFormatNameLine": {
+                                  "description": "Найменування суб'єкта",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "FreeFormatNameLine": {
+                          "description": "Найменування суб'єкта",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "DesignTitle": {
+          "description": "Назва промислового зразка",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

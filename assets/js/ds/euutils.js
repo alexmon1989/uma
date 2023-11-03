@@ -1,3 +1,9 @@
+if (typeof String.prototype.endsWith !== 'function') {
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+}
+
 //=============================================================================
 
 var MakeClass = function() {
@@ -82,7 +88,7 @@ function (euSign) {
 	// Session storage API
 	//-----------------------------------------------------------------------------
 	IsSessionStorageSupported: function() {
-		return (window.sessionStorage !== 'underfined');
+		return (window.sessionStorage !== 'undefined');
 	},
 	SetSessionStorageItem: function(name, item, protect) {
 		try {

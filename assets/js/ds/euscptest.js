@@ -4,8 +4,8 @@ var URL_EMAIL_PARAM = "@EMAIL_PARAM";
 var URL_GET_KEP_CERTIFICATE_BY_EMAIL = "http://ca.iit.com.ua/services-cmp-getcert?eUserEMail=" + 
 		URL_EMAIL_PARAM + "&certType=2&respType=2";
 
-var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.29";
-var URL_CAS = "/static/my_auth/CAs.json?version=1.0.29";
+var URL_GET_CERTIFICATES = "/static/my_auth/CACertificates.p7b?version=1.0.31";
+var URL_CAS = "/static/my_auth/CAs.json?version=1.0.31";
 var URL_XML_HTTP_PROXY_SERVICE = "/proxy_handler/ProxyHandlerCURL.php";
 
 //=============================================================================
@@ -309,7 +309,8 @@ function() {
 			
 			settings = euSign.CreateTSPSettings();
 			if (!offline) {
-				settings.SetGetStamps(true);
+				// settings.SetGetStamps(true);
+				settings.SetGetStamps(false);
 				if (caServer.tspAddress != "") {
 					settings.SetAddress(caServer.tspAddress);
 					settings.SetPort(caServer.tspAddressPort);
