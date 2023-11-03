@@ -513,6 +513,7 @@ class Command(BaseCommand):
             for item in res['Design']['DesignDetails'].get('IndicationProductDetails', {}):
                 cl = item.get('Class')
                 if cl:
+                    cl = cl.replace('.', '-')
                     cl_l = cl.split('-')
                     if len(cl_l[1]) == 1:
                         cl_l[1] = f"0{cl_l[1]}"
