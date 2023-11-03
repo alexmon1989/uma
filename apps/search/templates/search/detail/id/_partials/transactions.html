@@ -539,6 +539,38 @@
                                 <li><span class="g-font-weight-600">{% trans 'Дата припинення дії патенту' %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction|get:"@type" == 'TotalTerminationByCourt' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span
+                                        class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span
+                                        class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction|get:"@applicationNumber" %}
+                                <li><span
+                                        class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.TerminationDate %}
+                                <li><span
+                                        class="g-font-weight-600">(141) {% trans "Дата припинення дії свідоцтва" %}:</span> {{ transaction.TransactionBody.TerminationDate|parse_date|date:"d.m.Y" }}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.DecisionDetails %}
+                                <li><span
+                                        class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}
+                                </li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}
