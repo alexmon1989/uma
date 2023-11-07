@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-27 13:00+0300\n"
+"POT-Creation-Date: 2023-11-07 12:48+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -54,6 +54,7 @@ msgstr "Home"
 #: apps/bulletin_new/templates/bulletin_new/_partials/breadcrumbs.html:10
 #: apps/bulletin_new/templates/bulletin_new/_partials/breadcrumbs.html:20
 #: apps/bulletin_new/templates/bulletin_new/index.html:4
+#: apps/search/templates/search/detail/id/_partials/transactions.html:546
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:13
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:31
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:53
@@ -171,15 +172,15 @@ msgstr "Open in new window"
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:30
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:73
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:236
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:56
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:64
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:62
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:70
 msgid "бюл. №"
 msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:426
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:142
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:148
 msgid "Показати"
 msgstr "Show"
 
@@ -250,6 +251,7 @@ msgstr "Name or full name and address of the previous owner of the certificate"
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:194
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:252
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/tm.html:404
+#: apps/search/templates/search/detail/id/_partials/transactions.html:564
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:80
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:98
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:129
@@ -284,6 +286,7 @@ msgstr "Date from which the certificate is considered invalid"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:395
 #: apps/search/templates/search/detail/id/_partials/transactions.html:453
 #: apps/search/templates/search/detail/id/_partials/transactions.html:496
+#: apps/search/templates/search/detail/id/_partials/transactions.html:570
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:179
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:263
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:475
@@ -683,6 +686,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/id/_partials/transactions.html:492
 #: apps/search/templates/search/detail/id/_partials/transactions.html:510
 #: apps/search/templates/search/detail/id/_partials/transactions.html:535
+#: apps/search/templates/search/detail/id/_partials/transactions.html:558
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:21
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:39
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:61
@@ -968,7 +972,7 @@ msgstr "Full list of applicants"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:86
 #: apps/search/templates/search/advanced/_partials/qi_item.html:68
 #: apps/search/templates/search/advanced/_partials/tm_item.html:88
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:32
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:38
 msgid "Свідоцтво"
 msgstr "Certificate"
 
@@ -1034,7 +1038,7 @@ msgstr "Date from which the industrial design rights are valid"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:101
 #: apps/search/templates/search/advanced/_partials/qi_item.html:84
 #: apps/search/templates/search/advanced/_partials/tm_item.html:106
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:50
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:56
 msgid "Власник(и)"
 msgstr "Owner(s)"
 
@@ -1145,6 +1149,7 @@ msgid "Свідоцтво України на топографію (компон
 msgstr "Certificate of Ukraine on topography (layout) of IC"
 
 #: apps/search/templates/search/advanced/_partials/ld_item.html:91
+#: apps/search/templates/search/detail/id/_partials/transactions.html:552
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:17
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:17
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:40
@@ -1284,7 +1289,7 @@ msgid "Свідоцтво України на торговельну марку"
 msgstr "Trademark certificate of Ukraine"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:93
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:37
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:43
 msgid "Номер реєстрації знака, який є номером свідоцтва"
 msgstr "Registration number, which is a certificate number"
 
@@ -1293,7 +1298,7 @@ msgid "Дата реєстрації знака"
 msgstr "Registration date"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:63
 msgid ""
 "Міжнародна класифікація товарів і послуг для реєстрації знаків та перелік "
 "товарів і послуг"
@@ -1302,7 +1307,7 @@ msgstr ""
 "Registration of Marks"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:125
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:63
 #: apps/search/utils.py:1270
 msgid "МКТП"
 msgstr "ICGS"
@@ -1320,7 +1325,14 @@ msgstr ""
 msgid "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
 msgstr "International trademark registration registered in Ukraine"
 
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:43
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:28
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:30
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:23
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:25
+msgid "Дані станом на"
+msgstr "Data as of"
+
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:49
 msgid "Дата міжнародної реєстрації"
 msgstr "International registration date"
 
@@ -2061,7 +2073,9 @@ msgstr "Name or full name and address"
 
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:836
 msgid "Дата та номер договору управління майном, строк дії договору"
-msgstr "Date and number of the property management contract, term of validity of the contract"
+msgstr ""
+"Date and number of the property management contract, term of validity of the "
+"contract"
 
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:838
 msgid "від"
