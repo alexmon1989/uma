@@ -23,7 +23,13 @@
             {% endif %}
         </div>
 
-        {% registration_status hit=hit %}
+        <div>
+            {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                {% trans "Дані станом на" %} <strong>{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</strong>
+            {% elif hit.search_data.protective_doc_number == '1502939' %}
+                {% trans "Дані станом на" %} <strong>25.10.2023</strong>
+            {% endif %}
+        </div>
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
