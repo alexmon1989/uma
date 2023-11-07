@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Добре відома торговельна марка",
+  "description": "Опис даних, що надходять до індексу ElasticSearch",
+  "type": "object",
+  "properties": {
+    "additionalProperties": false,
+    "Document": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "filesPath": {
+          "type": "string",
+          "description": "Шлях до файлу з даними"
+        },
+        "idObjType": {
+          "type": "integer",
+          "description": "Ідентифікатор типу ОПВ"
+        }
+      }
+    },
+    "WellKnownMark": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "WellKnownMarkDetails": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "PublicationDetails": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "PublicationDate": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Дата публікації відомостей"
+                  },
+                  "PublicationIdentifier": {
+                    "type": "string",
+                    "description": "Номер бюлетеня"
+                  }
+                }
+              }
+            },
+            "DecisionDate": {
+              "type": "string",
+              "format": "date",
+              "description": "Дата набрання чинності рішенням"
+            },
+            "OrderDate": {
+              "type": "string",
+              "format": "date",
+              "description": "Дата наказу"
+            },
+            "RightsDate": {
+              "type": "string",
+              "format": "date",
+              "description": "Дата, на яку знак став добре відомим в Україні"
+            },
+            "Holder": {
+              "description": "Список власників",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "HolderAddressBook": {
+                    "type": "object",
+                    "properties": {
+                      "FormattedNameAddress": {
+                        "description": "Дані щодо адреси та найменування власника",
+                        "type": "object",
+                        "properties": {
+                          "Address": {
+                            "description": "Дані щодо адреси",
+                            "type": "object",
+                            "properties": {
+                              "AddressCountryCode": {
+                                "description": "Код країни",
+                                "type": "string"
+                              },
+                              "FreeFormatAddress": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatAddressLine": {
+                                    "description": "Адреса власника",
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Name": {
+                            "description": "Дані щодо найменування",
+                            "type": "object",
+                            "properties": {
+                              "FreeFormatName": {
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatNameDetails": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameLine": {
+                                        "description": "Найменування власника",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "HolderSequenceNumber": {
+                    "description": "Порядковий номер суб'єкта у списку власників",
+                    "type": ["integer", "string"]
+                  }
+                }
+              }
+            },
+            "MarkImage": {
+              "type": "object",
+              "properties": {
+                "MarkImageFilename": {
+                  "description": "Відносне посилання на зображення",
+                  "type": "string"
+                }
+              }
+            },
+            "WordMarkSpecification": {
+              "description": "Дані щодо ключових слів",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "MarkSignificantVerbalElement": {
+                  "description": "Список ключових слів",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "#text": {
+                        "description": "Ключове слово",
+                        "type": "string"
+                      },
+                      "@sequenceNumber": {
+                        "description": "Порядок ключового слова у списку",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "GoodsServicesDetails": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "GoodsServices": {
+                  "type": "object",
+                  "properties": {
+                    "ClassDescriptionDetails": {
+                      "type": "object",
+                      "properties": {
+                        "ClassDescription": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "ClassNumber": {
+                                "type": [
+                                  "string",
+                                  "integer"
+                                ]
+                              },
+                              "ClassificationTermDetails": {
+                                "type": "object",
+                                "properties": {
+                                  "ClassificationTerm": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "ClassificationTermLanguageCode": {
+                                          "type": "string"
+                                        },
+                                        "ClassificationTermText": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "CourtComments": {
+              "type": "object",
+              "properties": {
+                "CourtCommentsUA": {
+                  "type": "string"
+                },
+                "CourtCommentsEN": {
+                  "type": "string"
+                },
+                "CourtCommentsRU": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
