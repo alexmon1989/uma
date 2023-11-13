@@ -11,7 +11,7 @@ class TMJsonSchemaTestCase(TestCase):
     schema: dict = {}
 
     def setUp(self) -> None:
-        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'tm.json')) as f:
+        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'trademark.json')) as f:
             self.schema = json.load(f)
 
     def testLastUpdate(self) -> None:
@@ -147,18 +147,10 @@ class TMJsonSchemaTestCase(TestCase):
     def testCode_441_BulNumber(self) -> None:
         instance = {
             "data": {
-                "Code_441_BulNumber": "37"
+                "Code_441_BulNumber": 37
             }
         }
         validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
-
-        instance = {
-            "data": {
-                "Code_441_BulNumber": 123
-            }
-        }
-        with self.assertRaises(ValidationError):
-            validate(instance=instance, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
 
     def testCorrespondenceAddress(self) -> None:
         instance = {

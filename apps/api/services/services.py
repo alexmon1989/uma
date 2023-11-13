@@ -431,13 +431,15 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
             settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE,
             '%d.%m.%Y'
         )
-        # Fix случая когда приходил неверный номер бюлетня
-        if 'Code_441_BulNumber' in self._raw_biblio \
-                and 'Code_441' in self._raw_biblio \
-                and self._application_data['last_update'] < bulletin_date_until:
-            self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(
-                self._raw_biblio['Code_441']
-            )
+
+        if 'Code_441_BulNumber' in self._raw_biblio:
+            # Fix случая когда приходил неверный номер бюлетня
+            if 'Code_441' in self._raw_biblio and self._application_data['last_update'] < bulletin_date_until:
+                self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(
+                    self._raw_biblio['Code_441']
+                )
+            # Fix типа данных 'Code_441_BulNumber'
+            self._raw_biblio['Code_441_BulNumber'] = int(self._raw_biblio['Code_441_BulNumber'])
 
         # Полные пути к изображениям
         try:

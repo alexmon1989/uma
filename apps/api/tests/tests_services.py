@@ -1,11 +1,11 @@
 from django.test import TestCase
-from unittest.mock import patch
 
 from rest_framework import exceptions
 
 from apps.api.services import services
 
 from datetime import datetime
+import json
 
 
 class ApiServicesTestCase(TestCase):
@@ -77,3 +77,47 @@ class ApiServicesTestCase(TestCase):
         input_data = {'app_number': 'm202300001'}
         output_data = services.opendata_prepare_filters(input_data)
         self.assertEqual(output_data['app_number'], 'm202300001')
+
+
+class BiblioDataFullPresenterTMTestCase(TestCase):
+    biblio_data_presenter: services.BiblioDataFullPresenter = services.BiblioDataFullPresenter()
+
+    def _get_prepared_data(self, source_data: dict) -> dict:
+        json_data = json.dumps(source_data)
+        instance = {
+            'obj_type_id': 4,
+            'data': json_data
+        }
+        self.biblio_data_presenter.set_application_data(instance)
+        data = self.biblio_data_presenter.get_prepared_biblio()
+        return data
+
+    def test_check_441(self):
+        source_data = {
+            'Code_441_BulNumber': '37'
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        self.assertEqual(prepared_data['Code_441_BulNumber'], 37)
+
+        source_data = {
+            'Code_441_BulNumber': 37
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        self.assertEqual(prepared_data['Code_441_BulNumber'], 37)
+
+    def test_check_ApplicantSequenceNumber(self):
+        source_data = {
+            "ApplicantDetails": {
+                "Applicant": [
+                    {
+                        "ApplicantSequenceNumber": 1
+                    },
+                    {
+                        "ApplicantSequenceNumber": '2'
+                    }
+                ]
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for applicant in prepared_data['ApplicantDetails']['Applicant']:
+            self.assertIs(type(applicant['ApplicantSequenceNumber']), int)

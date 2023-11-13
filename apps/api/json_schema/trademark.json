@@ -193,7 +193,7 @@
           "format": "date"
         },
         "Code_441_BulNumber": {
-          "type": ["string", "integer"]
+          "type": "integer"
         },
         "CorrespondenceAddress": {
           "type": "object",
