@@ -338,11 +338,43 @@ class Command(BaseCommand):
                     if len(x.get('PublicationIdentifier')) < 6:
                         x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
 
-            applicant = None
+            # Список заявителей для быстрого поиска по наименованию
+            applicants_search_data = []
             if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
-                applicant = [{'name': x['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                                 'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
-                             res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']]
+                for applicant in res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
+                    applicants_search_data.append(
+                        {
+                            'name': applicant['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                'FreeFormatNameDetails']['FreeFormatNameLine']
+                        }
+                    )
+                    if 'FreeFormatNameLineOriginal' in applicant['ApplicantAddressBook'][
+                        'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']:
+                        applicants_search_data.append(
+                            {
+                                'name': applicant['ApplicantAddressBook']['FormattedNameAddress']['Name'][
+                                    'FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal']
+                            }
+                        )
+
+            # Список владельцев для быстрого поиска по наименованию
+            holders_search_data = []
+            if res['TradeMark']['TrademarkDetails'].get('HolderDetails'):
+                for holder in res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']:
+                    holders_search_data.append(
+                        {
+                            'name': holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                                'FreeFormatNameDetails']['FreeFormatNameLine']
+                        }
+                    )
+                    if 'FreeFormatNameLineOriginal' in holder['HolderAddressBook']['FormattedNameAddress']['Name'][
+                        'FreeFormatName']['FreeFormatNameDetails']:
+                        holders_search_data.append(
+                            {
+                                'name': holder['HolderAddressBook']['FormattedNameAddress']['Name'][
+                                    'FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal']
+                            }
+                        )
 
             # Поле 441 (дата опубликования заявки)
             if res['TradeMark']['TrademarkDetails'].get('Code_441'):
@@ -369,10 +401,8 @@ class Command(BaseCommand):
                 'app_number': res['TradeMark']['TrademarkDetails'].get('ApplicationNumber'),
                 'protective_doc_number': res['TradeMark']['TrademarkDetails'].get('RegistrationNumber'),
                 'rights_date': res['TradeMark']['TrademarkDetails'].get('RegistrationDate'),
-                'applicant': applicant,
-                'owner': [{'name': x['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                              'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
-                          res['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']]
+                'applicant': applicants_search_data,
+                'owner': holders_search_data
                 if res['TradeMark']['TrademarkDetails'].get('HolderDetails') else None,
                 'title': ', '.join([x['#text'] for x in res['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
                     'MarkSignificantVerbalElement']])
@@ -480,18 +510,19 @@ class Command(BaseCommand):
                             pass
 
             # Fix оригинальных наименований и адресов заявителей
-            for applicant in res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
-                formatted_name_address = applicant['ApplicantAddressBook']['FormattedNameAddress']
-                is_ua = formatted_name_address['Address']['AddressCountryCode'] == 'UA'
-                if 'FreeFormatAddressLineOriginal' in formatted_name_address['Address']['FreeFormatAddress']:
-                    if is_ua or formatted_name_address['Address']['FreeFormatAddress']['FreeFormatAddressLineOriginal'] == '':
-                        del formatted_name_address['Address']['FreeFormatAddress']['FreeFormatAddressLineOriginal']
-                if 'FreeFormatNameLineOriginal' in formatted_name_address['Address']['FreeFormatAddress']:
-                    if is_ua or formatted_name_address['Address']['FreeFormatAddress']['FreeFormatNameLineOriginal'] == '':
-                        del formatted_name_address['Address']['FreeFormatAddress']['FreeFormatNameLineOriginal']
-                if 'FreeFormatNameLineOriginal' in formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']:
-                    if is_ua or formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal'] == '':
-                        del formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal']
+            if 'Applicant' in res['TradeMark']['TrademarkDetails']:
+                for applicant in res['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
+                    formatted_name_address = applicant['ApplicantAddressBook']['FormattedNameAddress']
+                    is_ua = formatted_name_address['Address']['AddressCountryCode'] == 'UA'
+                    if 'FreeFormatAddressLineOriginal' in formatted_name_address['Address']['FreeFormatAddress']:
+                        if is_ua or formatted_name_address['Address']['FreeFormatAddress']['FreeFormatAddressLineOriginal'] == '':
+                            del formatted_name_address['Address']['FreeFormatAddress']['FreeFormatAddressLineOriginal']
+                    if 'FreeFormatNameLineOriginal' in formatted_name_address['Address']['FreeFormatAddress']:
+                        if is_ua or formatted_name_address['Address']['FreeFormatAddress']['FreeFormatNameLineOriginal'] == '':
+                            del formatted_name_address['Address']['FreeFormatAddress']['FreeFormatNameLineOriginal']
+                    if 'FreeFormatNameLineOriginal' in formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']:
+                        if is_ua or formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal'] == '':
+                            del formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLineOriginal']
 
             # Fix оригинальных наименований и адресов владельцев
             if 'HolderDetails' in res['TradeMark']['TrademarkDetails']:
