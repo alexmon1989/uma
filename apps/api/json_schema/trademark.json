@@ -17,14 +17,14 @@
       "type": "string"
     },
     "app_date": {
-      "type":  ["string", "null"],
+      "type":  "string",
       "format": "date-time"
     },
     "registration_number": {
-      "type": ["string", "null"]
+      "type": "string"
     },
     "registration_date": {
-      "type":  ["string", "null"],
+      "type":  "string",
       "format": "date-time"
     },
     "last_update": {
@@ -102,7 +102,7 @@
                     }
                   },
                   "ApplicantSequenceNumber": {
-                    "type": ["integer", "string"]
+                    "type": "integer"
                   }
                 }
               }
@@ -193,7 +193,7 @@
           "format": "date"
         },
         "Code_441_BulNumber": {
-          "type": ["string", "integer"]
+          "type": "string"
         },
         "CorrespondenceAddress": {
           "type": "object",
@@ -231,53 +231,58 @@
           "type": "string"
         },
         "ExhibitionPriorityDetails": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "ExhibitionCountryCode": {
-                "type": "string"
-              },
-              "ExhibitionDate": {
-                "type": "string",
-                "format": "date"
-              },
-              "ExhibitionPartialIndicator": {
-                "type": ["boolean", "string"]
-              },
-              "ExhibitionPartialGoodsServices": {
+          "type": "object",
+          "properties": {
+            "ExhibitionPriority": {
+              "type": "array",
+              "items": {
                 "type": "object",
                 "properties": {
-                  "ClassDescriptionDetails": {
+                  "ExhibitionCountryCode": {
+                    "type": "string"
+                  },
+                  "ExhibitionDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "ExhibitionPartialIndicator": {
+                    "type": "boolean"
+                  },
+                  "ExhibitionPartialGoodsServices": {
                     "type": "object",
                     "properties": {
-                      "ClassDescription": {
+                      "ClassDescriptionDetails": {
                         "type": "object",
                         "properties": {
-                          "ClassDescriptionDetails": {
+                          "ClassDescription": {
                             "type": "object",
                             "properties": {
-                              "ClassDescription": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "ClassNumber": {
-                                      "type": "integer"
-                                    },
-                                    "ClassificationTermDetails": {
+                              "ClassDescriptionDetails": {
+                                "type": "object",
+                                "properties": {
+                                  "ClassDescription": {
+                                    "type": "array",
+                                    "items": {
                                       "type": "object",
                                       "properties": {
-                                        "ClassificationTerm": {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "object",
-                                            "properties": {
-                                              "ClassificationTermLanguageCode": {
-                                                "type": "string"
-                                              },
-                                              "ClassificationTermText": {
-                                                "type": "string"
+                                        "ClassNumber": {
+                                          "type": "integer"
+                                        },
+                                        "ClassificationTermDetails": {
+                                          "type": "object",
+                                          "properties": {
+                                            "ClassificationTerm": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "ClassificationTermLanguageCode": {
+                                                    "type": "string"
+                                                  },
+                                                  "ClassificationTermText": {
+                                                    "type": "string"
+                                                  }
+                                                }
                                               }
                                             }
                                           }
@@ -299,7 +304,7 @@
           }
         },
         "GoodsServicesDetails": {
-          "type": ["object", "null"],
+          "type": "object",
           "properties": {
             "GoodsServices": {
               "type": "object",
@@ -313,7 +318,7 @@
                         "type": "object",
                         "properties": {
                           "ClassNumber": {
-                            "type": ["string", "integer"]
+                            "type": "integer"
                           },
                           "ClassificationTermDetails": {
                             "type": "object",
@@ -414,7 +419,7 @@
                     }
                   },
                   "HolderSequenceNumber": {
-                    "type": ["integer", "string"]
+                    "type": "integer"
                   }
                 }
               }
@@ -442,7 +447,7 @@
                         "CategoryCode": {
                           "type": "array",
                           "items": {
-                            "type": ["string", "null"]
+                            "type": "string"
                           }
                         }
                       }
@@ -458,7 +463,7 @@
                         "type": "string"
                       },
                       "@sequenceNumber": {
-                        "type": ["integer", "string"]
+                        "type": "integer"
                       }
                     }
                   }
@@ -484,7 +489,7 @@
                         "type": "object",
                         "properties": {
                           "Height": {
-                            "type": ["integer", "string"]
+                            "type": "integer"
                           },
                           "Resolution": {
                             "type": "integer"
@@ -496,7 +501,7 @@
                             "type": "string"
                           },
                           "Width": {
-                            "type":  ["integer", "string"]
+                            "type":  "integer"
                           }
                         }
                       }
@@ -578,7 +583,7 @@
                     }
                   },
                   "PriorityPartialIndicator": {
-                    "type": ["boolean", "string"]
+                    "type": "boolean"
                   }
                 }
               }
@@ -594,7 +599,7 @@
           "format": "date"
         },
         "PublicationDetails": {
-          "type": ["array", "object"],
+          "type": "array",
           "items": {
             "type": "object",
             "properties": {
@@ -706,7 +711,7 @@
           "type": "string"
         },
         "WordMarkSpecification": {
-          "type": ["object", "null"],
+          "type": "object",
           "properties": {
             "MarkSignificantVerbalElement": {
               "type": "array",
@@ -717,7 +722,7 @@
                     "type": "string"
                   },
                   "@sequenceNumber": {
-                    "type": "string"
+                    "type": "integer"
                   }
                 }
               }
@@ -761,7 +766,7 @@
                 "type": "string"
               },
               "DocIdDocCEAD": {
-                "type": ["integer", "string"]
+                "type": "integer"
               },
               "DocRegDate": {
                 "type": "string",
@@ -799,7 +804,7 @@
                     "type": "object",
                     "properties": {
                       "Amount": {
-                        "type": ["string", "number"]
+                        "type": "string"
                       },
                       "@currencyCode": {
                         "type": "string"

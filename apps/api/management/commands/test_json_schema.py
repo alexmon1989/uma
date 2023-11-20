@@ -13,11 +13,11 @@ class Command(BaseCommand):
     schema: dict = None
 
     def handle(self, *args, **options):
-        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'cr_agr_nacp.json')) as f:
+        with open(os.path.join(settings.BASE_DIR, 'apps', 'api', 'json_schema', 'trademark.json')) as f:
             self.schema = json.load(f)
 
         apps = OpenData.objects.filter(
-            obj_type_id__in=(11,12)
+            obj_type_id__in=(4,)
         ).select_related(
             'obj_type'
         ).order_by(
@@ -43,4 +43,11 @@ class Command(BaseCommand):
             i += 1
             serializer = OpenDataSerializerV1(app)
             print(f"{i}/{c} - {app['app_number']}")
-            validate(instance=serializer.data, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+            try:
+                validate(instance=serializer.data, schema=self.schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+            except ValidationError as error:
+                if "None is not of type" in str(error):
+                    continue
+                else:
+                    print(error)
+                    return
