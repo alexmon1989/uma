@@ -438,8 +438,80 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
                 self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(
                     self._raw_biblio['Code_441']
                 )
-            # Fix типа данных 'Code_441_BulNumber'
-            self._raw_biblio['Code_441_BulNumber'] = int(self._raw_biblio['Code_441_BulNumber'])
+            # Fix типа данных поля 'Code_441_BulNumber'
+            self._raw_biblio['Code_441_BulNumber'] = str(self._raw_biblio['Code_441_BulNumber'])
+
+        # Fix типа данных поля 'ApplicantSequenceNumber'
+        if 'ApplicantDetails' in self._raw_biblio:
+            for applicant in self._raw_biblio['ApplicantDetails']['Applicant']:
+                applicant['ApplicantSequenceNumber'] = int(applicant['ApplicantSequenceNumber'])
+
+        # Fix типа данных поля 'HolderSequenceNumber'
+        if 'HolderDetails' in self._raw_biblio:
+            for applicant in self._raw_biblio['HolderDetails']['Holder']:
+                applicant['HolderSequenceNumber'] = int(applicant['HolderSequenceNumber'])
+
+        # Fix типа данных поля '@sequenceNumber' секции 'WordMarkSpecification'
+        if self._raw_biblio.get('WordMarkSpecification'):
+            for item in self._raw_biblio['WordMarkSpecification']['MarkSignificantVerbalElement']:
+                if '@sequenceNumber' in item:
+                    try:
+                        item['@sequenceNumber'] = int(item['@sequenceNumber'])
+                    except ValueError:
+                        item['@sequenceNumber'] = 1
+
+        # Fix типа данных поля 'ClassNumber' секции 'GoodsServicesDetails'
+        if self._raw_biblio.get('GoodsServicesDetails') \
+                and 'ClassDescription' in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']:
+            for item in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription']:
+                item['ClassNumber'] = int(item['ClassNumber'])
+
+        # Fix типа данных поля '@sequenceNumber' секции 'MarkImageDetails'
+        if 'MarkImageDetails' in self._raw_biblio:
+            if 'MarkImageColourClaimedText' in self._raw_biblio['MarkImageDetails']['MarkImage']:
+                for item in self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']:
+                    if '@sequenceNumber' in item:
+                        try:
+                            item['@sequenceNumber'] = int(item['@sequenceNumber'])
+                        except ValueError:
+                            item['@sequenceNumber'] = 1
+
+            # Fix типов данных полей секции 'MarkImageRepresentationSize'
+            if self._raw_biblio['MarkImageDetails'].get('MarkImage', {}).get('MarkImageRepresentationSize'):
+                for item in self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageRepresentationSize']:
+                    if 'Height' in item['MarkImageRenditionRepresentationSize']:
+                        try:
+                            item['MarkImageRenditionRepresentationSize']['Height'] = int(
+                                item['MarkImageRenditionRepresentationSize']['Height']
+                            )
+                        except ValueError:
+                            item['MarkImageRenditionRepresentationSize']['Height'] = 0
+
+                    if 'Width' in item['MarkImageRenditionRepresentationSize']:
+                        try:
+                            item['MarkImageRenditionRepresentationSize']['Width'] = int(
+                                item['MarkImageRenditionRepresentationSize']['Width']
+                            )
+                        except ValueError:
+                            item['MarkImageRenditionRepresentationSize']['Width'] = 0
+
+        # Fix типа данных поля 'PriorityPartialIndicator' секции 'PriorityDetails'
+        if 'PriorityDetails' in self._raw_biblio and 'Priority' in self._raw_biblio['PriorityDetails']:
+            for item in self._raw_biblio['PriorityDetails']['Priority']:
+                if type(item['PriorityPartialIndicator']) is str:
+                    if item['PriorityPartialIndicator'] == 'true':
+                        item['PriorityPartialIndicator'] = True
+                    else:
+                        item['PriorityPartialIndicator'] = False
+
+        # Fix типа данных поля 'ExhibitionPartialIndicator' секции 'ExhibitionPriorityDetails'
+        if 'ExhibitionPriorityDetails' in self._raw_biblio:
+            for item in self._raw_biblio['ExhibitionPriorityDetails']['ExhibitionPriority']:
+                if type(item['ExhibitionPartialIndicator']) is str:
+                    if item['ExhibitionPartialIndicator'] == 'true':
+                        item['ExhibitionPartialIndicator'] = True
+                    else:
+                        item['ExhibitionPartialIndicator'] = False
 
         # Полные пути к изображениям
         try:
@@ -578,3 +650,45 @@ class BiblioDataNacpPresenter(BiblioDataPresenter):
     def get_prepared_biblio(self) -> dict:
         raw_biblio = json.loads(self._application_data['data'])
         return self._prepare_methods[self._application_data['obj_type_id']](raw_biblio)
+
+
+class PaymentsDataPresenter(ABC):
+    """Готовит данные платежей к отображению в API."""
+    _payments_data: dict
+
+    def set_payments_data(self, payments_data: dict):
+        self._payments_data = payments_data
+
+    @abstractmethod
+    def get_prepared_payments(self) -> dict:
+        pass
+
+
+class PaymentsDataPresenterTmId(PaymentsDataPresenter):
+    def get_prepared_payments(self) -> dict:
+        if 'Payment' in self._payments_data:
+            for payment in self._payments_data['Payment']:
+                payment['PaymentFeeDetails']['FeeAmount']['Amount'] = str(
+                    payment['PaymentFeeDetails']['FeeAmount']['Amount']
+                )
+        return self._payments_data
+
+
+class DocumentsDataPresenter(ABC):
+    """Готовит данные платежей к отображению в API."""
+    _documents_data: dict
+
+    def set_documents_data(self, documents_data: dict):
+        self._documents_data = documents_data
+
+    @abstractmethod
+    def get_prepared_documents(self) -> dict:
+        pass
+
+
+class DocumentsDataPresenterTmId(DocumentsDataPresenter):
+    def get_prepared_documents(self) -> dict:
+        for doc in self._documents_data:
+            if not doc['DocRecord'].get('DocIdDocCEAD'):
+                doc['DocRecord']['DocIdDocCEAD'] = None
+        return self._documents_data

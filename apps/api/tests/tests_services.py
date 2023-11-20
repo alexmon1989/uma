@@ -97,13 +97,13 @@ class BiblioDataFullPresenterTMTestCase(TestCase):
             'Code_441_BulNumber': '37'
         }
         prepared_data = self._get_prepared_data(source_data)
-        self.assertEqual(prepared_data['Code_441_BulNumber'], 37)
+        self.assertEqual(prepared_data['Code_441_BulNumber'], '37')
 
         source_data = {
             'Code_441_BulNumber': 37
         }
         prepared_data = self._get_prepared_data(source_data)
-        self.assertEqual(prepared_data['Code_441_BulNumber'], 37)
+        self.assertEqual(prepared_data['Code_441_BulNumber'], '37')
 
     def test_check_ApplicantSequenceNumber(self):
         source_data = {
@@ -121,3 +121,181 @@ class BiblioDataFullPresenterTMTestCase(TestCase):
         prepared_data = self._get_prepared_data(source_data)
         for applicant in prepared_data['ApplicantDetails']['Applicant']:
             self.assertIs(type(applicant['ApplicantSequenceNumber']), int)
+
+    def test_check_HolderSequenceNumber(self):
+        source_data = {
+            "HolderDetails": {
+                "Holder": [
+                    {
+                        "HolderSequenceNumber": 1
+                    },
+                    {
+                        "HolderSequenceNumber": '2'
+                    }
+                ]
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for holder in prepared_data['HolderDetails']['Holder']:
+            self.assertIs(type(holder['HolderSequenceNumber']), int)
+
+    def test_check_MarkImageColourClaimedTextSequenceNumber(self):
+        source_data = {
+            "WordMarkSpecification": {
+                "MarkSignificantVerbalElement": [
+                    {
+                        "@sequenceNumber": "1"
+                    },
+                    {
+                        "@sequenceNumber": 2
+                    }
+                ]
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['WordMarkSpecification']['MarkSignificantVerbalElement']:
+            self.assertIs(type(item['@sequenceNumber']), int)
+
+    def test_check_MarkImageDetailsSequenceNumber(self):
+        source_data = {
+            "MarkImageDetails": {
+                "MarkImage": {
+                    "MarkImageColourClaimedText": [
+                        {
+                            "@sequenceNumber": "1"
+                        },
+                        {
+                            "@sequenceNumber": 2
+                        }
+                    ]
+                }
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']:
+            self.assertIs(type(item['@sequenceNumber']), int)
+
+    def test_check_GoodsServicesDetailsClassNumber(self):
+        source_data = {
+            "GoodsServicesDetails": {
+                "GoodsServices": {
+                    "ClassDescriptionDetails": {
+                        "ClassDescription": [
+                            {
+                                "ClassNumber": "44"
+                            },
+                            {
+                                "ClassNumber": 45
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription']:
+            self.assertIs(type(item['ClassNumber']), int)
+
+    def test_check_MarkImageRenditionRepresentationSize(self):
+        source_data = {
+            "MarkImageDetails": {
+                "MarkImage": {
+                    "MarkImageRepresentationSize": [
+                        {
+                            "MarkImageRenditionRepresentationSize": {
+                                "Height": 423,
+                                "Width": 1400,
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['MarkImageDetails']['MarkImage']['MarkImageRepresentationSize']:
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Height']), int)
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Width']), int)
+
+        source_data = {
+            "MarkImageDetails": {
+                "MarkImage": {
+                    "MarkImageRepresentationSize": [
+                        {
+                            "MarkImageRenditionRepresentationSize": {
+                                "Height": '423',
+                                "Width": '1400',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['MarkImageDetails']['MarkImage']['MarkImageRepresentationSize']:
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Height']), int)
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Width']), int)
+
+        source_data = {
+            "MarkImageDetails": {
+                "MarkImage": {
+                    "MarkImageRepresentationSize": [
+                        {
+                            "MarkImageRenditionRepresentationSize": {
+                                "Height": '',
+                                "Width": '',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['MarkImageDetails']['MarkImage']['MarkImageRepresentationSize']:
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Height']), int)
+            self.assertIs(type(item['MarkImageRenditionRepresentationSize']['Width']), int)
+
+    def test_check_PriorityPartialIndicator(self):
+        source_data = {
+            "PriorityDetails": {
+                "Priority": [
+                    {
+                        "PriorityPartialIndicator": 'true'
+                    },
+                    {
+                        "PriorityPartialIndicator": 'false'
+                    },
+                    {
+                        "PriorityPartialIndicator": True
+                    },
+                    {
+                        "PriorityPartialIndicator": False
+                    }
+                ]
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['PriorityDetails']['Priority']:
+            self.assertIs(type(item['PriorityPartialIndicator']), bool)
+
+    def test_check_ExhibitionPartialIndicator(self):
+        source_data = {
+            "ExhibitionPriorityDetails": {
+                "ExhibitionPriority": [
+                    {
+                        "ExhibitionPartialIndicator": 'true'
+                    },
+                    {
+                        "ExhibitionPartialIndicator": 'false'
+                    },
+                    {
+                        "ExhibitionPartialIndicator": True
+                    },
+                    {
+                        "ExhibitionPartialIndicator": False
+                    }
+                ]
+            }
+        }
+        prepared_data = self._get_prepared_data(source_data)
+        for item in prepared_data['ExhibitionPriorityDetails']['ExhibitionPriority']:
+            self.assertIs(type(item['ExhibitionPartialIndicator']), bool)
