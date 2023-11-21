@@ -94,7 +94,7 @@ def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
     search_type = request.GET.get('search_type', None)
-    if task_id is not None and search_type in ('simple', 'advanced', 'transactions'):
+    if task_id and task_id.strip() and search_type in ('simple', 'advanced', 'transactions'):
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':
@@ -238,7 +238,7 @@ class ObjectDetailView(DetailView):
 def get_data_app_html(request):
     """Возвращает HTML с данными по заявке после выполнения асинхронной задачи."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    if task_id and task_id.strip():
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':
@@ -477,7 +477,7 @@ def download_transactions(request, format_: str):
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    if task_id and task_id.strip():
         task = AsyncResult(task_id)
         data = {
             'state': task.state,
@@ -491,7 +491,7 @@ def get_task_info(request):
 def get_validation_info(request):
     """Возвращает JSON с результатами валидации поискового запроса."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    if task_id and task_id.strip():
         task = AsyncResult(task_id)
         data = {
             'state': task.state,

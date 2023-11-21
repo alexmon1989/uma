@@ -57,7 +57,7 @@ def add_or_remove(request):
 def get_results_html(request):
     """Возвращает HTML с результатами простого поиска."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    if task_id and task_id.strip():
         task = AsyncResult(task_id)
         data = {}
         if task.state == 'SUCCESS':

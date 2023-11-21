@@ -39,7 +39,7 @@ def app_details_task(request):
 def get_task_info(request):
     """Возвращает JSON с результатами выполнения асинхронного задания."""
     task_id = request.GET.get('task_id', None)
-    if task_id is not None:
+    if task_id and task_id.strip():
         task = AsyncResult(task_id)
         data = {
             'state': task.state,
