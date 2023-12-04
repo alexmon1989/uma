@@ -162,8 +162,10 @@
 
         watch: {
             taskId() {
-                let tries = this.tries;
-                this.getTaskResult(tries);
+                if (this.taskId) {
+                  let tries = this.tries;
+                  this.getTaskResult(tries);
+                }
             },
 
             filePath(val) {
