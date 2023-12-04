@@ -1,11 +1,11 @@
-from django.db.models import F, QuerySet
+from django.db.models import F, QuerySet, Prefetch, Q as Q_ORM
 from django.conf import settings
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from rest_framework import exceptions
 
-from apps.search.models import IpcAppList
+from apps.search.models import IpcAppList, AppDocuments
 import apps.search.services as search_services
 from apps.api.models import OpenData
 from apps.bulletin import services as bulletin_services
@@ -372,22 +372,80 @@ def opendata_get_ids_queryset(filters: dict) -> QuerySet[OpenData]:
 
 def opendata_get_applications(ids: List[int]) -> List[dict]:
     """Возвращает список данных заявок по их идентификаторам."""
-    apps = OpenData.objects.select_related('obj_type').filter(pk__in=ids).values(
-        'id',
-        'obj_type_id',
-        'obj_state',
-        'app_number',
-        'app_date',
-        'registration_number',
-        'registration_date',
-        'last_update',
-        'data',
-        'data_docs',
-        'data_payments',
-        'obj_type__obj_type_ua',
-        'files_path',
+    apps = OpenData.objects.select_related('obj_type').prefetch_related(
+        Prefetch(
+            'app__appdocuments_set',
+            queryset=AppDocuments.objects.filter(file_type='pdf'),
+        )
+    ).filter(pk__in=ids)
+    res = []
+    for app in apps:
+        item = {
+            'id': app.pk,
+            'obj_type_id': app.obj_type.pk,
+            'obj_state': app.obj_state,
+            'app_number': app.app_number,
+            'app_date': app.app_date,
+            'registration_number': app.registration_number,
+            'registration_date': app.registration_date,
+            'last_update': app.last_update,
+            'data': app.data,
+            'data_docs': app.data_docs,
+            'data_payments': app.data_payments,
+            'obj_type__obj_type_ua': app.obj_type.obj_type_ua,
+            'files_path': app.files_path,
+        }
+        files = []
+        for f in app.app.appdocuments_set.all():
+            files.append(f.file_name.replace(
+                '\\\\bear\share\\', settings.MEDIA_URL
+            ).replace('\\', '/'))
+        item['files'] = files
+        res.append(item)
+    return res
+
+
+def opendata_get_application(app_number: str, obj_type_id: int = None) -> dict | None:
+    """Возвращает данные заявки"""
+    queryset = OpenData.objects.select_related('obj_type').prefetch_related(
+        Prefetch(
+            'app__appdocuments_set',
+            queryset=AppDocuments.objects.filter(file_type='pdf'),
+        )
+    ).order_by('-registration_number').filter(
+        Q_ORM(app_number=app_number) | Q_ORM(registration_number=app_number, obj_type_id=4)
     )
-    return list(apps)
+
+    if obj_type_id:
+        queryset = queryset.filter(obj_type_id=obj_type_id)
+
+    app = queryset.first()
+    if app:
+        item = {
+            'id': app.pk,
+            'obj_type_id': app.obj_type.pk,
+            'obj_state': app.obj_state,
+            'app_number': app.app_number,
+            'app_date': app.app_date,
+            'registration_number': app.registration_number,
+            'registration_date': app.registration_date,
+            'last_update': app.last_update,
+            'data': app.data,
+            'data_docs': app.data_docs,
+            'data_payments': app.data_payments,
+            'obj_type__obj_type_ua': app.obj_type.obj_type_ua,
+            'files_path': app.files_path,
+        }
+        files = []
+        for f in app.app.appdocuments_set.all():
+            files.append(f.file_name.replace(
+                '\\\\bear\share\\', settings.MEDIA_URL
+            ).replace('\\', '/'))
+        item['files'] = files
+
+        return item
+
+    return None
 
 
 class BiblioDataPresenter(ABC):
@@ -462,8 +520,10 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
         # Fix типа данных поля 'ClassNumber' секции 'GoodsServicesDetails'
         if self._raw_biblio.get('GoodsServicesDetails') \
-                and 'ClassDescription' in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']:
-            for item in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription']:
+                and 'ClassDescription' in self._raw_biblio['GoodsServicesDetails']['GoodsServices'][
+            'ClassDescriptionDetails']:
+            for item in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails'][
+                'ClassDescription']:
                 item['ClassNumber'] = int(item['ClassNumber'])
 
         # Fix типа данных поля '@sequenceNumber' секции 'MarkImageDetails'
@@ -559,6 +619,7 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
 class BiblioDataNacpPresenter(BiblioDataPresenter):
     """Готовит библиографические данные к отображению в API (для НАЗК)."""
+
     def __init__(self):
         self._prepare_methods = {
             1: self._prepare_biblio_id_um_ld,

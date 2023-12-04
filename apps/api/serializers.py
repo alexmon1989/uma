@@ -63,6 +63,14 @@ class OpenDataSerializer(serializers.ModelSerializer):
 
 
 class OpenDataSerializerV1(OpenDataSerializer):
+    files = serializers.ListField(child=serializers.CharField())
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if len(ret['files']) == 0:
+            del ret['files']
+        return ret
+
     class Meta:
         model = OpenData
         fields = (
@@ -78,6 +86,7 @@ class OpenDataSerializerV1(OpenDataSerializer):
             'data',
             'data_docs',
             'data_payments',
+            'files',
         )
 
 

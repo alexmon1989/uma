@@ -94,37 +94,17 @@ class OpenDataDetailViewV1(generics.RetrieveAPIView):
     serializer_class = OpenDataSerializerV1
     lookup_field = 'app_number'
 
-    def get_queryset(self):
-        queryset = OpenData.objects.select_related('obj_type').order_by('-registration_number')
-
-        if self.request.query_params.get('obj_type', None):
+    def get_object(self):
+        obj_type_id = self.request.query_params.get('obj_type', None)
+        if obj_type_id:
             try:
-                obj_type = int(self.request.query_params['obj_type'])
-                queryset = queryset.filter(obj_type=obj_type)
-            except ValueError:
+                obj_type_id = int(obj_type_id)
+            except TypeError:
                 raise Http404
 
-        return queryset
-
-    def get_object(self):
-        qs = self.get_queryset().filter(app_number=self.kwargs['app_number']).values(
-            'id',
-            'obj_type_id',
-            'obj_state',
-            'app_number',
-            'app_date',
-            'registration_number',
-            'registration_date',
-            'last_update',
-            'data',
-            'data_docs',
-            'data_payments',
-            'obj_type__obj_type_ua',
-            'files_path',
-        )
-
-        if qs.count() > 0:
-            return qs.first()
+        res = services.opendata_get_application(self.kwargs['app_number'], obj_type_id)
+        if res:
+            return res
         raise Http404
 
     def get(self, *args, **kwargs):
