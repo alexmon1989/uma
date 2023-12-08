@@ -52,8 +52,12 @@ class Command(BaseCommand):
 
     def get_app_date(self, app: IpcAppList, data: dict) -> datetime | str:
         """Возвращает дату заявки."""
-        if data['Document']['idObjType'] == 4 and data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
-            return data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10]
+        if data['Document']['idObjType'] == 4:
+            if data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
+                return data['TradeMark']['TrademarkDetails']['ApplicationDate'][:10]
+            else:
+                # Если дата подачи не установлена, то возвращается дата подачи материалов
+                return app.app_input_date
         elif data['Document']['idObjType'] == 6 and data['Design']['DesignDetails'].get('DesignApplicationDate'):
             return data['Design']['DesignDetails']['DesignApplicationDate'][:10]
         else:
