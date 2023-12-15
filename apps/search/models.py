@@ -493,7 +493,7 @@ class FvCicImporter(models.Model):
 
 
 class DeliveryDateCead(models.Model):
-    """Модель таблицы ls_delivery_dates базы данных EArchive. Содержит информацию о  """
+    """Модель таблицы ls_delivery_dates базы данных EArchive."""
     id = models.AutoField(db_column='idDelivery', primary_key=True)
     id_doc_cead = models.IntegerField(db_column='idDoc', blank=True, null=True)
     send_date = models.DateTimeField(blank=True, null=True)
@@ -518,3 +518,116 @@ class DeliveryDateCead(models.Model):
     class Meta:
         managed = False
         db_table = 'ls_delivery_dates'
+
+
+# WellKnownMarks DB
+
+class WKMMark(models.Model):
+    id = models.AutoField(db_column='IdMark', primary_key=True)
+    decision_date = models.DateTimeField(db_column='DecisionDate')
+    order_date = models.DateTimeField(db_column='OrderDate')
+    order_number = models.CharField(db_column='OrderNumber', max_length=50)
+    rights_date = models.DateTimeField(db_column='RightsDate')
+    keywords = models.CharField(db_column='KeyWords', max_length=200, blank=True, null=True)
+    mark_image = models.BinaryField(db_column='MarkImage', blank=True, null=True)
+    state_id = models.SmallIntegerField(db_column='IdState')
+    bulletin = models.ForeignKey('WKMRefBulletin', db_column='IdBulletin', on_delete=models.DO_NOTHING, blank=True, null=True)
+    where_to_publish = models.CharField(db_column='wheretopublish', max_length=20)
+    court_comments_ua = models.CharField(db_column='courtcomments', max_length=255, blank=True, null=True)
+    court_comments_rus = models.CharField(db_column='courtcommentsRUS', max_length=255, blank=True, null=True)
+    court_comments_eng = models.CharField(db_column='courtcommentsENG', max_length=255, blank=True, null=True)
+
+    owners = models.ManyToManyField('WKMRefOwner', through='WKMMarkOwner')
+
+    class Meta:
+        managed = False
+        db_table = 'Mark'
+
+    def to_dict(self) -> dict:
+        res = {
+            'PublicationDetails': [
+                {
+                    'PublicationDate': self.bulletin.bulletin_date[:10],
+                    'PublicationIdentifier': self.bulletin.bull_str,
+                }
+            ],
+            'DecisionDate': self.decision_date[:10] if self.decision_date else None,
+            'OrderDate': self.order_date[:10] if self.order_date else None,
+            'RightsDate': self.rights_date[:10] if self.rights_date else None,
+            'CourtComments': {
+                'CourtCommentsUA': self.court_comments_ua,
+                'CourtCommentsEN': self.court_comments_eng,
+                'CourtCommentsRU': self.court_comments_rus,
+            },
+            'WordMarkSpecification': {
+                'MarkSignificantVerbalElement': [
+                    {
+                        '#text': self.keywords,
+                        '@sequenceNumber': 1
+                    }
+                ]
+            },
+            'HolderDetails': {
+                'Holder': []
+            }
+        }
+        for i, owner in enumerate(self.owners.all(), 1):
+            res['HolderDetails']['Holder'].append(
+                {
+                    'HolderAddressBook': {
+                        'FormattedNameAddress': {
+                            'Name': {
+                                'FreeFormatName': {
+                                    'FreeFormatNameDetails': {
+                                        'FreeFormatNameLine': owner.owner_name
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'HolderSequenceNumber': i
+                }
+            )
+        return res
+
+
+class WKMRefOwner(models.Model):
+    id = models.AutoField(db_column='IdOwner', primary_key=True)
+    owner_name = models.CharField(db_column='OwnerName', max_length=500)
+    country_code = models.CharField(db_column='CountryCode', max_length=2)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_Owners'
+
+
+class WKMMarkOwner(models.Model):
+    mark = models.ForeignKey(WKMMark, db_column='IdMark', on_delete=models.DO_NOTHING)
+    owner = models.ForeignKey(WKMRefOwner, on_delete=models.DO_NOTHING, db_column='IdOwner')
+    ord_num = models.SmallIntegerField(db_column='OrdNum')
+
+    class Meta:
+        managed = False
+        db_table = 'MarkOwners'
+
+
+class WKMClass(models.Model):
+    mark = models.ForeignKey(WKMMark, db_column='IdMark', on_delete=models.DO_NOTHING)
+    class_number = models.SmallIntegerField(db_column='ClassNumber', primary_key=True, unique=False)
+    ord_num = models.SmallIntegerField(db_column='OrdNum')
+    products = models.CharField(db_column='Products', max_length=2000)
+
+    class Meta:
+        managed = False
+        db_table = 'MarkProducts'
+
+
+class WKMRefBulletin(models.Model):
+    id = models.AutoField(db_column='IdBulletin', primary_key=True)
+    bulletin_date = models.DateTimeField(db_column='BulletinDate')
+    bulletin_number = models.CharField(db_column='BulletinNumber', max_length=50)
+    bull_str = models.CharField(db_column='bullStr', max_length=10, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_Bulletins'

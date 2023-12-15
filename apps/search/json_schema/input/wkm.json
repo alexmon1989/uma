@@ -60,51 +60,56 @@
               "format": "date",
               "description": "Дата, на яку знак став добре відомим в Україні"
             },
-            "Holder": {
-              "description": "Список власників",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "HolderAddressBook": {
+            "HolderDetails": {
+              "type": "object",
+              "properties": {
+                "Holder": {
+                  "description": "Список власників",
+                  "type": "array",
+                  "items": {
                     "type": "object",
                     "properties": {
-                      "FormattedNameAddress": {
-                        "description": "Дані щодо адреси та найменування власника",
+                      "HolderAddressBook": {
                         "type": "object",
                         "properties": {
-                          "Address": {
-                            "description": "Дані щодо адреси",
+                          "FormattedNameAddress": {
+                            "description": "Дані щодо адреси та найменування власника",
                             "type": "object",
                             "properties": {
-                              "AddressCountryCode": {
-                                "description": "Код країни",
-                                "type": "string"
-                              },
-                              "FreeFormatAddress": {
+                              "Address": {
+                                "description": "Дані щодо адреси",
                                 "type": "object",
                                 "properties": {
-                                  "FreeFormatAddressLine": {
-                                    "description": "Адреса власника",
+                                  "AddressCountryCode": {
+                                    "description": "Код країни",
                                     "type": "string"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "Name": {
-                            "description": "Дані щодо найменування",
-                            "type": "object",
-                            "properties": {
-                              "FreeFormatName": {
-                                "type": "object",
-                                "properties": {
-                                  "FreeFormatNameDetails": {
+                                  },
+                                  "FreeFormatAddress": {
                                     "type": "object",
                                     "properties": {
-                                      "FreeFormatNameLine": {
-                                        "description": "Найменування власника",
+                                      "FreeFormatAddressLine": {
+                                        "description": "Адреса власника",
                                         "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "Name": {
+                                "description": "Дані щодо найменування",
+                                "type": "object",
+                                "properties": {
+                                  "FreeFormatName": {
+                                    "type": "object",
+                                    "properties": {
+                                      "FreeFormatNameDetails": {
+                                        "type": "object",
+                                        "properties": {
+                                          "FreeFormatNameLine": {
+                                            "description": "Найменування власника",
+                                            "type": "string"
+                                          }
+                                        }
                                       }
                                     }
                                   }
@@ -113,12 +118,15 @@
                             }
                           }
                         }
+                      },
+                      "HolderSequenceNumber": {
+                        "description": "Порядковий номер суб'єкта у списку власників",
+                        "type": [
+                          "integer",
+                          "string"
+                        ]
                       }
                     }
-                  },
-                  "HolderSequenceNumber": {
-                    "description": "Порядковий номер суб'єкта у списку власників",
-                    "type": ["integer", "string"]
                   }
                 }
               }
