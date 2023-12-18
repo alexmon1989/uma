@@ -512,6 +512,40 @@ def application_tm_censored_image_in_data(data: dict) -> bool:
     return notice_type and notice_type in censored_notices_types_list
 
 
+def application_tm_can_be_indexed(app_data: dict) -> bool:
+    """Проверяет может ли торговая марка быть добавлена в поисковый индекс."""
+    today = datetime.datetime.now()
+
+    publication = app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('PublicationDetails', [])
+    for item in publication:
+        if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
+            return False
+
+    transactions = app_data.get('TradeMark', {}).get('Transactions', {}).get('Transaction', [])
+    for item in transactions:
+        if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
+            return False
+
+    return True
+
+
+def application_id_can_be_indexed(app_data: dict) -> bool:
+    """Проверяет может ли пром образец быть добавлен в поисковый индекс."""
+    today = datetime.datetime.now()
+
+    publication = app_data.get('Design', {}).get('DesignDetails', {}).get('RecordPublicationDetails', [])
+    for item in publication:
+        if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
+            return False
+
+    transactions = app_data.get('Transactions', {}).get('Transaction', [])
+    for item in transactions:
+        if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
+            return False
+
+    return True
+
+
 def inid_code_get_list(lang: str) -> List[InidCode]:
     """
     Возвращает список ИНИД-кодов объектов пром собств.

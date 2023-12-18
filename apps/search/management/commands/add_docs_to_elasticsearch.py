@@ -556,7 +556,8 @@ class Command(BaseCommand):
                 self._fix_tm_image(doc, res)
 
             # Запись в индекс
-            self.write_to_es_index(doc, res)
+            if search_services.application_tm_can_be_indexed(data):
+                self.write_to_es_index(doc, res)
 
     def process_id(self, doc):
         """Добавляет документ типа "пром. образец" ElasticSearch."""
@@ -690,7 +691,8 @@ class Command(BaseCommand):
             self.fix_id_doc_cead(res['Design'].get('DocFlow', {}).get('Documents', []))
 
             # Запись в индекс
-            self.write_to_es_index(doc, res)
+            if search_services.application_id_can_be_indexed(data):
+                self.write_to_es_index(doc, res)
 
     def process_kzpt(self, doc):
         """Добавляет документ типа "географічне зазначення" ElasticSearch."""
