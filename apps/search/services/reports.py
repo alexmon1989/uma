@@ -825,10 +825,15 @@ class ReportItemDocxID(ReportItemDocx):
         if isinstance(priority, dict) and 'Priority' in priority:
             priority = priority['Priority']
         if inid and inid.visible and priority and len(priority) > 0:
-            self._paragraph.add_run(f"({inid.code})").bold = True
-            self._paragraph.add_run(f"\t{inid.title}: ")
-            self._paragraph.add_run(priority[0]['PriorityNumber']).bold = True
-            self._paragraph.add_run('\r')
+            priority_numbers = []
+            for item in priority:
+                if 'PriorityNumber' in item:
+                    priority_numbers.append(item['PriorityNumber'])
+            if len(priority_numbers):
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(', '.join(priority_numbers)).bold = True
+                self._paragraph.add_run('\r')
 
     def _write_32(self) -> None:
         """Записывает в документ данные об
@@ -838,11 +843,15 @@ class ReportItemDocxID(ReportItemDocx):
         if isinstance(priority, dict) and 'Priority' in priority:
             priority = priority['Priority']
         if inid and inid.visible and priority and len(priority) > 0:
-            priority_date = datetime.strptime(priority[0]['PriorityDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
-            self._paragraph.add_run(f"({inid.code})").bold = True
-            self._paragraph.add_run(f"\t{inid.title}: ")
-            self._paragraph.add_run(priority_date).bold = True
-            self._paragraph.add_run('\r')
+            priority_dates = []
+            for item in priority:
+                if 'PriorityDate' in item:
+                    priority_dates.append(datetime.strptime(item['PriorityDate'], '%Y-%m-%d').strftime('%d.%m.%Y'))
+            if len(priority_dates) > 0:
+                self._paragraph.add_run(f"({inid.code})").bold = True
+                self._paragraph.add_run(f"\t{inid.title}: ")
+                self._paragraph.add_run(', '.join(priority_dates)).bold = True
+                self._paragraph.add_run('\r')
 
     def _write_33(self) -> None:
         """Записывает в документ данные об
