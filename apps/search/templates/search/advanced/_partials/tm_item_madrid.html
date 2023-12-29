@@ -35,12 +35,12 @@
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Свідоцтво" %}:</h4>
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Міжнародна реєстрація" %}:</h4>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="(111) {% trans "Номер реєстрації знака, який є номером свідоцтва" %}"
+                   title="(111) {% trans "Номер міжнародної реєстрації" %}"
                 >{{ hit.MadridTradeMark.TradeMarkDetails|get:"@INTREGN" }}</a><br>
                 <a href="#!"
                    class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"

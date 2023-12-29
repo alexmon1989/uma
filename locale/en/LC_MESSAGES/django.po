@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-07 12:48+0200\n"
+"POT-Creation-Date: 2023-12-28 15:21+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -862,13 +862,13 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1254
+#: apps/search/services/services.py:1288
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1256
+#: apps/search/services/services.py:1290
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -972,7 +972,6 @@ msgstr "Full list of applicants"
 #: apps/search/templates/search/advanced/_partials/ld_item.html:86
 #: apps/search/templates/search/advanced/_partials/qi_item.html:68
 #: apps/search/templates/search/advanced/_partials/tm_item.html:88
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:38
 msgid "Свідоцтво"
 msgstr "Certificate"
 
@@ -982,7 +981,7 @@ msgstr "The number of the copyright registration certificate for the work"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:65
 msgid "Дата реєстрації авторського права"
-msgstr "Registration date, asc"
+msgstr "Registration date"
 
 #: apps/search/templates/search/advanced/_partials/favorites_icon.html:8
 #: apps/search/templates/search/detail/_partials/favorites_icon.html:8
@@ -1289,7 +1288,6 @@ msgid "Свідоцтво України на торговельну марку"
 msgstr "Trademark certificate of Ukraine"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:93
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:43
 msgid "Номер реєстрації знака, який є номером свідоцтва"
 msgstr "Registration number, which is a certificate number"
 
@@ -1332,9 +1330,17 @@ msgstr "International trademark registration registered in Ukraine"
 msgid "Дані станом на"
 msgstr "Data as of"
 
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:38
+msgid "Міжнародна реєстрація"
+msgstr "International registration"
+
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:43
+msgid "Номер міжнародної реєстрації"
+msgstr "International registration date"
+
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:49
 msgid "Дата міжнародної реєстрації"
-msgstr "International registration date"
+msgstr "International registration number"
 
 #: apps/search/templates/search/advanced/advanced.html:22
 #: apps/search/templates/search/simple/simple.html:21
