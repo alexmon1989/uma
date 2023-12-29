@@ -799,9 +799,6 @@ class Command(BaseCommand):
                 }
             }
 
-            # Статус охранного документа (цвет)
-            data['search_data']['registration_status_color'] = get_registration_status_color(data)
-
             # Поле 441 (дата опубликования заявки)
             try:
                 app = IpcAppList.objects.filter(
