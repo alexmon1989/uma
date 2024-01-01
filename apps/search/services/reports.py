@@ -1784,9 +1784,19 @@ class ReportItemCopyright(ReportItemDocx):
 
     def _write_54(self) -> None:
         """Записывает в документ данные об
-        ИНИД (54) Вид, повна та скорочена назва твору (творів)"""
+        ИНИД (54) Вид та повна назва твору (творів)"""
         inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
         name = self.application_data['Certificate']['CopyrightDetails'].get('Name')
+        if inid and inid.visible and name:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(name).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_54s(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Скорочена назва твору (творів)"""
+        inid = self._get_inid(self.obj_type_id, '54.S', self.application_data['search_data']['obj_state'])
+        name = self.application_data['Certificate']['CopyrightDetails'].get('NameShort')
         if inid and inid.visible and name:
             self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(name).bold = True
@@ -1884,6 +1894,7 @@ class ReportItemCopyright(ReportItemDocx):
         self._write_45d()
         self._write_45n()
         self._write_54()
+        self._write_54s()
         self._write_57()
         self._write_58()
         self._write_72()
@@ -1948,9 +1959,19 @@ class ReportItemAgreement(ReportItemDocx):
 
     def _write_54(self) -> None:
         """Записывает в документ данные об
-        ИНИД (54) Вид, повна та скорочена назва твору (творів)"""
+        ИНИД (54) Вид та повна назва твору (творів)"""
         inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
         name = self.application_data['Decision']['DecisionDetails'].get('Name')
+        if inid and inid.visible and name:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(name).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_54s(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Скорочена назва твору (творів)"""
+        inid = self._get_inid(self.obj_type_id, '54.S', self.application_data['search_data']['obj_state'])
+        name = self.application_data['Decision']['DecisionDetails'].get('NameShort')
         if inid and inid.visible and name:
             self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(name).bold = True
@@ -2037,6 +2058,7 @@ class ReportItemAgreement(ReportItemDocx):
         self._write_27()
         self._write_29()
         self._write_54()
+        self._write_54s()
         self._write_72()
         self._write_75()
 

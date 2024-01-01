@@ -22,10 +22,6 @@
                 {% trans 'Авторське право на службовий твір' %}
             {% endif %}
         </div>
-
-        {% if hit.search_data.obj_state == 2 %}
-            {% registration_status hit=hit %}
-        {% endif %}
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
@@ -34,7 +30,7 @@
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
                 {% for applicant in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}
                     {% if forloop.counter <= 2 %}
-                        {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                        {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
                     {% elif forloop.counter == 3 %}
                         <a href="#!"
                            data-toggle="popover"
@@ -42,7 +38,7 @@
                            data-html="true"
                            data-trigger="focus"
                            data-content="
-                                   {% for applicant_ in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                                   {% for applicant_ in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>{% endfor %}"
                         >(+{{ hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
                     {% endif %}
                 {% endfor %}
@@ -71,7 +67,7 @@
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Автор(и)" %}:</h4>
                     {% for author in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
                         {% if forloop.counter <= 2 %}
-                            {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                            {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
                         {% elif forloop.counter == 3 %}
                             <a href="#!"
                                data-toggle="popover"
@@ -79,7 +75,7 @@
                                data-html="true"
                                data-trigger="focus"
                                data-content="
-                                       {% for author_ in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author_.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                                       {% for author_ in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>{% endfor %}"
                             >(+{{ hit.Certificate.CopyrightDetails.AuthorDetails.Author|length|add:"-2" }})</a>
                         {% endif %}
                     {% endfor %}

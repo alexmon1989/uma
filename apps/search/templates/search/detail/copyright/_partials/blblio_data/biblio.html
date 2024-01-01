@@ -12,12 +12,6 @@
         </div>
     {% endif %}
 
-    {% if hit.search_data.obj_state == 2 %}
-        <div class="g-pb-10 d-flex justify-content-end">
-            {% registration_status hit=hit %}
-        </div>
-    {% endif %}
-
     <div class="table-responsive">
         <table class="table table-sm table-trade-mark g-font-size-13">
             <tbody>
@@ -105,6 +99,14 @@
                 </tr>
             {% endif %}
 
+            {% get_field '54.S' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.NameShort %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.NameShort }}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '55' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.Certificate.CopyrightDetails.WorkCopy %}
                 <tr>
@@ -147,7 +149,7 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.EmployerDetails.Employer %}
-                            {{ person.EmployerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.EmployerAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                            {{ person.EmployerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.EmployerAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.EmployerAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
                     </td>
                 </tr>
@@ -159,7 +161,7 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
-                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
                     </td>
                 </tr>
@@ -171,7 +173,7 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.HolderDetails.Holder %}
-                            {{ person.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                            {{ person.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
                     </td>
                 </tr>
@@ -183,7 +185,7 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.RepresentativeDetails.Representative %}
-                            {{ person.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
+                            {{ person.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
                     </td>
                 </tr>

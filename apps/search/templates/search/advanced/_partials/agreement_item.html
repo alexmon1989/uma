@@ -22,10 +22,6 @@
                 {% trans 'Договір про передачу (відчуження) майнових прав на твір' %}
             {% endif %}
         </div>
-
-        {% if hit.search_data.obj_state == 2 %}
-            {% registration_status hit=hit %}
-        {% endif %}
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
@@ -59,7 +55,7 @@
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Автор(и)" %}:</h4>
                     {% for author in hit.Decision.DecisionDetails.AuthorDetails.Author %}
                         {% if forloop.counter <= 2 %}
-                            {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
+                            {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
                         {% elif forloop.counter == 3 %}
                             <a href="#!"
                                data-toggle="popover"
@@ -67,7 +63,7 @@
                                data-html="true"
                                data-trigger="focus"
                                data-content="
-                                       {% for author_ in hit.Decision.DecisionDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ author_.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
+                                       {% for author_ in hit.Decision.DecisionDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>{% endfor %}"
                             >(+{{ hit.Decision.DecisionDetails.AuthorDetails.Author|length|add:"-2" }})</a>
                         {% endif %}
                     {% endfor %}
