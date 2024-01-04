@@ -78,6 +78,12 @@ def create_favorites_results_file_docx(user_id: int, favorites_ids: List[int], g
     )
     s = Search(using=client, index=settings.ELASTIC_INDEX_NAME).query(q)
 
+    # Сортировка
+    if get_params.get('sort_by'):
+        s = sort_results(s, get_params['sort_by'][0])
+    else:
+        s = s.sort('_score')
+
     if s.count() <= 500:
         # Сортировка
         if get_params.get('sort_by'):

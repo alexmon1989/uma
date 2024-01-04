@@ -88,7 +88,7 @@ def prepare_query(query, elastic_field):
     return query
 
 
-def get_elastic_results(search_groups, user):
+def get_elastic_results(search_groups: dict):
     """Поиск в ElasticSearch по группам."""
     qs_list = []
     for group in search_groups:

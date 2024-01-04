@@ -240,7 +240,7 @@ def perform_advanced_search(user_id, get_params):
     user = get_user_or_anonymous(user_id)
 
     # Поиск в ElasticSearch по каждой группе
-    s = get_elastic_results(search_groups, user)
+    s = get_elastic_results(search_groups)
 
     # Сортировка
     if get_params.get('sort_by'):
@@ -718,7 +718,13 @@ def create_advanced_search_results_file_docx(user_id, get_params, lang_code):
 
         # Поиск в ElasticSearch по каждой группе
         user = get_user_or_anonymous(user_id)
-        s = get_elastic_results(search_groups, user)
+        s = get_elastic_results(search_groups)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
 
         # Фильтрация
         # Возможные фильтры
@@ -789,7 +795,13 @@ def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
 
         # Поиск в ElasticSearch по каждой группе
         user = get_user_or_anonymous(user_id)
-        s = get_elastic_results(search_groups, user)
+        s = get_elastic_results(search_groups)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
 
         # Фильтрация
         # Возможные фильтры
@@ -862,6 +874,13 @@ def create_transactions_search_results_file_docx(get_params, lang_code):
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
+
         if s and s.count() <= 500:
             directory_path = Path(settings.MEDIA_ROOT) / 'search_results'
             os.makedirs(str(directory_path), exist_ok=True)
@@ -898,6 +917,13 @@ def create_transactions_search_results_file_xlsx(get_params, lang_code):
     # Валидация запроса
     if form.is_valid():
         s = get_search_in_transactions(form.cleaned_data)
+
+        # Сортировка
+        if get_params.get('sort_by'):
+            s = sort_results(s, get_params['sort_by'][0])
+        else:
+            s = s.sort('_score')
+
         if s and s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
 
