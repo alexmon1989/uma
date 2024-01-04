@@ -389,6 +389,7 @@
                                     <br>
                                     {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
                                         {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
                                         ({{ licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
                                     {% endfor %}
                                 </li>
@@ -400,7 +401,32 @@
                                     <br>
                                     {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
                                         {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
                                         ({{ licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
+                                    {% endfor %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.LicensorDetails.Licensee %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіара" %}:</span>
+                                    <br>
+                                    {% for licensor in transaction.TransactionBody.LicensorDetails.Licensee %}
+                                        {{ licensor.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        {{ licensor.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        ({{ licensor.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
+                                    {% endfor %}
+                                </li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.LicenseeDetails.Licensor %}
+                                <li>
+                                    <span class="g-font-weight-600">{% trans "Ім'я або повне найменування та адреса ліцензіата" %}:</span>
+                                    <br>
+                                    {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensor %}
+                                        {{ licensee.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        {{ licensee.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                        ({{ licensee.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }})
                                     {% endfor %}
                                 </li>
                             {% endif %}
