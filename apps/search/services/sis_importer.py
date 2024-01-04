@@ -161,3 +161,5 @@ class GeoSisImporter(DenotationSisImporter):
     """Реализация сервиса импорта КЗПТ."""
     type_code = 'KZPT'
     obj_type_id = 5
+
+

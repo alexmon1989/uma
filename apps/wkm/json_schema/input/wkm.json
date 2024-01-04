@@ -4,9 +4,7 @@
   "description": "Опис даних, що надходять до індексу ElasticSearch",
   "type": "object",
   "properties": {
-    "additionalProperties": false,
     "Document": {
-      "additionalProperties": false,
       "type": "object",
       "properties": {
         "filesPath": {
@@ -20,18 +18,15 @@
       }
     },
     "WellKnownMark": {
-      "additionalProperties": false,
       "type": "object",
       "properties": {
         "WellKnownMarkDetails": {
-          "additionalProperties": false,
           "type": "object",
           "properties": {
             "PublicationDetails": {
               "type": "array",
               "items": {
                 "type": "object",
-                "additionalProperties": false,
                 "properties": {
                   "PublicationDate": {
                     "type": "string",

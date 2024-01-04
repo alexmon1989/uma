@@ -1,27 +1,11 @@
 from django.test import TestCase
-from django.conf import settings
 
-from apps.search.models import IpcAppList, WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, WKMClass
-
-
-class TestIpcAppListTestCase(TestCase):
-
-    def test_real_files_path_property(self):
-        """Тестирует property real_files_path."""
-        app = IpcAppList()
-        app.files_path = '\\\\bear\\share\\INVENTIONS\\2023\\a202303880\\'
-        self.assertEqual(
-            app.real_files_path,
-            f'{settings.DOCUMENTS_MOUNT_FOLDER}INVENTIONS/2023/a202303880/'
-        )
-        app.files_path = 'e:\\poznach_test_sis\\bear_tmpp_sis\\TRADEMARKS\\2023\\m202303880\\'
-        self.assertEqual(
-            app.real_files_path,
-            f'{settings.DOCUMENTS_MOUNT_FOLDER}TRADEMARKS/2023/m202303880/'
-        )
+from apps.wkm.models import WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, WKMClass
 
 
 class WKMMarkTestCase(TestCase):
+
+    databases = ("WellKnownMarks", )
 
     def test_to_dict(self):
         mark_data = {
@@ -74,6 +58,7 @@ class WKMMarkTestCase(TestCase):
             ord_num=1,
             products='Products list 3'
         )
+        mark.refresh_from_db()
 
         expected = {
             'PublicationDetails': [

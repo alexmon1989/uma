@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from apps.search.models import WKMMark
+from apps.wkm.models import WKMMark
 
 
 class Command(BaseCommand):
