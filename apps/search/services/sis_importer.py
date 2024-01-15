@@ -83,12 +83,12 @@ class SisImporter(ABC):
         app_sis, created = IpcAppList.objects.update_or_create(
             app_number=application.app_number,
             obj_type_id=application.obj_type_id,
+            registration_date=application.reg_date,
             defaults={
                 'files_path': self._format_file_path_for_sis_db(application.files_path),
                 'app_date': application.app_date,
                 'app_input_date': application.app_input_date,
                 'registration_number': application.reg_number,
-                'registration_date': application.reg_date,
                 'elasticindexed': 0,
                 'lastupdate': datetime.now(),
                 'id_shedule_type': self._get_application_schedule_id(application),
