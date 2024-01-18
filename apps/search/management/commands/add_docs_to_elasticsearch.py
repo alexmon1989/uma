@@ -717,10 +717,6 @@ class Command(BaseCommand):
                     'FreeFormatNameDetails']['FreeFormatNameLine']} for x in
                              res['Geo']['GeoDetails']['ApplicantDetails']['Applicant']]
 
-            # Fix RegistrationDate
-            if res['Geo']['GeoDetails'].get('PublicationDetails'):
-                res['Geo']['GeoDetails']['RegistrationDate'] = res['Geo']['GeoDetails']['PublicationDetails'][0]['PublicationDate']
-
             # Поисковые данные (для сортировки и т.д.)
             res['search_data'] = {
                 'obj_state': 2 if (doc['registration_number'] and doc['registration_number'] != '0') else 1,
