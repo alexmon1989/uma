@@ -80,24 +80,6 @@
                 >{{ hit.Geo.GeoDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</a>
             </div>
 
-            <div class="col-md">
-                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Власник(и)' %}:</h4>
-                {% for holder in hit.Geo.GeoDetails.HolderDetails.Holder %}
-                    {% if forloop.counter <= 2 %}
-                        {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
-                    {% elif forloop.counter == 3 %}
-                        <a href="#!"
-                           data-toggle="popover"
-                           data-title="{% trans 'Повний список власників' %}"
-                           data-html="true"
-                           data-trigger="focus"
-                           data-content="
-                                   {% for holder_ in hit.Geo.GeoDetails.HolderDetails.Holder %}{{ holder_.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder_.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
-                        >(+{{ hit.Geo.GeoDetails.HolderDetails.Holder|length|add:"-2" }})</a>
-                    {% endif %}
-                {% endfor %}
-            </div>
-
             {% if hit.Geo.GeoDetails.GeoImageDetails %}
                 <div class="col-md-3">
                     <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"

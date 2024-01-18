@@ -742,7 +742,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '540', 'Назва товару', 1, True),
             InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
             InidCode(5, '529.A', 'Опис меж географічного місця', 1, True),
-            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 1, True),
+            InidCode(5, '539.D', 'Опис товару', 1, True),
             InidCode(5, '4573',
                      'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
                      1, True),
@@ -767,7 +767,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '540', 'Назва товару', 2, True),
             InidCode(5, '4551', 'Кваліфікація географічного зазначення', 2, True),
             InidCode(5, '529.A', 'Опис меж географічного місця', 2, True),
-            InidCode(5, '539.D', 'Опис товару, для якого географічне зазначення заявляється на реєстрацію', 2, True),
+            InidCode(5, '539.D', 'Опис товару', 2, True),
             InidCode(5, '4573',
                      'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
                      2, True),
@@ -1029,8 +1029,7 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             InidCode(5, '540', 'Name of the product', 2, True),
             InidCode(5, '4551', 'Qualification of geographical indication', 2, True),
             InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 2, True),
-            InidCode(5, '539.D', 'Description of the product for which the geographical indication '
-                                 'is applied for registration', 2, True),
+            InidCode(5, '539.D', 'Description of the product', 2, True),
             InidCode(5, '4573',
                      'Description of the product\'s relationship with the geographic environment '
                      'or geographic place of origin',
