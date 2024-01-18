@@ -75,7 +75,11 @@ class SisImporter(ABC):
         """Обрабатывает заявку"""
         # Запись в файловое хранилище
         application.files_path.mkdir(parents=True, exist_ok=True)
-        file_path = application.files_path / f"{application.app_number}.json"
+        if application.reg_number:
+            file_path = application.files_path / f"{application.reg_number.replace('/', '_')}.json"
+        else:
+            file_path = application.files_path / f"{application.app_number.replace('/', '_')}.json"
+
         with open(str(file_path), "w") as outfile:
             outfile.write(json.dumps(application.json_data))
 
@@ -83,16 +87,16 @@ class SisImporter(ABC):
         app_sis, created = IpcAppList.objects.update_or_create(
             app_number=application.app_number,
             obj_type_id=application.obj_type_id,
-            registration_number=application.reg_number,
+            id_parent=application.claim_id,
             defaults={
                 'files_path': self._format_file_path_for_sis_db(application.files_path),
                 'app_date': application.app_date,
                 'app_input_date': application.app_input_date,
                 'registration_date': application.reg_date,
+                'registration_number': application.reg_number,
                 'elasticindexed': 0,
                 'lastupdate': datetime.now(),
                 'id_shedule_type': self._get_application_schedule_id(application),
-                'id_parent': application.claim_id,
                 'id_claim': application.claim_id,
             }
         )
