@@ -7,9 +7,28 @@
             <tr>
                 <th class="g-px-10" width="20%">{{ transaction|get:"@name"|capfirst }}</th>
                 <td>
-                    {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
-                        <span class="g-font-weight-600">{% trans "Дата публікації та номер бюлетеня" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}
-                    {% endif %}
+                    <ul class="g-pl-20">
+                        {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                            <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinNumber" }}, {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }}</li>
+                        {% endif %}
+
+                        {% if transaction|get:"@registrationNumber" %}
+                            <li><span class="g-font-weight-600">(111) {% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                        {% endif %}
+
+                        {% if transaction|get:"@applicationNumber" %}
+                            <li><span class="g-font-weight-600">(210) {% trans "Номер заявки" %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
+                        {% endif %}
+
+                        {% if transaction|get:"@type" == 'ChangeOwner' and transaction.TransactionBody.HolderDetails %}
+                            <li>
+                                <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
+                                {% for holder in transaction.TransactionBody.HolderDetails.Holder %}
+                                    {{ holder.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ holder.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}){% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </li>
+                        {% endif %}
+                    </ul>
                 </td>
             </tr>
         {% endfor %}
