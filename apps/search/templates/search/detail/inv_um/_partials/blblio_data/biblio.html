@@ -182,13 +182,13 @@
                     <td>
                         {% for I_54 in hit.biblio_data.I_54 %}
                             {% if I_54|get:'I_54.U' %}
-                                {{ I_54|get:'I_54.U' }} [UA]
+                                {{ I_54|get:'I_54.U'|safe }} [UA]
                             {% endif %}
                             {% if I_54|get:'I_54.R' %}
-                                {{ I_54|get:'I_54.R' }} [RU]
+                                {{ I_54|get:'I_54.R'|safe }} [RU]
                             {% endif %}
                             {% if I_54|get:'I_54.E' %}
-                                {{ I_54|get:'I_54.E' }} [EN]
+                                {{ I_54|get:'I_54.E'|safe }} [EN]
                             {% endif %}
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
