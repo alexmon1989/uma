@@ -1171,7 +1171,7 @@ class ReportItemDocxGeo(ReportItemDocx):
         inid = self._get_inid(self.obj_type_id, '151', self.application_data['search_data']['obj_state'])
         reg_date = self.application_data['Geo']['GeoDetails'].get('RegistrationDate')
         if inid and inid.visible and reg_date:
-            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            reg_date = datetime.strptime(reg_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"{inid.title}: ")
             self._paragraph.add_run(reg_date).bold = True
             self._paragraph.add_run('\r')
