@@ -426,10 +426,11 @@ def prepare_kzpt_data(record):
     }
 
     # Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням
-    biblio_data['code_4573'] = {
-        'title': 'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
-        'value': data['DescriptionOfTheRelationship']
-    }
+    if 'DescriptionOfTheRelationship' in data:
+        biblio_data['code_4573'] = {
+            'title': 'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
+            'value': data['DescriptionOfTheRelationship']
+        }
 
     # 731 - заявник (ім'я або повне найменування та адреса заявника (заявників))
     biblio_data['code_731'] = {
