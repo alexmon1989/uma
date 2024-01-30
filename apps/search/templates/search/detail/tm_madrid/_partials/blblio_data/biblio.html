@@ -118,6 +118,18 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
+                        {% if hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA %}
+                            <div class="g-mb-10">
+                                <video style="height: auto; width: auto; max-width: 250px;" width="250px" height="250px" controls="controls">
+                                    <source src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".mp4" }}">
+                                </video>
+                            </div>
+                            <div class="g-mb-10">
+                                <a href="{{ hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA }}"
+                                   target="_blank">{{ hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA }}</a>
+                            </div>
+                        {% endif %}
+
                         <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
                            href="javascript:;"
                            data-src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".jpg" }}">
