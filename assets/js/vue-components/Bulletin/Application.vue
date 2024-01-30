@@ -21,7 +21,21 @@
                     >{{ app_data[code].title }}:</v-col>
                     <v-col v-if="app_data[code].value && code === 'code_540' && app_data[code].type === 'image'"
                            class="g-pa-5"
-                    ><img :src="app_data[code].value" class="img-fluid"></v-col>
+                    >
+                      <div class="g-mb-10" v-if="app_data['code_540_MULTIMEDIA_FILE']">
+                        <video style="height: auto; width: auto; max-width: 250px;"
+                               width="250px"
+                               height="250px"
+                               controls="controls">
+                          <source :src="app_data['code_540_MULTIMEDIA_FILE'].value">
+                        </video>
+                      </div>
+                      <div class="g-mb-10" v-if="app_data['code_540_MULTIMEDIA_MADRID_LINK']">
+                        <a :href="app_data['code_540_MULTIMEDIA_MADRID_LINK'].value"
+                           target="_blank">{{ app_data['code_540_MULTIMEDIA_MADRID_LINK'].value }}</a>
+                      </div>
+                      <img :src="app_data[code].value" class="img-fluid" alt="">
+                    </v-col>
                     <v-col v-else-if="app_data[code].value && code === 'code_9441'"
                            class="g-pa-5"
                     ><a :href="app_data[code].value"

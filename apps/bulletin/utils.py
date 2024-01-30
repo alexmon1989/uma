@@ -333,6 +333,16 @@ def prepare_madrid_tm_data(app_number, record):
     elif os.path.exists(os.path.join(image_dir, f"{data['@INTREGN'][1:]}.jpg")):
         biblio_data['code_540']['value'] = os.path.join(images_url, f"{data['@INTREGN'][1:]}.jpg")
 
+    # Видеофайл
+    if data.get('MULTIMEDIA'):
+        biblio_data['code_540_MULTIMEDIA_FILE'] = {
+            'value': os.path.join(images_url, f"{data['@INTREGN']}.mp4"),
+            'type': 'multimedia'
+        }
+        biblio_data['code_540_MULTIMEDIA_MADRID_LINK'] = {
+            'value': data['MULTIMEDIA'],
+        }
+
     # (511) Індекс (індекси) МКТП та перелік товарів і послуг
     biblio_data['code_511'] = {
         'title': '(511) Індекс (індекси) МКТП та перелік товарів і послуг',
