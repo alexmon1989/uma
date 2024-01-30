@@ -145,6 +145,14 @@
                 </tr>
             {% endif %}
 
+            {% get_field '553' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{% trans "Рухова торговельна марка" %}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '511' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.BASICGS.GSGR %}
                 <tr>

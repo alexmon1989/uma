@@ -342,6 +342,10 @@ def prepare_madrid_tm_data(app_number, record):
         biblio_data['code_540_MULTIMEDIA_MADRID_LINK'] = {
             'value': data['MULTIMEDIA'],
         }
+        biblio_data['code_553'] = {
+            'title': '(553) Зазначення того, що торговельна марка рухова або мультимедійна',
+            'value': 'Рухова торговельна марка',
+        }
 
     # (511) Індекс (індекси) МКТП та перелік товарів і послуг
     biblio_data['code_511'] = {
