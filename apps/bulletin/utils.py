@@ -347,6 +347,13 @@ def prepare_madrid_tm_data(app_number, record):
             'value': 'Рухова торговельна марка',
         }
 
+    # (571) Індекс (індекси) МКТП та перелік товарів і послуг
+    if data.get('DESCRIPTION'):
+        biblio_data['code_571'] = {
+            'title': '(571) Опис торговельної марки',
+            'value': data['DESCRIPTION']
+        }
+
     # (511) Індекс (індекси) МКТП та перелік товарів і послуг
     biblio_data['code_511'] = {
         'title': '(511) Індекс (індекси) МКТП та перелік товарів і послуг',
