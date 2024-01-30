@@ -1,4 +1,5 @@
 from django.db import models
+from collections import defaultdict
 
 
 # WellKnownMarks DB
@@ -96,7 +97,7 @@ class WKMMark(models.Model):
                 'Holder': []
             }
         }
-        for i, owner in enumerate(self.owners.all(), 1):
+        for i, owner in enumerate(self.owners.order_by('pk').all(), 1):
             res['HolderDetails']['Holder'].append(
                 {
                     'HolderAddressBook': {
@@ -113,6 +114,31 @@ class WKMMark(models.Model):
                     'HolderSequenceNumber': i
                 }
             )
+
+        classes = defaultdict(list)
+        for klass in self.wkmclass_set.order_by('class_number', 'ord_num').all():
+            classes[klass.class_number].append({
+                'ClassificationTermLanguageCode': 'UA',
+                'ClassificationTermText': klass.products
+            })
+
+        res['GoodsServicesDetails'] = {
+            'GoodsServices': {
+                'ClassDescriptionDetails': {
+                    'ClassDescription': []
+                }
+            }
+        }
+        for klass in classes:
+            res['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription'].append(
+                {
+                    'ClassNumber': klass,
+                    'ClassificationTermDetails': {
+                        'ClassificationTerm': classes[klass]
+                    }
+                }
+            )
+
         return res
 
 
@@ -149,9 +175,10 @@ class WKMMarkOwner(models.Model):
 
 
 class WKMClass(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
     mark = models.ForeignKey(WKMMark, db_column='IdMark', on_delete=models.DO_NOTHING)
     class_number = models.SmallIntegerField(
-        db_column='ClassNumber', primary_key=True, unique=False, verbose_name='Номер класу'
+        db_column='ClassNumber', unique=False, verbose_name='Номер класу'
     )
     ord_num = models.SmallIntegerField(db_column='OrdNum', verbose_name='Порядок відображення')
     products = models.CharField(db_column='Products', max_length=2000, verbose_name='Перелік товарів')
@@ -187,9 +214,10 @@ class WKMRefBulletin(models.Model):
 
 
 class WKMVienna(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
     mark = models.ForeignKey(WKMMark, db_column='IdMark', on_delete=models.DO_NOTHING)
     class_number = models.CharField(
-        db_column='ClassNumber', max_length=255, primary_key=True, unique=False, verbose_name='Номер класу'
+        db_column='ClassNumber', max_length=255, unique=False, verbose_name='Номер класу'
     )
 
     def __str__(self):

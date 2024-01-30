@@ -5,18 +5,18 @@ from apps.wkm.models import WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, 
 
 class WKMMarkTestCase(TestCase):
 
-    databases = ("WellKnownMarks", )
+    databases = ("default", "WellKnownMarks", )
 
     def test_to_dict(self):
         mark_data = {
-            'decision_date': '2023-12-12 12:00:00',
-            'order_date': '2023-12-12 13:00:00',
+            'decision_date': '2023-12-12',
+            'order_date': '2023-12-12',
             'order_number': '123',
-            'rights_date': '2023-12-12 14:00:00',
+            'rights_date': '2023-12-12',
             'keywords': 'Keywords',
             'state_id': 1,
             'bulletin': WKMRefBulletin.objects.create(
-                bulletin_date='2023-12-12 15:00:00',
+                bulletin_date='2023-12-12',
                 bulletin_number=5,
                 bull_str='5/2023',
             ),
@@ -29,11 +29,11 @@ class WKMMarkTestCase(TestCase):
         mark.save()
 
         owners_names = ['John Smith', 'Bob Jackson']
-        for i, n in enumerate(owners_names, 1):
+        for i, owners_name in enumerate(owners_names, 1):
             item = WKMMarkOwner(
                 mark=mark,
                 owner=WKMRefOwner.objects.create(
-                    owner_name=n,
+                    owner_name=owners_name,
                     country_code='UA',
                 ),
                 ord_num=i
