@@ -413,7 +413,7 @@ def opendata_get_application(app_number: str, obj_type_id: int = None) -> dict |
             queryset=AppDocuments.objects.filter(file_type='pdf'),
         )
     ).order_by('-registration_number').filter(
-        Q_ORM(app_number=app_number) | Q_ORM(registration_number=app_number, obj_type_id=4)
+        Q_ORM(app_number=app_number) | Q_ORM(registration_number=app_number)
     )
 
     if obj_type_id:
