@@ -468,6 +468,13 @@ def app_stages_inv_um(app):
                     if x in doc_type:
                         done_stages.append(stage['STAGERECORD']['STAGE'])
                         break
+        elif stage['STAGERECORD']['STAGE'] == 'Кваліфікаційна експертиза' \
+                and stage['STAGERECORD'].get('ENDDATE') \
+                and app['search_data']['obj_state'] == 1:
+            for doc_type in doc_types:
+                if '[В9]' in doc_type:
+                    done_stages.append(stage['STAGERECORD']['STAGE'])
+                    break
         elif stage['STAGERECORD'].get('ENDDATE'):
             done_stages.append(stage['STAGERECORD']['STAGE'])
 
