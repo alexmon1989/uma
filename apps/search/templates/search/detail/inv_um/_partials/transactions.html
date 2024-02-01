@@ -723,6 +723,20 @@
                                 <li><span class="g-font-weight-600">{% trans "Підстава" %}:</span> {{ transaction.REASON }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction.PUBLICATIONNAME == "Додаткова охорона прав на винаходи за рішенням суду" %}
+                        <ul class="g-pl-20">
+                            {% if transaction.OTHER4 %}
+                                <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.OTHER4 }}</li>
+                            {% endif %}
+
+                            {% if transaction.OTHER5 %}
+                                <li><span class="g-font-weight-600">{% trans "Номер та дата сертифіката додаткової охорони" %}:</span> {{ transaction.OTHER5 }}</li>
+                            {% endif %}
+
+                            {% if transaction.BULLETIN %}
+                                <li><span class="g-font-weight-600">{% trans "Дата публікації та номер бюлетеня" %}:</span> {{ transaction.BULLETIN }}</li>
+                            {% endif %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}

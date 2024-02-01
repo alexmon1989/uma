@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 16:38+0200\n"
+"POT-Creation-Date: 2024-02-01 14:58+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -294,6 +294,7 @@ msgstr "Date from which the certificate is considered invalid"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:475
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:595
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:635
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:729
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:151
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:186
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:240
@@ -792,7 +793,7 @@ msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
 #: apps/search/services/services.py:88
-#: apps/search/templatetags/search_extras.py:483
+#: apps/search/templatetags/search_extras.py:490
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
@@ -801,29 +802,29 @@ msgstr "Patent registered"
 #: apps/search/templatetags/search_extras.py:293
 #: apps/search/templatetags/search_extras.py:371
 #: apps/search/templatetags/search_extras.py:409
-#: apps/search/templatetags/search_extras.py:489
+#: apps/search/templatetags/search_extras.py:496
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
 #: apps/search/services/services.py:100
-#: apps/search/templatetags/search_extras.py:495
+#: apps/search/templatetags/search_extras.py:502
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
 #: apps/search/services/services.py:106 apps/search/services/services.py:242
 #: apps/search/templatetags/search_extras.py:297
-#: apps/search/templatetags/search_extras.py:501
+#: apps/search/templatetags/search_extras.py:508
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
 #: apps/search/services/services.py:111
-#: apps/search/templatetags/search_extras.py:506
+#: apps/search/templatetags/search_extras.py:513
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
 #: apps/search/services/services.py:117 apps/search/services/services.py:246
 #: apps/search/templatetags/search_extras.py:301
-#: apps/search/templatetags/search_extras.py:512
+#: apps/search/templatetags/search_extras.py:519
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
@@ -832,7 +833,7 @@ msgstr "Formal examination"
 #: apps/search/templatetags/search_extras.py:305
 #: apps/search/templatetags/search_extras.py:379
 #: apps/search/templatetags/search_extras.py:417
-#: apps/search/templatetags/search_extras.py:518
+#: apps/search/templatetags/search_extras.py:525
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
@@ -841,7 +842,7 @@ msgstr "According of the filling date"
 #: apps/search/templatetags/search_extras.py:309
 #: apps/search/templatetags/search_extras.py:383
 #: apps/search/templatetags/search_extras.py:421
-#: apps/search/templatetags/search_extras.py:525
+#: apps/search/templatetags/search_extras.py:532
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -1586,6 +1587,7 @@ msgstr "There are no credited payments"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:484
 #: apps/search/templates/search/detail/id/_partials/transactions.html:502
 #: apps/search/templates/search/detail/id/_partials/transactions.html:527
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:737
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:523
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:806
 msgid "Дата публікації та номер бюлетеня"
@@ -1932,6 +1934,10 @@ msgstr "Registration number, which is a patent number"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:661
 msgid "Імꞌя або повне найменування та адреса володільця патенту"
 msgstr "Name or full name and address of the patent owner"
+
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:733
+msgid "Номер та дата сертифіката додаткової охорони"
+msgstr "Number and date of the certificate of additional protection"
 
 #: apps/search/templates/search/detail/inv_um/detail.html:47
 #: apps/search/templates/search/detail/ld/detail.html:47
