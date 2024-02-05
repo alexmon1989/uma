@@ -81,7 +81,9 @@ class Command(BaseCommand):
                 i += 1
                 self.stdout.write(self.style.SUCCESS(f"{i}/{c} - {d[0]}"))
 
-            app = IpcAppList.objects.get(id=d[0])
+            app = IpcAppList.objects.filter(id=d[0], elasticindexed=1).first()
+            if not app:
+                continue
 
             # Получение данных с ElasticSearch
             data = Search(
