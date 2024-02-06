@@ -431,13 +431,16 @@ def application_filter_documents_tm_id(documents_data: List[dict]) -> List[dict]
     res = []
     for doc in documents_data:
         doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
-        doc_number = doc.get('DocRecord', {}).get('DocRegNumber', '').lower()
 
         # В рез. список не включаются служебные записки
         if 'службова' in doc_type or 'бібліографічні дані заявки на знак для товарів і послуг' in doc_type:
             continue
         # и внутренние документы
+        doc_number = doc.get('DocRecord', {}).get('DocRegNumber', '').lower()
         if doc_number.startswith('вн'):
+            continue
+        # и документы с датой 1970-01-01 без рег. номера
+        if not doc_number and doc.get('DocRecord', {}).get('DocRegDate', '') == '1970-01-01':
             continue
 
         res.append(doc)
