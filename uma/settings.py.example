@@ -54,13 +54,15 @@ INSTALLED_APPS = [
     'apps.patent_attorneys.apps.PatentAttorneysConfig',
     'apps.payments.apps.PaymentsConfig',
     # 'apps.intellectual_property.apps.IntellectualPropertyConfig',
+    'apps.classifiers.apps.ClassifiersConfig',
     'ckeditor',
     'ckeditor_uploader',
     'djcelery_email',
     'django_celery_results',
     'django_celery_beat',
     'annoying',
-    'bootstrap4'
+    'bootstrap4'б
+    'reversion',
 ]
 
 MIDDLEWARE = [
