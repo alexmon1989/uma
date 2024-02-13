@@ -1171,6 +1171,8 @@ def user_has_access_to_docs(user, hit):
     if not user.is_anonymous:
         if user.is_vip():
             return True
+        elif 'НАЗК' in user.groups.all().values_list('name', flat=True):
+            return not is_app_limited(hit)
         else:
             allowed_persons = []
 
@@ -1929,7 +1931,6 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
-            return res
 
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
             res = {
@@ -1941,7 +1942,6 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
-            return res
 
         elif app_data['Document']['idObjType'] == 4:
             # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
@@ -1993,7 +1993,6 @@ def filter_app_data(app_data, user):
                     'app_number': app_data['search_data']['app_number'],
                     'obj_state': app_data['search_data']['obj_state'],
                 }})
-                return res
 
         # КЗПТ
         elif app_data['Document']['idObjType'] == 5 and 'ApplicationPublicationDetails' not in app_data['Geo']['GeoDetails']:
@@ -2014,7 +2013,6 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
-            return res
 
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             res = {
@@ -2035,7 +2033,10 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
-            return res
+
+        res['app_limited'] = True
+
+        return res
 
     return app_data
 
@@ -2049,6 +2050,8 @@ def is_app_limited(app_data: dict):
             return True
         elif app_data['Document']['idObjType'] == 4:  # Заявки на ТМ
             # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
+            if 'app_date' not in app_data['search_data']:
+                return True
             mark_status = get_fixed_mark_status_code(app_data)
             app_date = datetime.datetime.strptime(app_data['search_data']['app_date'][:10], '%Y-%m-%d')
             date_441 = app_data['TradeMark']['TrademarkDetails'].get('Code_441')
