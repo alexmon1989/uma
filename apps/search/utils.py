@@ -1931,6 +1931,7 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
+            return res
 
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
             res = {
@@ -1942,6 +1943,7 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
+            return res
 
         elif app_data['Document']['idObjType'] == 4:
             # mark_status = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
@@ -1993,6 +1995,7 @@ def filter_app_data(app_data, user):
                     'app_number': app_data['search_data']['app_number'],
                     'obj_state': app_data['search_data']['obj_state'],
                 }})
+                return res
 
         # КЗПТ
         elif app_data['Document']['idObjType'] == 5 and 'ApplicationPublicationDetails' not in app_data['Geo']['GeoDetails']:
@@ -2013,6 +2016,7 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
+            return res
 
         elif app_data['Document']['idObjType'] == 6:  # Пром. образцы
             res = {
@@ -2033,10 +2037,7 @@ def filter_app_data(app_data, user):
                     'obj_state': app_data['search_data']['obj_state'],
                 }
             }
-
-        res['app_limited'] = True
-
-        return res
+            return res
 
     return app_data
 
