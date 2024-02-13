@@ -16,8 +16,8 @@ from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, Order
 from apps.bulletin import services as bulletin_services
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
-
-from uma.utils import get_user_or_anonymous
+from apps.my_auth.services import UserService
+from apps.classifiers.services import document_types_disabled_nacp
 
 
 def application_get_stages_statuses(app_data: dict) -> Optional[List]:
@@ -1188,6 +1188,39 @@ class DownloadDocumentsService:
                 return False
         return True
 
+    def _get_error_downloading(self) -> tuple[str, str] | None:
+        """Проверяет все ли запрошенные документы могут быть скачаны. Возвращает кортеж с данными ошибки или None."""
+        user_groups = UserService.get_user_groups(self.user_id)
+        if 'НАЗК' in user_groups:
+            doc_titles = []
+            for id_doc_cead in self.cead_ids:
+                for doc in self.documents:
+                    if int(doc.id_doc_cead) == int(id_doc_cead):
+                        doc_titles.append(doc.title.replace("\r\n", ""))
+            disabled_docs = document_types_disabled_nacp(doc_titles, self.application_data['Document']['idObjType'])
+            if disabled_docs:
+                if len(self.cead_ids) == 1:
+                    message = _('Завантаження неможливе, '
+                                'оскільки документ не дозволений для завантаження представникам НАЗК.')
+                else:
+                    message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
+                                'що не дозволений(і) для завантаження представникам НАЗК:')
+                    for doc in disabled_docs:
+                        message = f"{message}<br>- {doc}"
+                return 'nacp_disabled', message
+        else:
+            if self.application_data['search_data']['obj_state'] == 1:
+                self._set_docs_wo_receive_date()
+                if len(self.documents_wo_receive_date) > 0:
+                    if len(self.cead_ids) == 1:
+                        message = _('Завантаження неможливе, оскільки документ не був отриманий адресатом.')
+                    else:
+                        message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
+                                    'що не був(ли) отримані адресатом:')
+                        for doc in self.documents_wo_receive_date:
+                            message = f"{message}<br>- {doc.title} ({doc.reg_number})"
+                    return 'no_receive_date', message
+
     def _set_docs_wo_receive_date(self) -> None:
         """Проверяет, все ли документы для скачивания имеют дату получения.
         Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19'"""
@@ -1265,7 +1298,7 @@ class DownloadDocumentsService:
         self._set_application()
 
         # Проверка есть ли доступ у пользователя к этой заявке
-        user = get_user_or_anonymous(user_id)
+        user = UserService.get_user_or_anonymous(user_id)
         if not user_has_access_to_docs(user, self.application_data):
             return ServiceExecuteResult(
                 status='error',
@@ -1287,24 +1320,15 @@ class DownloadDocumentsService:
             )
 
         # Проверка все ли документы, запрошенные пользователем, доступны для загрузки
-        if self.application_data['search_data']['obj_state'] == 1:
-            self._set_docs_wo_receive_date()
-            if len(self.documents_wo_receive_date) > 0:
-                if len(self.cead_ids) == 1:
-                    message = _('Завантаження неможливе, оскільки документ не був отриманий адресатом.')
-                else:
-                    message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
-                                'що не був(ли) отримані адресатом:')
-                    for doc in self.documents_wo_receive_date:
-                        message = f"{message}<br>- {doc.title} ({doc.reg_number})"
-
-                return ServiceExecuteResult(
-                    status='error',
-                    error=ServiceExecuteResultError(
-                        error_type='no_receive_date',
-                        message=message
-                    )
+        error_downloading = self._get_error_downloading()
+        if error_downloading:
+            return ServiceExecuteResult(
+                status='error',
+                error=ServiceExecuteResultError(
+                    error_type=error_downloading[0],
+                    message=error_downloading[1]
                 )
+            )
 
         # Создание заказа
         self._create_order()
