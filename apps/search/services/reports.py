@@ -13,6 +13,8 @@ from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
 from docx.image.exceptions import UnrecognizedImageError, UnexpectedEndOfFileError
 
+from PIL import Image
+
 from django.conf import settings
 
 
@@ -72,6 +74,13 @@ class ReportItemDocxTM(ReportItemDocx):
             mark_image_filepath /= path.parts[parts_len - 1]
             mark_image_filepath /= mark_image_filename
             try:
+                run = self._paragraph.add_run()
+                run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+                self._paragraph.add_run('\r')
+            except UnicodeDecodeError:
+                # Необходимо пересохранить изображение
+                with Image.open(mark_image_filepath) as im:
+                    im.save(mark_image_filepath)
                 run = self._paragraph.add_run()
                 run.add_picture(str(mark_image_filepath), width=Inches(2.5))
                 self._paragraph.add_run('\r')
