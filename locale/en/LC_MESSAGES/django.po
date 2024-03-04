@@ -2335,6 +2335,18 @@ msgstr "Contact us"
 msgid "Адміністратор баз даних"
 msgstr "Database administrator"
 
+#: apps/search/templates/search/templatetags/registration_status.html:28
+msgid "Реєстрація діє"
+msgstr "Registration active"
+
+#: apps/search/templates/search/templatetags/registration_status.html:30
+msgid "Реєстрація не діє"
+msgstr "Registration is not active"
+
+#: apps/search/templates/search/templatetags/registration_status.html:32
+msgid "Дію реєстрації припинено, але може бути поновлено"
+msgstr "Ceased to be effective, but is subject to renewal"
+
 #~ msgid "показати все"
 #~ msgstr "show all"
 
