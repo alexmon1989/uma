@@ -1,0 +1,70 @@
+{% load i18n %}
+{% load uma_extras %}
+
+<div class="row">
+    <div class="col-md-12 g-mb-40">
+        <!-- Striped Rows -->
+        <div class="card g-brd-cyan rounded-0">
+            <h3 class="card-header g-bg-cyan g-brd-transparent g-color-white g-font-size-16 rounded-0 mb-0">
+                <i class="fa fa-list g-mr-5"></i>
+                {% trans "Збори" %}
+            </h3>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered u-table--v1 mb-0">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th class="text-nowrap text-center">{% trans "Код збору" %}</th>
+                        <th class="text-nowrap text-center">{% trans "Початок очікування" %}</th>
+                        <th class="text-center">{% trans "Планова дата отримання" %}</th>
+                        <th class="text-center">{% trans "Фактична дата отримання" %}</th>
+                        <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for collection in hit.DOCFLOW.COLLECTIONS %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td class="text-center">
+                                {% if collection.CLRECORD.CLCODE %}
+                                    {{ collection.CLRECORD.CLCODE }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if collection.CLRECORD.CLDATEBEGIN %}
+                                    {{ collection.CLRECORD.CLDATEBEGIN|parse_date|date:"d.m.Y" }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if collection.CLRECORD.CLDATEPLAN %}
+                                    {{ collection.CLRECORD.CLDATEPLAN|parse_date|date:"d.m.Y" }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if collection.CLRECORD.CLDATEFACT %}
+                                    {{ collection.CLRECORD.CLDATEFACT|parse_date|date:"d.m.Y" }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if collection.CLRECORD.CLNAME %}
+                                    {{ collection.CLRECORD.CLNAME }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if hit.DOCFLOW.COLLECTIONS|length == 0 %}
+                    <tr>
+                        <td colspan="5" class="g-bg-white">
+                            {% trans "Збори відсутні" %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- End Striped Rows -->
+    </div>
+</div>

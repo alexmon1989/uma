@@ -94,7 +94,7 @@ def get_elastic_results(search_groups: dict):
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
-            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32)
+            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34)
             qs = None
 
             for search_param in group['search_params']:
@@ -1835,7 +1835,7 @@ def sort_doc_flow(hit):
 def get_registration_status_color(hit):
     """Возвращает цвте статуса охранного документа объекта пром. собств."""
     status = 'gray'
-    if hit['Document']['idObjType'] in (1, 2, 3):
+    if hit['Document']['idObjType'] in (1, 2, 3, 16):
         try:
             if hit['Document']['RegistrationStatus'] == 'A':
                 status = 'green'
@@ -2094,7 +2094,7 @@ def get_ipc_codes_with_schedules(lang_code):
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32) else 1
+            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 

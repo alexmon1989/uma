@@ -1,0 +1,101 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div id="biblio-data">
+    <div class="g-pb-10 d-flex justify-content-end">
+        {% if hit.search_data.registration_status_color == 'green' %}
+            {% trans "СДО діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'red' %}
+            {% trans "СДО не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
+        {% elif hit.search_data.registration_status_color == 'yellow' %}
+            <span>{% trans "СДО діє з" %}&nbsp;<strong>{{ hit.Patent_Certificate.I_94.From|parse_date|date:"d.m.Y" }}</strong><i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
+        {% else %}
+            {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-biblio g-font-size-13">
+            <tbody>
+
+            {% get_field '11' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_11 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_11 }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '16' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_16 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_16|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '98' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_98 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_98|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '68' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_68 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_68 }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '54' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_54 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_54|safe }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '95' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_95 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_95|safe }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '92' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_92 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_92.N }} {% trans "від" %} {{ hit.Patent_Certificate.I_92.D|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '94' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_94 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Patent_Certificate.I_94.From|parse_date|date:"d.m.Y" }} - {{ hit.Patent_Certificate.I_94.To|parse_date|date:"d.m.Y" }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '73' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Patent_Certificate.I_73 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for item in hit.Patent_Certificate.I_73 %}
+                            {{ item|get:"N.U" }}<br>{{ item|get:"A.U" }} [{{ item|get:"C.U" }}]<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

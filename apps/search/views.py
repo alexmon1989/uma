@@ -262,7 +262,7 @@ def get_data_app_html(request):
                     )
                 else:
                     ipc_fields = ipc_fields.filter(
-                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32))
+                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32, 34))
                     )
                 context['ipc_fields'] = ipc_fields
 
@@ -289,6 +289,8 @@ def get_data_app_html(request):
                     template = 'search/detail/copyright/detail.html'
                 elif context['hit']['Document']['idObjType'] in (11, 12):  # Договора
                     template = 'search/detail/agreement/detail.html'
+                elif context['hit']['Document']['idObjType'] == 16:
+                    template = 'search/detail/inv_cert/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:

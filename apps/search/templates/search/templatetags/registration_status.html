@@ -12,7 +12,7 @@
         {% else %}
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
         {% endif %}
-    {# Товографії, знаки для товарів та послуг (свідоцтва), КЗПТ #}
+    {# Топографії, знаки для товарів та послуг (свідоцтва), КЗПТ #}
     {% elif hit.Document.idObjType == 3 or hit.Document.idObjType == 4 or hit.Document.idObjType == 9 or hit.Document.idObjType == 14 %}
         {% if hit.search_data.registration_status_color == 'green' %}
             {% trans "Свідоцтво діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
