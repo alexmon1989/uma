@@ -325,7 +325,7 @@ def opendata_prepare_filters(query_params: dict) -> dict:
 
 def opendata_get_ids_queryset(filters: dict) -> QuerySet[OpenData]:
     """Возвращает Queryset (с применением фильтров) с id заявок для API."""
-    queryset = OpenData.objects.order_by('pk').all()
+    queryset = OpenData.objects.filter(is_visible=True).order_by('pk').all()
 
     # Стан об'єкта
     if filters.get('obj_state'):
@@ -407,7 +407,7 @@ def opendata_get_applications(ids: List[int]) -> List[dict]:
 
 def opendata_get_application(app_number: str, obj_type_id: int = None) -> dict | None:
     """Возвращает данные заявки"""
-    queryset = OpenData.objects.select_related('obj_type').prefetch_related(
+    queryset = OpenData.objects.filter(is_visible=True).select_related('obj_type').prefetch_related(
         Prefetch(
             'app__appdocuments_set',
             queryset=AppDocuments.objects.filter(file_type='pdf'),

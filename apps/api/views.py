@@ -117,7 +117,7 @@ class OpenDataDocsView(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.all()
+        queryset = OpenData.objects.filter(is_visible=True).all()
 
         if self.request.query_params.get('obj_type', None):
             try:
@@ -147,7 +147,7 @@ class SearchListView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = OpenData.objects.select_related('obj_type').order_by('pk').all()
+        queryset = OpenData.objects.filter(is_visible=True).select_related('obj_type').order_by('pk').all()
 
         # Тип об'єкта
         obj_type = self.request.query_params.get('obj_type', None)

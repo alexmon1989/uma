@@ -120,6 +120,17 @@ class Command(BaseCommand):
                     open_data_record.obj_state = 2
                 else:
                     open_data_record.obj_state = 1
+
+                if app.obj_type_id in (1, 2, 3) and open_data_record.obj_state == 1:
+                    # Если это заявка на изобретение, полезную модель или топографию,
+                    # то при наличии патента, её отображать не нужно
+                    open_data_record.is_visible = not IpcAppList.objects.filter(
+                        app_number=app.app_number,
+                        obj_type_id=app.obj_type_id,
+                        registration_date__isnull=False,
+                        elasticindexed=1
+                    ).exists()
+
                 open_data_record.save()
 
                 # Обновление списка наименований субъектов
