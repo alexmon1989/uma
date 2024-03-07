@@ -811,6 +811,22 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
             ]
             res.extend(inid_data)
 
+        # СДО
+        inid_data = [
+            InidCode(16, '11', 'Номер сертифіката додаткової охорони (номер базового патенту/порядковий номер СДО '
+                               'за цим патентом)', 2, True),
+            InidCode(16, '16', 'Дата державної реєстрації додаткової охорони', 2, True),
+            InidCode(16, '98', 'Дата подання клопотання про видачу сертифіката додаткової охорони', 2, True),
+            InidCode(16, '68', 'Номер державної реєстрації, що є номером базового патенту', 2, True),
+            InidCode(16, '54', 'Назва винаходу', 2, True),
+            InidCode(16, '95', 'Назва продукту (СДО) (співпадає з назвою, зазначеною у дозвільному документі)', 2, True),
+            InidCode(16, '92', 'Номер та дата першого національного дозволу на розміщення продукту на ринку', 2, True),
+            InidCode(16, '94', 'Строк дії сертифіката додаткової охорони', 2, True),
+            InidCode(16, '73', 'Ім\'я або повне найменування й адреса володільця (володільців) сертифіката додаткової '
+                               'охорони та двобуквений код держави', 2, True),
+        ]
+        res.extend(inid_data)
+
     elif lang == 'en':
         # ТМ регистрации
         inid_data = [
@@ -1074,6 +1090,24 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                                             'entity(ies), parties to the agreement', 2, True),
             ]
             res.extend(inid_data)
+
+        # СДО
+        inid_data = [
+            InidCode(16, '11', 'Number of the certificate of additional protection (number of the basic patent/serial '
+                               'number of the CAP under this patent)', 2, True),
+            InidCode(16, '16', 'Date of state registration of additional protection', 2, True),
+            InidCode(16, '98', 'Date of submission of the request for the issuance of a certificate '
+                               'of additional protection', 2, True),
+            InidCode(16, '68', 'State registration number, which is the number of the basic patent', 2, True),
+            InidCode(16, '54', 'Name of the invention', 2, True),
+            InidCode(16, '95', 'Name of the product (CAP) (matches the name specified '
+                               'in the authorization document)', 2, True),
+            InidCode(16, '92', 'Number and date of the first national authorization to place the product '
+                               'on the market', 2, True),
+            InidCode(16, '94', 'Term of validity of certificate of additional protection', 2, True),
+            InidCode(16, '73', 'Name or full name and address of the CAP owner(s) and two-letter country code', 2, True),
+        ]
+        res.extend(inid_data)
     return res
 
 

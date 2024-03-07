@@ -2074,6 +2074,54 @@ class ReportItemAgreement(ReportItemDocx):
         return self._paragraph
 
 
+class ReportItemCAP(ReportItemDocx):
+    """СДО."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 16
+
+    def _write_11(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (11) Номер сертифіката додаткової охорони (номер базового патенту/порядковий номер СДО за цим патентом)."""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Patent_Certificate'].get('I_11')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_16(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (16) Дата державної реєстрації додаткової охорони."""
+        inid = self._get_inid(self.obj_type_id, '16', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Patent_Certificate'].get('I_16')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_98(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (98) Дата подання клопотання про видачу сертифіката додаткової охорони."""
+        inid = self._get_inid(self.obj_type_id, '98', self.application_data['search_data']['obj_state'])
+        data = self.application_data['Patent_Certificate'].get('I_98')
+        if inid and inid.visible and data:
+            reg_date = datetime.strptime(data, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_11()
+        self._write_16()
+
+        return self._paragraph
+
+
 class ReportItemAgreementTransfer(ReportItemAgreement):
     obj_type_id = 12
 
@@ -2196,6 +2244,12 @@ class ReportWriterDocx(ReportWriter):
             'ua': 'Міжнародна реєстрація торговельної марки, що зареєстрована в Україні',
             'en': 'International trademark registration registered in Ukraine',
         },
+        {
+            'obj_type_id': 16,
+            'obj_state': 2,
+            'ua': 'Сертифікат додаткової охорони прав на винахід ',
+            'en': 'Certificate of additional protection of invention rights',
+        },
     ]
 
     def _set_font(self, document: Document(), font_name='Times New Roman'):
@@ -2262,6 +2316,7 @@ class ReportWriterDocxCreator(ReportWriterCreator):
             12: ReportItemAgreementTransfer,
             13: ReportItemCopyrightOfficialWork,
             14: ReportItemDocxMadrid14,
+            16: ReportItemCAP,
         }
         report_items = []
         for app in applications:
