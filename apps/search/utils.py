@@ -1325,7 +1325,6 @@ def prepare_data_for_search_report(s, lang_code, user=None):
         obj_state = obj_states[h.search_data.obj_state - 1]
 
         nice_indexes = get_app_nice_indexes(h)
-
         if is_app_limited_for_user(h.to_dict(), user):
             # Если библиографические данные заявки не публикуются
             if h.Document.idObjType == 4:
@@ -1355,7 +1354,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             app_date = datetime.datetime.strptime(h.search_data.app_date[:10], '%Y-%m-%d').strftime('%d.%m.%Y') \
                 if hasattr(h.search_data, 'app_date') and h.search_data.app_date else ''
             rights_date = datetime.datetime.strptime(h.search_data.rights_date[:10], '%Y-%m-%d').strftime(
-                '%d.%m.%Y') if h.search_data.rights_date else ''
+                '%d.%m.%Y') if hasattr(h.search_data, 'rights_date') and h.search_data.rights_date else ''
             title = ';\r\n'.join(h.search_data.title) if iterable(h.search_data.title) else h.search_data.title
             applicant = get_app_applicant(h)
             owner = get_app_owner(h)
@@ -1376,7 +1375,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
             data.append([
                     obj_type,
                     obj_state,
-                    h.search_data.app_number,
+                    h.search_data.app_number if hasattr(h.search_data, 'app_number') else '',
                     app_date,
                     h.search_data.protective_doc_number,
                     rights_date,
@@ -1576,6 +1575,11 @@ def get_app_owner(app):
                 )
         except AttributeError:
             pass
+
+    # СДО
+    elif app.Document.idObjType == 16:
+        for item in app.Patent_Certificate.I_73:
+            owners.append(f"{item['N.U']} [{item['C.U']}]")
 
     return ';\r\n'.join(owners)
 

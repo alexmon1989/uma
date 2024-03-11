@@ -672,8 +672,8 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
-                          'Certificate'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark',
+                          'MadridTradeMark', 'Design', 'Geo', 'Certificate'])
 
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
@@ -826,8 +826,8 @@ def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
-                          'Certificate'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark',
+                          'MadridTradeMark', 'Design', 'Geo', 'Certificate'])
 
             # Сортировка
             if get_params.get('sort_by'):
@@ -925,7 +925,8 @@ def create_transactions_search_results_file_xlsx(get_params, lang_code):
             s = s.sort('_score')
 
         if s and s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark', 'Design',
+                          'Geo'])
 
             # Сортировка
             if get_params.get('sort_by'):
