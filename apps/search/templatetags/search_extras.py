@@ -37,8 +37,8 @@ def inv_um_item(context, hit, item_num):
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
-@register.inclusion_tag('search/advanced/_partials/inv_cert_item.html', takes_context=True)
-def inv_cert_item(context, hit, item_num):
+@register.inclusion_tag('search/advanced/_partials/cap_item.html', takes_context=True)
+def cap_item(context, hit, item_num):
     biblio_data = hit.get('Patent_Certificate')
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 

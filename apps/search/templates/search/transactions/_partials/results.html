@@ -51,7 +51,7 @@
                     {% elif hit.Document.idObjType == 6 %}
                         {% id_item hit forloop.counter0|add:results.start_index %}
                     {% elif hit.Document.idObjType == 16 %}
-                        {% inv_cert_item hit forloop.counter0|add:results.start_index %}
+                        {% cap_item hit forloop.counter0|add:results.start_index %}
                     {% endif %}
                 {% endfor %}
 
