@@ -172,9 +172,13 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
         # Документы заявки (библиографические)
         hit['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 
-        # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
         if hit['search_data']['obj_state'] == 2:
+            # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
             extend_doc_flow(hit)
+
+            # СДО
+            if hit['Document']['idObjType'] == 1:
+                hit['cap'] = search_services.application_get_cap_list(str(hit['search_data']['protective_doc_number']))
 
         if 'DOCFLOW' in hit and 'DOCUMENTS' in hit['DOCFLOW']:
             hit['DOCFLOW']['DOCUMENTS'] = search_services.application_filter_documents_im_um_ld(

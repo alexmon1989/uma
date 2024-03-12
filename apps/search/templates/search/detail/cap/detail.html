@@ -1,12 +1,12 @@
 {% load i18n %}
 {% load search_extras %}
 
-{% include 'search/detail/inv_cert/_partials/breadcrumbs.html' %}
+{% include 'search/detail/cap/_partials/breadcrumbs.html' %}
 
 <div class="container g-min-height-200 g-py-20 g-py-70--lg">
     <div class="row">
         <div class="col-md-3 g-mb-20">
-            {% include 'search/detail/inv_cert/_partials/sidebar.html' %}
+            {% include 'search/detail/cap/_partials/sidebar.html' %}
         </div>
 
         <div class="col-md-9">
@@ -15,7 +15,7 @@
                 <div class="tab-pane fade show active" id="nav-biblio" role="tabpanel">
                     {% include 'search/detail/_partials/biblio_header.html' %}
 
-                    {% include 'search/detail/inv_cert/_partials/blblio_data/biblio.html' %}
+                    {% include 'search/detail/cap/_partials/blblio_data/biblio.html' %}
                 </div>
 
                 <div class="tab-pane fade" id="nav-docs" role="tabpanel">
@@ -24,20 +24,20 @@
                     {% if hit.DOCFLOW %}
                         {% user_has_access_to_docs request.user hit as user_has_access_to_docs %}
                         {% if user_has_access_to_docs %}
-                            {% include 'search/detail/inv_cert/_partials/state_of_affair/documents.html' %}
+                            {% include 'search/detail/cap/_partials/state_of_affair/documents.html' %}
                         {% else %}
-                            {% include 'search/detail/inv_cert/_partials/state_of_affair/documents_without_links.html' %}
+                            {% include 'search/detail/cap/_partials/state_of_affair/documents_without_links.html' %}
                         {% endif %}
 
-                        {% include 'search/detail/inv_cert/_partials/state_of_affair/collections.html' %}
-                        {% include 'search/detail/inv_cert/_partials/state_of_affair/payments.html' %}
+                        {% include 'search/detail/cap/_partials/state_of_affair/collections.html' %}
+                        {% include 'search/detail/cap/_partials/state_of_affair/payments.html' %}
                     {% endif %}
                 </div>
 
                 <div class="tab-pane fade" id="nav-transactions" role="tabpanel">
                     <h3 class="g-pb-20">{% trans "Сповіщення" %}</h3>
 
-                    {% include 'search/detail/inv_cert/_partials/transactions.html' %}
+                    {% include 'search/detail/cap/_partials/transactions.html' %}
                 </div>
             </div>
             <!-- End Tab panes -->

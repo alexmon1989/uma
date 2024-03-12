@@ -290,7 +290,7 @@ def get_data_app_html(request):
                 elif context['hit']['Document']['idObjType'] in (11, 12):  # Договора
                     template = 'search/detail/agreement/detail.html'
                 elif context['hit']['Document']['idObjType'] == 16:
-                    template = 'search/detail/inv_cert/detail.html'
+                    template = 'search/detail/cap/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:

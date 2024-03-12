@@ -90,6 +90,14 @@
 
                     {% include 'search/detail/inv_um/_partials/transactions.html' %}
                 </div>
+
+                {% if hit.cap|length > 0 %}
+                    <div class="tab-pane fade" id="nav-cap" role="tabpanel">
+                        <h3 class="g-pb-20">{% trans "Додаткова охорона" %}</h3>
+
+                        {% include 'search/detail/inv_um/_partials/cap.html' %}
+                    </div>
+                {% endif %}
             </div>
             <!-- End Tab panes -->
         </div>

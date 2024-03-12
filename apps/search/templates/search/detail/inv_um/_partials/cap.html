@@ -1,0 +1,26 @@
+{% load uma_extras %}
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm g-font-size-13">
+        {% for item in hit.cap %}
+            <tr>
+                <th class="g-px-10" width="20%">{{ item.I_95|safe }}</th>
+                <td>
+                    <ul>
+                        <li><span class="g-font-weight-600">{% trans "Номер СДО" %}:</span> <a href="{% url 'search:detail' pk=item.id %}">{{ item.I_11 }}</a></li>
+                        <li>
+                            <span class="g-font-weight-600">{% trans "Ім'я або повне найменування й адреса володільця (володільців) СДО та двобуквений код держави" %}:</span>
+                            {% for i_73 in item.I_73 %}
+                                <br>
+                                {{ i_73|get:"N.U" }}<br>
+                                {{ i_73|get:"A.U" }}&nbsp;[{{ i_73|get:"C.U" }}]
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

@@ -502,6 +502,39 @@ def application_get_app_elasticsearch_data(app_id: int, exclude_bad_apps: bool =
     return s[0].to_dict()
 
 
+def application_get_cap_list(i_68: str) -> List[dict]:
+    es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    q = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "query": "16",
+                            "default_field": "Document.idObjType"
+                        }
+                    },
+                    {
+                        "query_string": {
+                            "query": i_68.replace('/', '//'),
+                            "default_field": "Patent_Certificate.I_68"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    s = Search.from_dict(q).index(settings.ELASTIC_INDEX_NAME).using(es)
+
+    res = []
+    for hit in s.scan():
+        item = hit.to_dict()['Patent_Certificate']
+        item['id'] = hit.meta.id
+        res.append(item)
+
+    return res
+
+
 def application_tm_censored_image_in_data(data: dict) -> bool:
     """Проверяет, содержит ли изображение ТМ запрещённые элементы."""
     censored_notices_types_list = (
