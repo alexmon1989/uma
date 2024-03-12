@@ -70,6 +70,16 @@
            role="tab"
         >{% trans "Сповіщення" %}</a>
     </li>
+
+    {% if hit.cap|length > 0 %}
+        <li class="nav-item">
+            <a class="nav-link g-text-underline--hover"
+               data-toggle="tab"
+               href="#nav-cap"
+               role="tab"
+            >{% trans "Додаткова охорона" %}</a>
+        </li>
+    {% endif %}
 </ul>
 <!-- End Nav tabs -->
 

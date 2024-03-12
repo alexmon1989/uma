@@ -2074,6 +2074,134 @@ class ReportItemAgreement(ReportItemDocx):
         return self._paragraph
 
 
+class ReportItemCAP(ReportItemDocx):
+    """СДО."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 16
+
+    def _write_11(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (11) Номер сертифіката додаткової охорони (номер базового патенту/порядковий номер СДО за цим патентом)."""
+        inid = self._get_inid(self.obj_type_id, '11', self.application_data['search_data']['obj_state'])
+        reg_number = self.application_data['Patent_Certificate'].get('I_11')
+        if inid and inid.visible and reg_number:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_number).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_16(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (16) Дата державної реєстрації додаткової охорони."""
+        inid = self._get_inid(self.obj_type_id, '16', self.application_data['search_data']['obj_state'])
+        reg_date = self.application_data['Patent_Certificate'].get('I_16')
+        if inid and inid.visible and reg_date:
+            reg_date = datetime.strptime(reg_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(reg_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_98(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (98) Дата подання клопотання про видачу сертифіката додаткової охорони."""
+        inid = self._get_inid(self.obj_type_id, '98', self.application_data['search_data']['obj_state'])
+        i_98 = self.application_data['Patent_Certificate'].get('I_98')
+        if inid and inid.visible and i_98:
+            i_98 = datetime.strptime(i_98, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(i_98).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_68(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (68) Номер державної реєстрації, що є номером базового патенту."""
+        inid = self._get_inid(self.obj_type_id, '68', self.application_data['search_data']['obj_state'])
+        i_68 = self.application_data['Patent_Certificate'].get('I_68')
+        if inid and inid.visible and i_68:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(i_68).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_54(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (54) Назва винаходу."""
+        inid = self._get_inid(self.obj_type_id, '54', self.application_data['search_data']['obj_state'])
+        i_54 = self.application_data['Patent_Certificate'].get('I_54')
+        if inid and inid.visible and i_54:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(i_54).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_95(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (95) Назва продукту (СДО) (співпадає з назвою, зазначеною у дозвільному документі)."""
+        inid = self._get_inid(self.obj_type_id, '95', self.application_data['search_data']['obj_state'])
+        i_95 = self.application_data['Patent_Certificate'].get('I_95')
+        if inid and inid.visible and i_95:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(i_95).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_92(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (92) Номер та дата першого національного дозволу на розміщення продукту на ринку."""
+        inid = self._get_inid(self.obj_type_id, '92', self.application_data['search_data']['obj_state'])
+        i_92 = self.application_data['Patent_Certificate'].get('I_92')
+        if inid and inid.visible and i_92:
+            i_92_n = i_92.get('N')
+            i_92_d = i_92.get('D')
+            if i_92_d:
+                i_92_d = datetime.strptime(i_92_d, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(f"{i_92_n}, {i_92_d}").bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_94(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (94) Строк дії сертифіката додаткової охорони."""
+        inid = self._get_inid(self.obj_type_id, '94', self.application_data['search_data']['obj_state'])
+        i_94 = self.application_data['Patent_Certificate'].get('I_94')
+        if inid and inid.visible and i_94:
+            i_94_from = i_94.get('From')
+            i_94_to = i_94.get('To')
+            if i_94_from:
+                i_94_from = datetime.strptime(i_94_from, '%Y-%m-%d').strftime('%d.%m.%Y')
+            if i_94_to:
+                i_94_to = datetime.strptime(i_94_to, '%Y-%m-%d').strftime('%d.%m.%Y')
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(f"{i_94_from} - {i_94_to}").bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_73(self) -> None:
+        """Записывает в документ данные об
+        ИНИД (73) Ім'я або повне найменування й адреса володільця (володільців) СДО та двобуквений код держави."""
+        inid = self._get_inid(self.obj_type_id, '73', self.application_data['search_data']['obj_state'])
+        i_73 = self.application_data['Patent_Certificate'].get('I_73')
+        if inid and inid.visible and i_73:
+            self._paragraph.add_run(f"({inid.code})").bold = True
+            self._paragraph.add_run(f"\t{inid.title}:\n")
+            for item in i_73:
+                self._paragraph.add_run(item.get('N.U')).bold = True
+                self._paragraph.add_run(f" ({item.get('A.U')}, {item.get('C.U')})")
+                self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_11()
+        self._write_16()
+        self._write_98()
+        self._write_68()
+        self._write_54()
+        self._write_95()
+        self._write_92()
+        self._write_94()
+        self._write_73()
+
+        return self._paragraph
+
+
 class ReportItemAgreementTransfer(ReportItemAgreement):
     obj_type_id = 12
 
@@ -2196,6 +2324,12 @@ class ReportWriterDocx(ReportWriter):
             'ua': 'Міжнародна реєстрація торговельної марки, що зареєстрована в Україні',
             'en': 'International trademark registration registered in Ukraine',
         },
+        {
+            'obj_type_id': 16,
+            'obj_state': 2,
+            'ua': 'Сертифікат додаткової охорони прав на винахід ',
+            'en': 'Certificate of additional protection of invention rights',
+        },
     ]
 
     def _set_font(self, document: Document(), font_name='Times New Roman'):
@@ -2262,6 +2396,7 @@ class ReportWriterDocxCreator(ReportWriterCreator):
             12: ReportItemAgreementTransfer,
             13: ReportItemCopyrightOfficialWork,
             14: ReportItemDocxMadrid14,
+            16: ReportItemCAP,
         }
         report_items = []
         for app in applications:

@@ -229,6 +229,10 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
             del app_data['Decision']['DecisionDetails']['DocFlow']
         data_biblio = app_data['Decision']['DecisionDetails']
 
+    # СДО
+    elif app_data['Document']['idObjType'] == 16:
+        data_biblio = app_data['Patent_Certificate']
+
     else:
         data_biblio = None
 

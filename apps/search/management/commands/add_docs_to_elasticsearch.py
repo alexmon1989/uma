@@ -284,6 +284,28 @@ class Command(BaseCommand):
                 # Запись в индекс
                 self.write_to_es_index(doc, res)
 
+    def process_invention_certificate(self, doc):
+        """Добавляет документ типа "сертифікат додаткової охорони" в ElasticSearch."""
+        # Получает данные для загрузки из файла JSON
+        data = self.get_data_from_json(doc)
+
+        if data is not None:
+            owners = []
+            for owner in data['Patent_Certificate'].get('I_73', []):
+                owners.append({'name': owner['N.U']})
+
+            # Поисковые данные (для сортировки и т.д.)
+            data['search_data'] = {
+                'obj_state': 2,
+                'protective_doc_number': data['Patent_Certificate'].get('I_11'),
+                'owner': owners,
+                'title': data['Patent_Certificate'].get('I_95'),
+                'registration_status_color': get_registration_status_color(data)
+            }
+
+            # Запись в индекс
+            self.write_to_es_index(doc, data)
+
     def process_tm(self, doc):
         """Добавляет документ типа "знак для товаров и услуг" ElasticSearch."""
         # Получает данные для загрузки из файла JSON
@@ -988,7 +1010,9 @@ class Command(BaseCommand):
 
         # Получение документов для индексации
         documents = IpcAppList.objects.exclude(
-            Q_db(registration_date__gte=timezone.now()) | Q_db(app_number__in=['m202006737', 'm202006738'])
+            Q_db(registration_date__gte=timezone.now()) | Q_db(app_number__in=[
+                'm202006737', 'm202006738', 'm202021203', 'm202021202', 'm202021173', 'm202020602',
+                'm202020603', 'm202020601', 'm202020630', 'm202009450', 'm202009453', 'm202009452'])
         ).values(
             'id',
             'files_path',
@@ -1040,6 +1064,8 @@ class Command(BaseCommand):
             # Авторское право
             elif doc['obj_type_id'] in (10, 11, 12, 13):
                 self.process_cr(doc)
+            elif doc['obj_type_id'] == 16:
+                self.process_invention_certificate(doc)
             # Увеличение счётчика обработанных документов
             self.indexation_process.processed_count += 1
             self.indexation_process.save()

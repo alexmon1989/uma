@@ -1,0 +1,59 @@
+{% load uma_extras %}
+{% load i18n %}
+{% load search_extras %}
+
+<div class="card g-brd-none rounded-0 g-mb-15 g-font-size-13">
+    <div class="d-flex justify-content-between card-header g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        <div>
+            {{ item_num }}.
+            <a href="{% url 'search:detail' pk=hit.meta.id %}"
+               class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
+            >{{ hit.search_data.title|safe }}</a>
+        </div>
+
+        {% include 'search/advanced/_partials/favorites_icon.html' %}
+    </div>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% trans "Сертифікат додаткової охорони прав на винахід" %}
+        </div>
+
+        {% if hit.search_data.obj_state == 2 %}
+            {% registration_status hit=hit %}
+        {% endif %}
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Номер СДО" %}:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="(11) {% trans "Номер СДО" %}"
+            >{{ biblio_data.I_11 }}</a>
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Дата державної реєстрації додаткової охорони" %}:</h4>
+            <a href="#!"
+               class="g-color-black-opacity-0_9 g-text-underline g-text-underline--none--hover"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="(16) {% trans "Дата державної реєстрації додаткової охорони" %}"
+            >{{ biblio_data.I_16|parse_date|date:"d.m.Y" }}</a>
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
+            {% for I_73 in biblio_data.I_73 %}
+                {{ I_73|get:"N.U" }}<br>
+                {{ I_73|get:"A.U" }}&nbsp;[{{ I_73|get:"C.U" }}]
+                {% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include 'search/advanced/_partials/item_details_link_block.html' %}
+</div>

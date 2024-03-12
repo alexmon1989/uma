@@ -172,9 +172,13 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
         # Документы заявки (библиографические)
         hit['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
 
-        # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
         if hit['search_data']['obj_state'] == 2:
+            # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки
             extend_doc_flow(hit)
+
+            # СДО
+            if hit['Document']['idObjType'] == 1:
+                hit['cap'] = search_services.application_get_cap_list(str(hit['search_data']['protective_doc_number']))
 
         if 'DOCFLOW' in hit and 'DOCUMENTS' in hit['DOCFLOW']:
             hit['DOCFLOW']['DOCUMENTS'] = search_services.application_filter_documents_im_um_ld(
@@ -672,8 +676,8 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
-                          'Certificate'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark',
+                          'MadridTradeMark', 'Design', 'Geo', 'Certificate'])
 
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
@@ -826,8 +830,8 @@ def create_advanced_search_results_file_xlsx(user_id, get_params, lang_code):
                 s = s.filter('terms', **{item['field']: get_params.get(f"filter_{item['title']}")})
 
         if s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'MadridTradeMark', 'Design', 'Geo',
-                          'Certificate'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark',
+                          'MadridTradeMark', 'Design', 'Geo', 'Certificate'])
 
             # Сортировка
             if get_params.get('sort_by'):
@@ -925,7 +929,8 @@ def create_transactions_search_results_file_xlsx(get_params, lang_code):
             s = s.sort('_score')
 
         if s and s.count() <= 500:
-            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'TradeMark', 'Design', 'Geo'])
+            s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark', 'Design',
+                          'Geo'])
 
             # Сортировка
             if get_params.get('sort_by'):
@@ -978,7 +983,7 @@ def create_details_file_docx(id_app_number: int, user_id: int, lang_code: str):
     os.makedirs(str(directory_path), exist_ok=True)
 
     # Имя файла с результатами поиска
-    if hit['search_data']['app_number'] is not None:
+    if hit['search_data'].get('app_number'):
         file_name = f"{get_unique_filename(hit['search_data']['app_number'])}.docx"
     else:
         file_name = f"{get_unique_filename(hit['search_data']['protective_doc_number'])}.docx"
