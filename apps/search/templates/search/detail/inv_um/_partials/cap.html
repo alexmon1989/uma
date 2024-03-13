@@ -9,6 +9,7 @@
                 <td>
                     <ul>
                         <li><span class="g-font-weight-600">{% trans "Номер СДО" %}:</span> <a href="{% url 'search:detail' pk=item.id %}">{{ item.I_11 }}</a></li>
+                        <li><span class="g-font-weight-600">{% trans "Дата державної реєстрації додаткової охорони" %}:</span> {{ item.I_16|parse_date|date:"d.m.Y" }}</li>
                         <li>
                             <span class="g-font-weight-600">{% trans "Ім'я або повне найменування й адреса володільця (володільців) СДО та двобуквений код держави" %}:</span>
                             {% for i_73 in item.I_73 %}

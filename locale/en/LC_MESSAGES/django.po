@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 15:54+0200\n"
+"POT-Creation-Date: 2024-03-13 11:50+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -980,6 +980,7 @@ msgstr "CAP number"
 
 #: apps/search/templates/search/advanced/_partials/cap_item.html:39
 #: apps/search/templates/search/advanced/_partials/cap_item.html:44
+#: apps/search/templates/search/detail/inv_um/_partials/cap.html:12
 msgid "Дата державної реєстрації додаткової охорони"
 msgstr "Date of state registration of additional protection"
 
@@ -1828,7 +1829,7 @@ msgstr ""
 "Name or full name of the patent owner, which is established by a court "
 "decision"
 
-#: apps/search/templates/search/detail/inv_um/_partials/cap.html:13
+#: apps/search/templates/search/detail/inv_um/_partials/cap.html:14
 msgid ""
 "Ім'я або повне найменування й адреса володільця (володільців) СДО та "
 "двобуквений код держави"
