@@ -121,7 +121,7 @@ class Command(BaseCommand):
                 else:
                     open_data_record.obj_state = 1
 
-                if app.obj_type_id in (1, 2, 3):
+                if app.obj_type_id in (1, 2, 3) and app.is_visible:
                     if open_data_record.obj_state == 1:
                         # Если это заявка на изобретение, полезную модель или топографию,
                         # то при наличии патента, её отображать не нужно
