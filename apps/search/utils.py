@@ -242,6 +242,9 @@ def filter_bad_apps(qs):
     # Скрывает пром. образцы на пром. образцы после 2024.03.20
     qs &= ~Q('query_string', query=f"Design.DesignDetails.RecordPublicationDetails.PublicationDate:[{hide_from} TO *]")
 
+    # Скрывает муждународку после 2024.03.20
+    qs &= ~Q('query_string', query=f"MadridTradeMark.TradeMarkDetails.Code_441:[{hide_from} TO *]")
+
     return qs
 
 
