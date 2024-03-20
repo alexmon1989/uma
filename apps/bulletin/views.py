@@ -179,5 +179,7 @@ class ApplicationViewSet(generics.ListAPIView):
         if publication_date:
             queryset = queryset.filter(publication_date=publication_date)
 
+        queryset = queryset.filter(publication_date__lt='2024-03-20')
+
         return queryset
 

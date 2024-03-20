@@ -57,7 +57,7 @@ class OpenDataListView(generics.ListAPIView):
             except ObjType.DoesNotExist:
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
-        return queryset
+        return queryset.filter(registration_date__lt='2024-03-20', last_update__lt='2024-03-20')
 
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
@@ -85,7 +85,7 @@ class OpenDataListViewV1(generics.ListAPIView):
     def get_queryset(self):
         filters = services.opendata_prepare_filters(self.request.query_params)
         queryset = services.opendata_get_ids_queryset(filters)
-        return queryset
+        return queryset.filter(registration_date__lt='2024-03-20', last_update__lt='2024-03-20')
 
 
 class OpenDataDetailViewV1(generics.RetrieveAPIView):
@@ -117,7 +117,7 @@ class OpenDataDocsView(generics.RetrieveAPIView):
     lookup_field = 'app_number'
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=True).all()
+        queryset = OpenData.objects.filter(is_visible=True, registration_date__lt='2024-03-20', last_update__lt='2024-03-20').all()
 
         if self.request.query_params.get('obj_type', None):
             try:
@@ -147,7 +147,9 @@ class SearchListView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = OpenData.objects.filter(is_visible=True).select_related('obj_type').order_by('pk').all()
+        queryset = OpenData.objects.filter(
+            is_visible=True, registration_date__lt='2024-03-20', last_update__lt='2024-03-20'
+        ).select_related('obj_type').order_by('pk').all()
 
         # Тип об'єкта
         obj_type = self.request.query_params.get('obj_type', None)
