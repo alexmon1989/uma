@@ -550,6 +550,13 @@ def application_tm_censored_image_in_data(data: dict) -> bool:
 
 def application_tm_can_be_indexed(app_data: dict) -> bool:
     """Проверяет может ли торговая марка быть добавлена в поисковый индекс."""
+
+    # Временно не индексировать заявки с 441 кодом больше 20.03.2024
+    code_441 = app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('Code_441')
+    d = datetime.datetime.strptime('2024-03-20', '%Y-%m-%d')
+    if code_441 and datetime.datetime.strptime(code_441, '%Y-%m-%d') >= d:
+        return False
+
     today = datetime.datetime.now()
 
     publication = app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('PublicationDetails', [])
