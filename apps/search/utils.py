@@ -175,9 +175,6 @@ def get_elastic_results(search_groups: dict):
         excludes=["*.DocBarCode", "*.DOCBARCODE"]
     ).sort('_score')
 
-    import json
-    print(json.dumps(qs_result.to_dict()))
-
     return s
 
 
@@ -225,25 +222,6 @@ def filter_bad_apps(qs):
     qs &= ~Q('query_string', query="Document.Status:3 AND search_data.obj_state:1")
     today = datetime.datetime.now().strftime('%Y-%m-%d')
     qs &= ~Q('query_string', query=f"_exists_:Claim.I_11 OR Claim.I_45.D:[* TO {today}]")
-
-    # Скрывает заявки на изобретения и полезные модели после 2024.03.20
-    hide_from = '2024-03-20'
-    qs &= ~Q('query_string', query=f"Claim.I_43.D:[{hide_from} TO *]")
-
-    # Скрывает патенты на изобретения и полезные модели после 2024.03.20
-    qs &= ~Q('query_string', query=f"Patent.I_45.D:[{hide_from} TO *]")
-
-    # Скрывает заявки на ТМ после 2024.03.20
-    qs &= ~Q('query_string', query=f"TradeMark.TrademarkDetails.Code_441:[{hide_from} TO *]")
-
-    # Скрывает свидетельства на ТМ после 2024.03.20
-    qs &= ~Q('query_string', query=f"TradeMark.TrademarkDetails.PublicationDetails.PublicationDate:[{hide_from} TO *]")
-
-    # Скрывает пром. образцы на пром. образцы после 2024.03.20
-    qs &= ~Q('query_string', query=f"Design.DesignDetails.RecordPublicationDetails.PublicationDate:[{hide_from} TO *]")
-
-    # Скрывает муждународку после 2024.03.20
-    qs &= ~Q('query_string', query=f"MadridTradeMark.TradeMarkDetails.Code_441:[{hide_from} TO *]")
 
     return qs
 

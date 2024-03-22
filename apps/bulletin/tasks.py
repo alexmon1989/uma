@@ -10,7 +10,7 @@ from .models import EBulletinData
 def get_app_details(app_number):
     """Задача для получения деталей по заявке."""
     # Проверка существует ли заявка в отдельной таблице с 441-ми кодами
-    if not EBulletinData.objects.filter(app_number=app_number, publication_date__lt='2024-03-20').exists():
+    if not EBulletinData.objects.filter(app_number=app_number).exists():
         return {}
 
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
