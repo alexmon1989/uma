@@ -19,28 +19,28 @@
            data-toggle="tab"
            href="#nav-cl"
            role="tab"
-        >{% trans "Формула" %}</a>
+        >{% trans "Формула" %}{% if hit.Document.is_limited %}&nbsp;<span class="g-color-red">*</span>{% endif %}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link g-text-underline--hover {% if not hit.biblio_documents.de %}disabled{% endif %}"
            data-toggle="tab"
            href="#nav-de"
            role="tab"
-        >{% trans "Опис" %}</a>
+        >{% trans "Опис" %}{% if hit.Document.is_limited %}&nbsp;<span class="g-color-red">*</span>{% endif %}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link g-text-underline--hover {% if not hit.biblio_documents.de_pub %}disabled{% endif %}"
            data-toggle="tab"
            href="#nav-de_pub"
            role="tab"
-        >{% trans "Опублікований опис" %}</a>
+        >{% trans "Опублікований опис" %}{% if hit.Document.is_limited %}&nbsp;<span class="g-color-red">*</span>{% endif %}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link g-text-underline--hover {% if not hit.biblio_documents.ab_ua %}disabled{% endif %}"
            data-toggle="tab"
            href="#nav-ab_ua"
            role="tab"
-        >{% trans "Реферат" %} (UA)</a>
+        >{% trans "Реферат" %} (UA){% if hit.Document.is_limited %}&nbsp;<span class="g-color-red">*</span>{% endif %}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link g-text-underline--hover {% if not hit.biblio_documents.ab_ru %}disabled{% endif %}"
@@ -54,7 +54,7 @@
            data-toggle="tab"
            href="#nav-ab_en"
            role="tab"
-        >{% trans "Реферат" %} (EN)</a>
+        >{% trans "Реферат" %} (EN){% if hit.Document.is_limited %}&nbsp;<span class="g-color-red">*</span>{% endif %}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link g-text-underline--hover {% if not hit.biblio_data %}active{% endif %} {% if not hit.DOCFLOW %}disabled{% endif %}"

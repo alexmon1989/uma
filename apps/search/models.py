@@ -25,6 +25,7 @@ class IpcAppList(models.Model):
     last_indexation_date = models.DateTimeField(db_column='last_indexation_date', blank=True, null=True)
     in_electronic_bull = models.BooleanField(db_column='in_electronic_bull', blank=True, null=True)
     publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
+    is_limited = models.BooleanField(db_column='is_limited', default=False)
     users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
 
     class Meta:
@@ -197,7 +198,8 @@ class AppDocuments(models.Model):
         objects = AppDocuments.objects.filter(
             app__id=id_app_number,
             enter_num__in=(98, 99, 100, 101),
-            file_type='pdf'
+            file_type='pdf',
+            app__is_limited=False
         ).values()
         documents = {}
         for document in objects:

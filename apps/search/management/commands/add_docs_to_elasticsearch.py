@@ -240,6 +240,28 @@ class Command(BaseCommand):
                 if biblio_data.get('I_98.Index') is not None:
                     biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
 
+                # Признак что данные необходимо публиковать не в полном объёме
+                if doc['is_limited']:
+                    res['Document']['is_limited'] = doc['is_limited']
+                    if 'AB' in biblio_data:
+                        del biblio_data['AB']
+                    if 'CL' in biblio_data:
+                        del biblio_data['CL']
+                    if 'DE' in biblio_data:
+                        del biblio_data['DE']
+                    if 'I_72' in biblio_data:
+                        del biblio_data['I_72']
+                    if 'I_73' in biblio_data:
+                        del biblio_data['I_73']
+
+                    # Удаление всех pdf из каталога
+                    file_path = self.get_doc_files_path(doc)
+                    files_in_directory = os.listdir(file_path)
+                    filtered_files = [file for file in files_in_directory if file.endswith(".pdf")]
+                    for file in filtered_files:
+                        path_to_file = os.path.join(file_path, file)
+                        os.remove(path_to_file)
+
                 # Состояние делопроизводства
                 if data.get('DOCFLOW'):
                     res['DOCFLOW'] = data['DOCFLOW']
@@ -1022,6 +1044,7 @@ class Command(BaseCommand):
             'app_number',
             'app_date',
             'app_input_date',
+            'is_limited',
         )
         # Фильтрация по параметрам командной строки
         if not options['ignore_indexed']:
