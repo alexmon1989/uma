@@ -379,7 +379,7 @@ def opendata_get_applications(ids: List[int]) -> List[dict]:
     apps = OpenData.objects.select_related('obj_type').prefetch_related(
         Prefetch(
             'app__appdocuments_set',
-            queryset=AppDocuments.objects.filter(file_type='pdf'),
+            queryset=AppDocuments.objects.filter(file_type='pdf', app__is_limited=False),
         )
     ).filter(pk__in=ids)
     res = []
@@ -416,7 +416,7 @@ def opendata_get_application(app_number: str, obj_type_id: int = None) -> dict |
     ).select_related('obj_type').prefetch_related(
         Prefetch(
             'app__appdocuments_set',
-            queryset=AppDocuments.objects.filter(file_type='pdf'),
+            queryset=AppDocuments.objects.filter(file_type='pdf', app__is_limited=False),
         )
     ).order_by('-registration_number').filter(
         Q_ORM(app_number=app_number) | Q_ORM(registration_number=app_number)
