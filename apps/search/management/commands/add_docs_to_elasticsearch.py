@@ -249,10 +249,14 @@ class Command(BaseCommand):
                         del biblio_data['CL']
                     if 'DE' in biblio_data:
                         del biblio_data['DE']
+                    if 'I_71' in biblio_data:
+                        del biblio_data['I_71']
                     if 'I_72' in biblio_data:
                         del biblio_data['I_72']
                     if 'I_73' in biblio_data:
                         del biblio_data['I_73']
+                    if 'I_98' in biblio_data:
+                        del biblio_data['I_98']
 
                     # Удаление всех pdf из каталога
                     file_path = self.get_doc_files_path(doc)

@@ -261,24 +261,31 @@
             {% endif %}
 
             {% get_field '71' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.biblio_data.I_71 %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="i_71">
-                        {% for I_71_ in hit.biblio_data.I_71|list_of_dicts_unique %}
-                            <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
-                                {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
-                                {% if forloop.counter == 2 and not forloop.last %}
-                                    &nbsp;<a href="#"
-                                             class="show-all g-font-size-12"
-                                             title="{% trans "Показати всі" %}"
-                                ><i class="fa fa-plus"></i></a>
-                                {% endif %}
-                                {% if not forloop.last %}<br>{% endif %}
-                            </span>
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.biblio_data.I_71 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="i_71">
+                            {% for I_71_ in hit.biblio_data.I_71|list_of_dicts_unique %}
+                                <span class="{% if forloop.counter > 2 %}more hidden{% endif %}">
+                                    {{ I_71_|get_person_name }} [{{ I_71_|get_person_country }}]
+                                    {% if forloop.counter == 2 and not forloop.last %}
+                                        &nbsp;<a href="#"
+                                                 class="show-all g-font-size-12"
+                                                 title="{% trans "Показати всі" %}"
+                                    ><i class="fa fa-plus"></i></a>
+                                    {% endif %}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                </span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '72' ipc_fields as ipc_field %}
@@ -347,11 +354,18 @@
             {% endif %}
 
             {% get_field '98' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.biblio_data.I_98 %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.biblio_data.I_98 }}</td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.biblio_data.I_98 %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.biblio_data.I_98 }}</td>
+                    </tr>
+                {% endif %}
             {% endif %}
             </tbody>
         </table>

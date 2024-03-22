@@ -71,6 +71,9 @@
 
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
+
+                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                 {% for I_71 in biblio_data.I_71|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
                         {{ I_71|get_person_name }} [{{ I_71|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
