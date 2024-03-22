@@ -1031,10 +1031,13 @@ def create_shared_docs_archive(id_app_number):
     # Создание архива
     zip_ = ZipFile(file_path, "a")
     for document in app.appdocuments_set.filter(file_type='pdf').all():
-        zip_.write(
-            document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
-            Path(document.file_name.replace('\\', '/')).name
-        )
+        try:
+            zip_.write(
+                document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
+                Path(document.file_name.replace('\\', '/')).name
+            )
+        except FileNotFoundError:
+            continue
 
     # fix for Linux zip files read in Windows
     for file in zip_.filelist:
