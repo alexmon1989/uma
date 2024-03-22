@@ -50,6 +50,9 @@
         {% else %}
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Винахідник(и)" %}:</h4>
+
+                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                 {% for I_72 in biblio_data.I_72|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
                         {{ I_72|get_person_name }} [{{ I_72|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
@@ -137,6 +140,9 @@
                 </div>
                 <div class="col-md">
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
+
+                    {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                     {% for I_73 in biblio_data.I_73|list_of_dicts_unique %}
                         {% if forloop.counter <= 2 %}
                             {{ I_73|get_person_name }} [{{ I_73|get_person_country }}]{% if not forloop.last %}<br>{% endif %}
@@ -150,6 +156,12 @@
                             >(+{{ biblio_data.I_73|list_of_dicts_unique|length|add:"-2" }})</a>
                         {% endif %}
                     {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if hit.Document.is_limited %}
+                <div class="col-12 g-mt-10 g-color-gray-dark-v3">
+                    <span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i>
                 </div>
             {% endif %}
     {% endif %}
