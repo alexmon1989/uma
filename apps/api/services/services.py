@@ -412,7 +412,7 @@ def opendata_get_applications(ids: List[int]) -> List[dict]:
 def opendata_get_application(app_number: str, obj_type_id: int = None) -> dict | None:
     """Возвращает данные заявки"""
     queryset = OpenData.objects.filter(
-        is_visible=True, registration_date__lt='2024-03-20', last_update__lt='2024-03-20'
+        is_visible=True
     ).select_related('obj_type').prefetch_related(
         Prefetch(
             'app__appdocuments_set',
