@@ -565,6 +565,20 @@ def application_tm_can_be_indexed(app_data: dict) -> bool:
     return True
 
 
+def application_inv_can_be_indexed(app_data: dict) -> bool:
+    """Проверяет может ли изобретение быть добавлено в поисковый индекс."""
+    res = True
+    today = datetime.datetime.now()
+
+    i_43 = app_data.get('Claim', {}).get('I_43.D', [])
+    for item in i_43:
+        if datetime.datetime.strptime(item, '%Y-%m-%d') > today:
+            res = False
+            break
+
+    return res
+
+
 def application_id_can_be_indexed(app_data: dict) -> bool:
     """Проверяет может ли пром образец быть добавлен в поисковый индекс."""
     today = datetime.datetime.now()

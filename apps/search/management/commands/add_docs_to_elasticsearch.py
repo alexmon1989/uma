@@ -310,7 +310,8 @@ class Command(BaseCommand):
                     res['search_data']['registration_status_color'] = get_registration_status_color(res)
 
                 # Запись в индекс
-                self.write_to_es_index(doc, res)
+                if search_services.application_inv_can_be_indexed(data):
+                    self.write_to_es_index(doc, res)
 
     def process_invention_certificate(self, doc):
         """Добавляет документ типа "сертифікат додаткової охорони" в ElasticSearch."""
