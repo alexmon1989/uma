@@ -8,7 +8,7 @@ from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
 from apps.search.services import services as search_services
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
-from ...utils import get_registration_status_color, filter_bad_apps
+from ...utils import get_registration_status_color, filter_bad_apps, delete_files_in_directory
 import json
 import os
 import datetime
@@ -260,13 +260,8 @@ class Command(BaseCommand):
                     if 'I_98_Index' in biblio_data:
                         del biblio_data['I_98_Index']
 
-                    # Удаление всех pdf из каталога
-                    file_path = self.get_doc_files_path(doc)
-                    files_in_directory = os.listdir(file_path)
-                    filtered_files = [file for file in files_in_directory if file.endswith(".pdf")]
-                    for file in filtered_files:
-                        path_to_file = os.path.join(file_path, file)
-                        os.remove(path_to_file)
+                    # Удаление всех .pdf из каталога
+                    delete_files_in_directory(self.get_doc_files_path(doc), '.pdf')
 
                 # Состояние делопроизводства
                 if data.get('DOCFLOW'):
@@ -650,6 +645,26 @@ class Command(BaseCommand):
                 for x in res['Design']['DesignDetails']['RecordPublicationDetails']:
                     if len(x.get('PublicationIdentifier')) < 6:
                         x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
+
+            # Признак что данные необходимо публиковать не в полном объёме
+            if doc['is_limited']:
+                res['Document']['is_limited'] = doc['is_limited']
+                if 'ApplicantDetails' in res['Design']['DesignDetails']:
+                    del res['Design']['DesignDetails']['ApplicantDetails']
+                if 'DesignerDetails' in res['Design']['DesignDetails']:
+                    del res['Design']['DesignDetails']['DesignerDetails']
+                if 'HolderDetails' in res['Design']['DesignDetails']:
+                    del res['Design']['DesignDetails']['HolderDetails']
+                if 'CorrespondenceAddress' in res['Design']['DesignDetails']:
+                    del res['Design']['DesignDetails']['CorrespondenceAddress']
+                if 'DesignSpecimenDetails' in res['Design']['DesignDetails']:
+                    del res['Design']['DesignDetails']['DesignSpecimenDetails']
+                # Удаление всех .jpeg, .jpg, .png, .tiff из каталога
+                exts = ('.jpeg', '.jpg', '.png', '.tiff')
+                directory = self.get_doc_files_path(doc)
+                for ext in exts:
+                    delete_files_in_directory(directory, ext)
+                    delete_files_in_directory(directory, ext.upper())
 
             applicant = None
             if res['Design']['DesignDetails'].get('ApplicantDetails'):

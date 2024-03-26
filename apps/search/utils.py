@@ -2116,3 +2116,12 @@ def get_ipc_codes_with_schedules(lang_code):
                 'obj_states': obj_states,
             })
     return res
+
+
+def delete_files_in_directory(directory: str, ext: str) -> None:
+    """Удаляет файлы указанного расширения из каталога."""
+    files_in_directory = os.listdir(directory)
+    filtered_files = [file for file in files_in_directory if file.endswith(ext)]
+    for file in filtered_files:
+        path_to_file = os.path.join(directory, file)
+        os.remove(path_to_file)

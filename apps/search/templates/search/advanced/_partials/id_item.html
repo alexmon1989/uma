@@ -39,6 +39,8 @@
         {% else %}
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Заявник(и)' %}:</h4>
+                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                 {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
                     {% if forloop.counter <= 2 %}
                         {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
@@ -92,6 +94,8 @@
             {% if hit.search_data.obj_state == 2 %}
                 <div class="col-md">
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans 'Власник(и)' %}:</h4>
+                    {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                     {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
                         {% if forloop.counter <= 2 %}
                             {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% if not forloop.last %}<br>{% endif %}
@@ -130,6 +134,12 @@
                         </span>
                     </a>
                     <div class="text-center">1.1</div>
+                </div>
+            {% endif %}
+
+            {% if hit.Document.is_limited %}
+                <div class="col-12 g-mt-10 g-color-gray-dark-v3">
+                    <span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i>
                 </div>
             {% endif %}
 

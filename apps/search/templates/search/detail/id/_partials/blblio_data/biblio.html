@@ -148,50 +148,71 @@
             {% endif %}
 
             {% get_field '71' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.ApplicantDetails.Applicant %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
-                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            {% if hit.search_data.obj_state == 2 %}
-                                <br>
-                                {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                            {% endif %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% for applicant in hit.Design.DesignDetails.ApplicantDetails.Applicant %}
+                                {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                {% if hit.search_data.obj_state == 2 %}
+                                    <br>
+                                    {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                {% endif %}
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '72' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignerDetails.Designer %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
-                            {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.DesignerDetails.Designer %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
+                                {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '73' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.HolderDetails.Holder %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify g-font-weight-600">
-                        {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
-                            {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            <br>
-                            {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                            <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.HolderDetails.Holder %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify g-font-weight-600">
+                            {% for holder in hit.Design.DesignDetails.HolderDetails.Holder %}
+                                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                <br>
+                                {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '74' ipc_fields as ipc_field %}
@@ -214,15 +235,22 @@
             {% endif %}
 
             {% get_field '98' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.CorrespondenceAddress %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                        <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                        <br>({{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.FormattedAddressCountryCode }})
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.CorrespondenceAddress  %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                            <br>{{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                            <br>({{ hit.Design.DesignDetails.CorrespondenceAddress.CorrespondenceAddressBook.FormattedNameAddress.Address.FormattedAddress.FormattedAddressCountryCode }})
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '28' ipc_fields as ipc_field %}
@@ -234,6 +262,15 @@
                     </td>
                 </tr>
             {% endif %}
+
+            {% if hit.Document.is_limited %}
+                {% get_field '55' ipc_fields as ipc_field %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% endif %}
+
             </tbody>
         </table>
     </div>
@@ -273,5 +310,10 @@
             {% endfor %}
         </div>
 
+    {% endif %}
+
+    {% if hit.Document.is_limited %}
+        <hr class="g-my-10">
+        <p><span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i></p>
     {% endif %}
 </div>
