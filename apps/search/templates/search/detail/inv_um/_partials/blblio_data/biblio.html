@@ -112,7 +112,8 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for I_43 in hit.biblio_data|get:'I_43.D' %}
-                            {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                            {{ I_43|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_43 %}
+                            {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
                 </tr>
@@ -124,7 +125,8 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for I_43 in hit.biblio_data|get:'I_43.D' %}
-                            {{ I_43|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                            {{ I_43|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_43 %}
+                            {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
                 </tr>
@@ -136,7 +138,8 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for I_45 in hit.biblio_data|get:'I_45.D' %}
-                            {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                            {{ I_45|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_45 %}
+                            {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
                 </tr>
@@ -148,7 +151,8 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for I_45 in hit.biblio_data|get:'I_45.D' %}
-                            {{ I_45|parse_date|date:"d.m.Y" }}{% if not forloop.last %},{% endif %}
+                            {{ I_45|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_45 %}
+                            {% if not forloop.last %};<br>{% endif %}
                         {% endfor %}
                     </td>
                 </tr>

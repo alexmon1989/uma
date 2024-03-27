@@ -1,6 +1,6 @@
 from apps.search.dataclasses import InidCode
 from apps.search.templatetags.search_extras import get_person_name, get_person_country
-from apps.bulletin.services import bulletin_get_number_441_code
+from apps.bulletin.services import bulletin_get_number_by_date, bulletin_get_number_with_year_by_date
 from templatetags.uma_extras import list_of_dicts_unique
 
 from typing import List
@@ -443,7 +443,7 @@ class ReportItemDocxTM(ReportItemDocx):
         if inid and inid.visible and code_441:
             bul_number = self.application_data['TradeMark']['TrademarkDetails'].get('Code_441_BulNumber')
             if not bul_number:
-                bul_number = str(bulletin_get_number_441_code(code_441))
+                bul_number = str(bulletin_get_number_by_date(code_441))
 
             code_441 = datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"({inid.code})").bold = True
@@ -592,7 +592,7 @@ class ReportItemDocxMadrid(ReportItemDocx):
         inid = self._get_inid(self.obj_type_id, '441', self.application_data['search_data']['obj_state'])
         code_441 = self.application_data['MadridTradeMark']['TradeMarkDetails'].get('Code_441')
         if inid and inid.visible and code_441:
-            bul_number = str(bulletin_get_number_441_code(code_441))
+            bul_number = str(bulletin_get_number_by_date(code_441))
             code_441 = datetime.strptime(code_441, '%Y-%m-%d').strftime('%d.%m.%Y')
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
@@ -1497,6 +1497,12 @@ class ReportItemInvUMLD(ReportItemDocx):
                 self._paragraph.add_run(f"({inid.code})").bold = True
                 self._paragraph.add_run(f"\t{inid.title}: ")
                 self._paragraph.add_run(value).bold = True
+                bul_number = bulletin_get_number_with_year_by_date(item)
+                if bul_number:
+                    if self.lang_code == 'ua':
+                        self._paragraph.add_run(f", бюл. № {bul_number}").bold = True
+                    else:
+                        self._paragraph.add_run(f", bul. № {bul_number}").bold = True
                 self._paragraph.add_run('\r')
 
     def _write_46(self):
@@ -1510,11 +1516,14 @@ class ReportItemInvUMLD(ReportItemDocx):
                 self._paragraph.add_run(f"({inid.code})").bold = True
                 self._paragraph.add_run(f"\t{inid.title}: ")
                 self._paragraph.add_run(value).bold = True
-                if self.body.get('I_45_bul_str'):
+
+                bul_number = bulletin_get_number_with_year_by_date(item)
+                if bul_number:
                     if self.lang_code == 'ua':
-                        self._paragraph.add_run(f", бюл. № {self.body.get('I_45_bul_str')}").bold = True
+                        self._paragraph.add_run(f", бюл. № {bul_number}").bold = True
                     else:
-                        self._paragraph.add_run(f", bul. № {self.body.get('I_45_bul_str')}").bold = True
+                        self._paragraph.add_run(f", bul. № {bul_number}").bold = True
+
                 self._paragraph.add_run('\r')
 
     def _write_51(self):

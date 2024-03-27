@@ -499,7 +499,7 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
         if 'Code_441_BulNumber' in self._raw_biblio:
             # Fix случая когда приходил неверный номер бюлетня
             if 'Code_441' in self._raw_biblio and self._application_data['last_update'] < bulletin_date_until:
-                self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(
+                self._raw_biblio['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_by_date(
                     self._raw_biblio['Code_441']
                 )
             # Fix типа данных поля 'Code_441_BulNumber'

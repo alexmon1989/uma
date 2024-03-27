@@ -237,7 +237,7 @@
                         {% if hit.TradeMark.TrademarkDetails.Code_441_BulNumber %}
                             {{ hit.TradeMark.TrademarkDetails.Code_441_BulNumber }}
                         {% else %}
-                            {% bulletin_number_441_code hit.TradeMark.TrademarkDetails.Code_441 as bul_num %}
+                            {% bulletin_number_by_date hit.TradeMark.TrademarkDetails.Code_441 as bul_num %}
                             {% if bul_num %}{{ bul_num }}{% endif %}
                         {% endif %}
                     </td>

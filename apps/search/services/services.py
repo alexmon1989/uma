@@ -471,7 +471,7 @@ def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> d
     bulletin_date_until = datetime.datetime.strptime(settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE, '%d.%m.%Y')
 
     if 'Code_441_BulNumber' in res and 'Code_441' in res and app_db_data.lastupdate < bulletin_date_until:
-        res['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_441_code(res['Code_441'])
+        res['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_by_date(res['Code_441'])
 
     return res
 
@@ -720,8 +720,10 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                 InidCode(obj_type_id, '31', 'Номер попередньої заявки', 2, True),
                 InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 2, True),
                 InidCode(obj_type_id, '33', 'Двобуквений код держави', 2, True),
-                InidCode(obj_type_id, '41', 'Дата публікації заявки', 2, True),
-                InidCode(obj_type_id, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2, True),
+                InidCode(obj_type_id, '41', 'Дата публікації відомостей про заявку на державну реєстрацію винаходу '
+                                            'та номер бюлетеня', 2, True),
+                InidCode(obj_type_id, '46', 'Дата публікації відомостей про державну реєстрацію патенту/сертифіката '
+                                            'додаткової охорони та номер бюлетеня', 2, True),
                 InidCode(obj_type_id, '51', 'Iндекс МПК', 2, True),
                 InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 2, True),
                 InidCode(obj_type_id, '56', 'Аналоги винаходу', 2, True),
@@ -744,7 +746,8 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                 InidCode(obj_type_id, '31', 'Номер попередньої заявки', 1, True),
                 InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 1, True),
                 InidCode(obj_type_id, '33', 'Двобуквений код держави', 1, True),
-                InidCode(obj_type_id, '41', 'Дата публікації заявки', 1, True),
+                InidCode(obj_type_id, '41', 'Дата публікації відомостей про заявку на державну реєстрацію винаходу '
+                                            'та номер бюлетеня', 1, True),
                 InidCode(obj_type_id, '51', 'Iндекс МПК', 1, True),
                 InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 1, True),
                 InidCode(obj_type_id, '56', 'Аналоги винаходу', 1, True),

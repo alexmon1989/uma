@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
 from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
                      user_has_access_to_tm_app, get_fixed_mark_status_code)
-from apps.bulletin.services import bulletin_get_number_441_code
+from apps.bulletin.services import bulletin_get_number_by_date, bulletin_get_number_with_year_by_date
 import re
 
 register = template.Library()
@@ -606,9 +606,18 @@ def remove_inn(s):
 
 
 @register.simple_tag()
-def bulletin_number_441_code(value):
+def bulletin_number_by_date(value) -> str | int:
     """Возвращает номер бюлетня из таблицы БД."""
-    bul_num = bulletin_get_number_441_code(value)
+    bul_num = bulletin_get_number_by_date(value)
+    if bul_num:
+        return bul_num
+    return ''
+
+
+@register.simple_tag()
+def bulletin_number_with_year_by_date(value) -> str | int:
+    """Возвращает номер бюлетня с годом из таблицы БД."""
+    bul_num = bulletin_get_number_with_year_by_date(value)
     if bul_num:
         return bul_num
     return ''

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-22 17:33+0200\n"
+"POT-Creation-Date: 2024-03-27 14:03+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -132,11 +132,11 @@ msgstr "Bulletin"
 #: apps/bulletin_new/templates/bulletin_new/detail/inv.html:276
 #: apps/bulletin_new/templates/bulletin_new/detail/inv.html:297
 #: apps/bulletin_new/templates/bulletin_new/detail/inv.html:319
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:168
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:211
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:280
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:308
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:331
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:172
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:215
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:284
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:312
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:341
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:145
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:186
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:207
@@ -172,6 +172,10 @@ msgstr "Open in new window"
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:155
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:30
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:115
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:128
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:141
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:154
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:73
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:236
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:62
@@ -667,8 +671,8 @@ msgid "Дякуємо, замовлення було сплачено."
 msgstr "Thank you, your order was successfully paid."
 
 #: apps/payments/templates/payments/order_detail/index.html:20
-#: apps/search/templates/search/advanced/_partials/id_item.html:64
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:110
+#: apps/search/templates/search/advanced/_partials/id_item.html:66
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:116
 #: apps/search/templates/search/advanced/_partials/ld_item.html:74
 #: apps/search/templates/search/advanced/_partials/qi_item.html:55
 #: apps/search/templates/search/advanced/_partials/tm_item.html:74
@@ -771,8 +775,8 @@ msgid "Статус об'єкта"
 msgstr "Object state"
 
 #: apps/search/admin.py:56 apps/search/admin.py:111
-#: apps/search/templates/search/advanced/_partials/id_item.html:59
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:105
+#: apps/search/templates/search/advanced/_partials/id_item.html:61
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:111
 #: apps/search/templates/search/advanced/_partials/ld_item.html:69
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/sidebar.html:55
@@ -871,7 +875,7 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1270
+#: apps/search/services/services.py:1284
 msgid ""
 "Завантаження неможливе, оскільки документ не дозволений для завантаження "
 "представникам НАЗК."
@@ -879,7 +883,7 @@ msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1273
+#: apps/search/services/services.py:1287
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не дозволений(і) для завантаження представникам НАЗК:"
@@ -887,13 +891,13 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/services/services.py:1283
+#: apps/search/services/services.py:1297
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1285
+#: apps/search/services/services.py:1299
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -985,8 +989,8 @@ msgid "Дата державної реєстрації додаткової о�
 msgstr "Date of state registration of additional protection"
 
 #: apps/search/templates/search/advanced/_partials/cap_item.html:49
-#: apps/search/templates/search/advanced/_partials/id_item.html:94
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:139
+#: apps/search/templates/search/advanced/_partials/id_item.html:96
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:145
 #: apps/search/templates/search/advanced/_partials/ld_item.html:101
 #: apps/search/templates/search/advanced/_partials/tm_item.html:106
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:56
@@ -1005,15 +1009,15 @@ msgstr "Copyright for an official work"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:30
 #: apps/search/templates/search/advanced/_partials/id_item.html:41
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:70
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:73
 #: apps/search/templates/search/advanced/_partials/ld_item.html:51
 #: apps/search/templates/search/advanced/_partials/tm_item.html:51
 msgid "Заявник(и)"
 msgstr "Applicant(s)"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:37
-#: apps/search/templates/search/advanced/_partials/id_item.html:48
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:77
+#: apps/search/templates/search/advanced/_partials/id_item.html:50
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:83
 #: apps/search/templates/search/advanced/_partials/ld_item.html:58
 #: apps/search/templates/search/advanced/_partials/tm_item.html:58
 msgid "Повний список заявників"
@@ -1061,8 +1065,8 @@ msgstr "Patent of Ukraine for industrial design"
 msgid "Для даної заявки можливий перегляд лише її стану діловодства."
 msgstr "For this application, it is possible to review only its status."
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:70
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:116
+#: apps/search/templates/search/advanced/_partials/id_item.html:72
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:122
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:62
 #: apps/search/templates/search/advanced/_partials/tm_item.html:81
@@ -1070,38 +1074,45 @@ msgstr "For this application, it is possible to review only its status."
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:76
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:122
+#: apps/search/templates/search/advanced/_partials/id_item.html:78
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:128
 msgid "Патент"
 msgstr "Patent"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:81
+#: apps/search/templates/search/advanced/_partials/id_item.html:83
 msgid "Номер реєстрації, який є номером патенту"
 msgstr "Registration number, which is a patent number"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:87
+#: apps/search/templates/search/advanced/_partials/id_item.html:89
 msgid "Дата, з якої є чинними права на промисловий зразок"
 msgstr "Date from which the industrial design rights are valid"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:101
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:146
+#: apps/search/templates/search/advanced/_partials/id_item.html:105
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:155
 #: apps/search/templates/search/advanced/_partials/ld_item.html:108
 #: apps/search/templates/search/advanced/_partials/tm_item.html:113
 msgid "Повний список власників"
 msgstr "Full list of owners"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:113
+#: apps/search/templates/search/advanced/_partials/id_item.html:117
 msgid "Індекси"
 msgstr "Indexes"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:113
+#: apps/search/templates/search/advanced/_partials/id_item.html:117
 msgid "Міжнародна класифікація промислових зразків"
 msgstr "International Classification for Industrial Designs"
 
-#: apps/search/templates/search/advanced/_partials/id_item.html:113
+#: apps/search/templates/search/advanced/_partials/id_item.html:117
 #: apps/search/utils.py:1273
 msgid "МКПЗ"
 msgstr "ICID"
+
+#: apps/search/templates/search/advanced/_partials/id_item.html:142
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:167
+#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:317
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:379
+msgid "інформація тимчасово обмежена"
+msgstr "information is temporarily limited"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:21
 #: apps/search/templates/search/detail/inv_um/_partials/breadcrumbs.html:21
@@ -1128,21 +1139,21 @@ msgstr "Utility Model Patent"
 msgid "Винахідник(и)"
 msgstr "Inventor(s)"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:59
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:62
 #: apps/search/templates/search/advanced/_partials/ld_item.html:40
 msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:94
 #: apps/search/utils.py:1271
 msgid "МПК"
 msgstr "IPC"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:95
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:101
 msgid "Повний список індексів МПК"
 msgstr "Full list of IPC indexes"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:127
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:133
 #: apps/search/templates/search/detail/id/_partials/transactions.html:17
 #: apps/search/templates/search/detail/id/_partials/transactions.html:35
 #: apps/search/templates/search/detail/id/_partials/transactions.html:75
@@ -1170,7 +1181,7 @@ msgstr "Full list of IPC indexes"
 msgid "Номер патенту"
 msgstr "Patent number"
 
-#: apps/search/templates/search/advanced/_partials/inv_um_item.html:134
+#: apps/search/templates/search/advanced/_partials/inv_um_item.html:140
 msgid "Дата публікації про видачу патенту"
 msgstr "Date of publication of the grant of a patent"
 
@@ -1828,10 +1839,6 @@ msgid ""
 msgstr ""
 "Name or full name of the patent owner, which is established by a court "
 "decision"
-
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:361
-msgid "інформація тимчасово обмежена"
-msgstr "information is temporarily limited"
 
 #: apps/search/templates/search/detail/inv_um/_partials/cap.html:14
 msgid ""
