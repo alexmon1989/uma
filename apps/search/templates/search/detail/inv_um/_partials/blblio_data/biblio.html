@@ -106,7 +106,7 @@
                 {% endif %}
             {% endif %}
 
-            {% get_field '41.D' ipc_fields as ipc_field %}
+            {% get_field '41' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.biblio_data|get:'I_43.D' %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
@@ -119,33 +119,7 @@
                 </tr>
             {% endif %}
 
-            {% get_field '43.D' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.biblio_data|get:'I_43.D' %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>
-                        {% for I_43 in hit.biblio_data|get:'I_43.D' %}
-                            {{ I_43|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_43 %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
-            {% endif %}
-
-            {% get_field '45.D' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.biblio_data|get:'I_45.D' %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>
-                        {% for I_45 in hit.biblio_data|get:'I_45.D' %}
-                            {{ I_45|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %}&nbsp;{% bulletin_number_with_year_by_date I_45 %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
-            {% endif %}
-
-            {% get_field '46.D' ipc_fields as ipc_field %}
+            {% get_field '46' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.biblio_data|get:'I_45.D' %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
