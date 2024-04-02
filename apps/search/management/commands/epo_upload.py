@@ -132,30 +132,30 @@ class Command(BaseCommand):
         folder_path = self._create_and_fill_folder(options['registration_date'])
 
         # Архивирование каталога
-        # if options['verbose']:
-        #     print('Folder archiving')
-        # if os.path.exists(folder_path):
-        #     shutil.make_archive(str(folder_path), 'zip', folder_path)
-        #
-        #     # Загрузка на ФТП
-        #     if options['verbose']:
-        #         print('FTP uploading')
-        #     HOSTNAME = settings.EPO_FTP_HOSTNAME
-        #     USERNAME = settings.EPO_FTP_USERNAME
-        #     PASSWORD = settings.EPO_FTP_PASSWORD
-        #     ftp_server = ftplib.FTP(HOSTNAME, USERNAME, PASSWORD)
-        #     ftp_server.encoding = "utf-8"
-        #
-        #     zip_path_local = f"{str(folder_path)}.zip"
-        #     zip_path_ftp = f"{settings.EPO_FTP_DIRECTORY}/{folder_path.name}.zip"
-        #     with open(zip_path_local, "rb") as file:
-        #         ftp_server.storbinary(f"STOR {zip_path_ftp}", file)
-        #
-        #     # Удаление
-        #     if options['verbose']:
-        #         print('Folder removing')
-        #     try:
-        #         shutil.rmtree(folder_path)
-        #     except OSError:
-        #         if options['verbose']:
-        #             print(f'Warning: could not remove folder {folder_path}')
+        if options['verbose']:
+            print('Folder archiving')
+        if os.path.exists(folder_path):
+            shutil.make_archive(str(folder_path), 'zip', folder_path)
+
+            # Загрузка на ФТП
+            if options['verbose']:
+                print('FTP uploading')
+            HOSTNAME = settings.EPO_FTP_HOSTNAME
+            USERNAME = settings.EPO_FTP_USERNAME
+            PASSWORD = settings.EPO_FTP_PASSWORD
+            ftp_server = ftplib.FTP(HOSTNAME, USERNAME, PASSWORD)
+            ftp_server.encoding = "utf-8"
+
+            zip_path_local = f"{str(folder_path)}.zip"
+            zip_path_ftp = f"{settings.EPO_FTP_DIRECTORY}/{folder_path.name}.zip"
+            with open(zip_path_local, "rb") as file:
+                ftp_server.storbinary(f"STOR {zip_path_ftp}", file)
+
+            # Удаление
+            if options['verbose']:
+                print('Folder removing')
+            try:
+                shutil.rmtree(folder_path)
+            except OSError:
+                if options['verbose']:
+                    print(f'Warning: could not remove folder {folder_path}')
