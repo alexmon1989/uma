@@ -8,6 +8,7 @@ from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
 from apps.search.services import services as search_services
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
+from apps.bulletin.services import bulletin_get_number_with_year_by_date
 from ...utils import get_registration_status_color, filter_bad_apps, delete_files_in_directory
 import json
 import os
@@ -184,24 +185,16 @@ class Command(BaseCommand):
                 )
             else:
                 # Строка бюлетня ("10/2011" и т.д.)
-                if res['Document']['idObjType'] == 1 and data.get('Claim', {}).get('I_43.D'):  # Заявки на изобретения
-                    i_43_d = data['Claim']['I_43.D'][0]
-                    bulletin = ClListOfficialBulletinsIp.objects.filter(
-                        date_from__lte=i_43_d,
-                        date_to__gte=i_43_d
-                    ).first()
-                    if bulletin:
-                        bull_str = f"{bulletin.bul_number}/{bulletin.bul_date.year}"
-                        data['Claim']['I_43_bul_str'] = bull_str
-                elif data.get('Patent', {}).get('I_45.D'):  # Патенты на изобретения, пол. модели, топографии
-                    i_45_d = data['Patent']['I_45.D'][len(data['Patent']['I_45.D']) - 1]
-                    bulletin = ClListOfficialBulletinsIp.objects.filter(
-                        date_from__lte=i_45_d,
-                        date_to__gte=i_45_d
-                    ).first()
-                    if bulletin:
-                        bull_str = f"{bulletin.bul_number}/{bulletin.bul_date.year}"
-                        data['Patent']['I_45_bul_str'] = bull_str
+                if biblio_data.get('I_43.D'):
+                    i_43_d = biblio_data['I_43.D'][0]
+                    bull_str = bulletin_get_number_with_year_by_date(i_43_d)
+                    if bull_str:
+                        biblio_data['I_43_bul_str'] = bull_str
+                if biblio_data.get('I_45.D'):
+                    i_45_d = biblio_data['I_45.D'][len(biblio_data['I_45.D']) - 1]
+                    bull_str = bulletin_get_number_with_year_by_date(i_45_d)
+                    if bull_str:
+                        biblio_data['I_45_bul_str'] = bull_str
 
                 # Обработка I_71 для избежания ошибки добавления в индекс ElasticSearch
                 i_71 = biblio_data.get('I_71', [])
