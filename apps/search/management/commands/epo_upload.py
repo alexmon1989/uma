@@ -8,6 +8,7 @@ import pathlib
 import shutil
 import os
 import ftplib
+import json
 
 
 class Command(BaseCommand):
@@ -26,6 +27,36 @@ class Command(BaseCommand):
             help='Show progress'
         )
 
+    def _process_limited_json(self, file_path: pathlib.Path):
+        """Удаляет из JSON закрытую информацию."""
+        try:
+            with open(file_path, 'r', encoding='utf16') as f:
+                content = json.load(f)
+        except (UnicodeDecodeError, UnicodeError):
+            with open(file_path, 'r', encoding='utf8') as f:
+                content = json.load(f)
+
+        if 'AB' in content['Patent']:
+            del content['Patent']['AB']
+        if 'CL' in content['Patent']:
+            del content['Patent']['CL']
+        if 'DE' in content['Patent']:
+            del content['Patent']['DE']
+        if 'I_71' in content['Patent']:
+            del content['Patent']['I_71']
+        if 'I_72' in content['Patent']:
+            del content['Patent']['I_72']
+        if 'I_73' in content['Patent']:
+            del content['Patent']['I_73']
+        if 'I_98' in content['Patent']:
+            del content['Patent']['I_98']
+        if 'I_98_Index' in content['Patent']:
+            del content['Patent']['I_98_Index']
+
+        json_str = json.dumps(content, indent=4, ensure_ascii=False)
+        with open(file_path, "w") as outfile:
+            outfile.write(json_str)
+
     def _create_and_fill_folder(self, registration_date: str) -> pathlib.Path:
         new_patents = IpcAppList.objects.filter(
             obj_type__id__in=(1, 2)
@@ -33,7 +64,7 @@ class Command(BaseCommand):
 
         updated_patents = IpcAppList.objects.filter(
             obj_type__id__in=(1, 2)
-        ).exclude(registration_date__isnull=True, is_limited=True).prefetch_related('appdocuments_set')
+        ).exclude(registration_date__isnull=True).prefetch_related('appdocuments_set')
 
         registration_date_from = datetime.datetime.strptime(
             f"{registration_date} 00:00:00",
@@ -45,7 +76,7 @@ class Command(BaseCommand):
         )
         new_patents = new_patents.filter(
             registration_date__gte=registration_date_from, registration_date__lte=registration_date_to
-        ).exclude(is_limited=True)
+        )
 
         notification_date = datetime.datetime.strptime(registration_date, '%d.%m.%Y')
         updated_patents = updated_patents.filter(notification_date=notification_date)
@@ -70,7 +101,11 @@ class Command(BaseCommand):
                 ))
                 dest = folder_path / 'New' / patent.registration_number / file_path_full.name
                 os.makedirs(dest.parent, exist_ok=True)
-                shutil.copy(file_path_full, dest)
+                if not patent.is_limited:
+                    shutil.copy(file_path_full, dest)
+                elif doc.file_type == 'json':
+                    shutil.copy(file_path_full, dest)
+                    self._process_limited_json(dest)
 
         # Копирование файлов изменённых патентов
         for patent in updated_patents:
@@ -82,7 +117,11 @@ class Command(BaseCommand):
                 ))
                 dest = folder_path / 'Updated' / patent.registration_number / file_path_full.name
                 os.makedirs(dest.parent, exist_ok=True)
-                shutil.copy(file_path_full, dest)
+                if not patent.is_limited:
+                    shutil.copy(file_path_full, dest)
+                elif doc.file_type == 'json':
+                    shutil.copy(file_path_full, dest)
+                    self._process_limited_json(dest)
 
         return folder_path
 
@@ -93,30 +132,30 @@ class Command(BaseCommand):
         folder_path = self._create_and_fill_folder(options['registration_date'])
 
         # Архивирование каталога
-        if options['verbose']:
-            print('Folder archiving')
-        if os.path.exists(folder_path):
-            shutil.make_archive(str(folder_path), 'zip', folder_path)
-
-            # Загрузка на ФТП
-            if options['verbose']:
-                print('FTP uploading')
-            HOSTNAME = settings.EPO_FTP_HOSTNAME
-            USERNAME = settings.EPO_FTP_USERNAME
-            PASSWORD = settings.EPO_FTP_PASSWORD
-            ftp_server = ftplib.FTP(HOSTNAME, USERNAME, PASSWORD)
-            ftp_server.encoding = "utf-8"
-
-            zip_path_local = f"{str(folder_path)}.zip"
-            zip_path_ftp = f"{settings.EPO_FTP_DIRECTORY}/{folder_path.name}.zip"
-            with open(zip_path_local, "rb") as file:
-                ftp_server.storbinary(f"STOR {zip_path_ftp}", file)
-
-            # Удаление
-            if options['verbose']:
-                print('Folder removing')
-            try:
-                shutil.rmtree(folder_path)
-            except OSError:
-                if options['verbose']:
-                    print(f'Warning: could not remove folder {folder_path}')
+        # if options['verbose']:
+        #     print('Folder archiving')
+        # if os.path.exists(folder_path):
+        #     shutil.make_archive(str(folder_path), 'zip', folder_path)
+        #
+        #     # Загрузка на ФТП
+        #     if options['verbose']:
+        #         print('FTP uploading')
+        #     HOSTNAME = settings.EPO_FTP_HOSTNAME
+        #     USERNAME = settings.EPO_FTP_USERNAME
+        #     PASSWORD = settings.EPO_FTP_PASSWORD
+        #     ftp_server = ftplib.FTP(HOSTNAME, USERNAME, PASSWORD)
+        #     ftp_server.encoding = "utf-8"
+        #
+        #     zip_path_local = f"{str(folder_path)}.zip"
+        #     zip_path_ftp = f"{settings.EPO_FTP_DIRECTORY}/{folder_path.name}.zip"
+        #     with open(zip_path_local, "rb") as file:
+        #         ftp_server.storbinary(f"STOR {zip_path_ftp}", file)
+        #
+        #     # Удаление
+        #     if options['verbose']:
+        #         print('Folder removing')
+        #     try:
+        #         shutil.rmtree(folder_path)
+        #     except OSError:
+        #         if options['verbose']:
+        #             print(f'Warning: could not remove folder {folder_path}')
