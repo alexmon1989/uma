@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
         updated_patents = IpcAppList.objects.filter(
             obj_type__id__in=(1, 2)
-        ).exclude(registration_date__isnull=True).prefetch_related('appdocuments_set')
+        ).exclude(registration_date__isnull=True, is_limited=True).prefetch_related('appdocuments_set')
 
         registration_date_from = datetime.datetime.strptime(
             f"{registration_date} 00:00:00",
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         )
         new_patents = new_patents.filter(
             registration_date__gte=registration_date_from, registration_date__lte=registration_date_to
-        )
+        ).exclude(is_limited=True)
 
         notification_date = datetime.datetime.strptime(registration_date, '%d.%m.%Y')
         updated_patents = updated_patents.filter(notification_date=notification_date)
