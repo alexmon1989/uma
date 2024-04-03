@@ -25,9 +25,12 @@
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
-        {% if hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}
+        {% if hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant or hit.Document.is_limited %}
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
+
+                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                 {% for applicant in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}
                     {% if forloop.counter <= 2 %}
                         {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
@@ -62,9 +65,12 @@
                 >{{ hit.search_data.rights_date|parse_date|date:"d.m.Y" }}</a>
             </div>
 
-            {% if hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
+            {% if hit.Certificate.CopyrightDetails.AuthorDetails.Author or hit.Document.is_limited %}
                 <div class="col-md">
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Автор(и)" %}:</h4>
+
+                    {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
                     {% for author in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
                         {% if forloop.counter <= 2 %}
                             {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
@@ -81,6 +87,12 @@
                     {% endfor %}
                 </div>
             {% endif %}
+        {% endif %}
+
+        {% if hit.Document.is_limited %}
+            <div class="col-12 g-mt-10 g-color-gray-dark-v3">
+                <span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i>
+            </div>
         {% endif %}
     </div>
 

@@ -927,10 +927,43 @@ class Command(BaseCommand):
             if doc['obj_type_id'] in (10, 13):  # Свидетельства
                 # Секция Certificate
                 res['Certificate'] = data.get('Certificate')
+                # Признак что данные необходимо публиковать не в полном объёме
+                if doc['is_limited']:
+                    res['Document']['is_limited'] = doc['is_limited']
+                    limited_data = {}
+                    if 'RegistrationNumber' in res['Certificate']['CopyrightDetails']:
+                        limited_data['RegistrationNumber'] = res['Certificate']['CopyrightDetails']['RegistrationNumber']
+                    if 'RegistrationDate' in res['Certificate']['CopyrightDetails']:
+                        limited_data['RegistrationDate'] = res['Certificate']['CopyrightDetails']['RegistrationDate']
+                    if 'Name' in res['Certificate']['CopyrightDetails']:
+                        limited_data['Name'] = res['Certificate']['CopyrightDetails']['Name']
+                    if 'NameShort' in res['Certificate']['CopyrightDetails']:
+                        limited_data['NameShort'] = res['Certificate']['CopyrightDetails']['NameShort']
+                    if 'PublicationDetails' in res['Certificate']['CopyrightDetails']:
+                        limited_data['PublicationDetails'] = res['Certificate']['CopyrightDetails']['PublicationDetails']
+                    res['Certificate']['CopyrightDetails'] = limited_data
+                    if 'DocFlow' in res['Certificate']:
+                        del res['Certificate']['DocFlow']
                 cr_data = res['Certificate']['CopyrightDetails']
-            else:   # Договоры
+
+            else:  # Договоры
                 # Секция Decision
                 res['Decision'] = data.get('Decision')
+                # Признак что данные необходимо публиковать не в полном объёме
+                if doc['is_limited']:
+                    res['Document']['is_limited'] = doc['is_limited']
+                    limited_data = {}
+                    if 'RegistrationNumber' in res['Decision']['DecisionDetails']:
+                        limited_data['RegistrationNumber'] = res['Decision']['DecisionDetails']['RegistrationNumber']
+                    if 'RegistrationDate' in res['Decision']['DecisionDetails']:
+                        limited_data['RegistrationDate'] = res['Decision']['DecisionDetails']['RegistrationDate']
+                    if 'PublicationDetails' in res['Decision']['DecisionDetails']:
+                        limited_data['PublicationDetails'] = res['Decision']['DecisionDetails']['PublicationDetails']
+                    if 'LicensorDetails' in res['Decision']['DecisionDetails']:
+                        limited_data['LicensorDetails'] = res['Decision']['DecisionDetails']['LicensorDetails']
+                    if 'LicenseeDetails' in res['Decision']['DecisionDetails']:
+                        limited_data['LicenseeDetails'] = res['Decision']['DecisionDetails']['LicenseeDetails']
+                    res['Decision']['DecisionDetails'] = limited_data
                 cr_data = res['Decision']['DecisionDetails']
 
             # fix PublicationDate
@@ -955,7 +988,6 @@ class Command(BaseCommand):
                 'title': cr_data.get('Name'),
                 'registration_status_color': 'red' if res['Document']['RegistrationStatus'] == 'Реєстрація недійсна' else 'green',
             }
-
             # Запись в индекс
             self.write_to_es_index(doc, res)
 

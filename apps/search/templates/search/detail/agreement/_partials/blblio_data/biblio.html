@@ -32,7 +32,12 @@
             {% endif %}
 
             {% get_field '27' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.RegistrationKind %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif hit.Decision.DecisionDetails.RegistrationKind %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>{{ hit.Decision.DecisionDetails.RegistrationKind }}</td>
@@ -52,7 +57,12 @@
             {% endif %}
 
             {% get_field '54' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.Name %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.Name %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.Name }}</td>
@@ -60,15 +70,38 @@
             {% endif %}
 
             {% get_field '54.S' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.NameShort %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.NameShort %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.NameShort }}</td>
                 </tr>
             {% endif %}
 
+            {% get_field '57' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.Annotation %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Certificate.CopyrightDetails.Annotation }}</td>
+                </tr>
+            {% endif %}
+
             {% get_field '72' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.AuthorDetails.Author|length > 0 %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.AuthorDetails.Author|length > 0 %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
