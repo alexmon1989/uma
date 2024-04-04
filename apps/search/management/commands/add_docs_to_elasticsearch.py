@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from elasticsearch_dsl import Search, Q
 from apps.search.models import IpcAppList, IndexationError, IndexationProcess
 from apps.search.services import services as search_services
-from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
+from apps.bulletin.models import EBulletinData
 from apps.bulletin.services import bulletin_get_number_with_year_by_date
 from ...utils import get_registration_status_color, filter_bad_apps, delete_files_in_directory
 import json

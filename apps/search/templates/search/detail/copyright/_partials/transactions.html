@@ -1,0 +1,36 @@
+{% load uma_extras %}
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm g-font-size-13">
+        {% for transaction in hit.Certificate.Transactions.Transaction %}
+            <tr>
+                <th class="g-px-10" width="20%">{{ transaction|get:"@name" }}</th>
+                <td>
+                    {% if transaction|get:"@type" == 'InvalidationByCourt' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }} №{{ transaction|get:"@bulletinNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">{% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">{% trans "Дата реєстрації" %}:</span> {{ hit.Certificate.CopyrightDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody.DecisionDetails %}
+                                <li><span class="g-font-weight-600">{% trans "Підстава" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}, постанова від {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }} у цивільній справі №{{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        {{ transaction }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

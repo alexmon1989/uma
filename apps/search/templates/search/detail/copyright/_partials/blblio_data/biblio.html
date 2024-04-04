@@ -12,6 +12,12 @@
         </div>
     {% endif %}
 
+    {% if hit.Document.ShowRegistrationStatus %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
+
     <div class="table-responsive">
         <table class="table table-sm table-trade-mark g-font-size-13">
             <tbody>

@@ -39,7 +39,7 @@
         {% if hit.search_data.registration_status_color == 'green' %}
             {% trans "Свідоцтво діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
         {% elif hit.search_data.registration_status_color == 'red' %}
-            {% trans "Свідоцтво не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
+            {% trans "Реєстрація недійсна" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
         {% elif hit.search_data.registration_status_color == 'yellow' %}
             <span title="{% trans "Дію свідоцтва припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
         {% else %}
