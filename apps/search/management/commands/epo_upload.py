@@ -54,7 +54,8 @@ class Command(BaseCommand):
             del content['Patent']['I_98_Index']
 
         json_str = json.dumps(content, indent=4, ensure_ascii=False)
-        with open(file_path, "w") as outfile:
+        with open(file_path, "w", encoding='utf-16-le') as outfile:
+            outfile.write('\ufeff')
             outfile.write(json_str)
 
     def _create_and_fill_folder(self, registration_date: str) -> pathlib.Path:
