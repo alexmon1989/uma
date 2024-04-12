@@ -186,7 +186,8 @@
                                     <br>
                                     {% if transaction.TransactionBody.LicensorDetails.Licensor|is_list %}
                                         {% for licensor in transaction.TransactionBody.LicensorDetails.Licensor %}
-                                            {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                            {{ licensor.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                                             <br>{{ licensor.LicensorAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
                                         {% endfor %}
                                     {% else %}
@@ -202,7 +203,8 @@
                                     <br>
                                     {% if transaction.TransactionBody.LicenseeDetails.Licensee|is_list %}
                                         {% for licensee in transaction.TransactionBody.LicenseeDetails.Licensee %}
-                                            {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }};
+                                            {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatNameDetails.FreeFormatNameLine }}
+                                            {{ licensee.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
                                             <br>{{ licensee.LicenseeAddressBook.FormattedNameAddress.Address.FreeFormatAddressLine }}
                                         {% endfor %}
                                     {% else %}
