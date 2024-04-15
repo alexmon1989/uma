@@ -7,6 +7,7 @@ from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_re
                      user_has_access_to_tm_app, get_fixed_mark_status_code)
 from apps.bulletin.services import bulletin_get_number_by_date, bulletin_get_number_with_year_by_date
 import re
+from typing import List
 
 register = template.Library()
 
@@ -131,6 +132,17 @@ def registration_status(hit):
 def registration_status_color(hit):
     """Возвращает статус охранного документа (зелёный, желтый, красный)."""
     return get_registration_status_color(hit)
+
+
+@register.simple_tag
+def is_first_year_paid_inv_um(collections: List[dict]) -> bool:
+    for item in collections:
+        # Если сбор найден, то производится проверка оплачен ли он
+        if 'Збір за 1 рік чинності' in item['CLRECORD']['CLNAME']:
+            return bool(item['CLRECORD'].get('CLDATEFACT'))
+    # Если сбор не найден,
+    # то считать что оплачен для того чтобы не выводить о сообщение о необходимости оплаты 1-го года
+    return True
 
 
 @register.simple_tag
