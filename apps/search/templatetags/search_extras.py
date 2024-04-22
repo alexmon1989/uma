@@ -1,3 +1,5 @@
+import datetime
+
 from django import template
 from django.conf import settings
 from django.db.models import F
@@ -136,13 +138,21 @@ def registration_status_color(hit):
 
 @register.simple_tag
 def is_first_year_paid_inv_um(collections: List[dict]) -> bool:
+    """Возвращает признак того что оплачен первый сбор поддержки действия патента."""
     for item in collections:
         # Если сбор найден, то производится проверка оплачен ли он
-        if 'Збір за 1 рік чинності' in item['CLRECORD']['CLNAME']:
-            return bool(item['CLRECORD'].get('CLDATEFACT'))
-    # Если сбор не найден,
-    # то считать что оплачен для того чтобы не выводить о сообщение о необходимости оплаты 1-го года
-    return True
+        if re.search(r'Збір за \d+ рік чинності', item['CLRECORD']['CLNAME']) \
+                and bool(item['CLRECORD'].get('CLDATEFACT')):
+            return True
+    return False
+
+
+@register.simple_tag
+def publication_inv_um_older_than_months(hit: dict, months: int) -> bool:
+    """Возвращает признак тарше ли публикация колическва месяцев months."""
+    pub_date = datetime.datetime.strptime(hit['Patent']['I_45.D'][0], '%Y-%m-%d')
+    four_months = pub_date + datetime.timedelta(days=(365.25 / 12)*months)
+    return datetime.datetime.now() > four_months
 
 
 @register.simple_tag

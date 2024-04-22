@@ -2295,8 +2295,8 @@ msgid "Дію патента припинено, але може бути пон
 msgstr "Ceased to be effective, but is subject to renewal"
 
 #: apps/search/templates/search/templatetags/registration_status.html:17
-msgid "Очікує сплату збору за перший рік чинності"
-msgstr "Awaiting payment of the fee for the first year of validity"
+msgid "Очікує першу сплату збору за підтримання чинності"
+msgstr "Awaiting the first payment of the maintenance fee"
 
 #: apps/search/templates/search/templatetags/registration_status.html:25
 #: apps/search/templates/search/templatetags/registration_status.html:57

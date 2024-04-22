@@ -11,10 +11,11 @@
             {% trans "Патент не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
         {% elif hit.search_data.registration_status_color == 'yellow' %}
             {% is_first_year_paid_inv_um hit.DOCFLOW.COLLECTIONS as first_year_paid %}
-            {% if first_year_paid %}
+            {% publication_inv_um_older_than_months hit=hit months=4 as publication_old %}
+            {% if first_year_paid or publication_old %}
                 <span title="{% trans "Дію патента припинено, але може бути поновлено" %}">{% trans "Дію припинено" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
             {% else %}
-                <span>{% trans "Очікує сплату збору за перший рік чинності" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
+                <span>{% trans "Очікує першу сплату збору за підтримання чинності" %}<i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
             {% endif %}
         {% else %}
             {% trans "Статус невідомий" %}<i class="fa fa-circle g-color-gray-light-v1 g-ml-5"></i>
