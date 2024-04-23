@@ -21,6 +21,7 @@ class Command(BaseCommand):
     help = 'Adds or updates documents in ElasticSearch index.'
     es = None
     indexation_process = None
+    is_limited_publication = False  # Признак что публикация с ограниченными данными
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -234,11 +235,8 @@ class Command(BaseCommand):
                     biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
 
                 # Признак что данные необходимо публиковать не в полном объёме
-                if search_services.application_is_limited_publication(
-                        doc['app_number'],
-                        res['Document']['idObjType']
-                ):
-                    res['Document']['is_limited'] = doc['is_limited']
+                if self.is_limited_publication:
+                    res['Document']['is_limited'] = True
                     if 'AB' in biblio_data:
                         del biblio_data['AB']
                     if 'CL' in biblio_data:
@@ -643,11 +641,8 @@ class Command(BaseCommand):
                         x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
 
             # Признак что данные необходимо публиковать не в полном объёме
-            if search_services.application_is_limited_publication(
-                    doc['app_number'],
-                    res['Document']['idObjType']
-            ):
-                res['Document']['is_limited'] = doc['is_limited']
+            if self.is_limited_publication:
+                res['Document']['is_limited'] = True
                 if 'ApplicantDetails' in res['Design']['DesignDetails']:
                     del res['Design']['DesignDetails']['ApplicantDetails']
                 if 'DesignerDetails' in res['Design']['DesignDetails']:
@@ -934,11 +929,8 @@ class Command(BaseCommand):
                 # Секция Certificate
                 res['Certificate'] = data.get('Certificate')
                 # Признак что данные необходимо публиковать не в полном объёме
-                if search_services.application_is_limited_publication(
-                        doc['app_number'],
-                        res['Document']['idObjType']
-                ):
-                    res['Document']['is_limited'] = doc['is_limited']
+                if self.is_limited_publication:
+                    res['Document']['is_limited'] = True
                     limited_data = {}
                     if 'RegistrationNumber' in res['Certificate']['CopyrightDetails']:
                         limited_data['RegistrationNumber'] = res['Certificate']['CopyrightDetails']['RegistrationNumber']
@@ -963,7 +955,7 @@ class Command(BaseCommand):
                         doc['app_number'],
                         res['Document']['idObjType']
                 ):
-                    res['Document']['is_limited'] = doc['is_limited']
+                    res['Document']['is_limited'] = True
                     limited_data = {}
                     if 'RegistrationNumber' in res['Decision']['DecisionDetails']:
                         limited_data['RegistrationNumber'] = res['Decision']['DecisionDetails']['RegistrationNumber']
@@ -1060,7 +1052,8 @@ class Command(BaseCommand):
             # Пометка в БД что этот документ проиндексирован и обновление времени индексации
             IpcAppList.objects.filter(id=doc['id']).update(
                 elasticindexed=1,
-                last_indexation_date=timezone.now()
+                last_indexation_date=timezone.now(),
+                is_limited=self.is_limited_publication
             )
 
     def fill_notification_date(self):
@@ -1103,7 +1096,6 @@ class Command(BaseCommand):
             'app_number',
             'app_date',
             'app_input_date',
-            'is_limited',
         )
         # Фильтрация по параметрам командной строки
         if not options['ignore_indexed']:
@@ -1128,6 +1120,10 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('The list of documents has been successfully received.'))
 
         for doc in documents:
+            self.is_limited_publication = search_services.application_is_limited_publication(
+                doc['app_number'], doc['obj_type_id']
+            )
+
             # Изобретения, полезные модели, топографии интегральных микросхем
             if doc['obj_type_id'] in (1, 2, 3):
                 self.process_inv_um_ld(doc)
