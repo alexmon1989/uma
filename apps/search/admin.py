@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from singlemodeladmin import SingleModelAdmin
 from .models import (IpcCode, ElasticIndexField, SimpleSearchField, InidCodeSchedule, SortParameter, AdvancedSearchPage,
-                     SimpleSearchPage, PaidServicesSettings, IpcCodeObjType)
+                     SimpleSearchPage, PaidServicesSettings, IpcCodeObjType, AppLimited)
 
 
 admin.site.register(SimpleSearchPage, SingleModelAdmin)
@@ -190,3 +190,23 @@ class SortParameterAdmin(admin.ModelAdmin):
         'is_enabled',
         'weight',
     )
+
+
+@admin.register(AppLimited)
+class AppLimitedAdmin(admin.ModelAdmin):
+    list_display = (
+        'app_number',
+        'obj_type',
+        'created_at',
+        'updated_at',
+    )
+    list_filter = (
+        'obj_type',
+    )
+    search_fields = (
+        'app_number',
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('obj_type')

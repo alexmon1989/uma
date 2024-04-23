@@ -44,6 +44,11 @@ class AppLimited(TimeStampedModel):
 
     class Meta:
         db_table = 'ls_limited_applications'
+        verbose_name = 'Обмежена публікація'
+        verbose_name_plural = 'Обмежені публікації'
+        constraints = [
+            models.UniqueConstraint(fields=['app_number', 'obj_type'], name='unique app_number_obj_type')
+        ]
 
 
 class ObjType(models.Model):
