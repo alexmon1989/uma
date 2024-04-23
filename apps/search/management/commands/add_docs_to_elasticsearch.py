@@ -234,7 +234,10 @@ class Command(BaseCommand):
                     biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
 
                 # Признак что данные необходимо публиковать не в полном объёме
-                if doc['is_limited']:
+                if search_services.application_is_limited_publication(
+                        doc['app_number'],
+                        res['Document']['idObjType']
+                ):
                     res['Document']['is_limited'] = doc['is_limited']
                     if 'AB' in biblio_data:
                         del biblio_data['AB']
@@ -640,7 +643,10 @@ class Command(BaseCommand):
                         x['PublicationIdentifier'] = f"{x['PublicationIdentifier']}/{x['PublicationDate'][:4]}"
 
             # Признак что данные необходимо публиковать не в полном объёме
-            if doc['is_limited']:
+            if search_services.application_is_limited_publication(
+                    doc['app_number'],
+                    res['Document']['idObjType']
+            ):
                 res['Document']['is_limited'] = doc['is_limited']
                 if 'ApplicantDetails' in res['Design']['DesignDetails']:
                     del res['Design']['DesignDetails']['ApplicantDetails']
@@ -928,7 +934,10 @@ class Command(BaseCommand):
                 # Секция Certificate
                 res['Certificate'] = data.get('Certificate')
                 # Признак что данные необходимо публиковать не в полном объёме
-                if doc['is_limited']:
+                if search_services.application_is_limited_publication(
+                        doc['app_number'],
+                        res['Document']['idObjType']
+                ):
                     res['Document']['is_limited'] = doc['is_limited']
                     limited_data = {}
                     if 'RegistrationNumber' in res['Certificate']['CopyrightDetails']:
@@ -950,7 +959,10 @@ class Command(BaseCommand):
                 # Секция Decision
                 res['Decision'] = data.get('Decision')
                 # Признак что данные необходимо публиковать не в полном объёме
-                if doc['is_limited']:
+                if search_services.application_is_limited_publication(
+                        doc['app_number'],
+                        res['Document']['idObjType']
+                ):
                     res['Document']['is_limited'] = doc['is_limited']
                     limited_data = {}
                     if 'RegistrationNumber' in res['Decision']['DecisionDetails']:

@@ -25,12 +25,24 @@ class IpcAppList(models.Model):
     last_indexation_date = models.DateTimeField(db_column='last_indexation_date', blank=True, null=True)
     in_electronic_bull = models.BooleanField(db_column='in_electronic_bull', blank=True, null=True)
     publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
-    is_limited = models.BooleanField(db_column='is_limited', default=False)
     users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
 
     class Meta:
         managed = False
         db_table = 'IPC_AppList'
+
+
+class AppLimited(TimeStampedModel):
+    """Модель заявки, которая публикуется с ограниченнм набором данных."""
+    app_number = models.CharField('Номер заявки', max_length=16, db_index=True)
+    obj_type = models.ForeignKey('ObjType', verbose_name="Тип об'єкта", db_column='idObjType', blank=True, null=True,
+                                 on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.app_number
+
+    class Meta:
+        db_table = 'ls_limited_applications'
 
 
 class ObjType(models.Model):

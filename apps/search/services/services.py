@@ -12,7 +12,7 @@ from django.utils import translation
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
-from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument
+from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited
 from apps.bulletin import services as bulletin_services
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
@@ -594,6 +594,11 @@ def application_id_can_be_indexed(app_data: dict) -> bool:
             return False
 
     return True
+
+
+def application_is_limited_publication(app_number: str, obj_type_id: int) -> bool:
+    """Возвращает признак того что объект публикуется с ограниченным набором данных."""
+    return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:
