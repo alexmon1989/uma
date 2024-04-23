@@ -25,6 +25,7 @@ class IpcAppList(models.Model):
     last_indexation_date = models.DateTimeField(db_column='last_indexation_date', blank=True, null=True)
     in_electronic_bull = models.BooleanField(db_column='in_electronic_bull', blank=True, null=True)
     publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
+    is_limited = models.BooleanField(db_column='is_limited', default=False)
     users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
 
     class Meta:
