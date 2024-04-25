@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 from django.core.cache import cache
+from django.db.models import Q
 
 from .models import ClListOfficialBulletinsIp
 
@@ -27,7 +28,7 @@ def bulletin_get_number_with_year_by_date(d: Union[datetime, str]) -> Optional[s
     bul_number = cache.get(cache_key)
     if not bul_number:
         try:
-            obj = ClListOfficialBulletinsIp.objects.get(date_from__lte=d, date_to__gte=d)
+            obj = ClListOfficialBulletinsIp.objects.get(Q(date_from__lte=d, date_to__gte=d) | Q(bul_date=d))
         except ClListOfficialBulletinsIp.DoesNotExist:
             return None
         else:
