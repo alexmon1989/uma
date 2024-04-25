@@ -705,6 +705,24 @@
                                 <li><span class="g-font-weight-600">{% trans "Підстава" %}:</span> {{ transaction.REASON }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction.PUBLICATIONNAME == "Припинення чинності майнових прав інтелектуальної власності у зв'язку із закінченням строку дії" %}
+                        <ul class="g-pl-20">
+                            {% if transaction.BULLETIN %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction.BULLETIN }}</li>
+                            {% endif %}
+
+                            {% if transaction.PATENTNUMBER %}
+                                <li><span class="g-font-weight-600">(11) {% trans "Номер реєстрації, що є номером патенту" %}:</span> {{ transaction.PATENTNUMBER }}</li>
+                            {% endif %}
+
+                            {% if transaction.INPUTNUMBER %}
+                                <li><span class="g-font-weight-600">(21) {% trans "Номер заявки" %}:</span> {{ transaction.INPUTNUMBER }}</li>
+                            {% endif %}
+
+                            {% if transaction.DATEFACTSTOP %}
+                                <li><span class="g-font-weight-600">{% trans "Дата припинення дії" %}:</span> {{ transaction.DATEFACTSTOP|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+                        </ul>
                     {% elif transaction.PUBLICATIONNAME == "Заява володільця патенту про готовність надання будь-якій особі дозволу на використання" %}
                         <ul class="g-pl-20">
                             {% if transaction.BULLETIN %}
