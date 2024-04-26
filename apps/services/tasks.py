@@ -8,8 +8,8 @@ import os
 @shared_task
 def get_original_document(sec_code):
     """Получает оригинал документа, ЭЦП, сохраняет их на диск в виде архива и возвращает путь к архиву."""
-    with connections['ellav'].cursor() as cursor:
-        cursor.execute("EXEC GetOriginalDocument %s", [sec_code])
+    with connections['e_archive'].cursor() as cursor:
+        cursor.execute("EXEC ext.uma_getOriginalDocument %s", [sec_code])
 
         rows = cursor.fetchall()
         if not rows:
