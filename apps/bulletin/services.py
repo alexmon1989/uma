@@ -27,11 +27,10 @@ def bulletin_get_number_with_year_by_date(d: Union[datetime, str]) -> Optional[s
     cache_key = f"bul_num_with_year_{d}"
     bul_number = cache.get(cache_key)
     if not bul_number:
-        try:
-            obj = ClListOfficialBulletinsIp.objects.get(Q(date_from__lte=d, date_to__gte=d) | Q(bul_date=d))
-        except ClListOfficialBulletinsIp.DoesNotExist:
-            return None
-        else:
+        obj = ClListOfficialBulletinsIp.objects.filter(Q(date_from__lte=d, date_to__gte=d) | Q(bul_date=d)).first()
+        if obj:
             bul_number = f"{obj.bul_number}/{obj.bul_date.year}"
             cache.set(cache_key, bul_number, 3600)
+        else:
+            return None
     return bul_number
