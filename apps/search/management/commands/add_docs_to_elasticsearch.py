@@ -15,6 +15,7 @@ import os
 import datetime
 import shutil
 import re
+import pyodbc
 
 
 class Command(BaseCommand):
@@ -144,6 +145,7 @@ class Command(BaseCommand):
         for doc in documents:
             if not doc['DocRecord'].get('DocIdDocCEAD') and doc['DocRecord'].get('DocBarCode'):
                 with connections['e_archive'].cursor() as cursor:
+                    cursor.setinputsizes([(pyodbc.SQL_VARCHAR, 255)])
                     cursor.execute(
                         "SELECT idDoc FROM EArchive WHERE BarCODE=%s",
                         [doc['DocRecord'].get('DocBarCode', '')]
