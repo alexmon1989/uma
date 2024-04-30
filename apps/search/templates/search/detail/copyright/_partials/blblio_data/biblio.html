@@ -177,7 +177,11 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
-                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                            {% if person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm %}
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                            {% else %}
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                            {% endif %}
                         {% endfor %}
                     </td>
                 </tr>
