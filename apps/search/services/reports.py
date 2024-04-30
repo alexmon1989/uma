@@ -1869,6 +1869,14 @@ class ReportItemCopyright(ReportItemDocx):
                     )
                 except KeyError:
                     pass
+
+                try:
+                    self._paragraph.add_run(
+                        f" ({author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['RepresentNameFormDetails']['RepresentNameForm']})"
+                    ).bold = True
+                except KeyError:
+                    pass
+
             self._paragraph.add_run('\r')
 
     def _write_77(self) -> None:
