@@ -122,14 +122,12 @@
             {% endif %}
 
             {% get_field '57' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td><span class="g-color-red">*</span></td>
-                    </tr>
-                {% endif %}
-            {% elif hit.Certificate.CopyrightDetails.Annotation %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Certificate.CopyrightDetails.Annotation %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>{{ hit.Certificate.CopyrightDetails.Annotation }}</td>
@@ -169,14 +167,12 @@
             {% endif %}
 
             {% get_field '72' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
-                    <tr>
-                        <th>{{ ipc_field.code_title }}</th>
-                        <td><span class="g-color-red">*</span></td>
-                    </tr>
-                {% endif %}
-            {% elif hit.Certificate.CopyrightDetails.AuthorDetails.Author|length > 0 %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Certificate.CopyrightDetails.AuthorDetails.Author|length > 0 %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
