@@ -1871,9 +1871,9 @@ class ReportItemCopyright(ReportItemDocx):
                     pass
 
                 try:
-                    self._paragraph.add_run(
-                        f" ({author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['RepresentNameFormDetails']['RepresentNameForm']})"
-                    ).bold = True
+                    represent = author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'RepresentNameFormDetails']['RepresentNameForm']
+                    self._paragraph.add_run(f" ({represent})").bold = True
                 except KeyError:
                     pass
 
