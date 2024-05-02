@@ -18,12 +18,31 @@
                             {% endif %}
 
 
-                            {% if transaction|get:"@registrationNumber" %}
-                                <li><span class="g-font-weight-600">{% trans "Дата реєстрації" %}:</span> {{ hit.Certificate.CopyrightDetails.RegistrationDate|parse_date|date:"d.m.Y" }}</li>
+                            {% if transaction|get:"@registrationDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Дата реєстрації" %}:</span> {{ transaction|get:"@registrationDate"|parse_date|date:"d.m.Y" }}</li>
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
                                 <li><span class="g-font-weight-600">{% trans "Підстава" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}, постанова від {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }} у цивільній справі №{{ transaction.TransactionBody.DecisionDetails.Decision.Number }}</li>
+                            {% endif %}
+                        </ul>
+                    {% elif transaction|get:"@type" == 'CorrectionOECW' %}
+                        <ul class="g-pl-20">
+                            {% if transaction|get:"@bulletinNumber" and transaction|get:"@bulletinDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction|get:"@bulletinDate"|parse_date|date:"d.m.Y" }} №{{ transaction|get:"@bulletinNumber" }}</li>
+                            {% endif %}
+
+                            {% if transaction|get:"@registrationNumber" %}
+                                <li><span class="g-font-weight-600">{% trans "Номер свідоцтва" %}:</span> {{ transaction|get:"@registrationNumber" }}</li>
+                            {% endif %}
+
+
+                            {% if transaction|get:"@registrationDate" %}
+                                <li><span class="g-font-weight-600">{% trans "Дата реєстрації" %}:</span> {{ transaction|get:"@registrationDate"|parse_date|date:"d.m.Y" }}</li>
+                            {% endif %}
+
+                            {% if transaction.TransactionBody|get:"@MustBeRead" %}
+                                <li><span class="g-font-weight-600">{% trans "Слід читати" %}:</span> {{ transaction.TransactionBody|get:"@MustBeRead" }}</li>
                             {% endif %}
                         </ul>
                     {% else %}
