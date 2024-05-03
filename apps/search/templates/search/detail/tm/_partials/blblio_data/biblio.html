@@ -253,60 +253,74 @@
             {% endif %}
 
             {% get_field '731' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
-                            {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            {% if applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal %}
-                                <br>{{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal }}
-                            {% endif %}
-                            {% if hit.search_data.obj_state == 2 %}
-                                <br>
-                                {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                                {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
-                                    [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
+                                {{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                {% if applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal %}
+                                    <br>{{ applicant.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal }}
                                 {% endif %}
-                                {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal %}
-                                    <br>{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal }}
+                                {% if hit.search_data.obj_state == 2 %}
+                                    <br>
+                                    {{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
                                     {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
                                         [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
                                     {% endif %}
+                                    {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal %}
+                                        <br>{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal }}
+                                        {% if applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                            [{{ applicant.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                                        {% endif %}
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '732' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify g-font-weight-600">
-                        {% for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
-                            {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            {% if holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal %}
-                                <br>{{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal }}
-                            {% endif %}
-                            <br>
-                            {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                            {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
-                                [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
-                            {% endif %}
-
-                            {% if holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal %}
-                                <br>{{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal }}
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify g-font-weight-600">
+                            {% for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
+                                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                {% if holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal %}
+                                    <br>{{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLineOriginal }}
+                                {% endif %}
+                                <br>
+                                {{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
                                 {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
                                     [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
                                 {% endif %}
-                            {% endif %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+
+                                {% if holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal %}
+                                    <br>{{ holder.HolderAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLineOriginal }}
+                                    {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                        [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                                    {% endif %}
+                                {% endif %}
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '740' ipc_fields as ipc_field %}
@@ -328,43 +342,57 @@
             {% endif %}
 
             {% get_field '750' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.CorrespondenceAddress %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine %}
-                            {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine }}
-                        {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine %}
-                            {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine }}
-                        {% endif %}
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine %}
+                                {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Name.FreeFormatNameLine }}
+                            {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine %}
+                                {{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Name.FreeFormatNameLine }}
+                            {% endif %}
 
-                        {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine %}
-                            <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine }}
-                        {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine %}
-                            <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine }}
-                        {% endif %}
-                    </td>
-                </tr>
+                            {% if hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine %}
+                                <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.Address.FreeFormatAddressLine }}
+                            {% elif hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine %}
+                                <br>{{ hit.TradeMark.TrademarkDetails.CorrespondenceAddress.CorrespondenceAddressBook.Address.FreeFormatAddressLine }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '540' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>
-                        <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
-                           href="javascript:;"
-                           data-src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
-                            <img class="img-fluid img-thumbnail"
-                                 src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
-                                 alt="">
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                               href="javascript:;"
+                               data-src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
+                                <img class="img-fluid img-thumbnail"
+                                     src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                                     alt="">
 
-                            <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
-                            <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
-                        </span>
-                        </a>
-                    </td>
-                </tr>
+                                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                                <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                            </span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '554' ipc_fields as ipc_field %}
@@ -396,7 +424,13 @@
             {% endif %}
 
             {% get_field '591' ipc_fields as ipc_field %}
-                {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText|length > 0 %}
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText|length > 0 %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td>
@@ -406,6 +440,7 @@
                         </td>
                     </tr>
                 {% endif %}
+            {% endif %}
 
             {% get_field '511.I' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
@@ -434,4 +469,9 @@
             </tbody>
         </table>
     </div>
+
+    {% if hit.Document.is_limited %}
+        <hr class="g-my-10">
+        <p><span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i></p>
+    {% endif %}
 </div>

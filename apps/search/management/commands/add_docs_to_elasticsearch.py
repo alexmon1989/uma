@@ -416,6 +416,20 @@ class Command(BaseCommand):
                             del formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails'][
                                 'FreeFormatNameLineOriginal']
 
+            # Признак что данные необходимо публиковать не в полном объёме
+            if self.is_limited_publication:
+                res['Document']['is_limited'] = True
+                if 'ApplicantDetails' in res['TradeMark']['TrademarkDetails']:
+                    del res['TradeMark']['TrademarkDetails']['ApplicantDetails']
+                if 'HolderDetails' in res['TradeMark']['TrademarkDetails']:
+                    del res['TradeMark']['TrademarkDetails']['HolderDetails']
+                if 'CorrespondenceAddress' in res['TradeMark']['TrademarkDetails']:
+                    del res['TradeMark']['TrademarkDetails']['CorrespondenceAddress']
+                if 'MarkImageDetails' in res['TradeMark']['TrademarkDetails']:
+                    if 'MarkImageColourClaimedText' in res['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']:
+                        del res['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']
+                    del res['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+
             # Список заявителей для быстрого поиска по наименованию
             applicants_search_data = []
             if res['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
