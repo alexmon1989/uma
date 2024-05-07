@@ -57,12 +57,7 @@
             {% endif %}
 
             {% get_field '54' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td><span class="g-color-red">*</span></td>
-                </tr>
-            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.Name %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.Name %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.Name }}</td>
@@ -70,12 +65,7 @@
             {% endif %}
 
             {% get_field '54.S' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td><span class="g-color-red">*</span></td>
-                </tr>
-            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.NameShort %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.NameShort %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td class="g-font-weight-600">{{ hit.Decision.DecisionDetails.NameShort }}</td>
@@ -113,7 +103,12 @@
             {% endif %}
 
             {% get_field '75' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.LicensorDetails and hit.Decision.DecisionDetails.LicenseeDetails %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.LicensorDetails and hit.Decision.DecisionDetails.LicenseeDetails %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
@@ -130,5 +125,9 @@
 
             </tbody>
         </table>
+        {% if hit.Document.is_limited %}
+            <hr class="g-my-10">
+            <p><span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i></p>
+        {% endif %}
     </div>
 </div>

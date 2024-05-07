@@ -75,9 +75,11 @@
                 </div>
             {% endif %}
 
-            {% if hit.Decision.DecisionDetails.LicensorDetails and hit.Decision.DecisionDetails.LicenseeDetails %}
-                <div class="col-md">
-                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Сторони договору" %}:</h4>
+            <div class="col-md">
+                <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Сторони договору" %}:</h4>
+                {% if hit.Document.is_limited %}
+                    <span class="g-color-red">*</span>
+                {% else %}
                     {% for item in hit.Decision.DecisionDetails.LicensorDetails.Licensor %}
                         {{ item.LicensorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
                     {% endfor %}
@@ -85,8 +87,8 @@
                     {% for item in hit.Decision.DecisionDetails.LicenseeDetails.Licensee %}
                         {{ item.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
                     {% endfor %}
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         {% endif %}
 
         {% if hit.Document.is_limited %}

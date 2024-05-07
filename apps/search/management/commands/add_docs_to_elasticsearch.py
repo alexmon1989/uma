@@ -979,10 +979,12 @@ class Command(BaseCommand):
                         limited_data['RegistrationDate'] = res['Decision']['DecisionDetails']['RegistrationDate']
                     if 'PublicationDetails' in res['Decision']['DecisionDetails']:
                         limited_data['PublicationDetails'] = res['Decision']['DecisionDetails']['PublicationDetails']
-                    if 'LicensorDetails' in res['Decision']['DecisionDetails']:
-                        limited_data['LicensorDetails'] = res['Decision']['DecisionDetails']['LicensorDetails']
-                    if 'LicenseeDetails' in res['Decision']['DecisionDetails']:
-                        limited_data['LicenseeDetails'] = res['Decision']['DecisionDetails']['LicenseeDetails']
+                    if 'PublicationDetails' in res['Decision']['DecisionDetails']:
+                        limited_data['PublicationDetails'] = res['Decision']['DecisionDetails']['PublicationDetails']
+                    if 'Name' in res['Decision']['DecisionDetails']:
+                        limited_data['Name'] = res['Decision']['DecisionDetails']['Name']
+                    if 'NameShort' in res['Decision']['DecisionDetails']:
+                        limited_data['NameShort'] = res['Decision']['DecisionDetails']['NameShort']
                     res['Decision']['DecisionDetails'] = limited_data
                 cr_data = res['Decision']['DecisionDetails']
 
