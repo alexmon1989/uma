@@ -240,7 +240,7 @@
 
             {% get_field '71' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.biblio_data.I_71 %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -268,7 +268,7 @@
 
             {% get_field '72' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.biblio_data.I_72 %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -297,7 +297,7 @@
 
             {% get_field '73' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.biblio_data.I_73 %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -333,7 +333,7 @@
 
             {% get_field '98' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.biblio_data.I_98 %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>

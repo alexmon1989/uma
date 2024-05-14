@@ -38,6 +38,8 @@ class AppLimited(TimeStampedModel):
     app_number = models.CharField('Номер заявки', max_length=16, db_index=True)
     obj_type = models.ForeignKey('ObjType', verbose_name="Тип об'єкта", db_column='idObjType', blank=True, null=True,
                                  on_delete=models.CASCADE)
+    settings_json = models.TextField('Налаштування', blank=True, null=True,
+                                     help_text='Налаштування публікації у форматі JSON')
 
     def __str__(self):
         return self.app_number

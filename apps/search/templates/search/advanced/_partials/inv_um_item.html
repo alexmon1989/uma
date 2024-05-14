@@ -51,7 +51,7 @@
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Винахідник(и)" %}:</h4>
 
-                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+                {% if hit.Document.is_limited and not biblio_data.I_72 %}<span class="g-color-red">*</span>{% endif %}
 
                 {% for I_72 in biblio_data.I_72|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
@@ -72,7 +72,7 @@
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
 
-                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+                {% if hit.Document.is_limited and not biblio_data.I_71 %}<span class="g-color-red">*</span>{% endif %}
 
                 {% for I_71 in biblio_data.I_71|list_of_dicts_unique %}
                     {% if forloop.counter <= 2 %}
@@ -144,7 +144,7 @@
                 <div class="col-md">
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
 
-                    {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+                    {% if hit.Document.is_limited and not biblio_data.I_73 %}<span class="g-color-red">*</span>{% endif %}
 
                     {% for I_73 in biblio_data.I_73|list_of_dicts_unique %}
                         {% if forloop.counter <= 2 %}
@@ -163,9 +163,11 @@
             {% endif %}
 
             {% if hit.Document.is_limited %}
-                <div class="col-12 g-mt-10 g-color-gray-dark-v3">
-                    <span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i>
-                </div>
+                {% if not biblio_data.I_71 or not biblio_data.I_72 or not biblio_data.I_73 %}
+                    <div class="col-12 g-mt-10 g-color-gray-dark-v3">
+                        <span class="g-color-red">*</span> - <i>{% trans "інформація тимчасово обмежена" %}</i>
+                    </div>
+                {% endif %}
             {% endif %}
     {% endif %}
     </div>

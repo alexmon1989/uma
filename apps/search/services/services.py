@@ -3,6 +3,7 @@ from typing import List, Optional
 import time
 import copy
 import os
+import json
 from zipfile import ZipFile
 
 from django.utils.translation import gettext as _
@@ -599,6 +600,33 @@ def application_id_can_be_indexed(app_data: dict) -> bool:
 def application_is_limited_publication(app_number: str, obj_type_id: int) -> bool:
     """Возвращает признак того что объект публикуется с ограниченным набором данных."""
     return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
+
+
+def application_filter_limited_biblio_data_inv_um_ld(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии."""
+    limited_app = AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).first()
+    settings_json = limited_app.settings_json
+    if settings_json:
+        settings_json = json.loads(settings_json)
+    else:
+        settings_json = {}
+
+    if 'AB' in biblio_data and not settings_json.get('AB', False):
+        del biblio_data['AB']
+    if 'CL' in biblio_data and not settings_json.get('CL', False):
+        del biblio_data['CL']
+    if 'DE' in biblio_data and not settings_json.get('DE', False):
+        del biblio_data['DE']
+    if 'I_71' in biblio_data and not settings_json.get('I_71', False):
+        del biblio_data['I_71']
+    if 'I_72' in biblio_data and not settings_json.get('I_72', False):
+        del biblio_data['I_72']
+    if 'I_73' in biblio_data and not settings_json.get('I_73', False):
+        del biblio_data['I_73']
+    if 'I_98' in biblio_data and not settings_json.get('I_98', False):
+        del biblio_data['I_98']
+    if 'I_98_Index' in biblio_data and not settings_json.get('I_98_Index', False):
+        del biblio_data['I_98_Index']
 
 
 def application_get_documents(app_id: int) -> dict:
