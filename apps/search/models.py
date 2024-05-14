@@ -210,38 +210,6 @@ class AppDocuments(models.Model):
         managed = False
         db_table = 'APP_Documents'
 
-    @staticmethod
-    def get_app_documents(id_app_number):
-        """Возвращает словарь документов по номеру заявки."""
-        objects = AppDocuments.objects.filter(
-            app__id=id_app_number,
-            enter_num__in=(98, 99, 100, 101),
-            file_type='pdf',
-            app__is_limited=False
-        ).values()
-        documents = {}
-        for document in objects:
-            # Формула
-            if document['enter_num'] == 98:
-                documents['cl'] = document
-            # Описание
-            elif document['enter_num'] == 99:
-                documents['de'] = document
-            # Описание
-            elif document['enter_num'] == 101:
-                documents['de_pub'] = document
-            else:
-                if 'A_UA' in document['file_name']:
-                    # Реферат укр.
-                    documents['ab_ua'] = document
-                if 'A_RU' in document['file_name']:
-                    # Реферат рос.
-                    documents['ab_ru'] = document
-                if 'A_EN' in document['file_name']:
-                    # Реферат англ.
-                    documents['ab_en'] = document
-        return documents
-
 
 class OrderService(models.Model):
     """Модель таблицы ls_OrderService."""

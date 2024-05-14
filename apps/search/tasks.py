@@ -170,7 +170,7 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
         hit['transactions'] = transactions
 
         # Документы заявки (библиографические)
-        hit['biblio_documents'] = AppDocuments.get_app_documents(id_app_number)
+        hit['biblio_documents'] = search_services.application_get_documents(id_app_number)
 
         if hit['search_data']['obj_state'] == 2:
             # Если это патент, то необходимо объеденить документы, платежи и т.д. с теми которые были на этапе заявки

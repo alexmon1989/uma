@@ -12,7 +12,7 @@ from django.utils import translation
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
-from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited
+from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited, AppDocuments
 from apps.bulletin import services as bulletin_services
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
@@ -599,6 +599,38 @@ def application_id_can_be_indexed(app_data: dict) -> bool:
 def application_is_limited_publication(app_number: str, obj_type_id: int) -> bool:
     """Возвращает признак того что объект публикуется с ограниченным набором данных."""
     return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
+
+
+def application_get_documents(app_id: int) -> dict:
+    """Возвращает словарь с документами объекта."""
+    objects = AppDocuments.objects.filter(
+        app_id=app_id,
+        enter_num__in=(98, 99, 100, 101),
+        file_type='pdf',
+        app__is_limited=False
+    ).values()
+    documents = {}
+    for document in objects:
+        # Формула
+        if document['enter_num'] == 98:
+            documents['cl'] = document
+        # Описание
+        elif document['enter_num'] == 99:
+            documents['de'] = document
+        # Описание
+        elif document['enter_num'] == 101:
+            documents['de_pub'] = document
+        else:
+            if 'A_UA' in document['file_name']:
+                # Реферат укр.
+                documents['ab_ua'] = document
+            if 'A_RU' in document['file_name']:
+                # Реферат рос.
+                documents['ab_ru'] = document
+            if 'A_EN' in document['file_name']:
+                # Реферат англ.
+                documents['ab_en'] = document
+    return documents
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:
