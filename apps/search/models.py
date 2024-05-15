@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -42,9 +44,6 @@ class AppLimited(TimeStampedModel):
                                      help_text='Налаштування публікації у форматі JSON')
     reason = models.TextField('Причина обмеження даних', blank=True, null=True)
 
-    def __str__(self):
-        return self.app_number
-
     class Meta:
         db_table = 'ls_limited_applications'
         verbose_name = 'Обмежена публікація'
@@ -52,6 +51,23 @@ class AppLimited(TimeStampedModel):
         constraints = [
             models.UniqueConstraint(fields=['app_number', 'obj_type'], name='unique app_number_obj_type')
         ]
+
+    def __str__(self):
+        return self.app_number
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        super().save(force_insert=False, force_update=False, using=None, update_fields=None)
+
+        # Сброс ElasticIndexed и LastUpdate в табл. IPCAppList
+        IpcAppList.objects.filter(
+            app_number=self.app_number,
+            obj_type_id=self.obj_type_id
+        ).update(
+            elasticindexed=0,
+            lastupdate=datetime.datetime.now()
+        )
 
 
 class ObjType(models.Model):
