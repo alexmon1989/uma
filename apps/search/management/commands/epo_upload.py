@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from apps.search.models import IpcAppList
+from apps.search.services import services as search_services
 
 import datetime
 import pathlib
@@ -27,7 +28,7 @@ class Command(BaseCommand):
             help='Show progress'
         )
 
-    def _process_limited_json(self, file_path: pathlib.Path):
+    def _process_limited_json(self, app_number: str, obj_type_id: int, file_path: pathlib.Path) -> None:
         """Удаляет из JSON закрытую информацию."""
         try:
             with open(file_path, 'r', encoding='utf16') as f:
@@ -36,22 +37,11 @@ class Command(BaseCommand):
             with open(file_path, 'r', encoding='utf8') as f:
                 content = json.load(f)
 
-        if 'AB' in content['Patent']:
-            del content['Patent']['AB']
-        if 'CL' in content['Patent']:
-            del content['Patent']['CL']
-        if 'DE' in content['Patent']:
-            del content['Patent']['DE']
-        if 'I_71' in content['Patent']:
-            del content['Patent']['I_71']
-        if 'I_72' in content['Patent']:
-            del content['Patent']['I_72']
-        if 'I_73' in content['Patent']:
-            del content['Patent']['I_73']
-        if 'I_98' in content['Patent']:
-            del content['Patent']['I_98']
-        if 'I_98_Index' in content['Patent']:
-            del content['Patent']['I_98_Index']
+        search_services.application_filter_limited_biblio_data_inv_um_ld(
+            app_number,
+            obj_type_id,
+            content['Patent'],
+        )
 
         json_str = json.dumps(content, indent=4, ensure_ascii=False)
         with open(file_path, "w", encoding='utf-16-le') as outfile:
@@ -106,7 +96,7 @@ class Command(BaseCommand):
                     shutil.copy(file_path_full, dest)
                 elif doc.file_type == 'json':
                     shutil.copy(file_path_full, dest)
-                    self._process_limited_json(dest)
+                    self._process_limited_json(patent.app_number, patent.obj_type_id, dest)
 
         # Копирование файлов изменённых патентов
         for patent in updated_patents:
@@ -122,7 +112,7 @@ class Command(BaseCommand):
                     shutil.copy(file_path_full, dest)
                 elif doc.file_type == 'json':
                     shutil.copy(file_path_full, dest)
-                    self._process_limited_json(dest)
+                    self._process_limited_json(patent.app_number, patent.obj_type_id, dest)
 
         return folder_path
 
