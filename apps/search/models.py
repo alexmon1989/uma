@@ -40,6 +40,7 @@ class AppLimited(TimeStampedModel):
                                  on_delete=models.CASCADE)
     settings_json = models.TextField('Налаштування', blank=True, null=True,
                                      help_text='Налаштування публікації у форматі JSON')
+    reason = models.TextField('Причина обмеження даних', blank=True, null=True)
 
     def __str__(self):
         return self.app_number
