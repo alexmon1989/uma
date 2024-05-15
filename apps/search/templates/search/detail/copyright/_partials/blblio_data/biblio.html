@@ -122,7 +122,7 @@
             {% endif %}
 
             {% get_field '57' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
+            {% if hit.Document.is_limited and not hit.Certificate.CopyrightDetails.Annotation %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>
@@ -167,7 +167,7 @@
             {% endif %}
 
             {% get_field '72' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
+            {% if hit.Document.is_limited and not hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>
@@ -188,7 +188,7 @@
             {% endif %}
 
             {% get_field '73' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
+            {% if hit.Document.is_limited and not hit.Certificate.CopyrightDetails.HolderDetails.Holder %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>

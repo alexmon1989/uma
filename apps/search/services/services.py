@@ -602,31 +602,65 @@ def application_is_limited_publication(app_number: str, obj_type_id: int) -> boo
     return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
 
 
-def application_filter_limited_biblio_data_inv_um_ld(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
-    """Удаляет ограниченные для отображения поля из библиографии."""
+def application_filter_limited_biblio_data(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии"""
     limited_app = AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).first()
-    settings_json = limited_app.settings_json
-    if settings_json:
-        settings_json = json.loads(settings_json)
+    limit_settings = limited_app.settings_json
+    if limit_settings:
+        limit_settings = json.loads(limit_settings)
     else:
-        settings_json = {}
+        limit_settings = {}
 
-    if 'AB' in biblio_data and not settings_json.get('AB', False):
+    if obj_type_id in (1, 2, 3):
+        application_filter_limited_biblio_data_inv_um_ld(limit_settings, biblio_data)
+    elif obj_type_id in (10, 13):
+        application_filter_limited_biblio_data_cr(limit_settings, biblio_data)
+
+
+def application_filter_limited_biblio_data_inv_um_ld(limit_settings: dict, biblio_data: dict) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии изобретения/полезной модели/топографии."""
+    if 'AB' in biblio_data and not limit_settings.get('AB', False):
         del biblio_data['AB']
-    if 'CL' in biblio_data and not settings_json.get('CL', False):
+    if 'CL' in biblio_data and not limit_settings.get('CL', False):
         del biblio_data['CL']
-    if 'DE' in biblio_data and not settings_json.get('DE', False):
+    if 'DE' in biblio_data and not limit_settings.get('DE', False):
         del biblio_data['DE']
-    if 'I_71' in biblio_data and not settings_json.get('I_71', False):
+    if 'I_71' in biblio_data and not limit_settings.get('I_71', False):
         del biblio_data['I_71']
-    if 'I_72' in biblio_data and not settings_json.get('I_72', False):
+    if 'I_72' in biblio_data and not limit_settings.get('I_72', False):
         del biblio_data['I_72']
-    if 'I_73' in biblio_data and not settings_json.get('I_73', False):
+    if 'I_73' in biblio_data and not limit_settings.get('I_73', False):
         del biblio_data['I_73']
-    if 'I_98' in biblio_data and not settings_json.get('I_98', False):
+    if 'I_98' in biblio_data and not limit_settings.get('I_98', False):
         del biblio_data['I_98']
-    if 'I_98_Index' in biblio_data and not settings_json.get('I_98_Index', False):
+    if 'I_98_Index' in biblio_data and not limit_settings.get('I_98_Index', False):
         del biblio_data['I_98_Index']
+
+
+def application_filter_limited_biblio_data_cr(limit_settings: dict, biblio_data: dict) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии авторского права."""
+    if 'AuthorDetails' in biblio_data and not limit_settings.get('AuthorDetails', False):
+        del biblio_data['AuthorDetails']
+    if 'Annotation' in biblio_data and not limit_settings.get('Annotation', False):
+        del biblio_data['Annotation']
+    if 'ApplicantDetails' in biblio_data and not limit_settings.get('ApplicantDetails', False):
+        del biblio_data['ApplicantDetails']
+    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
+        del biblio_data['CopyrightObjectKindDetails']
+    if 'EmployerDetails' in biblio_data and not limit_settings.get('EmployerDetails', False):
+        del biblio_data['EmployerDetails']
+    if 'HolderDetails' in biblio_data and not limit_settings.get('HolderDetails', False):
+        del biblio_data['HolderDetails']
+    if 'PromulgationData' in biblio_data and not limit_settings.get('PromulgationData', False):
+        del biblio_data['PromulgationData']
+    if 'RegistrationKind' in biblio_data and not limit_settings.get('RegistrationKind', False):
+        del biblio_data['RegistrationKind']
+    if 'RegistrationKindCode' in biblio_data and not limit_settings.get('RegistrationKindCode', False):
+        del biblio_data['RegistrationKindCode']
+    if 'RegistrationOfficeCode' in biblio_data and not limit_settings.get('RegistrationOfficeCode', False):
+        del biblio_data['RegistrationOfficeCode']
+    if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
+        del biblio_data['RepresentativeDetails']
 
 
 def application_get_documents(app_id: int) -> dict:

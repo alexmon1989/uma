@@ -241,7 +241,7 @@ class Command(BaseCommand):
                     res['Document']['is_limited'] = True
 
                     # Фильтрация библиографии
-                    search_services.application_filter_limited_biblio_data_inv_um_ld(
+                    search_services.application_filter_limited_biblio_data(
                         doc['app_number'],
                         doc['obj_type_id'],
                         biblio_data,
@@ -938,20 +938,11 @@ class Command(BaseCommand):
                 # Признак что данные необходимо публиковать не в полном объёме
                 if self.is_limited_publication:
                     res['Document']['is_limited'] = True
-                    limited_data = {}
-                    if 'RegistrationNumber' in res['Certificate']['CopyrightDetails']:
-                        limited_data['RegistrationNumber'] = res['Certificate']['CopyrightDetails']['RegistrationNumber']
-                    if 'RegistrationDate' in res['Certificate']['CopyrightDetails']:
-                        limited_data['RegistrationDate'] = res['Certificate']['CopyrightDetails']['RegistrationDate']
-                    if 'Name' in res['Certificate']['CopyrightDetails']:
-                        limited_data['Name'] = res['Certificate']['CopyrightDetails']['Name']
-                    if 'NameShort' in res['Certificate']['CopyrightDetails']:
-                        limited_data['NameShort'] = res['Certificate']['CopyrightDetails']['NameShort']
-                    if 'PublicationDetails' in res['Certificate']['CopyrightDetails']:
-                        limited_data['PublicationDetails'] = res['Certificate']['CopyrightDetails']['PublicationDetails']
-                    res['Certificate']['CopyrightDetails'] = limited_data
-                    if 'DocFlow' in res['Certificate']:
-                        del res['Certificate']['DocFlow']
+                    search_services.application_filter_limited_biblio_data(
+                        doc['app_number'],
+                        doc['obj_type_id'],
+                        res['Certificate']['CopyrightDetails']
+                    )
                 cr_data = res['Certificate']['CopyrightDetails']
 
             else:  # Договоры
