@@ -1,8 +1,10 @@
 import datetime
+import json
 
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.conf import settings
 from ckeditor_uploader.fields import RichTextUploadingField
 from uma.abstract_models import TimeStampedModel
 
@@ -38,10 +40,21 @@ class IpcAppList(models.Model):
 class AppLimited(TimeStampedModel):
     """Модель заявки, которая публикуется с ограниченнм набором данных."""
     app_number = models.CharField('Номер заявки', max_length=16, db_index=True)
-    obj_type = models.ForeignKey('ObjType', verbose_name="Тип об'єкта", db_column='idObjType', blank=True, null=True,
-                                 on_delete=models.CASCADE)
-    settings_json = models.TextField('Налаштування', blank=True, null=True,
-                                     help_text='Налаштування публікації у форматі JSON')
+    obj_type = models.ForeignKey(
+        'ObjType',
+        verbose_name="Тип об'єкта",
+        db_column='idObjType',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    settings_json = models.TextField(
+        'Налаштування',
+        blank=True,
+        null=True,
+        help_text='Налаштування публікації у форматі JSON',
+        default='{}'
+    )
     reason = models.TextField('Причина обмеження даних', blank=True, null=True)
 
     class Meta:
@@ -54,6 +67,11 @@ class AppLimited(TimeStampedModel):
 
     def __str__(self):
         return self.app_number
+
+    @property
+    def settings_dict(self) -> dict:
+        """Настройки отображения в виде словаря."""
+        return json.loads(self.settings_json)
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
@@ -228,6 +246,11 @@ class AppDocuments(models.Model):
     class Meta:
         managed = False
         db_table = 'APP_Documents'
+
+    @property
+    def real_file_path(self) -> str:
+        """Возвращает путь к файлу на диске."""
+        return self.file_name.replace("\\\\bear\share\\", settings.MEDIA_ROOT).replace("\\", "/")
 
 
 class OrderService(models.Model):

@@ -241,14 +241,11 @@ class Command(BaseCommand):
                     res['Document']['is_limited'] = True
 
                     # Фильтрация библиографии
-                    search_services.application_filter_limited_biblio_data(
+                    search_services.application_filter_limited_data(
                         doc['app_number'],
                         doc['obj_type_id'],
                         biblio_data,
                     )
-
-                    # Удаление всех .pdf из каталога
-                    delete_files_in_directory(self.get_doc_files_path(doc), '.pdf')
 
                 # Состояние делопроизводства
                 if data.get('DOCFLOW'):
@@ -938,7 +935,7 @@ class Command(BaseCommand):
                 # Признак что данные необходимо публиковать не в полном объёме
                 if self.is_limited_publication:
                     res['Document']['is_limited'] = True
-                    search_services.application_filter_limited_biblio_data(
+                    search_services.application_filter_limited_data(
                         doc['app_number'],
                         doc['obj_type_id'],
                         res['Certificate']['CopyrightDetails']

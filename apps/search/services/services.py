@@ -3,12 +3,12 @@ from typing import List, Optional
 import time
 import copy
 import os
-import json
 from zipfile import ZipFile
 
-from django.utils.translation import gettext as _
-from django.conf import settings
 from django.utils import translation
+from django.utils.translation import gettext as _
+from django.db.models.query import QuerySet
+from django.conf import settings
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -602,29 +602,41 @@ def application_is_limited_publication(app_number: str, obj_type_id: int) -> boo
     return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
 
 
-def application_filter_limited_biblio_data(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
+def application_filter_limited_data(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
     """Удаляет ограниченные для отображения поля из библиографии"""
     limited_app = AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).first()
-    limit_settings = limited_app.settings_json
-    if limit_settings:
-        limit_settings = json.loads(limit_settings)
-    else:
-        limit_settings = {}
 
     if obj_type_id in (1, 2, 3):
-        application_filter_limited_biblio_data_inv_um_ld(limit_settings, biblio_data)
+        app = IpcAppList.objects.filter(
+            app_number=app_number,
+            obj_type_id=obj_type_id
+        ).order_by('-registration_number').first()
+        documents = AppDocuments.objects.filter(app=app)
+        application_filter_limited_data_inv_um_ld(limited_app.settings_dict, biblio_data, documents)
+
     elif obj_type_id in (10, 13):
-        application_filter_limited_biblio_data_cr(limit_settings, biblio_data)
+        application_filter_limited_data_cr(limited_app.settings_dict, biblio_data)
 
 
-def application_filter_limited_biblio_data_inv_um_ld(limit_settings: dict, biblio_data: dict) -> None:
-    """Удаляет ограниченные для отображения поля из библиографии изобретения/полезной модели/топографии."""
+def application_filter_limited_data_inv_um_ld(limit_settings: dict, biblio_data: dict,
+                                              documents: QuerySet[AppDocuments]) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии изобретения/полезной модели/топографии,
+    а также файлы документов."""
     if 'AB' in biblio_data and not limit_settings.get('AB', False):
         del biblio_data['AB']
+        for doc in documents:
+            if doc.enter_num == 100 and os.path.exists(doc.real_file_path):
+                os.remove(doc.real_file_path)
     if 'CL' in biblio_data and not limit_settings.get('CL', False):
         del biblio_data['CL']
+        for doc in documents:
+            if doc.enter_num == 98 and doc.file_type == 'pdf' and os.path.exists(doc.real_file_path):
+                os.remove(doc.real_file_path)
     if 'DE' in biblio_data and not limit_settings.get('DE', False):
         del biblio_data['DE']
+        for doc in documents:
+            if doc.enter_num in (99, 101) and os.path.exists(doc.real_file_path):
+                os.remove(doc.real_file_path)
     if 'I_71' in biblio_data and not limit_settings.get('I_71', False):
         del biblio_data['I_71']
     if 'I_72' in biblio_data and not limit_settings.get('I_72', False):
@@ -637,7 +649,7 @@ def application_filter_limited_biblio_data_inv_um_ld(limit_settings: dict, bibli
         del biblio_data['I_98_Index']
 
 
-def application_filter_limited_biblio_data_cr(limit_settings: dict, biblio_data: dict) -> None:
+def application_filter_limited_data_cr(limit_settings: dict, biblio_data: dict) -> None:
     """Удаляет ограниченные для отображения поля из библиографии авторского права."""
     if 'AuthorDetails' in biblio_data and not limit_settings.get('AuthorDetails', False):
         del biblio_data['AuthorDetails']
@@ -665,34 +677,38 @@ def application_filter_limited_biblio_data_cr(limit_settings: dict, biblio_data:
 
 def application_get_documents(app_id: int) -> dict:
     """Возвращает словарь с документами объекта."""
-    objects = AppDocuments.objects.filter(
+    documents = AppDocuments.objects.filter(
         app_id=app_id,
         enter_num__in=(98, 99, 100, 101),
-        file_type='pdf',
-        app__is_limited=False
+        file_type='pdf'
     ).values()
-    documents = {}
-    for document in objects:
+
+    app = IpcAppList.objects.filter(pk=app_id).first()
+    limited_app = AppLimited.objects.filter(app_number=app.app_number, obj_type_id=app.obj_type_id).first()
+
+    res = {}
+    for document in documents:
         # Формула
-        if document['enter_num'] == 98:
-            documents['cl'] = document
+        if document['enter_num'] == 98 and (not limited_app or limited_app.settings_dict.get('CL')):
+            res['cl'] = document
         # Описание
-        elif document['enter_num'] == 99:
-            documents['de'] = document
+        elif document['enter_num'] == 99 and (not limited_app or limited_app.settings_dict.get('DE')):
+            res['de'] = document
         # Описание
-        elif document['enter_num'] == 101:
-            documents['de_pub'] = document
+        elif document['enter_num'] == 101 and (not limited_app or limited_app.settings_dict.get('DE')):
+            res['de_pub'] = document
         else:
-            if 'A_UA' in document['file_name']:
-                # Реферат укр.
-                documents['ab_ua'] = document
-            if 'A_RU' in document['file_name']:
-                # Реферат рос.
-                documents['ab_ru'] = document
-            if 'A_EN' in document['file_name']:
-                # Реферат англ.
-                documents['ab_en'] = document
-    return documents
+            if not limited_app or limited_app.settings_dict.get('AB'):
+                if 'A_UA' in document['file_name']:
+                    # Реферат укр.
+                    res['ab_ua'] = document
+                if 'A_RU' in document['file_name']:
+                    # Реферат рос.
+                    res['ab_ru'] = document
+                if 'A_EN' in document['file_name']:
+                    # Реферат англ.
+                    res['ab_en'] = document
+    return res
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:
