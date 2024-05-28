@@ -2,11 +2,10 @@ from django.urls import path
 from .views import (SimpleListView, AdvancedListView, add_filter_params, ObjectDetailView, download_docs_zipped,
                     download_doc, download_selection, download_simple, download_advanced, download_shared_docs,
                     TransactionsSearchView, download_transactions, get_results_html, get_data_app_html,
-                    get_obj_types_with_transactions, download_details_docx, recaptcha)
+                    get_obj_types_with_transactions, download_details_docx)
 
 app_name = 'search'
 urlpatterns = [
-    path('recaptcha/', recaptcha, name="recaptcha"),
     path('simple/', SimpleListView.as_view(), name="simple"),
     path('advanced/', AdvancedListView.as_view(), name="advanced"),
     path('transactions/', TransactionsSearchView.as_view(), name="transactions"),

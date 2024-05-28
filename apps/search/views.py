@@ -23,11 +23,6 @@ from apps.search.decorators import check_recaptcha
 from apps.bulletin.models import ClListOfficialBulletinsIp as Bulletin
 
 
-@csrf_exempt
-def recaptcha(request):
-    return HttpResponse("{'success': 1}")
-
-
 class SimpleListView(TemplateView):
     """Отображает страницу с возможностью простого поиска."""
     template_name = 'search/simple/simple.html'
