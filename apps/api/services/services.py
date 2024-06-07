@@ -605,6 +605,15 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
     def _prepare_biblio_copyright(self):
         """Готовит полные библиографические данные для авторского права."""
+
+        # Удаление наименования автора если аноним или псевдоним
+        try:
+            for author in self._raw_biblio['AuthorDetails']['Author']:
+                if author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['RepresentNameFormDetails']['RepresentNameForm']:
+                    del author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']
+        except KeyError:
+            pass
+
         # Удаление DocBarCode
         try:
             doc_flow = self._raw_biblio['DocFlow']['Documents']

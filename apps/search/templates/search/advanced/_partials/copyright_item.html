@@ -75,18 +75,12 @@
                 {% if hit.Document.is_limited and not hit.Certificate.CopyrightDetails.AuthorDetails.Author %}<span class="g-color-red">*</span>{% endif %}
 
                 {% for author in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
-                    {% if forloop.counter <= 2 %}
-                        {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}{% if not forloop.last %}<br>{% endif %}
-                    {% elif forloop.counter == 3 %}
-                        <a href="#!"
-                           data-toggle="popover"
-                           data-title="{% trans "Повний список авторів" %}"
-                           data-html="true"
-                           data-trigger="focus"
-                           data-content="
-                                   {% for author_ in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}{{ author_.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>{% endfor %}"
-                        >(+{{ hit.Certificate.CopyrightDetails.AuthorDetails.Author|length|add:"-2" }})</a>
+                    {% if author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm %}
+                        {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm }}
+                    {% else %}
+                        {{ author.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}&nbsp;[{{ author.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}
                     {% endif %}
+                    {% if not forloop.last %}<br>{% endif %}
                 {% endfor %}
             </div>
         {% endif %}

@@ -1854,6 +1854,15 @@ class ReportItemCopyright(ReportItemDocx):
             for author in authors:
                 self._paragraph.add_run('\r')
                 try:
+                    represent = author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'RepresentNameFormDetails']['RepresentNameForm']
+                    if represent:
+                        self._paragraph.add_run(represent).bold = True
+                        continue
+                except KeyError:
+                    pass
+
+                try:
                     self._paragraph.add_run(
                         author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                             'FreeFormatNameDetails']['FreeFormatNameLine']
@@ -1867,13 +1876,6 @@ class ReportItemCopyright(ReportItemDocx):
                     self._paragraph.add_run(
                         f" ({country})"
                     )
-                except KeyError:
-                    pass
-
-                try:
-                    represent = author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
-                        'RepresentNameFormDetails']['RepresentNameForm']
-                    self._paragraph.add_run(f" ({represent})").bold = True
                 except KeyError:
                     pass
 

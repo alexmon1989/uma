@@ -1570,8 +1570,7 @@ def get_app_owner(app):
         try:
             for item in app.Certificate.CopyrightDetails.HolderDetails.Holder:
                 owners.append(
-                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                    item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine
                 )
         except AttributeError:
             pass

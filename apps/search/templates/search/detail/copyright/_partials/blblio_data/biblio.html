@@ -177,9 +177,10 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Certificate.CopyrightDetails.AuthorDetails.Author %}
-                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}
                             {% if person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm %}
-                                ({{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm }})
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm }}
+                            {% else %}
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}
                             {% endif %}
                             <br>
                         {% endfor %}
