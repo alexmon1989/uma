@@ -36,6 +36,17 @@ class IpcAppList(models.Model):
         managed = False
         db_table = 'IPC_AppList'
 
+    @property
+    def real_files_path(self) -> str:
+        """Возвращает реальный путь к файлам на диске."""
+        return self.files_path.replace(
+            '\\\\bear\\share\\',
+            settings.DOCUMENTS_MOUNT_FOLDER
+        ).replace(
+            'e:\\poznach_test_sis\\bear_tmpp_sis\\',
+            settings.DOCUMENTS_MOUNT_FOLDER
+        ).replace('\\', '/')
+
 
 class AppLimited(TimeStampedModel):
     """Модель заявки, которая публикуется с ограниченнм набором данных."""
@@ -262,7 +273,7 @@ class AppDocuments(models.Model):
     @property
     def real_file_path(self) -> str:
         """Возвращает путь к файлу на диске."""
-        return self.file_name.replace("\\\\bear\share\\", settings.MEDIA_ROOT).replace("\\", "/")
+        return self.file_name.replace("\\\\bear\\share\\", settings.DOCUMENTS_MOUNT_FOLDER).replace("\\", "/")
 
 
 class OrderService(models.Model):
