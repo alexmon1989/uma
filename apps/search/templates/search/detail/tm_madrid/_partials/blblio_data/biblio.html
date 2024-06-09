@@ -118,11 +118,21 @@
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
-                        {% if hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA %}
+                        {% if hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA_TYPE == 'Motion' %}
                             <div class="g-mb-10">
                                 <video style="height: auto; width: auto; max-width: 250px;" width="250px" height="250px" controls="controls">
                                     <source src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".mp4" }}">
                                 </video>
+                            </div>
+                            <div class="g-mb-10">
+                                <a href="{{ hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA }}"
+                                   target="_blank">{{ hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA }}</a>
+                            </div>
+                        {% elif hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA_TYPE == 'Sound' %}
+                            <div class="g-mb-5">
+                                <audio controls="controls">
+                                    <source src="{{ hit.Document.filesPath|get_image_url_madrid_tm:hit.search_data.protective_doc_number|add:".mp3" }}">
+                                </audio>
                             </div>
                             <div class="g-mb-10">
                                 <a href="{{ hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA }}"
@@ -146,10 +156,18 @@
             {% endif %}
 
             {% get_field '553' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA_TYPE == 'Motion' %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>{% trans "Рухова торговельна марка" %}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '556' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.MULTIMEDIA_TYPE == 'Sound' %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{% trans "Звукова торговельна марка" %}</td>
                 </tr>
             {% endif %}
 

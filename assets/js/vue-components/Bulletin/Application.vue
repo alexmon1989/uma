@@ -26,9 +26,14 @@
                         <video style="height: auto; width: auto; max-width: 250px;"
                                width="250px"
                                height="250px"
-                               controls="controls">
+                               controls="controls"
+                               v-if="app_data['code_540_MULTIMEDIA_FILE'].type === 'motion'">
                           <source :src="app_data['code_540_MULTIMEDIA_FILE'].value">
                         </video>
+                        <audio controls="controls"
+                               v-else-if="app_data['code_540_MULTIMEDIA_FILE'].type === 'sound'">
+                            <source :src="app_data['code_540_MULTIMEDIA_FILE'].value">
+                        </audio>
                       </div>
                       <div class="g-mb-10" v-if="app_data['code_540_MULTIMEDIA_MADRID_LINK']">
                         <a :href="app_data['code_540_MULTIMEDIA_MADRID_LINK'].value"
@@ -86,6 +91,7 @@
                 'code_539_i',
                 'code_540',
                 'code_553',
+                'code_556',
                 'code_571',
                 'code_4551',
                 'code_529',

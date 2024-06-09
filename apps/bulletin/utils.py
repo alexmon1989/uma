@@ -335,16 +335,27 @@ def prepare_madrid_tm_data(app_number, record):
 
     # Видеофайл
     if data.get('MULTIMEDIA'):
-        biblio_data['code_540_MULTIMEDIA_FILE'] = {
-            'value': os.path.join(images_url, f"{data['@INTREGN']}.mp4"),
-            'type': 'multimedia'
-        }
+        multimedia_type = data.get('MULTIMEDIA_TYPE')
+        if multimedia_type == 'Motion':
+            biblio_data['code_540_MULTIMEDIA_FILE'] = {
+                'value': os.path.join(images_url, f"{data['@INTREGN']}.mp4"),
+                'type': 'motion'
+            }
+            biblio_data['code_553'] = {
+                'title': '(553) Зазначення того, що торговельна марка рухова або мультимедійна',
+                'value': 'Рухова торговельна марка',
+            }
+        elif multimedia_type == 'Sound':
+            biblio_data['code_540_MULTIMEDIA_FILE'] = {
+                'value': os.path.join(images_url, f"{data['@INTREGN']}.mp3"),
+                'type': 'sound'
+            }
+            biblio_data['code_556'] = {
+                'title': '(556) Зазначення того, що торговельна марка звукова',
+                'value': 'Звукова торговельна марка',
+            }
         biblio_data['code_540_MULTIMEDIA_MADRID_LINK'] = {
             'value': data['MULTIMEDIA'],
-        }
-        biblio_data['code_553'] = {
-            'title': '(553) Зазначення того, що торговельна марка рухова або мультимедійна',
-            'value': 'Рухова торговельна марка',
         }
 
     # (571) Індекс (індекси) МКТП та перелік товарів і послуг
