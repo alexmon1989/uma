@@ -1,9 +1,12 @@
 from django.test import TestCase
-from apps.search.services.application_raw_data_fixers import ApplicationTMRawDataFixerFS
+from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer
 
 
 class TestApplicationTMRawDataFixerFSTestCase(TestCase):
     """Тестирует класс ApplicationTMRawDataFixerFS"""
+
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSTMFixer()
 
     def test_fix_files_path(self):
         app_data = {
@@ -11,7 +14,7 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
                 'filesPath': 'e:\\poznach_test_sis\\bear_tmpp_sis\\TRADE_MARKS\\2024\\m202400001'
             }
         }
-        ApplicationTMRawDataFixerFS.fix_files_path(app_data)
+        self.fixer._fix_files_path(app_data)
         self.assertEqual(app_data['Document']['filesPath'], '\\\\bear\\share\\TRADE_MARKS\\2024\\m202400001\\')
 
     def test_fix_sections(self):
@@ -21,7 +24,7 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
             'DocFlow': {},
             'Transactions': {},
         }
-        ApplicationTMRawDataFixerFS.fix_sections(app_data)
+        self.fixer._fix_sections(app_data)
         self.assertIn('PaymentDetails', app_data['TradeMark'])
         self.assertIn('DocFlow', app_data['TradeMark'])
         self.assertIn('Transactions', app_data['TradeMark'])
@@ -42,7 +45,7 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
                 }
             }
         }
-        ApplicationTMRawDataFixerFS.fix_publication(app_data)
+        self.fixer._fix_publication(app_data)
         self.assertIsInstance(app_data['TradeMark']['TrademarkDetails']['PublicationDetails'], list)
         self.assertEqual(
             app_data['TradeMark']['TrademarkDetails']['PublicationDetails'][0]['PublicationDate'],
@@ -71,5 +74,3 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
     def test_fix_transactions(self):
         self.fail('Finish the test')
 
-    def test_fix_id_doc_cead(self):
-        self.fail('Finish the test')

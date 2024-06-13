@@ -4,7 +4,7 @@ import datetime
 from apps.search.services.external import cead_get_id_doc
 
 
-class ApplicationRawDataFixerService(ABC):
+class ApplicationRawDataFixer(ABC):
     """Абстрактный класс сервиса исправления данных заявки."""
 
     @abstractmethod
@@ -12,19 +12,10 @@ class ApplicationRawDataFixerService(ABC):
         pass
 
 
-class ApplicationRawDataFixerFSService(ApplicationRawDataFixerService):
-    """Сервис исправления данных заявки, которые были получены с файловой системы."""
+class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
+    """Сервис исправления данных заявки на ТМ, которые были получены с файловой системы."""
 
-    def fix_data(self, app_data: dict) -> None:
-        if app_data['Document']['idObjType'] == 4:
-            ApplicationTMRawDataFixerFS.fix_data(app_data)
-
-
-class ApplicationTMRawDataFixerFS:
-    """Исправляет данные заявки на ТМ, которые были прочитаны с файловой системы."""
-
-    @staticmethod
-    def fix_files_path(app_data: dict):
+    def _fix_files_path(self, app_data: dict):
         app_data['Document']['filesPath'] = app_data['Document']['filesPath'].replace(
             'e:\\poznach_test_sis\\bear_tmpp_sis',
             '\\\\bear\\share'
@@ -32,8 +23,7 @@ class ApplicationTMRawDataFixerFS:
         if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
             app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
 
-    @staticmethod
-    def fix_sections(app_data: dict):
+    def _fix_sections(self, app_data: dict):
         """Исправляет структуру словаря."""
         if 'PaymentDetails' in app_data:
             app_data['TradeMark']['PaymentDetails'] = app_data['PaymentDetails']
@@ -47,8 +37,7 @@ class ApplicationTMRawDataFixerFS:
             app_data['TradeMark']['Transactions'] = app_data['Transactions']
             del app_data['Transactions']
 
-    @staticmethod
-    def fix_publication(app_data: dict):
+    def _fix_publication(self, app_data: dict):
         """Исправляет данные и структуру данных публикации."""
         try:
             if app_data['TradeMark']['TrademarkDetails'].get('PublicationDetails', {}).get('Publication'):
@@ -74,8 +63,7 @@ class ApplicationTMRawDataFixerFS:
         except AttributeError:
             pass
 
-    @staticmethod
-    def fix_holder_original(app_data: dict):
+    def _fix_holder_original(self, app_data: dict):
         """Исправляет данные оригинальных наименований и адресов владельцев."""
         if 'HolderDetails' in app_data['TradeMark']['TrademarkDetails']:
             for holder in app_data['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']:
@@ -97,8 +85,7 @@ class ApplicationTMRawDataFixerFS:
                         del formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails'][
                             'FreeFormatNameLineOriginal']
 
-    @staticmethod
-    def fix_applicant_original(app_data: dict):
+    def _fix_applicant_original(self, app_data: dict):
         """Исправляет данные оригинальных наименований и адресов владельцев."""
         if 'ApplicantDetails' in app_data['TradeMark']['TrademarkDetails']:
             for applicant in app_data['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
@@ -120,8 +107,7 @@ class ApplicationTMRawDataFixerFS:
                         del formatted_name_address['Name']['FreeFormatName']['FreeFormatNameDetails'][
                             'FreeFormatNameLineOriginal']
 
-    @staticmethod
-    def fix_stages(app_data: dict):
+    def _fix_stages(self, app_data: dict):
         """Исправляет секцию стадий заявки."""
         if app_data['TradeMark']['TrademarkDetails'].get('stages'):
             app_data['TradeMark']['TrademarkDetails']['stages'] = app_data['TradeMark']['TrademarkDetails']['stages'][::-1]
@@ -130,8 +116,7 @@ class ApplicationTMRawDataFixerFS:
                 for stage in app_data['TradeMark']['TrademarkDetails']['stages']:
                     stage['status'] = 'done'
 
-    @staticmethod
-    def fix_associated_registration_details(app_data: dict):
+    def _fix_associated_registration_details(self, app_data: dict):
         if app_data['TradeMark']['TrademarkDetails'].get(
                 'AssociatedRegistrationApplicationDetails', {}
         ).get(
@@ -150,8 +135,7 @@ class ApplicationTMRawDataFixerFS:
                 except:
                     pass
 
-    @staticmethod
-    def fix_termination_date(app_data: dict):
+    def _fix_termination_date(self, app_data: dict):
         if app_data['TradeMark']['TrademarkDetails'].get('TerminationDate'):
             try:
                 app_data['TradeMark']['TrademarkDetails']['TerminationDate'] = datetime.datetime.strptime(
@@ -160,16 +144,14 @@ class ApplicationTMRawDataFixerFS:
             except:
                 pass
 
-    @staticmethod
-    def fix_exhibition_termination_date(app_data: dict):
+    def _fix_exhibition_termination_date(self, app_data: dict):
         if 'ExhibitionPriorityDetails' in app_data['TradeMark']['TrademarkDetails'] \
                 and type(app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']) == list:
             app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails'] = {
                 'ExhibitionPriority': app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']
             }
 
-    @staticmethod
-    def fix_transactions(app_data: dict):
+    def _fix_transactions(self, app_data: dict):
         if app_data['TradeMark'].get('Transactions', {}).get('Transaction'):
             # Удаление чужих оповещений
             app_data['TradeMark']['Transactions']['Transaction'] = list(filter(
@@ -206,26 +188,24 @@ class ApplicationTMRawDataFixerFS:
                     except:
                         pass
 
-    @staticmethod
-    def fix_id_doc_cead(app_data: dict):
+    def _fix_id_doc_cead(self, app_data: dict):
         """Получает idDocCead из БД EArchive, если он отсутсвует в JSON."""
         if app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
             for doc in app_data['TradeMark']['DocFlow']['Documents']:
                 if not doc['DocRecord'].get('DocIdDocCEAD') and doc['DocRecord'].get('DocBarCode'):
-                    id_doc_cead = cead_get_id_doc(doc['DocRecord'].get('DocBarCode', ''))
+                    id_doc_cead = cead_get_id_doc(doc['DocRecord']['DocBarCode'])
                     if id_doc_cead:
                         doc['DocRecord']['DocIdDocCEAD'] = id_doc_cead
 
-    @staticmethod
-    def fix_data(app_data: dict) -> None:
-        ApplicationTMRawDataFixerFS.fix_files_path(app_data)
-        ApplicationTMRawDataFixerFS.fix_sections(app_data)
-        ApplicationTMRawDataFixerFS.fix_publication(app_data)
-        ApplicationTMRawDataFixerFS.fix_applicant_original(app_data)
-        ApplicationTMRawDataFixerFS.fix_holder_original(app_data)
-        ApplicationTMRawDataFixerFS.fix_stages(app_data)
-        ApplicationTMRawDataFixerFS.fix_associated_registration_details(app_data)
-        ApplicationTMRawDataFixerFS.fix_termination_date(app_data)
-        ApplicationTMRawDataFixerFS.fix_exhibition_termination_date(app_data)
-        ApplicationTMRawDataFixerFS.fix_transactions(app_data)
-        ApplicationTMRawDataFixerFS.fix_id_doc_cead(app_data)
+    def fix_data(self, app_data: dict) -> None:
+        self._fix_files_path(app_data)
+        self._fix_sections(app_data)
+        self._fix_publication(app_data)
+        self._fix_applicant_original(app_data)
+        self._fix_holder_original(app_data)
+        self._fix_stages(app_data)
+        self._fix_associated_registration_details(app_data)
+        self._fix_termination_date(app_data)
+        self._fix_exhibition_termination_date(app_data)
+        self._fix_transactions(app_data)
+        self._fix_id_doc_cead(app_data)
