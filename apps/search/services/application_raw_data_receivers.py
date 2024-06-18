@@ -112,3 +112,8 @@ class ApplicationRawDataFSTMReceiver(ApplicationRawDataFSReceiver):
         self._set_441(data)
 
         return data
+
+
+class ApplicationRawDataFSIDReceiver(ApplicationRawDataFSReceiver):
+    """Получает сырые данные пром. образца с файловой системы, получает доп. информацию, которой нет в ФС."""
+    pass

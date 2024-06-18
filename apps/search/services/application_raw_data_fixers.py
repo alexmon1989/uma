@@ -209,3 +209,96 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
         self._fix_exhibition_termination_date(app_data)
         self._fix_transactions(app_data)
         self._fix_id_doc_cead(app_data)
+
+
+class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
+    """Исправляет данные промышленного образца, которые были получены с файловой системы."""
+
+    def _fix_files_path(self, app_data: dict):
+        if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
+            app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
+
+    def _fix_indication_details(self, app_data: dict):
+        """Исправляет формат МКПЗ"""
+        for item in app_data['Design']['DesignDetails'].get('IndicationProductDetails', []):
+            cl = item.get('Class')
+            if cl:
+                cl = cl.replace('.', '-')
+                cl_l = cl.split('-')
+                if len(cl_l[1]) == 1:
+                    cl_l[1] = f"0{cl_l[1]}"
+                item['Class'] = '-'.join(cl_l)
+
+    def _fix_sections(self, app_data: dict):
+        """Исправляет случай если секции PaymentDetails, DocFlow, Transactions не попали в секцию Design."""
+        if 'PaymentDetails' in app_data:
+            app_data['Design']['PaymentDetails'] = app_data['PaymentDetails']
+            del app_data['PaymentDetails']
+
+        if 'DocFlow' in app_data:
+            app_data['Design']['DocFlow'] = app_data['DocFlow']
+            del app_data['DocFlow']
+
+        if 'Transactions' in app_data:
+            app_data['Design']['Transactions'] = app_data['Transactions']
+            del app_data['Transactions']
+
+    def _fix_publication_details(self, app_data: dict):
+        """Приведение номеря бюлетня к формату "bul_num/YYYY"""
+        if app_data['Design']['DesignDetails'].get('RecordPublicationDetails'):
+            for item in app_data['Design']['DesignDetails']['RecordPublicationDetails']:
+                if len(item.get('PublicationIdentifier')) < 6:
+                    item['PublicationIdentifier'] = f"{item['PublicationIdentifier']}/{item['PublicationDate'][:4]}"
+
+    def _fix_stages(self, app_data: dict):
+        if app_data['Design']['DesignDetails'].get('stages'):
+            app_data['Design']['DesignDetails']['stages'] = app_data['Design']['DesignDetails']['stages'][::-1]
+            # Если есть охранный документ, то все стадии д.б. done
+            if 'RegistrationNumber' in app_data['Design']['DesignDetails']:
+                for stage in app_data['Design']['DesignDetails']['stages']:
+                    stage['status'] = 'done'
+
+    def _fix_priority_date(self, app_data: dict):
+        try:
+            if app_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority'):
+                for item in app_data['Design']['DesignDetails']['PriorityDetails']['Priority']:
+                    if not item['PriorityDate']:
+                        del item['PriorityDate']
+        except AttributeError:
+            pass
+
+    def _fix_transactions(self, app_data: dict):
+        if app_data['Design'].get('Transactions', {}).get('Transaction'):
+            # Удаление чужих оповещений
+            app_data['Design']['Transactions']['Transaction'] = list(filter(
+                lambda x: x.get('@registrationNumber') == app_data['Design']['DesignDetails'].get('RegistrationNumber'),
+                app_data['Design']['Transactions']['Transaction']
+            ))
+
+            # fix дат
+            for transaction in app_data['Design']['Transactions']['Transaction']:
+                try:
+                    d = transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate']
+                    transaction['TransactionBody']['PublicationDetails']['Publication'][
+                        'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
+                except:
+                    pass
+
+    def _fix_id_doc_cead(self, app_data: dict):
+        """Получает idDocCead из БД EArchive, если он отсутсвует в JSON."""
+        if app_data['Design'].get('DocFlow', {}).get('Documents', []):
+            for doc in app_data['Design']['DocFlow']['Documents']:
+                if not doc['DocRecord'].get('DocIdDocCEAD') and doc['DocRecord'].get('DocBarCode'):
+                    id_doc_cead = cead_get_id_doc(doc['DocRecord']['DocBarCode'])
+                    if id_doc_cead:
+                        doc['DocRecord']['DocIdDocCEAD'] = id_doc_cead
+
+    def fix_data(self, app_data: dict) -> None:
+        self._fix_files_path(app_data)
+        self._fix_indication_details(app_data)
+        self._fix_sections(app_data)
+        self._fix_publication_details(app_data)
+        self._fix_stages(app_data)
+        self._fix_priority_date(app_data)
+        self._fix_transactions(app_data)
+        self._fix_id_doc_cead(app_data)
