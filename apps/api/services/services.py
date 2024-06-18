@@ -481,6 +481,8 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
     def __init__(self):
         self._prepare_methods = {
+            1: self._prepare_biblio_inv_um,
+            2: self._prepare_biblio_inv_um,
             4: self._prepare_biblio_tm,
             6: self._prepare_biblio_id,
             10: self._prepare_biblio_copyright,
@@ -488,6 +490,18 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
             12: self._prepare_biblio_copyright,
             13: self._prepare_biblio_copyright,
         }
+
+    def _prepare_biblio_inv_um(self) -> None:
+        """Готовит полные библиографические данные для изобретений, полезных моделей."""
+        # Удаление дубликатов наименований персон
+        persons_codes = ('I_71', 'I_72', 'I_73',)
+        for code in persons_codes:
+            if code in self._raw_biblio:
+                code_unique_vals = []
+                for item in self._raw_biblio[code]:
+                    if item not in code_unique_vals:
+                        code_unique_vals.append(item)
+                self._raw_biblio[code] = code_unique_vals
 
     def _prepare_biblio_tm(self) -> None:
         """Готовит полные библиографические данные для ТМ."""
