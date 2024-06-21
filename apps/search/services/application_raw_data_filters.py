@@ -10,7 +10,7 @@ class ApplicationRawDataFilter(ABC):
 
 
 class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
-    """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации.."""
+    """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации."""
 
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
@@ -27,3 +27,24 @@ class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
                 if 'MarkImageColourClaimedText' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']:
                     del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']
                 del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+
+
+class ApplicationRawDataIDLimitedFilter(ApplicationRawDataFilter):
+    """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации."""
+
+    def filter_data(self, data: dict) -> None:
+        if data['Document'].get('is_limited'):
+            if 'ApplicantDetails' in data['Design']['DesignDetails']:
+                del data['Design']['DesignDetails']['ApplicantDetails']
+
+            if 'DesignerDetails' in data['Design']['DesignDetails']:
+                del data['Design']['DesignDetails']['DesignerDetails']
+
+            if 'HolderDetails' in data['Design']['DesignDetails']:
+                del data['Design']['DesignDetails']['HolderDetails']
+
+            if 'CorrespondenceAddress' in data['Design']['DesignDetails']:
+                del data['Design']['DesignDetails']['CorrespondenceAddress']
+
+            if 'DesignSpecimenDetails' in data['Design']['DesignDetails']:
+                del data['Design']['DesignDetails']['DesignSpecimenDetails']

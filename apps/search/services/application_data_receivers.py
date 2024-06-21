@@ -2,12 +2,17 @@ from typing import List
 
 from apps.search.models import IpcAppList
 from apps.search.services.application_raw_data_receivers import (ApplicationRawDataReceiver,
-                                                                 ApplicationRawDataFSTMReceiver)
-from apps.search.services.application_raw_data_fixers import ApplicationRawDataFixer, ApplicationRawDataFSTMFixer
+                                                                 ApplicationRawDataFSTMReceiver,
+                                                                 ApplicationRawDataFSIDReceiver)
+from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
+                                                              ApplicationRawDataFSTMFixer,
+                                                              ApplicationRawDataFSIDFixer)
 from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataCreator,
-                                                                   ApplicationSimpleDataTMCreator)
+                                                                   ApplicationSimpleDataTMCreator,
+                                                                   ApplicationSimpleDataIDCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
-                                                               ApplicationRawDataTMLimitedFilter)
+                                                               ApplicationRawDataTMLimitedFilter,
+                                                               ApplicationRawDataIDLimitedFilter)
 
 
 class ApplicationGetFullDataService:
@@ -57,6 +62,19 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
             simple_data_creator = ApplicationSimpleDataTMCreator()
             raw_data_filters = [ApplicationRawDataTMLimitedFilter()]
             raw_data_fixer = ApplicationRawDataFSTMFixer()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator,
+                raw_data_filters,
+                raw_data_fixer
+            )
+        elif app.obj_type_id == 6:
+            raw_data_receiver = ApplicationRawDataFSIDReceiver(app)
+            simple_data_creator = ApplicationSimpleDataIDCreator()
+            raw_data_filters = [ApplicationRawDataIDLimitedFilter()]
+            raw_data_fixer = ApplicationRawDataFSIDFixer()
 
             return ApplicationGetFullDataService(
                 app,

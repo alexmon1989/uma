@@ -9,7 +9,7 @@ class ApplicationIndexationValidator(ABC):
         self._app_data = app_data
 
     @abstractmethod
-    def validate(self) -> bool:
+    def validate(self) -> None:
         pass
 
 
@@ -33,5 +33,27 @@ class ApplicationIndexationTMValidator(ApplicationIndexationValidator):
                 raise ValueError("Publication date cannot be in future time")
 
     def validate(self):
+        self._validate_publication_date()
+        self._validate_transaction_date()
+
+
+class ApplicationIndexationIDValidator(ApplicationIndexationValidator):
+    def _validate_publication_date(self) -> None:
+        today = datetime.datetime.now()
+
+        publication = self._app_data.get('Design', {}).get('DesignDetails', {}).get('RecordPublicationDetails', [])
+        for item in publication:
+            if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
+                raise ValueError("Publication date cannot be in future time")
+
+    def _validate_transaction_date(self) -> None:
+        today = datetime.datetime.now()
+
+        transactions = self._app_data.get('Transactions', {}).get('Transaction', [])
+        for item in transactions:
+            if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
+                raise ValueError("Publication date cannot be in future time")
+
+    def validate(self) -> None:
         self._validate_publication_date()
         self._validate_transaction_date()

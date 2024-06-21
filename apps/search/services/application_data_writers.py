@@ -10,6 +10,7 @@ from django.conf import settings
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 
 from apps.search.models import IpcAppList
+from apps.search.utils import delete_files_in_directory
 from apps.bulletin.models import EBulletinData
 
 
@@ -112,6 +113,22 @@ class ApplicationESTMWriter(ApplicationESWriter):
         self._censor_image()
 
 
+class ApplicationESIDWriter(ApplicationESWriter):
+    """Пишет данные пром. образца в индекс ElasticSearch, обновляет данные об индексации в БД,
+    обновляет другую информацию."""
+    def _delete_limited_images(self):
+        if self._app_data['Document'].get('is_limited'):
+            # Удаление всех .jpeg, .jpg, .png, .tiff из каталога
+            exts = ['.jpeg', '.jpg', '.png', '.tiff']
+            exts_upper = list(map(lambda x: x.upper(), exts))
+            for ext in (exts + exts_upper):
+                delete_files_in_directory(self._app.real_files_path, ext)
+
+    def write(self):
+        super().write()
+        self._delete_limited_images()
+
+
 class ApplicationWriteIndexationService:
     """Сервис для записи информации о заявке в поисковый индекс."""
     _writer: ApplicationWriter
@@ -127,4 +144,7 @@ class ApplicationWriteIndexationService:
 def create_service(app: IpcAppList, app_data: dict):
     if app.obj_type_id == 4:
         writer = ApplicationESTMWriter(app, app_data)
+        return ApplicationWriteIndexationService(writer)
+    elif app.obj_type_id == 6:
+        writer = ApplicationESIDWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)
