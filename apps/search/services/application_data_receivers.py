@@ -2,15 +2,19 @@ from typing import List
 
 from apps.search.models import IpcAppList
 from apps.search.services.application_raw_data_receivers import (ApplicationRawDataReceiver,
+                                                                 ApplicationRawDataFSInvUMLDReceiver,
                                                                  ApplicationRawDataFSTMReceiver,
                                                                  ApplicationRawDataFSIDReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
+                                                              ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
                                                               ApplicationRawDataFSIDFixer)
 from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataCreator,
+                                                                   ApplicationSimpleDataInvUMLDCreator,
                                                                    ApplicationSimpleDataTMCreator,
                                                                    ApplicationSimpleDataIDCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
+                                                               ApplicationRawDataInvUMLDLimitedFilter,
                                                                ApplicationRawDataTMLimitedFilter,
                                                                ApplicationRawDataIDLimitedFilter)
 
@@ -32,7 +36,7 @@ class ApplicationGetFullDataService:
         self._app = app
         self._raw_data_receiver = raw_data_receiver
         self._raw_data_fixer = raw_data_fixer
-        self.data_filters = data_filters
+        self._data_filters = data_filters
         self._simple_search_data_creator = simple_search_data_creator
 
     def get_data(self) -> dict:
@@ -45,8 +49,8 @@ class ApplicationGetFullDataService:
                 self._raw_data_fixer.fix_data(data)
 
             # Фильтрация данных
-            if self.data_filters:
-                for _filter in self.data_filters:
+            if self._data_filters:
+                for _filter in self._data_filters:
                     _filter.filter_data(data)
 
             # Формирование данных для простого поиска
@@ -57,7 +61,20 @@ class ApplicationGetFullDataService:
 
 def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataService:
     if source == 'filesystem':
-        if app.obj_type_id == 4:
+        if app.obj_type_id in (1, 2, 3):  # Изобретения, полезные модели, топографии
+            raw_data_receiver = ApplicationRawDataFSInvUMLDReceiver(app)
+            simple_data_creator = ApplicationSimpleDataInvUMLDCreator()
+            raw_data_filters = [ApplicationRawDataInvUMLDLimitedFilter()]
+            raw_data_fixer = ApplicationRawDataFSInvUMLDFixer()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator,
+                raw_data_filters,
+                raw_data_fixer
+            )
+        elif app.obj_type_id == 4:  # ТМ
             raw_data_receiver = ApplicationRawDataFSTMReceiver(app)
             simple_data_creator = ApplicationSimpleDataTMCreator()
             raw_data_filters = [ApplicationRawDataTMLimitedFilter()]
@@ -70,7 +87,7 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 raw_data_filters,
                 raw_data_fixer
             )
-        elif app.obj_type_id == 6:
+        elif app.obj_type_id == 6:  # Пром. образцы
             raw_data_receiver = ApplicationRawDataFSIDReceiver(app)
             simple_data_creator = ApplicationSimpleDataIDCreator()
             raw_data_filters = [ApplicationRawDataIDLimitedFilter()]

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        apps = IpcAppList.objects.filter(obj_type_id=4, elasticindexed=0)
+        apps = IpcAppList.objects.filter(pk=1707354)
         for app in apps:
             service = ApplicationIndexationService(app)
             if service.index():

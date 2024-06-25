@@ -4,6 +4,7 @@ import os
 import logging
 
 from apps.search.models import IpcAppList, AppLimited
+from apps.bulletin.services import bulletin_get_number_with_year_by_date
 from apps.bulletin.models import EBulletinData
 
 
@@ -117,3 +118,30 @@ class ApplicationRawDataFSTMReceiver(ApplicationRawDataFSReceiver):
 class ApplicationRawDataFSIDReceiver(ApplicationRawDataFSReceiver):
     """Получает сырые данные пром. образца с файловой системы, получает доп. информацию, которой нет в ФС."""
     pass
+
+
+class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver):
+    """Получает сырые данные изобретения, полезной модели, топографии с файловой системы,
+    получает доп. информацию, которой нет в ФС."""
+
+    def _set_i_43_bul_str(self, data: dict) -> None:
+        if data.get('I_43.D'):
+            i_43_d = data['I_43.D'][0]
+            bull_str = bulletin_get_number_with_year_by_date(i_43_d)
+            if bull_str:
+                data['I_43_bul_str'] = bull_str
+
+    def _set_i_45_bul_str(self, data: dict) -> None:
+        if data.get('I_45.D'):
+            i_45_d = data['I_45.D'][len(data['I_45.D']) - 1]
+            bull_str = bulletin_get_number_with_year_by_date(i_45_d)
+            if bull_str:
+                data['I_45_bul_str'] = bull_str
+
+    def get_data(self) -> dict:
+        data = super().get_data()
+
+        self._set_i_43_bul_str(data)
+        self._set_i_45_bul_str(data)
+
+        return data

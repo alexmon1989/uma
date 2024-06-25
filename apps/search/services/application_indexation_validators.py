@@ -57,3 +57,18 @@ class ApplicationIndexationIDValidator(ApplicationIndexationValidator):
     def validate(self) -> None:
         self._validate_publication_date()
         self._validate_transaction_date()
+
+
+class ApplicationIndexationInvUMLDValidator(ApplicationIndexationValidator):
+
+    def _validate_i_43_claim(self) -> None:
+        """Проверяет может ли заявка на изобретение быть добавлена в поисковый индекс."""
+        today = datetime.datetime.now()
+
+        i_43 = self._app_data.get('Claim', {}).get('I_43.D', [])
+        for item in i_43:
+            if datetime.datetime.strptime(item, '%Y-%m-%d') > today:
+                raise ValueError("Publication date cannot be in future time")
+
+    def validate(self) -> None:
+        self._validate_i_43_claim()

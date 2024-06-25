@@ -9,7 +9,8 @@ from django.conf import settings
 
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 
-from apps.search.models import IpcAppList
+from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
+from apps.search.models import IpcAppList, AppDocuments, AppLimited
 from apps.search.utils import delete_files_in_directory
 from apps.bulletin.models import EBulletinData
 
@@ -129,6 +130,41 @@ class ApplicationESIDWriter(ApplicationESWriter):
         self._delete_limited_images()
 
 
+class ApplicationESInvUMLDWriter(ApplicationESWriter, BiblioDataInvUMLDRawGetMixin):
+    """Пишет данные изобретения, полезной модели, топографии в индекс ElasticSearch,
+    обновляет данные об индексации в БД,
+    обновляет другую информацию."""
+
+    def _delete_limited_files(self):
+        """Удаляет файлы документов с диска."""
+        if self._app_data['Document'].get('is_limited'):
+            biblio_data = self.get_biblio_data(self._app_data)
+
+            limited_app = AppLimited.objects.filter(
+                app_number=biblio_data['I_21'],
+                obj_type_id=self._app_data['Document']['idObjType']
+            ).first()
+
+            documents = AppDocuments.objects.filter(app=self._app)
+
+            if 'AB' in biblio_data and not limited_app.settings_dict.get('AB', False):
+                for doc in documents:
+                    if doc.enter_num == 100 and os.path.exists(doc.real_file_path):
+                        os.remove(doc.real_file_path)
+            if 'CL' in biblio_data and not limited_app.settings_dict.get('CL', False):
+                for doc in documents:
+                    if doc.enter_num == 98 and doc.file_type == 'pdf' and os.path.exists(doc.real_file_path):
+                        os.remove(doc.real_file_path)
+            if 'DE' in biblio_data and not limited_app.settings_dict.get('DE', False):
+                for doc in documents:
+                    if doc.enter_num in (99, 101) and os.path.exists(doc.real_file_path):
+                        os.remove(doc.real_file_path)
+
+    def write(self):
+        super().write()
+        self._delete_limited_files()
+
+
 class ApplicationWriteIndexationService:
     """Сервис для записи информации о заявке в поисковый индекс."""
     _writer: ApplicationWriter
@@ -142,7 +178,10 @@ class ApplicationWriteIndexationService:
 
 
 def create_service(app: IpcAppList, app_data: dict):
-    if app.obj_type_id == 4:
+    if app.obj_type_id in (1, 2, 3):
+        writer = ApplicationESInvUMLDWriter(app, app_data)
+        return ApplicationWriteIndexationService(writer)
+    elif app.obj_type_id == 4:
         writer = ApplicationESTMWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)
     elif app.obj_type_id == 6:

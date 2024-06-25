@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
 from apps.search.models import IpcAppList
 
 
@@ -242,3 +243,76 @@ class ApplicationSimpleDataIDCreator(ApplicationSimpleDataCreator):
             data['registration_status_color'] = self._get_registration_status_color(data)
 
         return data
+
+
+class ApplicationSimpleDataInvUMLDCreator(ApplicationSimpleDataCreator, BiblioDataInvUMLDRawGetMixin):
+    """Создаёт данные ТМ для простого поиска."""
+
+    def _get_obj_state(self, app: IpcAppList) -> int:
+        return 2 if (app.registration_number and app.registration_number != '0') else 1
+
+    def _get_app_number(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('I_21')
+
+    def _get_app_date(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('I_22')
+
+    def _get_protective_doc_number(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('I_11')
+
+    def _get_rights_date(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('I_24') if biblio_data.get('I_24') != '1899-12-30' else None
+
+    def _get_applicant(self, biblio_data: dict) -> List[dict]:
+        return [{'name': list(x.values())[0]} for x in biblio_data.get('I_71', [])]
+
+    def _get_inventor(self, biblio_data: dict) -> List[dict]:
+        return [{'name': list(x.values())[0]} for x in biblio_data.get('I_72', [])]
+
+    def _get_owner(self, biblio_data: dict) -> List[dict]:
+        res = []
+        for x in biblio_data.get('I_73', []):
+            if list(x.keys())[0] != 'EDRPOU':
+                res.append({'name': list(x.values())[0]})
+            else:
+                res.append({'name': list(x.values())[1]})
+        return res
+
+    def _get_title(self, biblio_data: dict) -> List[str]:
+        return [list(x.values())[0] for x in biblio_data.get('I_54', [])]
+
+    def _get_agent(self, biblio_data: dict) -> List[dict] | None:
+        if biblio_data.get('I_74'):
+            return [{'name': biblio_data['I_74']}]
+        return None
+
+    def _get_registration_status_color(self, data: dict):
+        try:
+            if data['Document']['RegistrationStatus'] == 'A':
+                status = 'green'
+            elif data['Document']['RegistrationStatus'] == 'N':
+                status = 'red'
+            elif data['Document']['RegistrationStatus'] == 'T':
+                status = 'yellow'
+            else:
+                status = 'red'
+        except KeyError:
+            status = 'red'
+        return status
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        biblio_data = self.get_biblio_data(data)
+
+        return {
+            'obj_state': self._get_obj_state(app),
+            'app_number': self._get_app_number(biblio_data),
+            'app_date': self._get_app_date(biblio_data),
+            'protective_doc_number': self._get_protective_doc_number(biblio_data),
+            'rights_date': self._get_rights_date(biblio_data),
+            'applicant': self._get_applicant(biblio_data),
+            'inventor': self._get_inventor(biblio_data),
+            'owner': self._get_owner(biblio_data),
+            'title': self._get_title(biblio_data),
+            'agent': self._get_agent(biblio_data),
+            'registration_status_color': self._get_registration_status_color(data),
+        }
