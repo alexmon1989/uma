@@ -37,7 +37,7 @@ class Command(BaseCommand):
             with open(file_path, 'r', encoding='utf8') as f:
                 content = json.load(f)
 
-        search_services.application_filter_limited_biblio_data_inv_um_ld(
+        search_services.application_filter_limited_data(
             app_number,
             obj_type_id,
             content['Patent'],
