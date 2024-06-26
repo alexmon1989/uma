@@ -12,6 +12,10 @@ from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
 from apps.search.models import IpcAppList, AppDocuments, AppLimited
 from apps.search.utils import delete_files_in_directory
+from apps.search.services.application_indexation_validators import (ApplicationIndexationValidator,
+                                                                    ApplicationIndexationInvUMLDValidator,
+                                                                    ApplicationIndexationIDValidator,
+                                                                    ApplicationIndexationTMValidator)
 from apps.bulletin.models import EBulletinData
 
 
@@ -165,25 +169,48 @@ class ApplicationESInvUMLDWriter(ApplicationESWriter, BiblioDataInvUMLDRawGetMix
         self._delete_limited_files()
 
 
+class ApplicationESInvCertWriter(ApplicationESWriter):
+    """Пишет данные сертификата дополнительной охраны в индекс ElasticSearch,
+    обновляет данные об индексации в БД,
+    обновляет другую информацию."""
+    pass
+
+
 class ApplicationWriteIndexationService:
     """Сервис для записи информации о заявке в поисковый индекс."""
     _writer: ApplicationWriter
 
-    def __init__(self, writer: ApplicationWriter):
+    def __init__(self, writer: ApplicationWriter, validator: ApplicationIndexationValidator = None):
         self._writer = writer
+        self._validator = validator
 
     def write(self):
-        with transaction.atomic():
-            self._writer.write()
+        if self._validator:
+            try:
+                self._validator.validate()
+            except ValueError as e:
+                logger.error(e)
+            else:
+                with transaction.atomic():
+                    self._writer.write()
+        else:
+            with transaction.atomic():
+                self._writer.write()
 
 
 def create_service(app: IpcAppList, app_data: dict):
     if app.obj_type_id in (1, 2, 3):
         writer = ApplicationESInvUMLDWriter(app, app_data)
-        return ApplicationWriteIndexationService(writer)
+        validator = ApplicationIndexationInvUMLDValidator(app_data)
+        return ApplicationWriteIndexationService(writer, validator)
     elif app.obj_type_id == 4:
         writer = ApplicationESTMWriter(app, app_data)
-        return ApplicationWriteIndexationService(writer)
+        validator = ApplicationIndexationTMValidator(app_data)
+        return ApplicationWriteIndexationService(writer, validator)
     elif app.obj_type_id == 6:
         writer = ApplicationESIDWriter(app, app_data)
+        validator = ApplicationIndexationIDValidator(app_data)
+        return ApplicationWriteIndexationService(writer, validator)
+    elif app.obj_type_id == 16:
+        writer = ApplicationESInvCertWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)

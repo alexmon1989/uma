@@ -3,6 +3,7 @@ from typing import List
 from apps.search.models import IpcAppList
 from apps.search.services.application_raw_data_receivers import (ApplicationRawDataReceiver,
                                                                  ApplicationRawDataFSInvUMLDReceiver,
+                                                                 ApplicationRawDataFSInvCertReceiver,
                                                                  ApplicationRawDataFSTMReceiver,
                                                                  ApplicationRawDataFSIDReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
@@ -11,6 +12,7 @@ from apps.search.services.application_raw_data_fixers import (ApplicationRawData
                                                               ApplicationRawDataFSIDFixer)
 from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataCreator,
                                                                    ApplicationSimpleDataInvUMLDCreator,
+                                                                   ApplicationSimpleDataInvCertCreator,
                                                                    ApplicationSimpleDataTMCreator,
                                                                    ApplicationSimpleDataIDCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
@@ -99,4 +101,13 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 simple_data_creator,
                 raw_data_filters,
                 raw_data_fixer
+            )
+        elif app.obj_type_id == 16:  # Сертификат доп. охраны
+            raw_data_receiver = ApplicationRawDataFSInvCertReceiver(app)
+            simple_data_creator = ApplicationSimpleDataInvCertCreator()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator
             )

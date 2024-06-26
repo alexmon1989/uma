@@ -145,3 +145,7 @@ class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver):
         self._set_i_45_bul_str(data)
 
         return data
+
+
+class ApplicationRawDataFSInvCertReceiver(ApplicationRawDataFSReceiver):
+    pass

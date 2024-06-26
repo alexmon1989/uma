@@ -316,3 +316,46 @@ class ApplicationSimpleDataInvUMLDCreator(ApplicationSimpleDataCreator, BiblioDa
             'agent': self._get_agent(biblio_data),
             'registration_status_color': self._get_registration_status_color(data),
         }
+
+
+class ApplicationSimpleDataInvCertCreator(ApplicationSimpleDataCreator):
+    """Создаёт данные сертификата дополнительной охраны для простого поиска."""
+
+    def _get_obj_state(self) -> int:
+        return 2
+
+    def _get_protective_doc_number(self, data: dict) -> int | str:
+        return data['Patent_Certificate'].get('I_11')
+
+    def _get_owner(self, data: dict) -> List[dict]:
+        owners = []
+        for owner in data['Patent_Certificate'].get('I_73', []):
+            owners.append({'name': owner['N.U']})
+        return owners
+
+    def _get_title(self, data: dict) -> str | None:
+        return data['Patent_Certificate'].get('I_95')
+
+    def _get_registration_status_color(self, data: dict) -> str:
+        try:
+            if data['Document']['RegistrationStatus'] == 'A':
+                status = 'green'
+            elif data['Document']['RegistrationStatus'] == 'N':
+                status = 'red'
+            elif data['Document']['RegistrationStatus'] == 'T':
+                status = 'yellow'
+            else:
+                status = 'red'
+        except KeyError:
+            status = 'red'
+
+        return status
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        return {
+            'obj_state': self._get_obj_state(),
+            'protective_doc_number': self._get_protective_doc_number(data),
+            'owner': self._get_owner(data),
+            'title': self._get_title(data),
+            'registration_status_color': self._get_registration_status_color(data)
+        }
