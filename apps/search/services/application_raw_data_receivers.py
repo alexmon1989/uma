@@ -156,6 +156,8 @@ class ApplicationRawDataFSInvCertReceiver(ApplicationRawDataFSReceiver):
 
 
 class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
+    """Получает сырые данные международных ТМ,
+    получает доп. информацию, которой нет в ФС."""
 
     def _set_450(self, data: dict) -> None:
         """Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України",
@@ -203,3 +205,9 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
         self._set_441(data)
 
         return data
+
+
+class ApplicationRawDataFSGeoReceiver(ApplicationRawDataFSReceiver):
+    """Получает сырые данные ГЗ,
+    получает доп. информацию, которой нет в ФС."""
+    pass

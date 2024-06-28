@@ -395,3 +395,72 @@ class ApplicationSimpleDataMadridCreator(ApplicationSimpleDataCreator):
             'agent': self._get_agent(data['MadridTradeMark']['TradeMarkDetails']),
             'title': self._get_title(data['MadridTradeMark']['TradeMarkDetails']),
         }
+
+
+class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
+
+    def _get_obj_state(self, app: IpcAppList) -> int:
+        return 2 if (app.registration_number and app.registration_number != '0') else 1
+
+    def _get_app_number(self, data: dict) -> str | None:
+        return data['Geo']['GeoDetails'].get('ApplicationNumber')
+
+    def _get_app_date(self, data: dict) -> str | None:
+        return data['Geo']['GeoDetails'].get('ApplicationDate')
+
+    def _get_protective_doc_number(self, data: dict) -> str | None:
+        return data['Geo']['GeoDetails'].get('RegistrationNumber')
+
+    def _get_rights_date(self, data: dict) -> str | None:
+        return data['Geo']['GeoDetails'].get('RegistrationDate')
+
+    def _get_applicants(self, data: dict) -> List[dict]:
+        applicants = []
+        if data['Geo']['GeoDetails'].get('ApplicantDetails'):
+            for item in data['Geo']['GeoDetails']['ApplicantDetails']['Applicant']:
+                applicants.append({
+                    'name': item['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'FreeFormatNameDetails']['FreeFormatNameLine']
+                })
+        return applicants
+
+    def _get_owners(self, data: dict) -> List[dict]:
+        owners = []
+        if data['Geo']['GeoDetails'].get('HolderDetails'):
+            for item in data['Geo']['GeoDetails']['HolderDetails']['Holder']:
+                owners.append({
+                    'name': item['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                        'FreeFormatNameDetails']['FreeFormatNameLine']
+                })
+        return owners
+
+    def _get_agents(self, data: dict) -> List[dict]:
+        agents = []
+        if data['Geo']['GeoDetails'].get('RepresentativeDetails'):
+            for item in data['Geo']['GeoDetails']['RepresentativeDetails']['Representative']:
+                agents.append({'name': item['RepresentativeAddressBook']['FormattedNameAddress']['Name'][
+                    'FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']})
+        return agents
+
+    def _get_title(self, data: dict) -> str | None:
+        return data['Geo']['GeoDetails'].get('Indication')
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        data = {
+            'obj_state': self._get_obj_state(app),
+            'app_number': self._get_app_number(data),
+            'app_date': self._get_app_date(data),
+            'protective_doc_number': self._get_protective_doc_number(data),
+            'rights_date': self._get_rights_date(data),
+            'applicant': self._get_applicants(data),
+            'owner': self._get_owners(data),
+            'agent': self._get_agents(data),
+
+            'title': self._get_title(data),
+        }
+
+        # Статус охранного документа (цвет)
+        if data['obj_state'] == 2:
+            data['registration_status_color'] = 'green'
+
+        return data

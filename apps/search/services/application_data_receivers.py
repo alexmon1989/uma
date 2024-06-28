@@ -6,18 +6,21 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSInvCertReceiver,
                                                                  ApplicationRawDataFSTMReceiver,
                                                                  ApplicationRawDataFSIDReceiver,
-                                                                 ApplicationRawDataFSMadridReceiver)
+                                                                 ApplicationRawDataFSMadridReceiver,
+                                                                 ApplicationRawDataFSGeoReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
                                                               ApplicationRawDataFSIDFixer,
-                                                              ApplicationRawDataFSMadridFixer)
+                                                              ApplicationRawDataFSMadridFixer,
+                                                              ApplicationRawDataFSGeoFixer)
 from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataCreator,
                                                                    ApplicationSimpleDataInvUMLDCreator,
                                                                    ApplicationSimpleDataInvCertCreator,
                                                                    ApplicationSimpleDataTMCreator,
                                                                    ApplicationSimpleDataIDCreator,
-                                                                   ApplicationSimpleDataMadridCreator)
+                                                                   ApplicationSimpleDataMadridCreator,
+                                                                   ApplicationSimpleDataGeoCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
                                                                ApplicationRawDataInvUMLDLimitedFilter,
                                                                ApplicationRawDataTMLimitedFilter,
@@ -91,6 +94,17 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 simple_data_creator,
                 raw_data_filters,
                 raw_data_fixer
+            )
+        elif app.obj_type_id == 5:  # ГЗ
+            raw_data_receiver = ApplicationRawDataFSGeoReceiver(app)
+            simple_data_creator = ApplicationSimpleDataGeoCreator()
+            raw_data_fixer = ApplicationRawDataFSGeoFixer()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator,
+                raw_data_fixer=raw_data_fixer
             )
         elif app.obj_type_id == 6:  # Пром. образцы
             raw_data_receiver = ApplicationRawDataFSIDReceiver(app)

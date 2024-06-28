@@ -402,3 +402,12 @@ class ApplicationRawDataFSMadridFixer(ApplicationRawDataFixer):
         self._fix_pub_date(app_data['MadridTradeMark']['TradeMarkDetails'])
         self._fix_basappd(app_data['MadridTradeMark']['TradeMarkDetails'])
         self._fix_priappd(app_data['MadridTradeMark']['TradeMarkDetails'])
+
+
+class ApplicationRawDataFSGeoFixer(ApplicationRawDataFixer):
+    def _fix_product_description(self, app_data: dict) -> None:
+        if 'ProductDescription' in app_data['Geo']['GeoDetails']:
+            app_data['Geo']['GeoDetails']['ProductDesc'] = app_data['Geo']['GeoDetails'].pop('ProductDescription')
+
+    def fix_data(self, app_data: dict) -> None:
+        self._fix_product_description(app_data)

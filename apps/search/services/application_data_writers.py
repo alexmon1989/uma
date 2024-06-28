@@ -217,6 +217,26 @@ class ApplicationESMadridWriter(ApplicationESWriter):
         self._write_441()
 
 
+class ApplicationESGeoWriter(ApplicationESWriter):
+    """Пишет данные ГЗ в индекс ElasticSearch, данные об индексации в БД, другую информацию."""
+
+    def _write_441(self) -> None:
+        """Запись в БД для бюлетеня."""
+        if 'ApplicationPublicationDetails' in self._app_data['Geo']['GeoDetails']:
+            EBulletinData.objects.update_or_create(
+                app_number=self._app_data['Geo']['GeoDetails'].get('ApplicationNumber'),
+                unit_id=3,
+                defaults={
+                    'publication_date': self._app_data['Geo']['GeoDetails']['ApplicationPublicationDetails'][
+                        'PublicationDate']
+                }
+            )
+
+    def write(self):
+        super().write()
+        self._write_441()
+
+
 class ApplicationWriteIndexationService:
     """Сервис для записи информации о заявке в поисковый индекс."""
     _writer: ApplicationWriter
@@ -248,6 +268,9 @@ def create_service(app: IpcAppList, app_data: dict):
         writer = ApplicationESTMWriter(app, app_data)
         validator = ApplicationIndexationTMValidator(app_data)
         return ApplicationWriteIndexationService(writer, validator)
+    elif app.obj_type_id == 5:
+        writer = ApplicationESGeoWriter(app, app_data)
+        return ApplicationWriteIndexationService(writer)
     elif app.obj_type_id == 6:
         writer = ApplicationESIDWriter(app, app_data)
         validator = ApplicationIndexationIDValidator(app_data)
