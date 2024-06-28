@@ -5,16 +5,19 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSInvUMLDReceiver,
                                                                  ApplicationRawDataFSInvCertReceiver,
                                                                  ApplicationRawDataFSTMReceiver,
-                                                                 ApplicationRawDataFSIDReceiver)
+                                                                 ApplicationRawDataFSIDReceiver,
+                                                                 ApplicationRawDataFSMadridReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
-                                                              ApplicationRawDataFSIDFixer)
+                                                              ApplicationRawDataFSIDFixer,
+                                                              ApplicationRawDataFSMadridFixer)
 from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataCreator,
                                                                    ApplicationSimpleDataInvUMLDCreator,
                                                                    ApplicationSimpleDataInvCertCreator,
                                                                    ApplicationSimpleDataTMCreator,
-                                                                   ApplicationSimpleDataIDCreator)
+                                                                   ApplicationSimpleDataIDCreator,
+                                                                   ApplicationSimpleDataMadridCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
                                                                ApplicationRawDataInvUMLDLimitedFilter,
                                                                ApplicationRawDataTMLimitedFilter,
@@ -101,6 +104,17 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 simple_data_creator,
                 raw_data_filters,
                 raw_data_fixer
+            )
+        elif app.obj_type_id in (9, 14):  # Международные ТМ
+            raw_data_receiver = ApplicationRawDataFSMadridReceiver(app)
+            simple_data_creator = ApplicationSimpleDataMadridCreator()
+            raw_data_fixer = ApplicationRawDataFSMadridFixer()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator,
+                raw_data_fixer=raw_data_fixer
             )
         elif app.obj_type_id == 16:  # Сертификат доп. охраны
             raw_data_receiver = ApplicationRawDataFSInvCertReceiver(app)

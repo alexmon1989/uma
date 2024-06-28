@@ -367,3 +367,38 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
         self._fix_i_73(biblio_data)
         self._fix_i_98(biblio_data)
         self.fix_transactions(app_data)
+
+
+class ApplicationRawDataFSMadridFixer(ApplicationRawDataFixer):
+    def _fix_dates(self, biblio_data: dict) -> None:
+        date_keys = ['@EXPDATE', '@NOTDATE', '@REGEDAT', '@REGRDAT', '@INTREGD']
+        for key in date_keys:
+            if biblio_data.get(key):
+                biblio_data[key] = datetime.datetime.strptime(biblio_data[key], '%Y%m%d').strftime('%Y-%m-%d')
+
+    def _fix_pub_date(self, biblio_data: dict) -> None:
+        if biblio_data.get('ENN', {}).get('@PUBDATE'):
+            try:
+                biblio_data['ENN']['@PUBDATE'] = datetime.datetime.strptime(
+                    biblio_data['ENN']['@PUBDATE'], '%Y%m%d'
+                ).strftime('%Y-%m-%d')
+            except ValueError:  # Дата уже в правильном формате
+                pass
+
+    def _fix_basappd(self, biblio_data: dict) -> None:
+        if biblio_data.get('BASGR', {}).get('BASAPPGR', {}).get('BASAPPD'):
+            biblio_data['BASGR']['BASAPPGR']['BASAPPD'] = datetime.datetime.strptime(
+                biblio_data['BASGR']['BASAPPGR']['BASAPPD'], '%Y%m%d'
+            ).strftime('%Y-%m-%d')
+
+    def _fix_priappd(self, biblio_data: dict) -> None:
+        if biblio_data.get('PRIGR', {}).get('PRIAPPD', {}):
+            biblio_data['PRIGR']['PRIAPPD'] = datetime.datetime.strptime(
+                biblio_data['PRIGR']['PRIAPPD'], '%Y%m%d'
+            ).strftime('%Y-%m-%d')
+
+    def fix_data(self, app_data: dict) -> None:
+        self._fix_dates(app_data['MadridTradeMark']['TradeMarkDetails'])
+        self._fix_pub_date(app_data['MadridTradeMark']['TradeMarkDetails'])
+        self._fix_basappd(app_data['MadridTradeMark']['TradeMarkDetails'])
+        self._fix_priappd(app_data['MadridTradeMark']['TradeMarkDetails'])

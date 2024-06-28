@@ -359,3 +359,39 @@ class ApplicationSimpleDataInvCertCreator(ApplicationSimpleDataCreator):
             'title': self._get_title(data),
             'registration_status_color': self._get_registration_status_color(data)
         }
+
+
+class ApplicationSimpleDataMadridCreator(ApplicationSimpleDataCreator):
+    def _get_obj_state(self) -> int:
+        return 2
+
+    def _get_protective_doc_number(self, app: IpcAppList) -> str:
+        return app.registration_number
+
+    def _get_app_number(self, app: IpcAppList) -> str:
+        return app.registration_number
+
+    def _get_rights_date(self, data: dict) -> str | None:
+        return data.get('@INTREGD')
+
+    def _get_owner(self, data: dict) -> List[dict]:
+        return [{'name': data.get('HOLGR', {}).get('NAME', {}).get('NAMEL')}]
+
+    def _get_agent(self, data: dict) -> List[dict] | None:
+        if data.get('REPGR', {}).get('NAME', {}).get('NAMEL'):
+            return [{'name': data['REPGR']['NAME']['NAMEL']}]
+        return None
+
+    def _get_title(self, data: dict) -> str | None:
+        return data.get('IMAGE', {}).get('@TEXT')
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        return {
+            'app_number': self._get_app_number(app),
+            'protective_doc_number':  self._get_protective_doc_number(app),
+            'obj_state': self._get_obj_state(),
+            'rights_date': self._get_rights_date(data['MadridTradeMark']['TradeMarkDetails']),
+            'owner': self._get_owner(data['MadridTradeMark']['TradeMarkDetails']),
+            'agent': self._get_agent(data['MadridTradeMark']['TradeMarkDetails']),
+            'title': self._get_title(data['MadridTradeMark']['TradeMarkDetails']),
+        }

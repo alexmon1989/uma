@@ -8,6 +8,7 @@ from django.db import transaction
 from django.conf import settings
 
 from elasticsearch import Elasticsearch, exceptions as elasticsearch_exceptions
+from elasticsearch_dsl import Search, Q
 
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
 from apps.search.models import IpcAppList, AppDocuments, AppLimited
@@ -176,6 +177,46 @@ class ApplicationESInvCertWriter(ApplicationESWriter):
     pass
 
 
+class ApplicationESMadridWriter(ApplicationESWriter):
+    """Пишет данные международной ТМ в индекс ElasticSearch, данные об индексации в БД, другую информацию."""
+
+    def _write_450(self):
+        """Если это "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні", которая появляется
+        позже чем "Міжнародна реєстрація торговельної марки з поширенням на територію України" с тем же номером,
+        то необхожимо обновить 450-й код у "Міжнародна реєстрація торговельної марки з поширенням на територію України"
+        """
+        if self._app.obj_type_id == 14:
+            q = Q(
+                'bool',
+                must=[
+                    Q('match', Document__idObjType=9),
+                    Q('match', search_data__protective_doc_number=self._app.registration_number),
+                ],
+            )
+            s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es).query(q).execute()
+            if s:
+                hit = s[0].to_dict()
+                hit['MadridTradeMark']['TradeMarkDetails']['ENN'] = self._app_data['MadridTradeMark']['TradeMarkDetails']['ENN']
+                self.es.index(index=settings.ELASTIC_INDEX_NAME,
+                              doc_type='_doc',
+                              id=s[0].meta.id,
+                              body=hit,
+                              request_timeout=30)
+
+    def _write_441(self) -> None:
+        """Запись в БД для бюлетня."""
+        EBulletinData.objects.update_or_create(
+            app_number=self._app.registration_number,
+            unit_id=2,
+            defaults={'publication_date': self._app_data['MadridTradeMark']['TradeMarkDetails']['Code_441']}
+        )
+
+    def write(self):
+        super().write()
+        self._write_450()
+        self._write_441()
+
+
 class ApplicationWriteIndexationService:
     """Сервис для записи информации о заявке в поисковый индекс."""
     _writer: ApplicationWriter
@@ -211,6 +252,9 @@ def create_service(app: IpcAppList, app_data: dict):
         writer = ApplicationESIDWriter(app, app_data)
         validator = ApplicationIndexationIDValidator(app_data)
         return ApplicationWriteIndexationService(writer, validator)
+    elif app.obj_type_id in (9, 14):
+        writer = ApplicationESMadridWriter(app, app_data)
+        return ApplicationWriteIndexationService(writer)
     elif app.obj_type_id == 16:
         writer = ApplicationESInvCertWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)

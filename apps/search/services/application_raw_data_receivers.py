@@ -3,6 +3,10 @@ import json
 import os
 import logging
 
+from django.conf import settings
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
+
 from apps.search.models import IpcAppList, AppLimited
 from apps.bulletin.services import bulletin_get_number_with_year_by_date
 from apps.bulletin.models import EBulletinData
@@ -149,3 +153,53 @@ class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver):
 
 class ApplicationRawDataFSInvCertReceiver(ApplicationRawDataFSReceiver):
     pass
+
+
+class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
+
+    def _set_450(self, data: dict) -> None:
+        """Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України",
+        то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
+        и взять у неё 450 код."
+        """
+        if self._app.obj_type_id == 9:
+            es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+            q = Q(
+                'bool',
+                must=[
+                    Q('match', Document__idObjType=14),
+                    Q('match', search_data__protective_doc_number=self._app.registration_number),
+                ],
+            )
+            s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
+            if s:
+                hit = s[0].to_dict()
+                data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
+
+    def _set_441(self, data: dict) -> None:
+        try:
+            app = IpcAppList.objects.filter(
+                obj_type_id=9,  # registration_date у заявки с этим obj_type_id и будет 441-м кодом
+                app_number=self._app.app_number
+            ).first()
+            data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = app.registration_date.strftime('%Y-%m-%d')
+        except AttributeError:
+            data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = self._app.registration_date.strftime('%Y-%m-%d')
+
+    def get_data(self) -> dict:
+        data_from_file = super().get_data()
+
+        data = {
+            'Document': {
+                'idObjType': self._app.obj_type_id,
+                'filesPath': self._app.files_path
+            },
+            'MadridTradeMark': {
+                'TradeMarkDetails': data_from_file
+            }
+        }
+
+        self._set_450(data)
+        self._set_441(data)
+
+        return data
