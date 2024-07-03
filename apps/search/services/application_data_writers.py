@@ -278,6 +278,9 @@ def create_service(app: IpcAppList, app_data: dict):
     elif app.obj_type_id in (9, 14):
         writer = ApplicationESMadridWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)
+    elif app.obj_type_id in (10, 11, 12, 13):
+        writer = ApplicationESWriter(app, app_data)
+        return ApplicationWriteIndexationService(writer)
     elif app.obj_type_id == 16:
         writer = ApplicationESInvCertWriter(app, app_data)
         return ApplicationWriteIndexationService(writer)

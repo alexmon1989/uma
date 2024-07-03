@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import datetime
 import re
 
-from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
+from apps.search.mixins import BiblioDataInvUMLDRawGetMixin, BiblioDataCRRawGetMixin
 from apps.search.services.external import cead_get_id_doc
 
 
@@ -411,3 +411,18 @@ class ApplicationRawDataFSGeoFixer(ApplicationRawDataFixer):
 
     def fix_data(self, app_data: dict) -> None:
         self._fix_product_description(app_data)
+
+
+class ApplicationRawDataFSCRFixer(ApplicationRawDataFixer, BiblioDataCRRawGetMixin):
+
+    def _fix_publication_date(self, biblio_data: dict) -> None:
+        """Исправление формата даты PublicationDate."""
+        if biblio_data.get('PublicationDetails', {}).get('Publication', {}).get('PublicationDate'):
+            d = biblio_data['PublicationDetails']['Publication']['PublicationDate']
+            biblio_data['PublicationDetails']['Publication']['PublicationDate'] = datetime.datetime.strptime(
+                d, '%d.%m.%Y'
+            ).strftime('%Y-%m-%d')
+
+    def fix_data(self, app_data: dict) -> None:
+        biblio_data = self.get_biblio_data(app_data)
+        self._fix_publication_date(biblio_data)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
+from apps.search.mixins import BiblioDataInvUMLDRawGetMixin, BiblioDataCRRawGetMixin
 from apps.search.models import IpcAppList
 
 
@@ -455,7 +455,6 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
             'applicant': self._get_applicants(data),
             'owner': self._get_owners(data),
             'agent': self._get_agents(data),
-
             'title': self._get_title(data),
         }
 
@@ -464,3 +463,51 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
             data['registration_status_color'] = 'green'
 
         return data
+
+
+class ApplicationSimpleDataCRCreator(ApplicationSimpleDataCreator, BiblioDataCRRawGetMixin):
+
+    def _get_obj_state(self) -> int:
+        return 2
+
+    def _get_app_number(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('ApplicationNumber')
+
+    def _get_app_date(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('ApplicationDate')
+
+    def _get_protective_doc_number(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('RegistrationNumber')
+
+    def _get_rights_date(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('RegistrationDate')
+
+    def _get_owner(self, biblio_data: dict) -> List[dict] | None:
+        owners = []
+        if biblio_data.get('AuthorDetails', {}).get('Author'):
+            for author in biblio_data['AuthorDetails']['Author']:
+                owners.append({'name': author['AuthorAddressBook']['FormattedNameAddress']['Name'][
+                    'FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']})
+        return owners
+
+    def _get_title(self, biblio_data: dict) -> str | None:
+        return biblio_data.get('Name')
+
+    def get_registration_status_color(self, data: dict) -> str:
+        return 'red' if data['Document']['RegistrationStatus'] == 'Реєстрація недійсна' else 'green'
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        biblio_data = self.get_biblio_data(data)
+
+        res = {
+            'obj_state': self._get_obj_state(),
+            'app_number': self._get_app_number(biblio_data),
+            'app_date': self._get_app_date(biblio_data),
+            'protective_doc_number': self._get_protective_doc_number(biblio_data),
+            'rights_date': self._get_rights_date(biblio_data),
+            'owner': self._get_owner(biblio_data),
+            'title': self._get_title(biblio_data),
+            'registration_status_color': self.get_registration_status_color(data),
+        }
+
+        return res

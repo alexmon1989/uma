@@ -40,6 +40,7 @@ class ApplicationRawDataFSReceiver(ApplicationRawDataReceiver):
         # Если путь к файлу указан сразу (случай с авторским правом)
         if '.json' in self._app.real_files_path:
             self._file_path = self._app.real_files_path
+            return
 
         # Путь к файлу JSON с данными объекта:
         file_name = self._app.registration_number \
