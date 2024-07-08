@@ -8,6 +8,7 @@ from zipfile import ZipFile
 from django.utils import translation
 from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
+from django.db.models import Max
 from django.conf import settings
 
 from elasticsearch import Elasticsearch
@@ -773,6 +774,43 @@ def application_get_documents(app_id: int) -> dict:
                     # Реферат англ.
                     res['ab_en'] = document
     return res
+
+
+def application_get_indexed_count() -> int:
+    """Возвращает количество проиндексированных объектов в поисковом индексе ElasticSearch."""
+    qs = Q('query_string', query='*')
+
+    # Не включать в список результатов заявки, по которым выдан патент
+    qs = filter_bad_apps(qs)
+
+    # Количество документов в индексе
+    es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    s = Search(using=es, index=settings.ELASTIC_INDEX_NAME).query(qs)
+    return s.count()
+
+
+def application_fill_notification_date():
+    """Заполняет поле NotificationDate в таблице IPC_AppList."""
+    app_list = IpcAppList.objects.filter(obj_type__id__in=(1, 2))
+    registration_date__max = app_list.aggregate(Max('registration_date'))['registration_date__max']
+    q = Q(
+        "nested",
+        path="TRANSACTIONS.TRANSACTION",
+        query=Q(
+            "query_string",
+            query=registration_date__max.date(),
+            default_field="TRANSACTIONS.TRANSACTION.BULLETIN_DATE",
+        )
+    )
+    es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+    s = Search(using=es, index=settings.ELASTIC_INDEX_NAME).query(q).source(False)
+    total = s.count()
+    s = s[0:total]
+    results = s.execute()
+    ids = []
+    for res in results:
+        ids.append(res.meta.id)
+    IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:
