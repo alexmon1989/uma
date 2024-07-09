@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
                 ('last_indexation_date', models.DateTimeField(blank=True, db_column='last_indexation_date', null=True)),
                 ('in_electronic_bull', models.BooleanField(blank=True, db_column='in_electronic_bull', null=True)),
                 ('publication_app_date', models.DateTimeField(blank=True, db_column='publication_APP_date', null=True)),
+                ('is_limited', models.BooleanField(db_column='is_limited', default=False)),
             ],
             options={
                 'db_table': 'IPC_AppList',
