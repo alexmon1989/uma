@@ -457,7 +457,7 @@ def application_prepare_biblio_data_id(data: dict) -> dict:
         for i, designer in enumerate(res['DesignerDetails']['Designer']):
             # Значение поля Publicated - признак того надо ли публиковать автора
             if 'Publicated' in designer and not designer['Publicated']:
-                del res['DesignerDetails']['Designer'][i]
+                del res['DesignerDetails']['Designer'][i]['DesignerAddressBook']
     return res
 
 

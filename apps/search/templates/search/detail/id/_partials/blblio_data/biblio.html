@@ -183,9 +183,13 @@
                         <th>{{ ipc_field.code_title }}</th>
                         <td class="text-justify">
                             {% for designer in hit.Design.DesignDetails.DesignerDetails.Designer %}
-                                {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                                ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                                {% if not forloop.last %};<br>{% endif %}
+                                {% if designer.DesignerAddressBook.Publicated %}
+                                    {{ designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                    ({{ designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                                    {% if not forloop.last %};<br>{% endif %}
+                                {% else %}
+                                    *{% if not forloop.last %}<br>{% endif %}
+                                {% endif %}
                             {% endfor %}
                         </td>
                     </tr>
