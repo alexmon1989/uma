@@ -9,7 +9,9 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSTMReceiver,
                                                                  ApplicationRawDataReceiver,
                                                                  ApplicationRawDataFSIDReceiver,
-                                                                 ApplicationRawDataFSInvUMLDReceiver)
+                                                                 ApplicationRawDataFSInvUMLDReceiver,
+                                                                 ApplicationRawDataFSMadrid9Receiver,
+                                                                 ApplicationRawDataFSGeoReceiver)
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 
 
@@ -75,7 +77,7 @@ class ApplicationRawDataFSReceiverTestCase(TestCase):
         receiver = ApplicationRawDataFSReceiver(app)
         data = receiver.get_data()
         self.assertEqual(data['Document']['idObjType'], obj_type.pk)
-        self.assertFalse(data['Document']['is_limited'])
+        self.assertFalse(data['Document'].get('is_limited'))
 
         AppLimited.objects.create(obj_type_id=obj_type.pk, app_number='app')
         data = receiver.get_data()
@@ -159,15 +161,50 @@ class ApplicationRawDataFSInvUMLDReceiverTestCase(TestCase):
 
 class ApplicationRawDataFSMadridReceiverTestCase(TestCase):
 
-    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_450')
-    def test_set_450(self, mock_set_450):
+    def test_is_instance(self):
+        receiver = ApplicationRawDataFSMadridReceiver(IpcAppList())
+        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
 
-        def side_effect(d: dict):
-            d['a'] = 'b'
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
+    def test_get_data(self, mock_set_441):
+        with open('/tmp/11111.json', 'w') as fp:
+            json.dump({'test': 'data'}, fp)
 
-        mock_set_450.side_effect = side_effect
-        app = IpcAppList(obj_type_id=9)
+        app = IpcAppList(obj_type_id=14, registration_number='11111', app_number=11111, files_path='/tmp/')
         receiver = ApplicationRawDataFSMadridReceiver(app)
-        data = {}
-        receiver._set_450(data)
-        self.assertEqual(data['a'], 'b')
+        data = receiver.get_data()
+        
+        self.assertEqual(data['Document']['idObjType'], 14)
+        self.assertEqual(data['Document']['filesPath'], '/tmp/')
+        self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
+        mock_set_441.assert_called()
+
+
+class ApplicationRawDataFSMadrid9ReceiverTestCase(TestCase):
+
+    def test_is_instance(self):
+        receiver = ApplicationRawDataFSMadrid9Receiver(IpcAppList())
+        self.assertIsInstance(receiver, ApplicationRawDataFSMadridReceiver)
+
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadrid9Receiver._set_450')
+    def test_get_data(self, mock_set_450, mock_set_441):
+        with open('/tmp/11111.json', 'w') as fp:
+            json.dump({'test': 'data'}, fp)
+
+        app = IpcAppList(obj_type_id=9, registration_number='11111', app_number=11111, files_path='/tmp/')
+        receiver = ApplicationRawDataFSMadrid9Receiver(app)
+        data = receiver.get_data()
+
+        self.assertEqual(data['Document']['idObjType'], 9)
+        self.assertEqual(data['Document']['filesPath'], '/tmp/')
+        self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
+        mock_set_450.assert_called()
+        mock_set_441.assert_called()
+
+
+class ApplicationRawDataFSGeoReceiverTestCase(TestCase):
+
+    def test_is_instance(self):
+        receiver = ApplicationRawDataFSGeoReceiver(IpcAppList())
+        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
