@@ -8,7 +8,7 @@
             {{ item_num }}.
             <a href="{% url 'search:detail' pk=hit.meta.id %}"
                class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
-            >{{ hit.Certificate.CopyrightDetails.Name }}</a>
+            >{% if hit.search_data.title %}{{ hit.search_data.title }}{% elif hit.Document.is_limited %}<span class="g-color-red">*</span>{% else %}---{% endif %}</a>
         </div>
 
         {% include 'search/advanced/_partials/favorites_icon.html' %}

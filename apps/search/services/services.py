@@ -673,6 +673,8 @@ def application_filter_limited_data_cr(limit_settings: dict, biblio_data: dict) 
         del biblio_data['RegistrationOfficeCode']
     if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
         del biblio_data['RepresentativeDetails']
+    if 'Name' in biblio_data and not limit_settings.get('Name', False):
+        del biblio_data['Name']
 
 
 def application_get_documents(app_id: int) -> dict:
