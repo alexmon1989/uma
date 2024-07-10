@@ -10,7 +10,7 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataReceiver,
                                                                  ApplicationRawDataFSIDReceiver,
                                                                  ApplicationRawDataFSInvUMLDReceiver)
-from apps.bulletin.models import EBulletinData
+from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 
 
 class ApplicationRawDataFSReceiverTestCase(TestCase):
@@ -132,10 +132,29 @@ class ApplicationRawDataFSInvUMLDReceiverTestCase(TestCase):
         self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
 
     def test_set_i_43_bul_str(self):
-        self.fail()
+        with open('/tmp/a202400001.json', 'w') as fp:
+            json.dump({'Claim': {'I_43.D': ['2024-07-09']}}, fp)
+        app = IpcAppList(app_number='a202400001', files_path='/tmp/')
+        ClListOfficialBulletinsIp.objects.create(bul_date='2024-07-09', bul_number=7)
+        receiver = ApplicationRawDataFSInvUMLDReceiver(app)
+        data = receiver.get_data()
+        self.assertEqual(data['Claim']['I_43_bul_str'], '7/2024')
 
     def test_set_i_45_bul_str(self):
-        self.fail()
+        with open('/tmp/11111.json', 'w') as fp:
+            json.dump({
+                'Patent': {
+                    'I_45.D': ['2024-07-09'],
+                    'I_43.D': ['2024-01-01']
+                }
+            }, fp)
+        app = IpcAppList(app_number='a202400001', registration_number='11111', files_path='/tmp/')
+        ClListOfficialBulletinsIp.objects.create(bul_date='2024-07-09', bul_number=7)
+        ClListOfficialBulletinsIp.objects.create(bul_date='2024-01-01', bul_number=1)
+        receiver = ApplicationRawDataFSInvUMLDReceiver(app)
+        data = receiver.get_data()
+        self.assertEqual(data['Patent']['I_45_bul_str'], '7/2024')
+        self.assertEqual(data['Patent']['I_43_bul_str'], '1/2024')
 
 
 class ApplicationRawDataFSMadridReceiverTestCase(TestCase):

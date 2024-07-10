@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, AppLimited
+from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
 from apps.bulletin.services import bulletin_get_number_with_year_by_date
 from apps.bulletin.models import EBulletinData
 
@@ -125,29 +126,30 @@ class ApplicationRawDataFSIDReceiver(ApplicationRawDataFSReceiver):
     pass
 
 
-class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver):
+class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver, BiblioDataInvUMLDRawGetMixin):
     """Получает сырые данные изобретения, полезной модели, топографии с файловой системы,
     получает доп. информацию, которой нет в ФС."""
 
-    def _set_i_43_bul_str(self, data: dict) -> None:
-        if data.get('I_43.D'):
-            i_43_d = data['I_43.D'][0]
+    def _set_i_43_bul_str(self, biblio_data: dict) -> None:
+        if biblio_data.get('I_43.D'):
+            i_43_d = biblio_data['I_43.D'][0]
             bull_str = bulletin_get_number_with_year_by_date(i_43_d)
             if bull_str:
-                data['I_43_bul_str'] = bull_str
+                biblio_data['I_43_bul_str'] = bull_str
 
-    def _set_i_45_bul_str(self, data: dict) -> None:
-        if data.get('I_45.D'):
-            i_45_d = data['I_45.D'][len(data['I_45.D']) - 1]
+    def _set_i_45_bul_str(self, biblio_data: dict) -> None:
+        if biblio_data.get('I_45.D'):
+            i_45_d = biblio_data['I_45.D'][len(biblio_data['I_45.D']) - 1]
             bull_str = bulletin_get_number_with_year_by_date(i_45_d)
             if bull_str:
-                data['I_45_bul_str'] = bull_str
+                biblio_data['I_45_bul_str'] = bull_str
 
     def get_data(self) -> dict:
         data = super().get_data()
 
-        self._set_i_43_bul_str(data)
-        self._set_i_45_bul_str(data)
+        biblio_data = self.get_biblio_data(data)
+        self._set_i_43_bul_str(biblio_data)
+        self._set_i_45_bul_str(biblio_data)
 
         return data
 
@@ -157,28 +159,7 @@ class ApplicationRawDataFSInvCertReceiver(ApplicationRawDataFSReceiver):
 
 
 class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
-    """Получает сырые данные международных ТМ,
-    получает доп. информацию, которой нет в ФС."""
-
-    def _set_450(self, data: dict) -> None:
-        """Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України",
-        то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
-        и взять у неё 450 код."
-        """
-        if self._app.obj_type_id == 9:
-            es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-            q = Q(
-                'bool',
-                must=[
-                    Q('match', Document__idObjType=14),
-                    Q('match', search_data__protective_doc_number=self._app.registration_number),
-                ],
-            )
-            s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
-            if s:
-                hit = s[0].to_dict()
-                data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
-
+    """Получает сырые данные международных ТМ, получает доп. информацию, которой нет в ФС."""
     def _set_441(self, data: dict) -> None:
         try:
             app = IpcAppList.objects.filter(
@@ -202,8 +183,37 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
             }
         }
 
-        self._set_450(data)
         self._set_441(data)
+
+        return data
+
+
+class ApplicationRawDataFSMadrid9Receiver(ApplicationRawDataFSMadridReceiver):
+    """Получает сырые данные международных ТМ с распространением на территорию Украины,
+    получает доп. информацию, которой нет в ФС."""
+
+    def _set_450(self, data: dict) -> None:
+        """Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України",
+        то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
+        и взять у неё 450 код."
+        """
+        es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+        q = Q(
+            'bool',
+            must=[
+                Q('match', Document__idObjType=14),
+                Q('match', search_data__protective_doc_number=self._app.registration_number),
+            ],
+        )
+        s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
+        if s:
+            hit = s[0].to_dict()
+            data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
+
+    def get_data(self) -> dict:
+        data = super().get_data()
+
+        self._set_450(data)
 
         return data
 

@@ -8,7 +8,8 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSIDReceiver,
                                                                  ApplicationRawDataFSMadridReceiver,
                                                                  ApplicationRawDataFSGeoReceiver,
-                                                                 ApplicationRawDataFSReceiver)
+                                                                 ApplicationRawDataFSReceiver,
+                                                                 ApplicationRawDataFSMadrid9Receiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
@@ -123,8 +124,8 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 raw_data_filters,
                 raw_data_fixer
             )
-        elif app.obj_type_id in (9, 14):  # Международные ТМ
-            raw_data_receiver = ApplicationRawDataFSMadridReceiver(app)
+        elif app.obj_type_id == 9:  # Международные ТМ с распространением на территорию Украины
+            raw_data_receiver = ApplicationRawDataFSMadrid9Receiver(app)
             simple_data_creator = ApplicationSimpleDataMadridCreator()
             raw_data_fixer = ApplicationRawDataFSMadridFixer()
 
@@ -159,6 +160,17 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 simple_data_creator,
                 raw_data_filters,
                 raw_data_fixer
+            )
+        elif app.obj_type_id == 14:  # Международные ТМ, зарегистрированные в Украине
+            raw_data_receiver = ApplicationRawDataFSMadridReceiver(app)
+            simple_data_creator = ApplicationSimpleDataMadridCreator()
+            raw_data_fixer = ApplicationRawDataFSMadridFixer()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator,
+                raw_data_fixer=raw_data_fixer
             )
         elif app.obj_type_id == 16:  # Сертификат доп. охраны
             raw_data_receiver = ApplicationRawDataFSInvCertReceiver(app)
