@@ -18,12 +18,13 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
     """Сервис исправления данных заявки на ТМ, которые были получены с файловой системы."""
 
     def _fix_files_path(self, app_data: dict):
-        app_data['Document']['filesPath'] = app_data['Document']['filesPath'].replace(
-            'e:\\poznach_test_sis\\bear_tmpp_sis',
-            '\\\\bear\\share'
-        )
-        if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
-            app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
+        if 'Document' in app_data:
+            app_data['Document']['filesPath'] = app_data['Document']['filesPath'].replace(
+                'e:\\poznach_test_sis\\bear_tmpp_sis',
+                '\\\\bear\\share'
+            )
+            if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
+                app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
 
     def _fix_sections(self, app_data: dict):
         """Исправляет структуру словаря."""
@@ -42,7 +43,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
     def _fix_publication(self, app_data: dict):
         """Исправляет данные и структуру данных публикации."""
         try:
-            if app_data['TradeMark']['TrademarkDetails'].get('PublicationDetails', {}).get('Publication'):
+            if app_data['TradeMark'].get('TrademarkDetails', {}).get('PublicationDetails', {}).get('Publication'):
                 # Исправление даты публикации, структуры
                 try:
                     d = datetime.datetime.today().strptime(
@@ -67,7 +68,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
 
     def _fix_holder_original(self, app_data: dict):
         """Исправляет данные оригинальных наименований и адресов владельцев."""
-        if 'HolderDetails' in app_data['TradeMark']['TrademarkDetails']:
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get('HolderDetails'):
             for holder in app_data['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']:
                 formatted_name_address = holder['HolderAddressBook']['FormattedNameAddress']
                 is_ua = formatted_name_address['Address']['AddressCountryCode'] == 'UA'
@@ -89,7 +90,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
 
     def _fix_applicant_original(self, app_data: dict):
         """Исправляет данные оригинальных наименований и адресов владельцев."""
-        if 'ApplicantDetails' in app_data['TradeMark']['TrademarkDetails']:
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get('ApplicantDetails'):
             for applicant in app_data['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
                 formatted_name_address = applicant['ApplicantAddressBook']['FormattedNameAddress']
                 is_ua = formatted_name_address['Address']['AddressCountryCode'] == 'UA'
@@ -111,7 +112,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
 
     def _fix_stages(self, app_data: dict):
         """Исправляет секцию стадий заявки."""
-        if app_data['TradeMark']['TrademarkDetails'].get('stages'):
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get('stages'):
             app_data['TradeMark']['TrademarkDetails']['stages'] = app_data['TradeMark']['TrademarkDetails']['stages'][::-1]
             # Если есть охранный документ, то все стадии д.б. done
             if app_data['TradeMark']['TrademarkDetails'].get('RegistrationNumber'):
@@ -119,7 +120,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
                     stage['status'] = 'done'
 
     def _fix_associated_registration_details(self, app_data: dict):
-        if app_data['TradeMark']['TrademarkDetails'].get(
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get(
                 'AssociatedRegistrationApplicationDetails', {}
         ).get(
             'AssociatedRegistrationApplication', {}
@@ -138,7 +139,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
                     pass
 
     def _fix_termination_date(self, app_data: dict):
-        if app_data['TradeMark']['TrademarkDetails'].get('TerminationDate'):
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get('TerminationDate'):
             try:
                 app_data['TradeMark']['TrademarkDetails']['TerminationDate'] = datetime.datetime.strptime(
                     app_data['TradeMark']['TrademarkDetails']['TerminationDate'], '%d.%m.%Y'
@@ -147,7 +148,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
                 pass
 
     def _fix_exhibition_termination_date(self, app_data: dict):
-        if 'ExhibitionPriorityDetails' in app_data['TradeMark']['TrademarkDetails'] \
+        if app_data['TradeMark'].get('TrademarkDetails', {}).get('ExhibitionPriorityDetails') \
                 and type(app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']) == list:
             app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails'] = {
                 'ExhibitionPriority': app_data['TradeMark']['TrademarkDetails']['ExhibitionPriorityDetails']
