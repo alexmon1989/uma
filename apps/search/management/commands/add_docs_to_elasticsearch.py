@@ -951,20 +951,11 @@ class Command(BaseCommand):
                         res['Document']['idObjType']
                 ):
                     res['Document']['is_limited'] = True
-                    limited_data = {}
-                    if 'RegistrationNumber' in res['Decision']['DecisionDetails']:
-                        limited_data['RegistrationNumber'] = res['Decision']['DecisionDetails']['RegistrationNumber']
-                    if 'RegistrationDate' in res['Decision']['DecisionDetails']:
-                        limited_data['RegistrationDate'] = res['Decision']['DecisionDetails']['RegistrationDate']
-                    if 'PublicationDetails' in res['Decision']['DecisionDetails']:
-                        limited_data['PublicationDetails'] = res['Decision']['DecisionDetails']['PublicationDetails']
-                    if 'PublicationDetails' in res['Decision']['DecisionDetails']:
-                        limited_data['PublicationDetails'] = res['Decision']['DecisionDetails']['PublicationDetails']
-                    if 'Name' in res['Decision']['DecisionDetails']:
-                        limited_data['Name'] = res['Decision']['DecisionDetails']['Name']
-                    if 'NameShort' in res['Decision']['DecisionDetails']:
-                        limited_data['NameShort'] = res['Decision']['DecisionDetails']['NameShort']
-                    res['Decision']['DecisionDetails'] = limited_data
+                    search_services.application_filter_limited_data(
+                        doc['app_number'],
+                        doc['obj_type_id'],
+                        res['Decision']['DecisionDetails']
+                    )
                 cr_data = res['Decision']['DecisionDetails']
 
             # fix PublicationDate

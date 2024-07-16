@@ -617,6 +617,9 @@ def application_filter_limited_data(app_number: str, obj_type_id: int, biblio_da
     elif obj_type_id in (10, 13):
         application_filter_limited_data_cr(limited_app.settings_dict, biblio_data)
 
+    elif obj_type_id in (11, 12):
+        application_filter_limited_data_agreement(limited_app.settings_dict, biblio_data)
+
 
 def application_filter_limited_data_inv_um_ld(limit_settings: dict, biblio_data: dict,
                                               documents: QuerySet[AppDocuments]) -> None:
@@ -673,8 +676,67 @@ def application_filter_limited_data_cr(limit_settings: dict, biblio_data: dict) 
         del biblio_data['RegistrationOfficeCode']
     if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
         del biblio_data['RepresentativeDetails']
-    if 'Name' in biblio_data and not limit_settings.get('Name', False):
+    if 'Name' in biblio_data and not limit_settings.get('Name', True):
         del biblio_data['Name']
+
+
+def application_filter_limited_data_agreement(limit_settings: dict, biblio_data: dict) -> None:
+    """Удаляет ограниченные для отображения поля из библиографии договоров авторского права."""
+    # Поля, которые по умолчанию сохраняются
+    if 'RegistrationNumber' in biblio_data and not limit_settings.get('RegistrationNumber', True):
+        del biblio_data['RegistrationNumber']
+    if 'RegistrationDate' in biblio_data and not limit_settings.get('RegistrationDate', True):
+        del biblio_data['RegistrationDate']
+    if 'PublicationDetails' in biblio_data and not limit_settings.get('PublicationDetails', True):
+        del biblio_data['PublicationDetails']
+    if 'Name' in biblio_data and not limit_settings.get('Name', True):
+        del biblio_data['Name']
+    if 'NameShort' in biblio_data and not limit_settings.get('NameShort', True):
+        del biblio_data['NameShort']
+
+    # Поля, которые по умолчанию удаляются
+    if 'Annotation' in biblio_data and not limit_settings.get('Annotation', False):
+        del biblio_data['Annotation']
+    if 'ApplicantDetails' in biblio_data and not limit_settings.get('ApplicantDetails', False):
+        del biblio_data['ApplicantDetails']
+    if 'ApplicationDate' in biblio_data and not limit_settings.get('ApplicationDate', False):
+        del biblio_data['ApplicationDate']
+    if 'ApplicationNumber' in biblio_data and not limit_settings.get('ApplicationNumber', False):
+        del biblio_data['ApplicationNumber']
+    if 'AuthorDetails' in biblio_data and not limit_settings.get('AuthorDetails', False):
+        del biblio_data['AuthorDetails']
+    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
+        del biblio_data['CopyrightObjectKindDetails']
+    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
+        del biblio_data['CopyrightObjectKindDetails']
+    if 'DocFlow' in biblio_data and not limit_settings.get('DocFlow', False):
+        del biblio_data['DocFlow']
+    if 'LicenseeDetails' in biblio_data:
+        if not limit_settings.get('LicenseeDetails', False):
+            del biblio_data['LicenseeDetails']
+        else:
+            for item in biblio_data['LicenseeDetails']['Licensee']:
+                if not limit_settings['LicenseeDetails']['Address']:
+                    del item['LicenseeAddressBook']['FormattedNameAddress']['Address']
+                if not limit_settings['LicenseeDetails']['Name']:
+                    del item['LicenseeAddressBook']['FormattedNameAddress']['Name']
+    if 'LicensorDetails' in biblio_data:
+        if not limit_settings.get('LicensorDetails', False):
+            del biblio_data['LicensorDetails']
+        else:
+            for item in biblio_data['LicensorDetails']['Licensor']:
+                if not limit_settings['LicensorDetails']['Address']:
+                    del item['LicensorAddressBook']['FormattedNameAddress']['Address']
+                if not limit_settings['LicensorDetails']['Name']:
+                    del item['LicensorAddressBook']['FormattedNameAddress']['Name']
+    if 'RegistrationKind' in biblio_data and not limit_settings.get('RegistrationKind', False):
+        del biblio_data['RegistrationKind']
+    if 'RegistrationKindCode' in biblio_data and not limit_settings.get('RegistrationKindCode', False):
+        del biblio_data['RegistrationKindCode']
+    if 'RegistrationOfficeCode' in biblio_data and not limit_settings.get('RegistrationOfficeCode', False):
+        del biblio_data['RegistrationOfficeCode']
+    if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
+        del biblio_data['RepresentativeDetails']
 
 
 def application_get_documents(app_id: int) -> dict:

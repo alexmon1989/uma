@@ -103,7 +103,7 @@
             {% endif %}
 
             {% get_field '75' ipc_fields as ipc_field %}
-            {% if hit.Document.is_limited %}
+            {% if hit.Document.is_limited and not hit.Decision.DecisionDetails.LicensorDetails and not hit.Decision.DecisionDetails.LicenseeDetails %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>
