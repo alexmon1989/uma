@@ -121,6 +121,8 @@ class ApplicationRawDataCRLimitedFilter(ApplicationRawDataFilter):
             if 'RepresentativeDetails' in biblio_data \
                     and not limited_app.settings_dict.get('RepresentativeDetails', False):
                 del biblio_data['RepresentativeDetails']
+            if 'Name' in biblio_data and not limited_app.settings_dict.get('Name', True):
+                del biblio_data['Name']
 
 
 class ApplicationRawDataDecisionLimitedFilter(ApplicationRawDataFilter):
@@ -128,17 +130,70 @@ class ApplicationRawDataDecisionLimitedFilter(ApplicationRawDataFilter):
 
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
-            limited_data = {}
-            if 'RegistrationNumber' in data['Decision']['DecisionDetails']:
-                limited_data['RegistrationNumber'] = data['Decision']['DecisionDetails']['RegistrationNumber']
-            if 'RegistrationDate' in data['Decision']['DecisionDetails']:
-                limited_data['RegistrationDate'] = data['Decision']['DecisionDetails']['RegistrationDate']
-            if 'PublicationDetails' in data['Decision']['DecisionDetails']:
-                limited_data['PublicationDetails'] = data['Decision']['DecisionDetails']['PublicationDetails']
-            if 'PublicationDetails' in data['Decision']['DecisionDetails']:
-                limited_data['PublicationDetails'] = data['Decision']['DecisionDetails']['PublicationDetails']
-            if 'Name' in data['Decision']['DecisionDetails']:
-                limited_data['Name'] = data['Decision']['DecisionDetails']['Name']
-            if 'NameShort' in data['Decision']['DecisionDetails']:
-                limited_data['NameShort'] = data['Decision']['DecisionDetails']['NameShort']
-            data['Decision']['DecisionDetails'] = limited_data
+            limited_app = AppLimited.objects.filter(
+                app_number=data['Decision']['DecisionDetails']['ApplicationNumber'],
+                obj_type_id=data['Document']['idObjType']
+            ).first()
+
+            biblio_data = data['Decision']['DecisionDetails']
+
+            # Поля, которые по умолчанию сохраняются
+            if 'RegistrationNumber' in biblio_data and not limited_app.settings_dict.get('RegistrationNumber', True):
+                del biblio_data['RegistrationNumber']
+            if 'RegistrationDate' in biblio_data and not limited_app.settings_dict.get('RegistrationDate', True):
+                del biblio_data['RegistrationDate']
+            if 'PublicationDetails' in biblio_data and not limited_app.settings_dict.get('PublicationDetails', True):
+                del biblio_data['PublicationDetails']
+            if 'Name' in biblio_data and not limited_app.settings_dict.get('Name', True):
+                del biblio_data['Name']
+            if 'NameShort' in biblio_data and not limited_app.settings_dict.get('NameShort', True):
+                del biblio_data['NameShort']
+
+            # Поля, которые по умолчанию удаляются
+            if 'Annotation' in biblio_data and not limited_app.settings_dict.get('Annotation', False):
+                del biblio_data['Annotation']
+            if 'ApplicantDetails' in biblio_data and not limited_app.settings_dict.get('ApplicantDetails', False):
+                del biblio_data['ApplicantDetails']
+            if 'ApplicationDate' in biblio_data and not limited_app.settings_dict.get('ApplicationDate', False):
+                del biblio_data['ApplicationDate']
+            if 'ApplicationNumber' in biblio_data and not limited_app.settings_dict.get('ApplicationNumber', False):
+                del biblio_data['ApplicationNumber']
+            if 'AuthorDetails' in biblio_data and not limited_app.settings_dict.get('AuthorDetails', False):
+                del biblio_data['AuthorDetails']
+            if 'CopyrightObjectKindDetails' in biblio_data \
+                    and not limited_app.settings_dict.get('CopyrightObjectKindDetails', False):
+                del biblio_data['CopyrightObjectKindDetails']
+            if 'CopyrightObjectKindDetails' in biblio_data \
+                    and not limited_app.settings_dict.get('CopyrightObjectKindDetails', False):
+                del biblio_data['CopyrightObjectKindDetails']
+            if 'DocFlow' in biblio_data and not limited_app.settings_dict.get('DocFlow', False):
+                del biblio_data['DocFlow']
+            if 'LicenseeDetails' in biblio_data:
+                if not limited_app.settings_dict.get('LicenseeDetails', False):
+                    del biblio_data['LicenseeDetails']
+                else:
+                    for item in biblio_data['LicenseeDetails']['Licensee']:
+                        if not limited_app.settings_dict['LicenseeDetails']['Address']:
+                            del item['LicenseeAddressBook']['FormattedNameAddress']['Address']
+                        if not limited_app.settings_dict['LicenseeDetails']['Name']:
+                            del item['LicenseeAddressBook']['FormattedNameAddress']['Name']
+            if 'LicensorDetails' in biblio_data:
+                if not limited_app.settings_dict.get('LicensorDetails', False):
+                    del biblio_data['LicensorDetails']
+                else:
+                    for item in biblio_data['LicensorDetails']['Licensor']:
+                        if not limited_app.settings_dict['LicensorDetails']['Address']:
+                            del item['LicensorAddressBook']['FormattedNameAddress']['Address']
+                        if not limited_app.settings_dict['LicensorDetails']['Name']:
+                            del item['LicensorAddressBook']['FormattedNameAddress']['Name']
+            if 'RegistrationKind' in biblio_data and not limited_app.settings_dict.get('RegistrationKind', False):
+                del biblio_data['RegistrationKind']
+            if 'RegistrationKindCode' in biblio_data \
+                    and not limited_app.settings_dict.get('RegistrationKindCode', False):
+                del biblio_data['RegistrationKindCode']
+            if 'RegistrationOfficeCode' in biblio_data \
+                    and not limited_app.settings_dict.get('RegistrationOfficeCode', False):
+                del biblio_data['RegistrationOfficeCode']
+            if 'RepresentativeDetails' in biblio_data \
+                    and not limited_app.settings_dict.get('RepresentativeDetails', False):
+                del biblio_data['RepresentativeDetails']
