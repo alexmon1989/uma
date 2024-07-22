@@ -641,3 +641,24 @@ class ApplicationRawDataFSGeoFixerTestCase(TestCase):
         self.fixer.fix_data(app_data)
         self.assertEqual(app_data['Geo']['GeoDetails']['ProductDesc'], 'Test Data')
         self.assertNotIn('ProductDescription', app_data['Geo']['GeoDetails'])
+
+
+class ApplicationRawDataFSCRFixerTestCase(TestCase):
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSCRFixer()
+
+    def test_fix_publication_date(self):
+        app_data = {
+            'Certificate': {
+                'CopyrightDetails': {
+                    'PublicationDetails': {
+                        'Publication': {
+                            'PublicationDate': '01.02.2024'
+                        }
+                    }
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['Certificate']['CopyrightDetails']['PublicationDetails'][
+                             'Publication']['PublicationDate'], '2024-02-01')
