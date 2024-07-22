@@ -394,7 +394,7 @@ class ApplicationRawDataFSMadridFixer(ApplicationRawDataFixer):
             ).strftime('%Y-%m-%d')
 
     def _fix_priappd(self, biblio_data: dict) -> None:
-        if biblio_data.get('PRIGR', {}).get('PRIAPPD', {}):
+        if biblio_data.get('PRIGR', {}).get('PRIAPPD'):
             biblio_data['PRIGR']['PRIAPPD'] = datetime.datetime.strptime(
                 biblio_data['PRIGR']['PRIAPPD'], '%Y%m%d'
             ).strftime('%Y-%m-%d')

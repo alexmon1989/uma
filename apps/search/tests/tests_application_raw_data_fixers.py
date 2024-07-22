@@ -2,7 +2,7 @@ from unittest import mock
 
 from django.test import TestCase
 from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer, ApplicationRawDataFSIDFixer, \
-    ApplicationRawDataFSMadridFixer
+    ApplicationRawDataFSMadridFixer, ApplicationRawDataFSGeoFixer, ApplicationRawDataFSCRFixer
 
 
 class TestApplicationTMRawDataFixerFSTestCase(TestCase):
@@ -624,3 +624,20 @@ class ApplicationRawDataFSMadridFixerTestCase(TestCase):
         }
         self.fixer.fix_data(app_data)
         self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['PRIGR']['PRIAPPD'], '2024-01-01')
+
+
+class ApplicationRawDataFSGeoFixerTestCase(TestCase):
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSGeoFixer()
+
+    def test_fix_product_description(self):
+        app_data = {
+            'Geo': {
+                'GeoDetails': {
+                    'ProductDescription': 'Test Data'
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['Geo']['GeoDetails']['ProductDesc'], 'Test Data')
+        self.assertNotIn('ProductDescription', app_data['Geo']['GeoDetails'])
