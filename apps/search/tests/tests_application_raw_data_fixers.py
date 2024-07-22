@@ -1,7 +1,8 @@
 from unittest import mock
 
 from django.test import TestCase
-from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer, ApplicationRawDataFSIDFixer
+from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer, ApplicationRawDataFSIDFixer, \
+    ApplicationRawDataFSMadridFixer
 
 
 class TestApplicationTMRawDataFixerFSTestCase(TestCase):
@@ -558,3 +559,68 @@ class TestApplicationIDRawDataFixerFSTestCase(TestCase):
         self.fixer.fix_data(app_data)
         for doc in app_data['Design']['DocFlow']['Documents']:
             self.assertEqual(doc['DocRecord']['DocIdDocCEAD'], 111)
+
+
+class ApplicationRawDataFSMadridFixerTestCase(TestCase):
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSMadridFixer()
+
+    def test_fix_dates(self):
+        app_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    '@EXPDATE': '20240101',
+                    '@NOTDATE': '20240102',
+                    '@REGEDAT': '20240103',
+                    '@REGRDAT': '20240104',
+                    '@INTREGD': '20240105',
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['@EXPDATE'], '2024-01-01')
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['@NOTDATE'], '2024-01-02')
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['@REGEDAT'], '2024-01-03')
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['@REGRDAT'], '2024-01-04')
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['@INTREGD'], '2024-01-05')
+
+    def test_fix_pub_date(self):
+        app_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    'ENN': {
+                        '@PUBDATE': '20240101'
+                    }
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['ENN']['@PUBDATE'], '2024-01-01')
+
+    def test_fix_basappd(self):
+        app_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    'BASGR': {
+                        'BASAPPGR': {
+                            'BASAPPD': '20240101'
+                        }
+                    }
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['BASGR']['BASAPPGR']['BASAPPD'], '2024-01-01')
+
+    def test_fix_priappd(self):
+        app_data = {
+            'MadridTradeMark': {
+                'TradeMarkDetails': {
+                    'PRIGR': {
+                        'PRIAPPD': '20240101'
+                    }
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['MadridTradeMark']['TradeMarkDetails']['PRIGR']['PRIAPPD'], '2024-01-01')
