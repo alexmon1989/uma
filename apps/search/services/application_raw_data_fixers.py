@@ -218,12 +218,13 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
     """Исправляет данные промышленного образца, которые были получены с файловой системы."""
 
     def _fix_files_path(self, app_data: dict):
-        if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
-            app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
+        if 'Document' in app_data:
+            if app_data['Document']['filesPath'][len(app_data['Document']['filesPath']) - 1] != '\\':
+                app_data['Document']['filesPath'] = f"{app_data['Document']['filesPath']}\\"
 
     def _fix_indication_details(self, app_data: dict):
         """Исправляет формат МКПЗ"""
-        for item in app_data['Design']['DesignDetails'].get('IndicationProductDetails', []):
+        for item in app_data.get('Design', {}).get('DesignDetails', {}).get('IndicationProductDetails', []):
             cl = item.get('Class')
             if cl:
                 cl = cl.replace('.', '-')
@@ -248,13 +249,13 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
 
     def _fix_publication_details(self, app_data: dict):
         """Приведение номеря бюлетня к формату "bul_num/YYYY"""
-        if app_data['Design']['DesignDetails'].get('RecordPublicationDetails'):
+        if app_data.get('Design', {}).get('DesignDetails', {}).get('RecordPublicationDetails'):
             for item in app_data['Design']['DesignDetails']['RecordPublicationDetails']:
                 if len(item.get('PublicationIdentifier')) < 6:
                     item['PublicationIdentifier'] = f"{item['PublicationIdentifier']}/{item['PublicationDate'][:4]}"
 
     def _fix_stages(self, app_data: dict):
-        if app_data['Design']['DesignDetails'].get('stages'):
+        if app_data.get('Design', {}).get('DesignDetails', {}).get('stages'):
             app_data['Design']['DesignDetails']['stages'] = app_data['Design']['DesignDetails']['stages'][::-1]
             # Если есть охранный документ, то все стадии д.б. done
             if 'RegistrationNumber' in app_data['Design']['DesignDetails']:
@@ -263,7 +264,7 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
 
     def _fix_priority_date(self, app_data: dict):
         try:
-            if app_data['Design']['DesignDetails'].get('PriorityDetails', {}).get('Priority'):
+            if app_data.get('Design', {}).get('DesignDetails', {}).get('PriorityDetails', {}).get('Priority'):
                 for item in app_data['Design']['DesignDetails']['PriorityDetails']['Priority']:
                     if not item['PriorityDate']:
                         del item['PriorityDate']
@@ -271,7 +272,7 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
             pass
 
     def _fix_transactions(self, app_data: dict):
-        if app_data['Design'].get('Transactions', {}).get('Transaction'):
+        if app_data.get('Design', {}).get('Transactions', {}).get('Transaction'):
             # Удаление чужих оповещений
             app_data['Design']['Transactions']['Transaction'] = list(filter(
                 lambda x: x.get('@registrationNumber') == app_data['Design']['DesignDetails'].get('RegistrationNumber'),
@@ -289,7 +290,7 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
 
     def _fix_id_doc_cead(self, app_data: dict):
         """Получает idDocCead из БД EArchive, если он отсутсвует в JSON."""
-        if app_data['Design'].get('DocFlow', {}).get('Documents', []):
+        if app_data.get('Design', {}).get('DocFlow', {}).get('Documents', []):
             for doc in app_data['Design']['DocFlow']['Documents']:
                 if not doc['DocRecord'].get('DocIdDocCEAD') and doc['DocRecord'].get('DocBarCode'):
                     id_doc_cead = cead_get_id_doc(doc['DocRecord']['DocBarCode'])

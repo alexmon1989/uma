@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.test import TestCase
-from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer
+from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer, ApplicationRawDataFSIDFixer
 
 
 class TestApplicationTMRawDataFixerFSTestCase(TestCase):
@@ -244,7 +244,7 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
                 }
             }
         }
-        self.fixer._fix_stages(app_data)
+        self.fixer.fix_data(app_data)
         self.assertEqual(app_data['TradeMark']['TrademarkDetails']['stages'][0]['title'], 'stage_2')
         self.assertEqual(app_data['TradeMark']['TrademarkDetails']['stages'][0]['status'], 'done')
         self.assertEqual(app_data['TradeMark']['TrademarkDetails']['stages'][1]['title'], 'stage_1')
@@ -365,4 +365,196 @@ class TestApplicationTMRawDataFixerFSTestCase(TestCase):
         }
         self.fixer.fix_data(app_data)
         for doc in app_data['TradeMark']['DocFlow']['Documents']:
+            self.assertEqual(doc['DocRecord']['DocIdDocCEAD'], 111)
+
+
+class TestApplicationIDRawDataFixerFSTestCase(TestCase):
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSIDFixer()
+
+    def test_fix_files_path(self):
+        app_data = {
+            'Design': {},
+            'Document': {
+                'filesPath': '\\\\bear\\share\\INDUSTRIAL_DES\\2024\\s202400001'
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['Document']['filesPath'], '\\\\bear\\share\\INDUSTRIAL_DES\\2024\\s202400001\\')
+
+    def test_fix_indication_details(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    "IndicationProductDetails": [
+                        {
+                            "Class": "11.1",
+                        }
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(
+            app_data['Design']['DesignDetails']['IndicationProductDetails'][0]['Class'], '11-01'
+        )
+
+    def test_fix_sections(self):
+        app_data = {
+            'Design': {},
+            'PaymentDetails': {},
+            'DocFlow': {},
+            'Transactions': {},
+        }
+        self.fixer.fix_data(app_data)
+        self.assertIn('PaymentDetails', app_data['Design'])
+        self.assertIn('DocFlow', app_data['Design'])
+        self.assertIn('Transactions', app_data['Design'])
+        self.assertNotIn('PaymentDetails', app_data)
+        self.assertNotIn('DocFlow', app_data)
+        self.assertNotIn('Transactions', app_data)
+
+    def test_fix_publication_details(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RecordPublicationDetails": [
+                        {
+                            "PublicationDate": "2024-01-01",
+                            "PublicationIdentifier": "1"
+                        }
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(
+            app_data['Design']['DesignDetails']['RecordPublicationDetails'][0]['PublicationIdentifier'], '1/2024'
+        )
+
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    "RecordPublicationDetails": [
+                        {
+                            "PublicationDate": "2024-01-01",
+                            "PublicationIdentifier": "1/2024"
+                        }
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(
+            app_data['Design']['DesignDetails']['RecordPublicationDetails'][0]['PublicationIdentifier'], '1/2024'
+        )
+
+    def test_fix_stages(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RegistrationNumber': '11111',
+                    'stages': [
+                        {
+                            'title': 'stage_1',
+                            'status': 'done'
+                        },
+                        {
+                            'title': 'stage_2',
+                            'status': 'active'
+                        }
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertEqual(app_data['Design']['DesignDetails']['stages'][0]['title'], 'stage_2')
+        self.assertEqual(app_data['Design']['DesignDetails']['stages'][0]['status'], 'done')
+        self.assertEqual(app_data['Design']['DesignDetails']['stages'][1]['title'], 'stage_1')
+        self.assertEqual(app_data['Design']['DesignDetails']['stages'][1]['status'], 'done')
+
+    def test_fix_priority_date(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'PriorityDetails': {
+                        'Priority': [
+                            {
+                                'PriorityDate': '2024-01-01'
+                            },
+                            {
+                                'PriorityDate': ''
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        self.assertIn('PriorityDate', app_data['Design']['DesignDetails']['PriorityDetails']['Priority'][0])
+        self.assertNotIn('PriorityDate', app_data['Design']['DesignDetails']['PriorityDetails']['Priority'][1])
+
+    def test_fix_transactions(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RegistrationNumber': '111111'
+                },
+                'Transactions': {
+                    'Transaction': [
+                        {
+                            '@registrationNumber': '22222'
+                        },
+                        {
+                            '@registrationNumber': '111111',
+                            'TransactionBody': {
+                                'PublicationDetails': {
+                                    'Publication': {
+                                        'PublicationDate': '11.07.2024',
+                                        'PublicationNumber': '1',
+                                    }
+                                }
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        for transaction in app_data['Design']['Transactions']['Transaction']:
+            # Нет "чужих" оповещений
+            self.assertEqual(transaction['@registrationNumber'], '111111')
+
+            self.assertEqual(
+                transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate'],
+                '2024-07-11'
+            )
+            self.assertEqual(
+                transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationNumber'],
+                '1'
+            )
+
+    @mock.patch("apps.search.services.application_raw_data_fixers.cead_get_id_doc")
+    def test_fix_id_doc_cead(self, cead_get_id_doc):
+        cead_get_id_doc.return_value = 111
+        app_data = {
+            'Design': {
+                "DocFlow": {
+                    'Documents': [
+                        {
+                            'DocRecord': {
+                                'DocBarCode': '12345',
+                            }
+                        },
+                        {
+                            'DocRecord': {
+                                'DocBarCode': '67890',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+        for doc in app_data['Design']['DocFlow']['Documents']:
             self.assertEqual(doc['DocRecord']['DocIdDocCEAD'], 111)
