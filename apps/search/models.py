@@ -87,6 +87,18 @@ class AppLimited(TimeStampedModel):
             lastupdate=datetime.datetime.now()
         )
 
+    def delete(self, using=None, keep_parents=False):
+        # Сброс ElasticIndexed и LastUpdate в табл. IPCAppList
+        IpcAppList.objects.filter(
+            app_number=self.app_number,
+            obj_type_id=self.obj_type_id
+        ).update(
+            elasticindexed=0,
+            lastupdate=datetime.datetime.now()
+        )
+        
+        super().delete(using=None, keep_parents=False)
+
 
 class ObjType(models.Model):
     """Модель типа объекта ИС."""
