@@ -20,27 +20,29 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
         return 2 if (app.registration_number and app.registration_number != '0') else 1
 
     def _get_app_number(self, data: dict) -> str | None:
-        return data['TradeMark']['TrademarkDetails'].get('ApplicationNumber')
+        return data.get('TradeMark', {}).get('TrademarkDetails', {}).get('ApplicationNumber')
 
-    def _get_app_date(self, app: IpcAppList, data: dict) -> str:
-        if data['TradeMark']['TrademarkDetails'].get('ApplicationDate'):
-            return data['TradeMark']['TrademarkDetails']['ApplicationDate']
+    def _get_app_date(self, app: IpcAppList, data: dict) -> str | None:
+        if data.get('TradeMark', {}).get('TrademarkDetails', {}).get('ApplicationDate'):
+            return data.get('TradeMark', {}).get('TrademarkDetails', {})['ApplicationDate']
         else:
             if app.app_date:
                 return app.app_date.strftime('%Y-%m-%d')
-            else:
+            elif app.app_input_date:
                 return app.app_input_date.strftime('%Y-%m-%d')
+            else:
+                return None
 
     def _get_protective_doc_number(self, data: dict) -> str | None:
-        return data['TradeMark']['TrademarkDetails'].get('RegistrationNumber')
+        return data.get('TradeMark', {}).get('TrademarkDetails', {}).get('RegistrationNumber')
 
     def _get_rights_date(self, data: dict) -> str | None:
-        return data['TradeMark']['TrademarkDetails'].get('RegistrationDate')
+        return data.get('TradeMark', {}).get('TrademarkDetails', {}).get('RegistrationDate')
 
     def _get_applicants(self, data: dict) -> List[dict]:
         res = []
-        if data['TradeMark']['TrademarkDetails'].get('ApplicantDetails'):
-            for applicant in data['TradeMark']['TrademarkDetails']['ApplicantDetails']['Applicant']:
+        if data.get('TradeMark', {}).get('TrademarkDetails', {}).get('ApplicantDetails'):
+            for applicant in data.get('TradeMark', {}).get('TrademarkDetails', {})['ApplicantDetails']['Applicant']:
                 res.append(
                     {
                         'name': applicant['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
@@ -59,8 +61,8 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
 
     def _get_owners(self, data: dict) -> List[dict]:
         res = []
-        if data['TradeMark']['TrademarkDetails'].get('HolderDetails'):
-            for holder in data['TradeMark']['TrademarkDetails']['HolderDetails']['Holder']:
+        if data.get('TradeMark', {}).get('TrademarkDetails', {}).get('HolderDetails'):
+            for holder in data.get('TradeMark', {}).get('TrademarkDetails', {})['HolderDetails']['Holder']:
                 res.append(
                     {
                         'name': holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
@@ -78,7 +80,7 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
         return res
 
     def _get_title(self, data: dict) -> str:
-        if data['TradeMark']['TrademarkDetails'].get('WordMarkSpecification'):
+        if data.get('TradeMark', {}).get('TrademarkDetails', {}).get('WordMarkSpecification'):
             return ', '.join(
                 [x['#text'] for x in data['TradeMark']['TrademarkDetails']['WordMarkSpecification'][
                     'MarkSignificantVerbalElement']]
@@ -88,7 +90,6 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
 
     def _get_registration_status_color(self, data: dict) -> str:
         status = data.get('TradeMark', {}).get('TrademarkDetails', {}).get('registration_status_color')
-
         if not status:
             status = 'green'
 
@@ -111,7 +112,8 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
 
     def _get_agents(self, data) -> List[dict]:
         represents = []
-        for represent in data['TradeMark']['TrademarkDetails'].get('RepresentativeDetails', {}).get('Representative', []):
+        for represent in data.get('TradeMark', {}).get('TrademarkDetails', {}).get(
+                'RepresentativeDetails', {}).get('Representative', []):
             name = represent['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                 'FreeFormatNameDetails']['FreeFormatNameDetails']['FreeFormatNameLine']
             address = represent['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
@@ -120,7 +122,7 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
         return represents
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
-        data = {
+        search_data = {
             'obj_state': self._get_obj_state(app),
             'app_number': self._get_app_number(data),
             'app_date': self._get_app_date(app, data),
@@ -132,7 +134,10 @@ class ApplicationSimpleDataTMCreator(ApplicationSimpleDataCreator):
             'agent': self._get_agents(data)
         }
 
-        return data
+        if search_data['obj_state'] == 2:
+            search_data['registration_status_color'] = self._get_registration_status_color(data)
+
+        return search_data
 
 
 class ApplicationSimpleDataIDCreator(ApplicationSimpleDataCreator):
@@ -226,7 +231,7 @@ class ApplicationSimpleDataIDCreator(ApplicationSimpleDataCreator):
         return inventors
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
-        data = {
+        search_data = {
             'obj_state': self._get_obj_state(app),
             'app_number': self._get_app_number(data),
             'app_date': self._get_app_date(app, data),
@@ -239,10 +244,10 @@ class ApplicationSimpleDataIDCreator(ApplicationSimpleDataCreator):
             'inventor': self._get_inventors(data),
         }
 
-        if data['obj_state'] == 2:
-            data['registration_status_color'] = self._get_registration_status_color(data)
+        if search_data['obj_state'] == 2:
+            search_data['registration_status_color'] = self._get_registration_status_color(data)
 
-        return data
+        return search_data
 
 
 class ApplicationSimpleDataInvUMLDCreator(ApplicationSimpleDataCreator, BiblioDataInvUMLDRawGetMixin):
@@ -446,7 +451,7 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
         return data['Geo']['GeoDetails'].get('Indication')
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
-        data = {
+        search_data = {
             'obj_state': self._get_obj_state(app),
             'app_number': self._get_app_number(data),
             'app_date': self._get_app_date(data),
@@ -459,10 +464,10 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
         }
 
         # Статус охранного документа (цвет)
-        if data['obj_state'] == 2:
-            data['registration_status_color'] = 'green'
+        if search_data['obj_state'] == 2:
+            search_data['registration_status_color'] = 'green'
 
-        return data
+        return search_data
 
 
 class ApplicationSimpleDataCRCreator(ApplicationSimpleDataCreator, BiblioDataCRRawGetMixin):
