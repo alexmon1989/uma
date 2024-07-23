@@ -123,6 +123,8 @@ class ApplicationRawDataCRLimitedFilter(ApplicationRawDataFilter):
                 del biblio_data['RepresentativeDetails']
             if 'Name' in biblio_data and not limited_app.settings_dict.get('Name', True):
                 del biblio_data['Name']
+            if 'NameShort' in biblio_data and not limited_app.settings_dict.get('NameShort', True):
+                del biblio_data['NameShort']
 
 
 class ApplicationRawDataDecisionLimitedFilter(ApplicationRawDataFilter):
@@ -160,9 +162,6 @@ class ApplicationRawDataDecisionLimitedFilter(ApplicationRawDataFilter):
                 del biblio_data['ApplicationNumber']
             if 'AuthorDetails' in biblio_data and not limited_app.settings_dict.get('AuthorDetails', False):
                 del biblio_data['AuthorDetails']
-            if 'CopyrightObjectKindDetails' in biblio_data \
-                    and not limited_app.settings_dict.get('CopyrightObjectKindDetails', False):
-                del biblio_data['CopyrightObjectKindDetails']
             if 'CopyrightObjectKindDetails' in biblio_data \
                     and not limited_app.settings_dict.get('CopyrightObjectKindDetails', False):
                 del biblio_data['CopyrightObjectKindDetails']

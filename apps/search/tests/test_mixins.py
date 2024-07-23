@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin, BiblioDataCRRawGetMixin
 
