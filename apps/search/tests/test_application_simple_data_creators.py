@@ -1,7 +1,9 @@
 from django.test import TestCase
 
 from apps.search.models import IpcAppList
-from apps.search.services.application_simple_data_creators import ApplicationSimpleDataTMCreator
+from apps.search.services.application_simple_data_creators import (ApplicationSimpleDataTMCreator,
+                                                                   ApplicationSimpleDataIDCreator,
+                                                                   ApplicationSimpleDataInvUMLDCreator)
 
 
 class ApplicationSimpleDataTMCreatorTestCase(TestCase):
@@ -31,6 +33,34 @@ class ApplicationSimpleDataTMCreatorTestCase(TestCase):
         }
         res = self.simple_data_creator.get_data(IpcAppList(), app_data)
         self.assertEqual(res['app_number'], 'm202400001')
+
+    def test_get_app_date(self):
+        app_data = {
+            'TradeMark': {
+                'TrademarkDetails': {
+                    'ApplicationDate': '2024-01-01'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+        app_data = {
+            'TradeMark': {
+                'TrademarkDetails': {}
+            }
+        }
+        app = IpcAppList(app_date='2024-01-01', id_shedule_type=1)
+        app.save()
+        app.refresh_from_db()
+        res = self.simple_data_creator.get_data(app, app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+        app = IpcAppList(app_input_date='2024-01-01', id_shedule_type=1)
+        app.save()
+        app.refresh_from_db()
+        res = self.simple_data_creator.get_data(app, app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
 
     def test_get_protective_doc_number(self):
         app_data = {
@@ -240,3 +270,350 @@ class ApplicationSimpleDataTMCreatorTestCase(TestCase):
         }
         res = self.simple_data_creator.get_data(IpcAppList(registration_number='12345'), app_data)
         self.assertEqual(res['registration_status_color'], 'green')
+
+
+class ApplicationSimpleDataIDCreatorTestCase(TestCase):
+    def setUp(self) -> None:
+        self.simple_data_creator = ApplicationSimpleDataIDCreator()
+
+    def test_get_obj_state(self):
+        app = IpcAppList()
+        res = self.simple_data_creator.get_data(app, {})
+        self.assertEqual(res['obj_state'], 1)
+
+        app = IpcAppList(registration_number='0')
+        res = self.simple_data_creator.get_data(app, {})
+        self.assertEqual(res['obj_state'], 1)
+
+        app = IpcAppList(registration_number='123')
+        res = self.simple_data_creator.get_data(app, {})
+        self.assertEqual(res['obj_state'], 2)
+
+    def test_get_app_number(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignApplicationNumber': 's202400001'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['app_number'], 's202400001')
+
+    def test_get_app_date(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignApplicationDate': '2024-01-01'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+        app_data = {
+            'Design': {
+                'DesignDetails': {}
+            }
+        }
+        app = IpcAppList(app_date='2024-01-01', id_shedule_type=1)
+        app.save()
+        app.refresh_from_db()
+        res = self.simple_data_creator.get_data(app, app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+        app = IpcAppList(app_input_date='2024-01-01', id_shedule_type=1)
+        app.save()
+        app.refresh_from_db()
+        res = self.simple_data_creator.get_data(app, app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+    def test_get_protective_doc_number(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RegistrationNumber': '123456'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['protective_doc_number'], '123456')
+
+    def test_get_rights_date(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RecordEffectiveDate': '2024-01-01'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['rights_date'], '2024-01-01')
+
+    def test_get_applicants(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'ApplicantDetails': {
+                        'Applicant': [
+                            {
+                                'ApplicantAddressBook': {
+                                    'FormattedNameAddress': {
+                                        'Name': {
+                                            'FreeFormatName': {
+                                                'FreeFormatNameDetails': {
+                                                    'FreeFormatNameLine': 'Іванов Іван Іванович'
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(
+            res['applicant'],
+            [
+                {'name': 'Іванов Іван Іванович'}
+            ]
+        )
+
+    def test_get_owners(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'HolderDetails': {
+                        'Holder': [
+                            {
+                                'HolderAddressBook': {
+                                    'FormattedNameAddress': {
+                                        'Name': {
+                                            'FreeFormatName': {
+                                                'FreeFormatNameDetails': {
+                                                    'FreeFormatNameLine': 'Іванов Іван Іванович'
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(
+            res['owner'],
+            [
+                {'name': 'Іванов Іван Іванович'},
+            ]
+        )
+
+    def test_get_title(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {}
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['title'], '')
+
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'DesignTitle': 'Test Data'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['title'], 'Test Data')
+
+    def test_get_agents(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RepresentativeDetails': {
+                        'Representative': [
+                            {
+                                'RepresentativeAddressBook': {
+                                    'FormattedNameAddress': {
+                                        'Address': {
+                                            'FreeFormatAddress': {
+                                                'FreeFormatAddressLine': 'Адреса'
+                                            }
+                                        },
+                                        'Name': {
+                                            'FreeFormatName': {
+                                                'FreeFormatNameDetails': {
+                                                    'FreeFormatNameLine': 'Іванов Іван Іванович'
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(
+            res['agent'],
+            [
+                {'name': 'Іванов Іван Іванович, Адреса'},
+            ]
+        )
+
+    def test_get_inventors(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    "DesignerDetails": {
+                        "Designer": [
+                            {
+                                "DesignerAddressBook": {
+                                    "FormattedNameAddress": {
+                                        "Name": {
+                                            "FreeFormatName": {
+                                                "FreeFormatNameDetails": {
+                                                    "FreeFormatNameLine": "Іванов Іван Іванович"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(
+            res['inventor'],
+            [
+                {'name': 'Іванов Іван Іванович'},
+            ]
+        )
+
+    def test_get_registration_status_color(self):
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'registration_status_color': 'green'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(registration_number='12345'), app_data)
+        self.assertEqual(res['registration_status_color'], 'green')
+
+        red_transaction_types = [
+            'Termination',
+            'TerminationByAppeal',
+            'TerminationNoRenewalFee',
+            'TotalInvalidationByAppeal',
+            'TotalInvalidationByCourt',
+            'TotalTerminationByOwner',
+        ]
+        for r_t in red_transaction_types:
+            app_data = {
+                'Design': {
+                    'DesignDetails': {},
+                    "Transactions": {
+                        "Transaction": [
+                            {
+                                "@type": 'Test Data'
+                            },
+                            {
+                                "@type": r_t
+                            }
+                        ]
+                    }
+                }
+            }
+            res = self.simple_data_creator.get_data(IpcAppList(registration_number='12345'), app_data)
+            self.assertEqual(res['registration_status_color'], 'red')
+
+        app_data = {
+            'Design': {
+                'DesignDetails': {},
+                "Transactions": {
+                    "Transaction": [
+                        {
+                            "@type": 'Test Data'
+                        }
+                    ]
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(registration_number='12345'), app_data)
+        self.assertEqual(res['registration_status_color'], 'green')
+
+
+class ApplicationSimpleDataInvUMLDCreatorTestCase(TestCase):
+
+    def setUp(self) -> None:
+        self.simple_data_creator = ApplicationSimpleDataInvUMLDCreator()
+
+    def test_get_obj_state(self):
+        app = IpcAppList()
+        res = self.simple_data_creator.get_data(app, {'Claim': {}})
+        self.assertEqual(res['obj_state'], 1)
+
+        app = IpcAppList(registration_number='0')
+        res = self.simple_data_creator.get_data(app, {'Claim': {}})
+        self.assertEqual(res['obj_state'], 1)
+
+        app = IpcAppList(registration_number='123')
+        res = self.simple_data_creator.get_data(app, {'Patent': {}})
+        self.assertEqual(res['obj_state'], 2)
+
+    def test_get_app_number(self):
+        app_data = {
+            'Claim': {
+                'I_21': 'a202400001'
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['app_number'], 'a202400001')
+
+    def test_get_app_date(self):
+        app_data = {
+            'Claim': {
+                'I_22': '2024-01-01'
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['app_date'], '2024-01-01')
+
+    def test_get_protective_doc_number(self):
+        app_data = {
+            'Patent': {
+                'I_11': '12345'
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['protective_doc_number'], '12345')
+
+    def test_get_rights_date(self):
+        app_data = {
+            'Patent': {
+                'I_24': '2024-01-01'
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['rights_date'], '2024-01-01')
+
+        app_data = {
+            'Patent': {
+                'I_24': '1899-12-30'
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertIsNone(res['rights_date'])
