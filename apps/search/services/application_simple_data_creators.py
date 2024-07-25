@@ -333,16 +333,16 @@ class ApplicationSimpleDataInvCertCreator(ApplicationSimpleDataCreator):
         return 2
 
     def _get_protective_doc_number(self, data: dict) -> int | str:
-        return data['Patent_Certificate'].get('I_11')
+        return data.get('Patent_Certificate', {}).get('I_11')
 
     def _get_owner(self, data: dict) -> List[dict]:
         owners = []
-        for owner in data['Patent_Certificate'].get('I_73', []):
+        for owner in data.get('Patent_Certificate', {}).get('I_73', []):
             owners.append({'name': owner['N.U']})
         return owners
 
     def _get_title(self, data: dict) -> str | None:
-        return data['Patent_Certificate'].get('I_95')
+        return data.get('Patent_Certificate', {}).get('I_95')
 
     def _get_registration_status_color(self, data: dict) -> str:
         try:
@@ -394,14 +394,15 @@ class ApplicationSimpleDataMadridCreator(ApplicationSimpleDataCreator):
         return data.get('IMAGE', {}).get('@TEXT')
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
+        biblio_data = data.get('MadridTradeMark', {}).get('TradeMarkDetails', {})
         return {
             'app_number': self._get_app_number(app),
             'protective_doc_number':  self._get_protective_doc_number(app),
             'obj_state': self._get_obj_state(),
-            'rights_date': self._get_rights_date(data['MadridTradeMark']['TradeMarkDetails']),
-            'owner': self._get_owner(data['MadridTradeMark']['TradeMarkDetails']),
-            'agent': self._get_agent(data['MadridTradeMark']['TradeMarkDetails']),
-            'title': self._get_title(data['MadridTradeMark']['TradeMarkDetails']),
+            'rights_date': self._get_rights_date(biblio_data),
+            'owner': self._get_owner(biblio_data),
+            'agent': self._get_agent(biblio_data),
+            'title': self._get_title(biblio_data),
         }
 
 
@@ -411,20 +412,20 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
         return 2 if (app.registration_number and app.registration_number != '0') else 1
 
     def _get_app_number(self, data: dict) -> str | None:
-        return data['Geo']['GeoDetails'].get('ApplicationNumber')
+        return data.get('Geo', {}).get('GeoDetails', {}).get('ApplicationNumber')
 
     def _get_app_date(self, data: dict) -> str | None:
-        return data['Geo']['GeoDetails'].get('ApplicationDate')
+        return data.get('Geo', {}).get('GeoDetails', {}).get('ApplicationDate')
 
     def _get_protective_doc_number(self, data: dict) -> str | None:
-        return data['Geo']['GeoDetails'].get('RegistrationNumber')
+        return data.get('Geo', {}).get('GeoDetails', {}).get('RegistrationNumber')
 
     def _get_rights_date(self, data: dict) -> str | None:
-        return data['Geo']['GeoDetails'].get('RegistrationDate')
+        return data.get('Geo', {}).get('GeoDetails', {}).get('RegistrationDate')
 
     def _get_applicants(self, data: dict) -> List[dict]:
         applicants = []
-        if data['Geo']['GeoDetails'].get('ApplicantDetails'):
+        if data.get('Geo', {}).get('GeoDetails', {}).get('ApplicantDetails'):
             for item in data['Geo']['GeoDetails']['ApplicantDetails']['Applicant']:
                 applicants.append({
                     'name': item['ApplicantAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
@@ -434,7 +435,7 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
 
     def _get_owners(self, data: dict) -> List[dict]:
         owners = []
-        if data['Geo']['GeoDetails'].get('HolderDetails'):
+        if data.get('Geo', {}).get('GeoDetails', {}).get('HolderDetails'):
             for item in data['Geo']['GeoDetails']['HolderDetails']['Holder']:
                 owners.append({
                     'name': item['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
@@ -444,14 +445,14 @@ class ApplicationSimpleDataGeoCreator(ApplicationSimpleDataCreator):
 
     def _get_agents(self, data: dict) -> List[dict]:
         agents = []
-        if data['Geo']['GeoDetails'].get('RepresentativeDetails'):
+        if data.get('Geo', {}).get('GeoDetails', {}).get('RepresentativeDetails'):
             for item in data['Geo']['GeoDetails']['RepresentativeDetails']['Representative']:
                 agents.append({'name': item['RepresentativeAddressBook']['FormattedNameAddress']['Name'][
                     'FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']})
         return agents
 
     def _get_title(self, data: dict) -> str | None:
-        return data['Geo']['GeoDetails'].get('Indication')
+        return data.get('Geo', {}).get('GeoDetails', {}).get('Indication')
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
         search_data = {
@@ -502,7 +503,7 @@ class ApplicationSimpleDataCRCreator(ApplicationSimpleDataCreator, BiblioDataCRR
         return biblio_data.get('Name')
 
     def get_registration_status_color(self, data: dict) -> str:
-        return 'red' if data['Document']['RegistrationStatus'] == 'Реєстрація недійсна' else 'green'
+        return 'red' if data.get('Document', {}).get('RegistrationStatus') == 'Реєстрація недійсна' else 'green'
 
     def get_data(self, app: IpcAppList, data: dict) -> dict:
         biblio_data = self.get_biblio_data(data)
