@@ -49,7 +49,7 @@ class ApplicationIndexationIDValidator(ApplicationIndexationValidator):
     def _validate_transaction_date(self) -> None:
         today = datetime.datetime.now()
 
-        transactions = self._app_data.get('Transactions', {}).get('Transaction', [])
+        transactions = self._app_data.get('Design', {}).get('Transactions', {}).get('Transaction', [])
         for item in transactions:
             if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
                 raise ValueError("Publication date cannot be in future time")
