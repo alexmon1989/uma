@@ -46,7 +46,6 @@ class ApplicationESWriter(ApplicationWriter):
         self.es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
 
     def _write_es(self) -> bool:
-        """Записывает данные в ES."""
         try:
             self.es.index(
                 index=settings.ELASTIC_INDEX_NAME,
@@ -152,15 +151,15 @@ class ApplicationESInvUMLDWriter(ApplicationESWriter, BiblioDataInvUMLDRawGetMix
 
             documents = AppDocuments.objects.filter(app=self._app)
 
-            if 'AB' in biblio_data and not limited_app.settings_dict.get('AB', False):
+            if not limited_app.settings_dict.get('AB', False):
                 for doc in documents:
                     if doc.enter_num == 100 and os.path.exists(doc.real_file_path):
                         os.remove(doc.real_file_path)
-            if 'CL' in biblio_data and not limited_app.settings_dict.get('CL', False):
+            if not limited_app.settings_dict.get('CL', False):
                 for doc in documents:
                     if doc.enter_num == 98 and doc.file_type == 'pdf' and os.path.exists(doc.real_file_path):
                         os.remove(doc.real_file_path)
-            if 'DE' in biblio_data and not limited_app.settings_dict.get('DE', False):
+            if not limited_app.settings_dict.get('DE', False):
                 for doc in documents:
                     if doc.enter_num in (99, 101) and os.path.exists(doc.real_file_path):
                         os.remove(doc.real_file_path)
