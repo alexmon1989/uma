@@ -61,28 +61,26 @@ class ApplicationRawDataFSReceiver(ApplicationRawDataReceiver):
     def _read_data_from_file(self) -> dict:
         """Читает и возвращает данные из файла."""
         data = {}
+        encodings = ['utf-8', 'utf-8-sig', 'utf-16']
+        error = None
 
-        # Чтение содержимого JSON в data
-        try:
-            f = open(self._file_path, 'r', encoding='utf16')
+        for encoding in encodings:
             try:
-                file_content = str.encode(f.read())
-                file_content = file_content.replace(b'\xef\xbb\xbf', b'')
-                data = json.loads(file_content)
+                with open(self._file_path, 'r', encoding=encoding) as f:
+                    file_content = f.read().encode()
+                    file_content = file_content.replace(b'\xef\xbb\xbf', b'')
+                    data = json.loads(file_content)
+                    break  # Если успешно прочитали и распарсили, выходим из цикла
+            except (UnicodeDecodeError, UnicodeError) as e:
+                error = f"Unicode error with encoding {encoding}: {e}: {self._file_path}"
             except json.decoder.JSONDecodeError as e:
-                logger.error(f"JSONDecodeError: {e}: {self._file_path}")
-        except (UnicodeDecodeError, UnicodeError):
-            try:
-                f = open(self._file_path, 'r', encoding='utf-8')
-                data = json.loads(f.read())
-            except json.decoder.JSONDecodeError as e:
-                try:
-                    f = open(self._file_path, 'r', encoding='utf-8-sig')
-                    data = json.loads(f.read())
-                except json.decoder.JSONDecodeError as e:
-                    logger.error(f"JSONDecodeError: {e}: {self._file_path}")
-        except FileNotFoundError as e:
-            logger.error(f"JSONDecodeError: {e}")
+                error = f"JSONDecodeError with encoding {encoding}: {e}: {self._file_path}"
+            except FileNotFoundError as e:
+                error = f"FileNotFoundError: {e}"
+                break  # Если файл не найден, нет смысла продолжать
+
+        if not data and error:
+            logger.error(error)
 
         return data
 
