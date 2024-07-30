@@ -70,7 +70,7 @@ class ApplicationRawDataFSReceiver(ApplicationRawDataReceiver):
                 file_content = file_content.replace(b'\xef\xbb\xbf', b'')
                 data = json.loads(file_content)
             except json.decoder.JSONDecodeError as e:
-                logger.error(f"JSONDecodeError: {e}")
+                logger.error(f"JSONDecodeError: {e}: {self._file_path}")
         except (UnicodeDecodeError, UnicodeError):
             try:
                 f = open(self._file_path, 'r', encoding='utf-8')
@@ -80,7 +80,7 @@ class ApplicationRawDataFSReceiver(ApplicationRawDataReceiver):
                     f = open(self._file_path, 'r', encoding='utf-8-sig')
                     data = json.loads(f.read())
                 except json.decoder.JSONDecodeError as e:
-                    logger.error(f"JSONDecodeError: {e}")
+                    logger.error(f"JSONDecodeError: {e}: {self._file_path}")
         except FileNotFoundError as e:
             logger.error(f"JSONDecodeError: {e}")
 

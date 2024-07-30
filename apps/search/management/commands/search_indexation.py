@@ -50,7 +50,9 @@ class Command(BaseCommand):
             ]
         )
 
-        self.stdout.write(self.style.SUCCESS('The list of documents has been successfully received.'))
+        self.stdout.write(self.style.SUCCESS(
+            f'The list of documents has been successfully received ({apps.count()} items).'
+        ))
 
         # Создание процесса индексации в БД
         self.indexation_process = IndexationProcess.objects.create(
