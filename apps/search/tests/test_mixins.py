@@ -19,6 +19,8 @@ class BiblioDataInvUMLDRawGetMixinTestCase(TestCase):
             }
         }
         self.assertEqual(mixin.get_biblio_data(app_data), {'Test': 'Data'})
+        app_data = {'Test': 'Data'}
+        self.assertEqual(mixin.get_biblio_data(app_data), {})
 
 
 class BiblioDataCRRawGetMixinTestCase(TestCase):
@@ -41,3 +43,5 @@ class BiblioDataCRRawGetMixinTestCase(TestCase):
             }
         }
         self.assertEqual(mixin.get_biblio_data(app_data), {'Test': 'Data'})
+        app_data = {'Test': 'Data'}
+        self.assertEqual(mixin.get_biblio_data(app_data), {})
