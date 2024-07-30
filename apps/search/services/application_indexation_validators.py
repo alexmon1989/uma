@@ -22,8 +22,8 @@ class ApplicationIndexationTMValidator(ApplicationIndexationValidator):
         publication = self._app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('PublicationDetails', [])
         for item in publication:
             if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
-                raise ValueError(f"Publication date cannot be in future time ("
-                                 f"{self._app_data['TradeMark']['TrademarkDetails']['ApplicationNumber']})")
+                raise ValueError(f"Publication date cannot be in future time "
+                                 f"{self._app_data['TradeMark']['TrademarkDetails']['ApplicationNumber']}")
 
     def _validate_transaction_date(self) -> None:
         today = datetime.datetime.now()

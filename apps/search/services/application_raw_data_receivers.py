@@ -171,19 +171,23 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
     def get_data(self) -> dict:
         data_from_file = super().get_data()
 
-        data = {
-            'Document': {
-                'idObjType': self._app.obj_type_id,
-                'filesPath': self._app.files_path
-            },
-            'MadridTradeMark': {
-                'TradeMarkDetails': data_from_file
+        if data_from_file:
+
+            data = {
+                'Document': {
+                    'idObjType': self._app.obj_type_id,
+                    'filesPath': self._app.files_path
+                },
+                'MadridTradeMark': {
+                    'TradeMarkDetails': data_from_file
+                }
             }
-        }
 
-        self._set_441(data)
+            self._set_441(data)
 
-        return data
+            return data
+
+        return data_from_file
 
 
 class ApplicationRawDataFSMadrid9Receiver(ApplicationRawDataFSMadridReceiver):
@@ -195,18 +199,19 @@ class ApplicationRawDataFSMadrid9Receiver(ApplicationRawDataFSMadridReceiver):
         то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
         и взять у неё 450 код."
         """
-        es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-        q = Q(
-            'bool',
-            must=[
-                Q('match', Document__idObjType=14),
-                Q('match', search_data__protective_doc_number=self._app.registration_number),
-            ],
-        )
-        s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
-        if s:
-            hit = s[0].to_dict()
-            data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
+        if data:
+            es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
+            q = Q(
+                'bool',
+                must=[
+                    Q('match', Document__idObjType=14),
+                    Q('match', search_data__protective_doc_number=self._app.registration_number),
+                ],
+            )
+            s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
+            if s:
+                hit = s[0].to_dict()
+                data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
 
     def get_data(self) -> dict:
         data = super().get_data()
