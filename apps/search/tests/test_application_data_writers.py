@@ -42,6 +42,11 @@ class ApplicationESWriterTestCase(TestCase):
         app.refresh_from_db()
         self.assertEqual(app.last_indexation_date, now)
         self.assertTrue(app.elasticindexed)
+        self.assertEqual(app.is_limited, 0)
+
+        writer = ApplicationESWriter(app, {'Document': {'is_limited': True}})
+        writer.write()
+        self.assertEqual(app.is_limited, 1)
 
 
 class ApplicationESTMWriterTestCase(TestCase):
