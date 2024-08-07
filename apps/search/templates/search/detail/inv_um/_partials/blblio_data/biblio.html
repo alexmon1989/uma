@@ -232,7 +232,7 @@
                     {% if ipc_field.enable_view and i_62|get:"I_62.D" %}
                         <tr>
                             <th>{{ ipc_field.code_title }}</th>
-                            <td>{{ i_62|get:"I_62.D" }}</td>
+                            <td>{{ i_62|get:"I_62.D"|parse_date|date:"d.m.Y" }}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
