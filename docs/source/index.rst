@@ -14,8 +14,18 @@ documentation for details.
 .. toctree::
    common_info
    functional_purpose
-   components/index
    architecture/index
-   manuals/index
    :maxdepth: 3
-   :caption: Contents:
+   :caption: Документація:
+
+
+.. toctree::
+   components/search_indexation
+   :maxdepth: 3
+   :caption: Компоненти:
+
+.. toctree::
+   search_indexation
+   settings
+   :maxdepth: 3
+   :caption: Інструкції та налаштування:
