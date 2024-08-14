@@ -11,20 +11,34 @@
     </div>
 
     <div class="row">
-        <div class="col-md-5 form-group g-mb-10 {% if filter_form.reg_num.errors %}has-danger{% endif %}">
+        <div class="col-md-6 form-group g-mb-10 {% if filter_form.reg_num.errors %}has-danger{% endif %}">
             <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Реєстраційний номер" %}:</label>
             <input class="form-control g-brd-primary--focus rounded-3 g-pa-8 {% if filter_form.reg_num.errors %}form-control-danger{% endif %}"
                    type="text" name="reg_num" value="{{ request.GET.reg_num }}">
         </div>
 
-        <div class="col-md-5 form-group g-mb-10">
+        <div class="col-md-6 form-group g-mb-10">
             <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "ПІБ" %}:</label>
             <input class="form-control g-bg-white g-bg-white--focus g-brd-gray-light-v1 g-brd-primary--focus rounded-3 g-pa-8"
                    type="text" name="name" value="{{ request.GET.name }}">
         </div>
 
-        <div class="col-md-2 d-flex align-items-end g-mb-10">
-            <button class="btn u-btn-primary rounded-3 g-py-6 g-px-16" type="submit" role="button">{% trans "Фільтрувати" %}</button>
+        <div class="col-md-6 form-group g-mb-10">
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Спеціалізації діяльності" %}:</label>
+            <input class="form-control g-bg-white g-bg-white--focus g-brd-gray-light-v1 g-brd-primary--focus rounded-3 g-pa-8"
+                   type="text" name="special" value="{{ request.GET.special }}">
+        </div>
+
+        <div class="col-md-6 form-group g-mb-10">
+            <label class="g-color-gray-dark-v2 g-font-size-13">{% trans "Адреса для листування" %}:</label>
+            <input class="form-control g-bg-white g-bg-white--focus g-brd-gray-light-v1 g-brd-primary--focus rounded-3 g-pa-8"
+                   type="text" name="postal_address" value="{{ request.GET.postal_address }}">
+        </div>
+
+        <div class="col-md-12 d-flex justify-content-end g-my-10">
+            <button class="btn u-btn-primary rounded-3 g-py-6 g-px-16" type="submit" role="button">
+                <i class="fa fa-search g-mr-5"></i>{% trans "Фільтрувати" %}
+            </button>
         </div>
     </div>
 

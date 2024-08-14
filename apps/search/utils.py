@@ -335,8 +335,8 @@ def extend_doc_flow(hit):
 
         try:
             # Объединение документов
-            documents = application['DOCFLOW']['DOCUMENTS']
-            documents.extend(hit['DOCFLOW']['DOCUMENTS'])
+            documents = application['DOCFLOW'].get('DOCUMENTS', [])
+            documents.extend(hit['DOCFLOW'].get('DOCUMENTS', []))
             hit['DOCFLOW']['DOCUMENTS'] = documents
         except (AttributeError, KeyError):
             pass

@@ -21,6 +21,7 @@ import '../vendor/popper.min.js';
 import '../vendor/bootstrap/bootstrap.min.js';
 import '../vendor/chosen/chosen.jquery.js';
 import '../vendor/fancybox/jquery.fancybox.min.js';
+import '../vendor/jqDoubleScroll/jquery.doubleScroll.js';
 
 import '../vendor/hs-megamenu/src/hs.megamenu.js';
 import '../js/hs.core.js';
@@ -43,6 +44,8 @@ $(document).on('ready', function () {
 
     // initialization of popovers
     $('[data-toggle="popover"]').popover();
+
+    $('.double-scroll').doubleScroll();
 });
 
 $(window).on('load', function () {

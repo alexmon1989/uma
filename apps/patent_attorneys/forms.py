@@ -27,3 +27,5 @@ class SortPaginationForm(forms.Form):
 class FilterForm(forms.Form):
     name = forms.CharField(required=False, max_length=255, label='ПІБ')
     reg_num = forms.IntegerField(required=False, label='Реєстраційний номер')
+    special = forms.CharField(required=False, max_length=255, label='Спеціалізації діяльності')
+    postal_address = forms.CharField(required=False, max_length=255, label='Адреса для листування')
