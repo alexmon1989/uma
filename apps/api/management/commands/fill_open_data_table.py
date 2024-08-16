@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.core.mail import mail_admins
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from apps.search.models import IpcAppList
@@ -151,9 +150,4 @@ class Command(BaseCommand):
 
                 updated_count += 1
 
-        mail_admins(
-            "API SIS",
-            f"API updated. Total count: {updated_count}",
-        )
-
-        self.stdout.write(self.style.SUCCESS(f'Finished'))
+        self.stdout.write(self.style.SUCCESS(f"API updated. Total count: {updated_count}"))

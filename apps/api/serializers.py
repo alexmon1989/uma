@@ -8,7 +8,6 @@ import json
 
 
 class OpenDataSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True, source="app_id")
     obj_type = serializers.CharField(read_only=True, source="obj_type__obj_type_ua")
 
     def to_representation(self, instance):
@@ -49,7 +48,6 @@ class OpenDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = OpenData
         fields = (
-            'id',
             'obj_type',
             'obj_type_id',
             'app_number',
@@ -74,7 +72,6 @@ class OpenDataSerializerV1(OpenDataSerializer):
     class Meta:
         model = OpenData
         fields = (
-            'id',
             'obj_type',
             'obj_type_id',
             'obj_state',
@@ -91,7 +88,6 @@ class OpenDataSerializerV1(OpenDataSerializer):
 
 
 class OpenDataSerializerNacpV1(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True, source="app_id")
     obj_type = serializers.CharField(read_only=True, source="obj_type__obj_type_ua")
 
     def to_representation(self, instance):
@@ -108,7 +104,6 @@ class OpenDataSerializerNacpV1(serializers.ModelSerializer):
     class Meta:
         model = OpenData
         fields = (
-            'id',
             'obj_type',
             'obj_type_id',
             'obj_state',

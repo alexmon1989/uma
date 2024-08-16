@@ -376,7 +376,7 @@ def opendata_get_ids_queryset(filters: dict) -> QuerySet[OpenData]:
 
 def opendata_get_applications(ids: List[int]) -> List[dict]:
     """Возвращает список данных заявок по их идентификаторам."""
-    apps = OpenData.objects.select_related('obj_type').prefetch_related(
+    apps = OpenData.objects.select_related('app').select_related('obj_type').prefetch_related(
         Prefetch(
             'app__appdocuments_set',
             queryset=AppDocuments.objects.filter(file_type='pdf', app__is_limited=False),
