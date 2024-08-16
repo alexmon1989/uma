@@ -1,51 +1,55 @@
 {% load i18n %}
 
 <div class="table-responsive double-scroll">
-    <table class="table table-sm table-bordered table-striped g-font-size-13 g-mb-0">
-        <thead>
-        <tr>
-            <th class="g-min-width-170">Реєстраційний номер / номер свідоцтва</th>
-            <th class="g-min-width-200">Дата реєстрації патентного повіреного в Реєстрі</th>
-            <th class="g-min-width-200">Прізвище, ім’я, по батькові (за наявності) патентного повіреного</th>
-            <th>Стать</th>
-            <th class="g-min-width-170">Дата та номер рішення Атестаційної комісії</th>
-            <th class="g-min-width-200">Спеціалізація діяльності патентного повіреного</th>
-            <th class="g-min-width-200">Адреса для листування, номер телефону, адреса електронної пошти</th>
-            <th class="g-min-width-200">Місце роботи та посада (за наявності)</th>
-            <th class="g-min-width-200">Участь у громадських організаціях патентних повірених (за наявності)</th>
-            <th class="g-min-width-200">
-                Зупинення, поновлення та припинення права на зайняття діяльністю патентного повіреного
-            </th>
-            <th class="g-min-width-220">
-                Застосування до патентного повіреного заходу у вигляді персональних спеціальних економічних та інших обмежувальних заходів (санкцій)
-            </th>
-            <th class="g-min-width-150">Підвищення рівня професійної компетентності</th>
-            <th class="g-min-width-150">Дата актуалізації відомостей</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        {% for item in object_list %}
+    {% if object_list %}
+        <table class="table table-sm table-bordered table-striped g-font-size-13 g-mb-0">
+            <thead>
             <tr>
-                <td>{{ item.reg_num }}</td>
-                <td>{{ item.dat_reg|date:"SHORT_DATE_FORMAT" }}</td>
-                <td>{{ item.prizv }} {{ item.name }} {{ item.po_batk }}</td>
-                <td>{% if item.sex == 0 %}Ж{% else %}Ч{% endif %}</td>
-                <td class="text-nowrap">{{ item.dat_at_kom|date:"SHORT_DATE_FORMAT" }}, №{{ item.num_at_kom }}</td>
-                <td>{{ item.special }}</td>
-                <td>
-                    {{ item.postaladdress }}
-                    {% if item.phones %}<br>{{ item.phones }}{% endif %}
-                    {% if item.e_mail %}<br>{{ item.e_mail }}{% endif %}
-                </td>
-                <td>{{ item.mis_rob|linebreaksbr }}</td>
-                <td>{{ item.public_orgs|linebreaksbr }}</td>
-                <td>{{ item.event_list|linebreaksbr }}</td>
-                <td>{{ item.sanctions_list|linebreaksbr }}</td>
-                <td>{{ item.competence_list|linebreaksbr }}</td>
-                <td>{{ item.last_update|date:"SHORT_DATE_FORMAT" }}</td>
+                <th class="g-min-width-170">Реєстраційний номер / номер свідоцтва</th>
+                <th class="g-min-width-200">Дата реєстрації патентного повіреного в Реєстрі</th>
+                <th class="g-min-width-200">Прізвище, ім’я, по батькові (за наявності) патентного повіреного</th>
+                <th>Стать</th>
+                <th class="g-min-width-170">Дата та номер рішення Атестаційної комісії</th>
+                <th class="g-min-width-200">Спеціалізація діяльності патентного повіреного</th>
+                <th class="g-min-width-200">Адреса для листування, номер телефону, адреса електронної пошти</th>
+                <th class="g-min-width-200">Місце роботи та посада (за наявності)</th>
+                <th class="g-min-width-200">Участь у громадських організаціях патентних повірених (за наявності)</th>
+                <th class="g-min-width-200">
+                    Зупинення, поновлення та припинення права на зайняття діяльністю патентного повіреного
+                </th>
+                <th class="g-min-width-220">
+                    Застосування до патентного повіреного заходу у вигляді персональних спеціальних економічних та інших обмежувальних заходів (санкцій)
+                </th>
+                <th class="g-min-width-150">Підвищення рівня професійної компетентності</th>
+                <th class="g-min-width-150">Дата актуалізації відомостей</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+            {% for item in object_list %}
+                <tr>
+                    <td>{{ item.reg_num }}</td>
+                    <td>{{ item.dat_reg|date:"SHORT_DATE_FORMAT" }}</td>
+                    <td>{{ item.prizv }} {{ item.name }} {{ item.po_batk }}</td>
+                    <td>{% if item.sex == 0 %}Ж{% else %}Ч{% endif %}</td>
+                    <td class="text-nowrap">{{ item.dat_at_kom|date:"SHORT_DATE_FORMAT" }}, №{{ item.num_at_kom }}</td>
+                    <td>{{ item.special }}</td>
+                    <td>
+                        {{ item.postaladdress }}
+                        {% if item.phones %}<br>{{ item.phones }}{% endif %}
+                        {% if item.e_mail %}<br>{{ item.e_mail }}{% endif %}
+                    </td>
+                    <td>{{ item.mis_rob|linebreaksbr }}</td>
+                    <td>{{ item.public_orgs|linebreaksbr }}</td>
+                    <td>{{ item.event_list|linebreaksbr }}</td>
+                    <td>{{ item.sanctions_list|linebreaksbr }}</td>
+                    <td>{{ item.competence_list|linebreaksbr }}</td>
+                    <td>{{ item.last_update|date:"SHORT_DATE_FORMAT" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {% trans "Патентні повірені відсутні." %}
+    {% endif %}
 </div>
