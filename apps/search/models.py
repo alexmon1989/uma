@@ -31,6 +31,7 @@ class IpcAppList(models.Model):
     publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
     is_limited = models.BooleanField(db_column='is_limited', default=False)
     users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
+    open_data_updated = models.IntegerField(db_column='open_data_updated', blank=True, null=True)
 
     class Meta:
         managed = False

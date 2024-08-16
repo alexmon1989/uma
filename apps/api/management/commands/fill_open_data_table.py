@@ -21,9 +21,9 @@ class Command(BaseCommand):
             help='Index only one record with certain idAPPNumber from table IPC_AppLIST'
         )
         parser.add_argument(
-            '--not_compare_last_update',
+            '--ignore_updated',
             type=bool,
-            help='Do not compare last update field for determining app list for adding to API table'
+            help='Ignore if object has been already updated.'
         )
         parser.add_argument(
             '--obj_type_ids',
@@ -68,21 +68,19 @@ class Command(BaseCommand):
 
         # Объекты для добавления в API
         apps = api_services.app_get_api_list(options)
+        c = apps.count()
+
+        self.stdout.write(f"Received: {c}")
 
         if options['verbose']:
-            c = len(apps)
             i = 0
 
         # Добавление/обновление данных
         updated_count = 0
-        for d in apps:
+        for app in apps:
             if options['verbose']:
                 i += 1
-                self.stdout.write(self.style.SUCCESS(f"{i}/{c} - {d[0]}"))
-
-            app = IpcAppList.objects.filter(id=d[0], elasticindexed=1).first()
-            if not app:
-                continue
+                self.stdout.write(self.style.SUCCESS(f"{i}/{c} - {app.pk}"))
 
             # Получение данных с ElasticSearch
             data = Search(
@@ -90,7 +88,7 @@ class Command(BaseCommand):
                 index=settings.ELASTIC_INDEX_NAME
             ).query(
                 "match",
-                _id=d[0]
+                _id=app.pk
             ).source(
                 excludes=["*.DocBarCode", "*.DOCBARCODE"]
             ).execute()
@@ -104,9 +102,9 @@ class Command(BaseCommand):
                 data_payments = api_services.app_get_payments(data)
 
                 # Сохраннение данных
-                open_data_record, created = OpenData.objects.get_or_create(app_id=d[0])
+                open_data_record, created = OpenData.objects.get_or_create(app_id=app.pk)
                 open_data_record.obj_type_id = app.obj_type_id
-                open_data_record.last_update = app.lastupdate
+                open_data_record.last_update = datetime.now()
                 open_data_record.app_number = app.app_number
                 open_data_record.app_date = self.get_app_date(app, data)
                 open_data_record.files_path = app.files_path
@@ -148,6 +146,9 @@ class Command(BaseCommand):
                             person_name=person_name
                         )
 
+                app.open_data_updated = 1
+                app.save()
+
                 updated_count += 1
 
-        self.stdout.write(self.style.SUCCESS(f"API updated. Total count: {updated_count}"))
+        self.stdout.write(f"Updated: {updated_count}")

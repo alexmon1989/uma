@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 import json
 
 
-def app_get_api_list(options: dict) -> List:
+def app_get_api_list(options: dict) -> QuerySet[IpcAppList]:
     """Возвращает список объектов для добавления в API"""
     apps = IpcAppList.objects.filter(
         elasticindexed=1
@@ -24,28 +24,23 @@ def app_get_api_list(options: dict) -> List:
         obj_type_id__in=(9, 14)
     ).annotate(
         app_id=F('id'), last_update=F('lastupdate')
-    ).values_list('app_id', 'last_update')
-
-    # Объекты в API
-    api_apps = OpenData.objects.values_list('app_id', 'last_update')
+    )
 
     # Фильтр по параметру id (если в API нужно добавить только определённую заявку)
     if options['id']:
         apps = apps.filter(id=options['id'])
-        api_apps = api_apps.filter(app_id=options['id'])
 
     # Фильтр по типу объекта
     if options['obj_type_ids']:
         apps = apps.filter(obj_type_id__in=options['obj_type_ids'])
-        api_apps = api_apps.filter(obj_type_id__in=options['obj_type_ids'])
 
-    # Объекты, которых нет в API (или которые имеют другое значение поля last_update)
-    if options['not_compare_last_update']:
-        diff = apps
-    else:
-        diff = list(set(apps) - set(api_apps))
+    # Не учитывать что объект уже обновлён в БД
+    if not options['ignore_updated']:
+        apps = apps.filter(
+            open_data_updated=0
+        )
 
-    return diff
+    return apps
 
 
 def app_get_claim_from_es(app_number: str) -> dict:

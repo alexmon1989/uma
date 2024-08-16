@@ -24,7 +24,8 @@ class ApplicationESWriterTestCase(TestCase):
         app = IpcAppList.objects.create(
             last_indexation_date=None,
             elasticindexed=0,
-            id_shedule_type=1
+            id_shedule_type=1,
+            open_data_updated=1
         )
 
         mock_write_es.return_value = False
@@ -43,6 +44,7 @@ class ApplicationESWriterTestCase(TestCase):
         self.assertEqual(app.last_indexation_date, now)
         self.assertTrue(app.elasticindexed)
         self.assertEqual(app.is_limited, 0)
+        self.assertEqual(app.open_data_updated, 0)
 
         writer = ApplicationESWriter(app, {'Document': {'is_limited': True}})
         writer.write()

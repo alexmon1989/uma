@@ -66,6 +66,7 @@ class ApplicationESWriter(ApplicationWriter):
         """Обновляет данные в БД."""
         self._app.last_indexation_date = datetime.datetime.now()
         self._app.elasticindexed = 1
+        self._app.open_data_updated = 0
         self._app.is_limited = self._app_data.get('Document', {}).get('is_limited', 0)
         self._app.save()
 
