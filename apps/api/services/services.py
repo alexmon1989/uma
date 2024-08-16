@@ -22,8 +22,6 @@ def app_get_api_list(options: dict) -> QuerySet[IpcAppList]:
         elasticindexed=1
     ).exclude(
         obj_type_id__in=(9, 14)
-    ).annotate(
-        app_id=F('id'), last_update=F('lastupdate')
     )
 
     # Фильтр по параметру id (если в API нужно добавить только определённую заявку)
