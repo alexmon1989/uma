@@ -417,6 +417,17 @@ files = [
 Django = ">=2.2"
 
 [[package]]
+name = "django-custom-logging"
+version = "0.2.1"
+description = "Django middleware for custom format logging"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "django_custom_logging-0.2.1-py3-none-any.whl", hash = "sha256:95ebac5b5ee4fb5c392baa09657aa1e644857d9a2643f23c6d1af900da681a1f"},
+    {file = "django_custom_logging-0.2.1.tar.gz", hash = "sha256:1e4064f2a31c434893e503904ce1c86c3db0bd63a000eff9ab0fb24a3a8861d2"},
+]
+
+[[package]]
 name = "django-debug-toolbar"
 version = "3.2.4"
 description = "A configurable set of panels that display various debug information about the current request/response."
@@ -1677,4 +1688,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "2e244e87c8050e75074c384c18089ac8b0d4add60953f4a89707c15fb446fe28"
+content-hash = "44a4eeeefc8e6a7537f8547a7dbaf589794eecad137e2f0cc3692bba92ad02bb"
