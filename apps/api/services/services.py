@@ -774,4 +774,8 @@ class DocumentsDataPresenterTmId(DocumentsDataPresenter):
         for doc in self._documents_data:
             if not doc['DocRecord'].get('DocIdDocCEAD'):
                 doc['DocRecord']['DocIdDocCEAD'] = None
+            if 'ReturnPostReason' in doc['DocRecord']:
+                del doc['DocRecord']['ReturnPostReason']
+            if 'ReturnAt' in doc['DocRecord']:
+                del doc['DocRecord']['ReturnAt']
         return self._documents_data
