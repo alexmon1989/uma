@@ -70,7 +70,4 @@ class Command(BaseCommand):
         self.indexation_process.documents_in_index = application_get_indexed_count()
         self.indexation_process.save()
 
-        # Заполнение поля NotificationDate в таблице IPC_AppList
-        application_fill_notification_date()
-
         self.stdout.write(self.style.SUCCESS('Finished'))

@@ -202,6 +202,41 @@ class ApplicationESInvUMLDWriterTestCase(TestCase):
         self.assertFalse(os.path.exists('/tmp/a202400001/DE2.pdf'))
         self.assertTrue(os.path.exists('/tmp/a202400001/a202400001.json'))
 
+    @mock.patch("apps.search.services.application_data_writers.ApplicationESWriter._write_es")
+    def test_update_notification_date(self, mock_write_es):
+        app = IpcAppList.objects.create(
+            files_path='/tmp/a202400001/',
+            registration_date='2024-01-01',
+            id_shedule_type=1
+        )
+        app.refresh_from_db()
+        app_data = {
+            'Document': {}
+        }
+        writer = ApplicationESInvUMLDWriter(app, app_data)
+        writer.write()
+        app.refresh_from_db()
+        self.assertIsNone(app.notification_date)
+
+        app_data = {
+            'Document': {},
+            "TRANSACTIONS": {
+                "TRANSACTION": [
+                    {
+                        "BULLETIN_DATE": "2024-01-01"
+                    },
+                    {
+                        "BULLETIN_DATE": "2024-02-02"
+                    },
+                    {},
+                ]
+            },
+        }
+        writer = ApplicationESInvUMLDWriter(app, app_data)
+        writer.write()
+        app.refresh_from_db()
+        self.assertEqual(app.notification_date.strftime('%Y-%m-%d'), '2024-02-02')
+
 
 class ApplicationESMadridWriterTestCase(TestCase):
 
