@@ -31,7 +31,7 @@
                     <td>{{ item.reg_num }}</td>
                     <td>{{ item.dat_reg|date:"SHORT_DATE_FORMAT" }}</td>
                     <td>{{ item.prizv }} {{ item.name }} {{ item.po_batk }}</td>
-                    <td>{% if item.sex == 0 %}Ж{% else %}Ч{% endif %}</td>
+                    <td>{% if item.sex == 0 %}Ж{% elif item.sex == 1 %}Ч{% endif %}</td>
                     <td class="text-nowrap">{{ item.dat_at_kom|date:"SHORT_DATE_FORMAT" }}, №{{ item.num_at_kom }}</td>
                     <td>{{ item.special }}</td>
                     <td>
