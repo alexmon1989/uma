@@ -13,6 +13,7 @@ class PatentAttorneyListViewTestCase(TestCase):
         self.assertQuerysetEqual(response.context['object_list'], [])
 
     def test_table_contains_records(self):
+        PatentAttorneyExt.objects.all().delete()
         PatentAttorneyExt.objects.create(
             prizv='Test_prizv',
             name='Test_name',
@@ -23,6 +24,41 @@ class PatentAttorneyListViewTestCase(TestCase):
         self.assertContains(response, 'Test_prizv')
         self.assertContains(response, 'Test_name')
         self.assertContains(response, 'Test_po_batk')
+
+    def test_gender(self):
+        PatentAttorneyExt.objects.all().delete()
+        PatentAttorneyExt.objects.create(
+            prizv='Test_prizv',
+            name='Test_name',
+            po_batk='Test_po_batk',
+            sex=0
+        )
+        response = self.client.get(reverse('patent_attorneys:list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<td>Ж</td>')
+
+        PatentAttorneyExt.objects.all().delete()
+        PatentAttorneyExt.objects.create(
+            prizv='Test_prizv',
+            name='Test_name',
+            po_batk='Test_po_batk',
+            sex=1
+        )
+        response = self.client.get(reverse('patent_attorneys:list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<td>Ч</td>')
+
+        # Якщо стать не вказана
+        PatentAttorneyExt.objects.all().delete()
+        PatentAttorneyExt.objects.create(
+            prizv='Test_prizv',
+            name='Test_name',
+            po_batk='Test_po_batk',
+        )
+        response = self.client.get(reverse('patent_attorneys:list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, '<td>Ч</td>')
+        self.assertNotContains(response, '<td>Ж</td>')
 
     def test_pagination(self):
         PatentAttorneyExt.objects.all().delete()
