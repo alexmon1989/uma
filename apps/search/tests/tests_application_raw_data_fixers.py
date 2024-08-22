@@ -514,6 +514,11 @@ class TestApplicationIDRawDataFixerFSTestCase(TestCase):
                                         'PublicationDate': '11.07.2024',
                                         'PublicationNumber': '1',
                                     }
+                                },
+                                'DesignerDetails': {
+                                    'Designer': [
+                                        {'DesignerAddressBook': {}}
+                                    ]
                                 }
                             }
                         },
@@ -534,6 +539,9 @@ class TestApplicationIDRawDataFixerFSTestCase(TestCase):
                 transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationNumber'],
                 '1'
             )
+
+            # DesignerDetails.Designer у сповіщеннях має бути словником
+            self.assertIsInstance(transaction['TransactionBody']['DesignerDetails']['Designer'], dict)
 
     @mock.patch("apps.search.services.application_raw_data_fixers.cead_get_id_doc")
     def test_fix_id_doc_cead(self, cead_get_id_doc):

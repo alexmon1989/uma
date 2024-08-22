@@ -279,14 +279,20 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
                 app_data['Design']['Transactions']['Transaction']
             ))
 
-            # fix дат
             for transaction in app_data['Design']['Transactions']['Transaction']:
+                # fix дат
                 try:
                     d = transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate']
                     transaction['TransactionBody']['PublicationDetails']['Publication'][
                         'PublicationDate'] = datetime.datetime.strptime(d, '%d.%m.%Y').strftime('%Y-%m-%d')
                 except:
                     pass
+
+                # TransactionBody.DesignerDetails.Designer у сповіщеннях має бути словником
+                if 'DesignerDetails' in transaction['TransactionBody'] \
+                        and isinstance(transaction['TransactionBody']['DesignerDetails']['Designer'], list):
+                    transaction['TransactionBody']['DesignerDetails']['Designer'] = \
+                        transaction['TransactionBody']['DesignerDetails']['Designer'][0]
 
     def _fix_id_doc_cead(self, app_data: dict):
         """Получает idDocCead из БД EArchive, если он отсутсвует в JSON."""

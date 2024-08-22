@@ -326,7 +326,7 @@
                                 <li><span class="g-font-weight-600">(21) {% trans 'Номер заявки' %}:</span> {{ transaction|get:"@applicationNumber" }}</li>
                             {% endif %}
 
-                            {% if transaction.TransactionBody.DesignerDetails.Designer %}
+                            {% if transaction.TransactionBody.DesignerDetails.Designer and transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine %}
                                  <li>
                                      <span class="g-font-weight-600">(72) {% trans "Ім'я автора" %}:</span>
                                      {{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
