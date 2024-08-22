@@ -14,11 +14,13 @@
             <div class="col-md-12">
                 {% include 'patent_attorneys/list/_partials/filter_form.html' %}
 
-                {% include 'patent_attorneys/list/_partials/header.html' %}
+                {% if not filter_form.errors %}
+                    {% include 'patent_attorneys/list/_partials/header.html' %}
 
-                {% include 'patent_attorneys/list/_partials/table.html' %}
+                    {% include 'patent_attorneys/list/_partials/table.html' %}
 
-                {% include 'patent_attorneys/list/_partials/pagination.html' %}
+                    {% include 'patent_attorneys/list/_partials/pagination.html' %}
+                {% endif %}
             </div>
         </div>
     </section>

@@ -29,11 +29,11 @@ class PatentAttorneyListView(ListView):
 
     def get_queryset(self):
         return patent_attorney_list(
-            name=self.filter_form.cleaned_data['name'],
-            reg_num=self.filter_form.cleaned_data['reg_num'],
-            special=self.filter_form.cleaned_data['special'],
-            postal_address=self.filter_form.cleaned_data['postal_address'],
-            sort_by=self.sort_pagination_form.cleaned_data['sort_by']
+            name=self.filter_form.cleaned_data.get('name'),
+            reg_num=self.filter_form.cleaned_data.get('reg_num'),
+            special=self.filter_form.cleaned_data.get('special'),
+            postal_address=self.filter_form.cleaned_data.get('postal_address'),
+            sort_by=self.sort_pagination_form.cleaned_data.get('sort_by')
         )
 
     def get_paginate_by(self, queryset):

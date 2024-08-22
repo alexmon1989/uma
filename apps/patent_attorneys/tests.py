@@ -93,6 +93,10 @@ class PatentAttorneyListViewTestCase(TestCase):
                 phones=f'phones_{i}',
                 e_mail=f'e_mail_{i}',
             )
+
+        response = self.client.get(f"{reverse('patent_attorneys:list')}?reg_num=qwerty")
+        self.assertContains(response, 'Введіть ціле число або залиште поле пустим.')
+
         response = self.client.get(f"{reverse('patent_attorneys:list')}?reg_num=90")
         self.assertContains(response, 'Test_prizv_90')
         self.assertContains(response, 'Test_name_90')
