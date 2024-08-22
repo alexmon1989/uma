@@ -197,9 +197,6 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
             )
 
     elif hit['Document']['idObjType'] == 6:
-        hit['Design']['DesignDetails'] = search_services.application_prepare_biblio_data_id(
-            hit['Design']['DesignDetails']
-        )
         if hit['Design'].get('DocFlow', {}).get('Documents'):
             hit['Design']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
                 hit['Design'].get('DocFlow', {}).get('Documents', [])

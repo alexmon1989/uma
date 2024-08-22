@@ -450,18 +450,6 @@ def application_filter_documents_tm_id(documents_data: List[dict]) -> List[dict]
     return res
 
 
-def application_prepare_biblio_data_id(data: dict) -> dict:
-    """Готовит библиографические данные пром. образца для отображения."""
-    res = copy.deepcopy(data)
-    # Нужно ли публиковать автора
-    if 'DesignerDetails' in data and 'Designer' in data['DesignerDetails']:
-        for i, designer in enumerate(res['DesignerDetails']['Designer']):
-            # Значение поля Publicated - признак того надо ли публиковать автора
-            if 'Publicated' in designer and not designer['Publicated']:
-                del res['DesignerDetails']['Designer'][i]['DesignerAddressBook']
-    return res
-
-
 def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> dict:
     """Готовит библиографические данные ТМ для отображения."""
     res = copy.deepcopy(data)

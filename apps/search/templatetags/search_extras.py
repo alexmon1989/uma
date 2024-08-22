@@ -93,9 +93,9 @@ def get_image_url(file_path, image_name):
     splitted_path_len = len(splitted_path)
 
     return f"{settings.MEDIA_URL}/" \
-           f"{splitted_path[splitted_path_len-4]}" \
-           f"/{splitted_path[splitted_path_len-3]}/" \
-           f"{splitted_path[splitted_path_len-2]}/{image_name}"
+           f"{splitted_path[splitted_path_len - 4]}" \
+           f"/{splitted_path[splitted_path_len - 3]}/" \
+           f"{splitted_path[splitted_path_len - 2]}/{image_name}"
 
 
 @register.filter
@@ -104,10 +104,10 @@ def get_image_url_madrid_tm(file_path, image_name):
     splitted_path_len = len(splitted_path)
 
     return f"{settings.MEDIA_URL}/" \
-           f"{splitted_path[splitted_path_len-5].upper()}/" \
-           f"{splitted_path[splitted_path_len-4]}/" \
-           f"{splitted_path[splitted_path_len-3]}/" \
-           f"{splitted_path[splitted_path_len-2]}/{image_name}"
+           f"{splitted_path[splitted_path_len - 5].upper()}/" \
+           f"{splitted_path[splitted_path_len - 4]}/" \
+           f"{splitted_path[splitted_path_len - 3]}/" \
+           f"{splitted_path[splitted_path_len - 2]}/{image_name}"
 
 
 @register.inclusion_tag('search/detail/document_pdf.html')
@@ -151,7 +151,7 @@ def is_first_year_paid_inv_um(collections: List[dict]) -> bool:
 def publication_inv_um_older_than_months(hit: dict, months: int) -> bool:
     """Возвращает признак тарше ли публикация колическва месяцев months."""
     pub_date = datetime.datetime.strptime(hit['Patent']['I_45.D'][0], '%Y-%m-%d')
-    four_months = pub_date + datetime.timedelta(days=(365.25 / 12)*months)
+    four_months = pub_date + datetime.timedelta(days=(365.25 / 12) * months)
     return datetime.datetime.now() > four_months
 
 
@@ -217,11 +217,12 @@ def filter_bad_documents(documents):
     """Исключает из списка документов документы без даты регистрации и barcode"""
     if documents:
         return list(filter(lambda x: (x['DOCRECORD'].get('DOCREGNUMBER')
-                                     or x['DOCRECORD'].get('DOCBARCODE')
-                                     or x['DOCRECORD'].get('DOCSENDINGDATE'))
+                                      or x['DOCRECORD'].get('DOCBARCODE')
+                                      or x['DOCRECORD'].get('DOCSENDINGDATE'))
                                      and 'службова' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
                                      and 'звіт про інформаційний пошук' not in x['DOCRECORD'].get('DOCTYPE', '').lower()
-                                     and not x['DOCRECORD'].get('DOCREGNUMBER', '').lower().startswith('вн'), documents))
+                                     and not x['DOCRECORD'].get('DOCREGNUMBER', '').lower().startswith('вн'),
+                           documents))
 
 
 @register.simple_tag
@@ -286,7 +287,7 @@ def app_stages_tm(app):
                 if is_stopped:
                     stages_statuses[i] = 'not-active'
                     if i > 1:
-                        stages_statuses[i-1] = 'stopped'
+                        stages_statuses[i - 1] = 'stopped'
                     else:
                         stages_statuses[i] = 'stopped'
                 else:
@@ -385,7 +386,7 @@ def app_stages_id(app):
             else:
                 if is_stopped:
                     stages_statuses[i] = 'not-active'
-                    stages_statuses[i-1] = 'stopped'
+                    stages_statuses[i - 1] = 'stopped'
                 else:
                     stages_statuses[i] = 'current'
                 break
@@ -518,43 +519,43 @@ def app_stages_inv_um(app):
             'title': _('Патент зареєстровано'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or 'Підтримка чинності' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Підготовка до державної реєстрації та публікації'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or 'Підготовка заявки до реєстрації патенту' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Очікування документа про сплату державного мита'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or '19994' in cl_codes or '19996' in cl_codes
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Кваліфікаційна експертиза'),
             'status': 'done' if app['search_data']['obj_state'] == 2 or 'Кваліфікаційна експертиза' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Очікування клопотання про проведення кваліфікаційної експертизи'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or 'Очікування клопотання та збору щодо КЕ' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Формальна експертиза'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or 'Формальна експертиза заявок на винаходи і корисні моделі' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Встановлення дати подання'),
             'status': 'done' if app['search_data']['obj_state'] == 2
                                 or 'Встановлення дати подання національної заявки' in done_stages
                                 or 'Встановлення дати входження в національну фазу в Україні' in done_stages
-                             else 'not-active'
+            else 'not-active'
         },
         {
             'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
@@ -574,15 +575,15 @@ def app_stages_inv_um(app):
                 if is_stopped:
                     if i == 7:
                         # Поскольку стадия "Реєстрація первинних документів" всегда пройдена
-                        stages[i-1]['status'] = 'stopped'
+                        stages[i - 1]['status'] = 'stopped'
                     else:
                         stages[i]['status'] = 'stopped'
                 else:
-                    if stages[i-1]['status'] == 'not-used':
+                    if stages[i - 1]['status'] == 'not-used':
                         # Для полезных моделей пропускаются два неиспользуемых этапа
-                        stages[i-3]['status'] = 'current'
+                        stages[i - 3]['status'] = 'current'
                     else:
-                        stages[i-1]['status'] = 'current'
+                        stages[i - 1]['status'] = 'current'
             break
 
     return {
@@ -618,11 +619,11 @@ def remove_inn(s):
 
     # Также удаляется запятая, если строка ею заканчивается
     if s.endswith(','):
-        s = s[:len(s)-2]
+        s = s[:len(s) - 2]
 
     # Также удаляется точка с запятой, если строка ею заканчивается
     if s.endswith(';'):
-        s = s[:len(s)-2]
+        s = s[:len(s) - 2]
 
     return s
 
@@ -643,3 +644,17 @@ def bulletin_number_with_year_by_date(value) -> str | int:
     if bul_num:
         return bul_num
     return ''
+
+
+@register.simple_tag()
+def designer_should_be_publicated_in_transaction(designer_name: str, designer_biblio: dict) -> bool:
+    """Повертає ознаку чи має ім'я автора публікуватися у сповіщенні.
+
+       Функція порівнює ім'я автора з тим, що в бібліографії і якщо є співпадіння,
+       то повертає ознаку публікації автора з бібліографії
+    """
+    for designer in designer_biblio['Designer']:
+        if designer_name == designer['DesignerAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+            'FreeFormatNameDetails']['FreeFormatNameLine']:
+            return designer['Publicated']
+    return True

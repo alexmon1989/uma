@@ -1,4 +1,5 @@
 {% load uma_extras %}
+{% load search_extras %}
 {% load i18n %}
 
 <div class="table-responsive">
@@ -327,10 +328,15 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DesignerDetails.Designer and transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine %}
-                                 <li>
-                                     <span class="g-font-weight-600">(72) {% trans "Ім'я автора" %}:</span>
-                                     {{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
-                                 </li>
+                                 {% designer_should_be_publicated_in_transaction transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine hit.Design.DesignDetails.DesignerDetails as publicated %}
+                                      <li>
+                                          <span class="g-font-weight-600">(72) {% trans "Ім'я автора" %}:</span>
+                                          {% if publicated %}
+                                              {{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} ({{ transaction.TransactionBody.DesignerDetails.Designer.DesignerAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
+                                          {% else %}
+                                              *
+                                          {% endif %}
+                                      </li>
                             {% endif %}
                         </ul>
                     {% elif transaction|get:"@type" == 'Restore' %}

@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.search.services.application_indexators import ApplicationIndexationService
-from apps.search.services.services import application_get_indexed_count, application_fill_notification_date
+from apps.search.services.services import application_get_indexed_count
 from apps.search.models import IndexationProcess
 
 
