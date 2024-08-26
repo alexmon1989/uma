@@ -1236,20 +1236,6 @@ def user_has_access_to_docs(user, hit):
     return False
 
 
-def user_has_access_to_tm_app(user, hit):
-    """Возвращает признак доступности заявки на знак для товаров и услуг пользователю."""
-    if not type(hit) is dict:
-        item = hit.to_dict()
-        item['meta'] = hit.meta.to_dict()
-        hit = item
-    try:
-        return hit['Document'].get('MarkCurrentStatusCodeType') != '1000' \
-               or user_has_access_to_docs(user, hit) \
-               or user in IpcAppList.objects.get(id=hit['meta']['id']).users_with_access.all()
-    except IpcAppList.DoesNotExist:
-        return False
-
-
 def create_search_res_doc(data, file_path):
     """Формировние Excel-файла с результатами поиска."""
     workbook = xlsxwriter.Workbook(file_path)

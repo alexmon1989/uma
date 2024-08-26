@@ -13,10 +13,34 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    Клас за допомогою якого відбувається запуск (виклик) команди **search_indexation**.
+
+    Являю собою `Django Management command <https://docs.djangoproject.com/en/dev/howto/custom-management-commands/>`_
+    для додавання або оновлення документів у індексі ElasticSearch.
+
+    :cvar help str: Короткий опис команди, який використовується в підказці..
+    :cvar indexation_process IndexationProcess: Об'єкт процесу індексації,
+     який створюється та оновлюється під час виконання команди.
+    """
+
     help: str = 'Adds or updates documents in ElasticSearch index.'
     indexation_process: IndexationProcess = None
 
     def add_arguments(self, parser):
+        """
+        Додає аргументи командного рядка для команди.
+
+        :param parser: Парсер аргументів для додавання параметрів.
+        :type parser: argparse.ArgumentParser
+
+        Аргументи:
+
+        - ``--id`` (int): Індексує лише запис з певним ``idAPPNumber`` з таблиці ``IPC_AppLIST``.
+        - ``--obj_type`` (int): Додає до індексу лише записи певного типу ОПВ.
+        - ``--status`` (int): Додає до індексу лише записи з певним статусом: 1 - заявки, 2 - охоронні документи.
+        - ``--ignore_indexed`` (bool): Ігнорує записи з ``elasticindexed=1``.
+        """
         parser.add_argument(
             '--id',
             type=int,
@@ -39,6 +63,20 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        """
+        Основна логіка виконання команди.
+
+        :param args: Додаткові позиційні аргументи.
+        :param options: Аргументи командного рядка.
+
+        Логіка:
+
+        - Отримання списку додатків для індексації за допомогою сервісу ``ApplicationIndexationService``.
+        - Створення процесу індексації в базі даних.
+        - Індексація кожного додатка та оновлення лічильника оброблених записів.
+        - Збереження часу завершення індексації та оновлення даних про процес індексації.
+        - Виведення повідомлення про успішне завершення процесу індексації.
+        """
         apps = ApplicationIndexationService.get_apps_for_indexation(
             ignore_indexed=options['ignore_indexed'],
             app_id=options['id'],

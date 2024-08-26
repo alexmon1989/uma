@@ -124,9 +124,6 @@
      - | Сервіс (класс Python), виконує функцію запису
        | бібліографічної інформації у пошуковий індекс,
        | оновлення інформації у файловій системі, БД.
-   * - NotificationDateUpdaterService
-     - | Сервіс (класс Python), виконує функцію оновлення
-       | у БД дати останнього сповіщення ОПВ.
    * - UMA
      - | Основна база даних СІС на сервері **10.10.18.1 (Rhino)**.
        | Побудована на базі СУБД Microsoft SQL Server 2016.
@@ -137,3 +134,15 @@
 
 3.1.3. Діаграма рівня програмного коду (C4) для Підсистеми
 -----------------------------------------------------------
+
+Нижче представлено опис класів, що були розроблені для функціонування Підсистеми.
+
+.. autoclass:: apps.search.management.commands.search_indexation.Command
+   :members:
+
+.. autoclass:: apps.search.models.IndexationProcess
+   :members:
+   :exclude-members: DoesNotExist, MultipleObjectsReturned
+
+.. autoclass:: apps.search.services.application_indexators.ApplicationIndexationService
+   :members:

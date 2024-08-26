@@ -9,7 +9,7 @@ from apps.search.services.application_data_writers import create_service as crea
 
 
 class ApplicationIndexationService:
-    """Сервис для добавления информации о заявке в поисковый индекс."""
+    """Сервіс для додавання інформації про заявку в пошуковий індекс."""
 
     @staticmethod
     def get_apps_for_indexation(
@@ -19,7 +19,23 @@ class ApplicationIndexationService:
             status: int | None = None,
             ignore_apps: List[str] = None
     ) -> QuerySet[IpcAppList]:
-        """Возвращает список заявок, которые необходимо добавить в поисковый индекс."""
+        """
+        Повертає список заявок, які необхідно додати в пошуковий індекс.
+
+        :param ignore_indexed: Якщо встановлено в `True`, ігнорує заявки, які вже індексовані.
+        :type ignore_indexed: bool, optional
+        :param app_id: Ідентифікатор заявки для індексації. Якщо вказано, індексується тільки одна заявка.
+        :type app_id: int, optional
+        :param obj_type: Тип об'єкта для фільтрації заявок.
+        :type obj_type: int, optional
+        :param status: Статус заявки для фільтрації: 1 - заявки, 2 - охоронні документи.
+        :type status: int, optional
+        :param ignore_apps: Список номерів заявок, які потрібно ігнорувати під час індексації.
+        :type ignore_apps: List[str], optional
+
+        :return: QuerySet з заявками, які потрібно додати в індекс.
+        :rtype: QuerySet[apps.search.models.IpcAppList]
+        """
         if not ignore_apps:
             ignore_apps = []
 
@@ -45,7 +61,15 @@ class ApplicationIndexationService:
 
     @staticmethod
     def index_application(app: IpcAppList) -> bool:
-        """Индексирует данные заявки."""
+        """
+        Індексує дані заявки.
+
+        :param app: Об'єкт заявки для індексації.
+        :type app: apps.search.models.IpcAppList
+
+        :return: Успішність індексації.
+        :rtype: bool
+        """
 
         # Получение данных
         data_receiver_service = create_data_receiver_service(app, 'filesystem')

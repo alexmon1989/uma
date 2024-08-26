@@ -10,6 +10,31 @@ from uma.abstract_models import TimeStampedModel
 
 
 class IpcAppList(models.Model):
+    """
+    Модель об'єкта інтелектуальної власності (заявки).
+    Представляє таблицю `IPC_AppList` у базі даних.
+
+    :cvar int id: Ідентифікатор об'єкта.
+    :cvar str app_number: Номер заявки.
+    :cvar str registration_number: Номер охоронного документа.
+    :cvar str, datetime.datetime registration_date: Дата охоронного документа.
+    :cvar int id_shedule_type: Індекс завдання з таблиці cl_sheduleTypes.
+    :cvar str files_path: Шлях до каталогу з документами на файловому сховищі.
+    :cvar int id_parent: Ідентифікатор охоронного документа з технологічної системи.
+    :cvar int id_claim: Ідентифікатор заявки з технологічної системи.
+    :cvar apps.search.models.ObjType, int obj_type: Тип об'єкта інтелектуальної власності.
+    :cvar int changescount: Кількість проведених оновлень. 0 - новий запис.
+    :cvar int lastupdate: Дата останнього оновлення даних заявки.
+    :cvar int idstatus: Статус ОПВ (індекс idStatus з таблиці cl_ClaimStatus).
+    :cvar str, datetime.datetime app_date: Дата подання заявки.
+    :cvar str, datetime.datetime app_input_date: Дата надходження матеріалів заявки.
+    :cvar bool elasticindexed: Ознака вказує на те, що об'єкт необхідно проіндексувати ElasticSearch.
+    :cvar str, datetime.datetime notification_date: Дата останнього сповіщення.
+    :cvar str, datetime.datetime last_indexation_date: Дата останнього додання даних в пошуковий індекс.
+    :cvar bool in_electronic_bull: Вказує, що опубліковано в електронному бюлетені.
+    :cvar bool is_limited: Ознака того, що публікація обмежена.
+    :cvar bool open_data_updated: Ознака того, дані оновлено у публічному API.
+    """
     id = models.AutoField(db_column='idAPPNumber', primary_key=True)
     app_number = models.CharField(db_column='APP_Number', max_length=100, blank=True, null=True)
     registration_number = models.CharField(db_column='RegistrationNumber', max_length=32, blank=True, null=True)
@@ -30,8 +55,7 @@ class IpcAppList(models.Model):
     in_electronic_bull = models.BooleanField(db_column='in_electronic_bull', blank=True, null=True)
     publication_app_date = models.DateTimeField(db_column='publication_APP_date', blank=True, null=True)
     is_limited = models.BooleanField(db_column='is_limited', default=False)
-    users_with_access = models.ManyToManyField(get_user_model(), through='AppUserAccess')
-    open_data_updated = models.IntegerField(db_column='open_data_updated', blank=True, null=True)
+    open_data_updated = models.BooleanField(db_column='open_data_updated', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -39,7 +63,7 @@ class IpcAppList(models.Model):
 
     @property
     def real_files_path(self) -> str:
-        """Возвращает реальный путь к файлам на диске."""
+        """Повертає реальний шлях до файлів на сервері."""
         return self.files_path.replace(
             '\\\\bear\\share\\',
             settings.DOCUMENTS_MOUNT_FOLDER
@@ -113,13 +137,18 @@ class AppLimited(TimeStampedModel):
 
 
 class ObjType(models.Model):
-    """Модель типа объекта ИС."""
+    """
+        Модель типу об'єкта інтелектуальної власності.
+        Представляє таблицю `cl_IP_ObjTypes` у базі даних.
+
+        :cvar int id: Ідентифікатор об'єкта.
+        :cvar int obj_type_ua: Назва типу ОПВ українською.
+        :cvar int obj_type_en: Назва типу ОПВ англійською мовою.
+        :cvar int order: Порядок відображення типу об'єкта у формі розширенного пошуку.
+    """
     id = models.AutoField(db_column='idObjType', primary_key=True)
     obj_type_ua = models.CharField(db_column='ObjTypeUA', max_length=100)
     obj_type_en = models.CharField(db_column='ObjTypeEN', max_length=100)
-    obj_server_folder = models.CharField(db_column='ObjServerFolder', max_length=255, blank=True, null=True)
-    file_server_name = models.CharField(db_column='FileServerName', max_length=250, blank=True, null=True)
-    net_share_name = models.CharField(db_column='NetShareName', max_length=500, blank=True, null=True)
     order = models.PositiveSmallIntegerField(db_column='order', blank=True, null=True)
 
     def __str__(self):
@@ -359,13 +388,19 @@ class SortParameter(models.Model):
 
 
 class IndexationProcess(models.Model):
-    """Модель процесса индексации."""
+    """Модель процесу індексації.
+
+    :cvar int not_indexed_count: Кількість об'єктів для індексації.
+    :cvar int processed_count: Опрацьовано об'єктів.
+    :cvar str, datetime.datetime begin_date: Дата та час початку індексації.
+    :cvar str, datetime.datetime finish_date: Дата та час закінчення індексації.
+    :cvar int documents_in_index: Всього документів у пошуковому індексі.
+    """
     not_indexed_count = models.PositiveIntegerField("Кількість об'єктів для індексації", default=0)
     processed_count = models.PositiveIntegerField("Опрацьовано об'єктів", default=0)
     begin_date = models.DateTimeField("Дата та час початку індексації")
     finish_date = models.DateTimeField("Дата та час закінчення індексації", null=True, blank=True)
     documents_in_index = models.PositiveIntegerField("Всього документів", null=True, blank=True)
-    documents_in_index_shared = models.PositiveIntegerField("Всього документів опублікованих", null=True, blank=True)
 
     def __str__(self):
         return self.finish_date
@@ -399,15 +434,6 @@ class AdvancedSearchPage(models.Model):
     class Meta:
         verbose_name = 'Сторінка розширенного пошуку'
         verbose_name_plural = 'Сторінка розширенного пошуку'
-
-
-class AppUserAccess(TimeStampedModel):
-    """Связующая модель между заявками на объекты ИС и пользователями."""
-    user = models.ForeignKey(get_user_model(), verbose_name='Користувач', on_delete=models.CASCADE)
-    app = models.ForeignKey(IpcAppList, verbose_name='Заявка', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Доступ користувача {self.user.get_username_full()} до заявки {self.app.app_number}"
 
 
 class AppVisit(TimeStampedModel):

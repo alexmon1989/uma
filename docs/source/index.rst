@@ -20,6 +20,7 @@ documentation for details.
 
 
 .. toctree::
+   components/search_system
    components/search_indexation
    :maxdepth: 3
    :caption: Компоненти:
