@@ -79,9 +79,14 @@ class ApplicationRawDataFSReceiverTestCase(TestCase):
         self.assertEqual(data['Document']['idObjType'], obj_type.pk)
         self.assertFalse(data['Document'].get('is_limited'))
 
-        AppLimited.objects.create(obj_type_id=obj_type.pk, app_number='app')
+        app_limited = AppLimited.objects.create(obj_type_id=obj_type.pk, app_number='app')
         data = receiver.get_data()
         self.assertTrue(data['Document']['is_limited'])
+
+        app_limited.cancelled = True
+        app_limited.save()
+        data = receiver.get_data()
+        self.assertFalse(data['Document'].get('is_limited'))
 
 
 class ApplicationRawDataFSTMReceiverTestCase(TestCase):

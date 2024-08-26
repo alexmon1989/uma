@@ -87,7 +87,8 @@ class ApplicationRawDataFSReceiver(ApplicationRawDataReceiver):
     def _set_is_limited(self, data: dict) -> None:
         """Проверяет является ли обїект ограниченной публикацией, устанавливает метку в данных об этом."""
         if data and AppLimited.objects.filter(app_number=self._app.app_number,
-                                              obj_type_id=self._app.obj_type_id).exists():
+                                              obj_type_id=self._app.obj_type_id
+                                              ).exclude(cancelled=True).exists():
             data['Document']['is_limited'] = True
 
     def get_data(self) -> dict:

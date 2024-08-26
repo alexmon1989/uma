@@ -91,7 +91,10 @@ class AppLimited(TimeStampedModel):
         help_text='Налаштування публікації у форматі JSON',
         default='{}'
     )
-    reason = models.TextField('Причина обмеження даних', blank=True, null=True)
+    reason = models.TextField('Причина обмеження даних / зняття обмежень', blank=True, null=True)
+    cancelled = models.BooleanField('Обмеження зняті', default=False, null=False,
+                                    help_text='Якщо опцію активовано, то дані об\'єкта відображатимуться '
+                                              'у повному обсязі')
 
     class Meta:
         db_table = 'ls_limited_applications'
