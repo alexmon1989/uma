@@ -288,9 +288,10 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
                 except:
                     pass
 
-                # TransactionBody.DesignerDetails.Designer у сповіщеннях має бути словником
+                # TransactionBody.DesignerDetails.Designer у сповіщеннях має бути словником.
                 if 'DesignerDetails' in transaction['TransactionBody'] \
-                        and isinstance(transaction['TransactionBody']['DesignerDetails']['Designer'], list):
+                        and transaction['TransactionBody']['DesignerDetails'] is not None \
+                        and isinstance(transaction['TransactionBody']['DesignerDetails'].get('Designer'), list):
                     transaction['TransactionBody']['DesignerDetails']['Designer'] = \
                         transaction['TransactionBody']['DesignerDetails']['Designer'][0]
 

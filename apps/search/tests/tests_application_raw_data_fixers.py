@@ -543,6 +543,26 @@ class TestApplicationIDRawDataFixerFSTestCase(TestCase):
             # DesignerDetails.Designer у сповіщеннях має бути словником
             self.assertIsInstance(transaction['TransactionBody']['DesignerDetails']['Designer'], dict)
 
+        # Існують випадки коли у сповіщенні "DesignerDetails": None, корекція даних має проходити
+        app_data = {
+            'Design': {
+                'DesignDetails': {
+                    'RegistrationNumber': '111111'
+                },
+                'Transactions': {
+                    'Transaction': [
+                        {
+                            '@registrationNumber': '111111',
+                            'TransactionBody': {
+                                'DesignerDetails': None,
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        self.fixer.fix_data(app_data)
+
     @mock.patch("apps.search.services.application_raw_data_fixers.cead_get_id_doc")
     def test_fix_id_doc_cead(self, cead_get_id_doc):
         cead_get_id_doc.return_value = 111
