@@ -1,8 +1,6 @@
 from django.db import models
-from collections import defaultdict
 
-
-# WellKnownMarks DB
+from apps.wkm.services import wkm_to_dict
 
 
 class WKMMark(models.Model):
@@ -37,7 +35,7 @@ class WKMMark(models.Model):
         null=True,
         verbose_name='Ключові слова'
     )
-    mark_image = models.BinaryField(db_column='MarkImage', blank=True, null=True)
+    mark_image = models.BinaryField(db_column='MarkImage', blank=True, null=True, editable=True)
     state_id = models.SmallIntegerField(db_column='IdState', default=1)
     bulletin = models.ForeignKey(
         'WKMRefBulletin',
@@ -70,76 +68,7 @@ class WKMMark(models.Model):
         verbose_name_plural = 'Добре відомі ТМ'
 
     def to_dict(self) -> dict:
-        res = {
-            'PublicationDetails': [
-                {
-                    'PublicationDate': self.bulletin.bulletin_date.strftime('%Y-%m-%d'),
-                    'PublicationIdentifier': self.bulletin.bull_str,
-                }
-            ],
-            'DecisionDate': self.decision_date.strftime('%Y-%m-%d') if self.decision_date else None,
-            'OrderDate': self.order_date.strftime('%Y-%m-%d') if self.order_date else None,
-            'RightsDate': self.rights_date.strftime('%Y-%m-%d') if self.rights_date else None,
-            'CourtComments': {
-                'CourtCommentsUA': self.court_comments_ua,
-                'CourtCommentsEN': self.court_comments_eng,
-                'CourtCommentsRU': self.court_comments_rus,
-            },
-            'WordMarkSpecification': {
-                'MarkSignificantVerbalElement': [
-                    {
-                        '#text': self.keywords,
-                        '@sequenceNumber': 1
-                    }
-                ]
-            },
-            'HolderDetails': {
-                'Holder': []
-            }
-        }
-        for i, owner in enumerate(self.owners.order_by('pk').all(), 1):
-            res['HolderDetails']['Holder'].append(
-                {
-                    'HolderAddressBook': {
-                        'FormattedNameAddress': {
-                            'Name': {
-                                'FreeFormatName': {
-                                    'FreeFormatNameDetails': {
-                                        'FreeFormatNameLine': owner.owner_name
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    'HolderSequenceNumber': i
-                }
-            )
-
-        classes = defaultdict(list)
-        for klass in self.wkmclass_set.order_by('class_number', 'ord_num').all():
-            classes[klass.class_number].append({
-                'ClassificationTermLanguageCode': 'UA',
-                'ClassificationTermText': klass.products
-            })
-
-        res['GoodsServicesDetails'] = {
-            'GoodsServices': {
-                'ClassDescriptionDetails': {
-                    'ClassDescription': []
-                }
-            }
-        }
-        for klass in classes:
-            res['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription'].append(
-                {
-                    'ClassNumber': klass,
-                    'ClassificationTermDetails': {
-                        'ClassificationTerm': classes[klass]
-                    }
-                }
-            )
-
-        return res
+        return wkm_to_dict(self)
 
 
 class WKMRefOwner(models.Model):
@@ -227,4 +156,4 @@ class WKMVienna(models.Model):
         managed = False
         db_table = 'MarkVienna'
         verbose_name = 'Клас'
-        verbose_name_plural = 'Ніццька класифікація'
+        verbose_name_plural = 'Віденська класифікація'
