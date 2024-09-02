@@ -129,6 +129,23 @@
             "MarkImage": {
               "type": "object",
               "properties": {
+                "MarkImageCategory": {
+                  "type": "object",
+                  "properties": {
+                    "CategoryCodeDetails": {
+                      "type": "object",
+                      "properties": {
+                        "CategoryCode": {
+                          "description": "Класи віденської класифікації",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
                 "MarkImageFilename": {
                   "description": "Відносне посилання на зображення",
                   "type": "string"

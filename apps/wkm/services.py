@@ -138,6 +138,13 @@ class WKMJSONConverter(WKMConverter):
 
 
 class WKMImportService:
+    """
+    Сервіс для імпорту Добре відомої ТМ у СІС.
+
+    :cvar apps.search.models.WKMMark _wkm: екземпляр моделі добре відомої ТМ
+    :cvar apps.search.models.ObjType _obj_type: тип ОПВ
+    """
+
     _wkm: 'WKMMark'
     _obj_type: ObjType
 
@@ -147,7 +154,12 @@ class WKMImportService:
 
     @property
     def _files_path(self) -> str:
-        """Повертає шлях до файлів добре відомого знака у файловому сховищі СІС."""
+        """
+        Повертає шлях до файлів добре відомого знака у файловому сховищі СІС.
+
+        :return шлях до файлів добре відомого знака у файловому сховищі СІС
+        :rtype str
+        """
         return os.path.join(
             settings.MEDIA_ROOT,
             'WKM',
@@ -201,12 +213,7 @@ class WKMImportService:
         return app
 
     def execute(self) -> None:
-        """
-        Головний метод класу, який виконує роботу по імпорту добре відомої ТМ у СІС.
-
-        :return: Успішність індексації.
-        :rtype: bool
-        """
+        """Головний метод класу, який виконує роботу по імпорту добре відомої ТМ у СІС."""
         # Створити файли з даними і зображенням у файловому сховищі
         self._create_files()
 
