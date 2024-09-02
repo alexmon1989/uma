@@ -522,26 +522,33 @@ class TestApplicationIDRawDataFixerFSTestCase(TestCase):
                                 }
                             }
                         },
+                        {
+                            '@registrationNumber': '111111'
+                        },
                     ]
                 }
             }
         }
         self.fixer.fix_data(app_data)
         for transaction in app_data['Design']['Transactions']['Transaction']:
-            # Нет "чужих" оповещений
+            # Відсутні "чужі сповіщення"
             self.assertEqual(transaction['@registrationNumber'], '111111')
 
-            self.assertEqual(
-                transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationDate'],
-                '2024-07-11'
-            )
-            self.assertEqual(
-                transaction['TransactionBody']['PublicationDetails']['Publication']['PublicationNumber'],
-                '1'
-            )
-
-            # DesignerDetails.Designer у сповіщеннях має бути словником
-            self.assertIsInstance(transaction['TransactionBody']['DesignerDetails']['Designer'], dict)
+        self.assertEqual(
+            app_data['Design']['Transactions']['Transaction'][0]['TransactionBody']['PublicationDetails'][
+                'Publication']['PublicationDate'],
+            '2024-07-11'
+        )
+        self.assertEqual(
+            app_data['Design']['Transactions']['Transaction'][0]['TransactionBody']['PublicationDetails'][
+                'Publication']['PublicationNumber'],
+            '1'
+        )
+        # DesignerDetails.Designer у сповіщеннях має бути словником
+        self.assertIsInstance(
+            app_data['Design']['Transactions']['Transaction'][0]['TransactionBody']['DesignerDetails']['Designer'],
+            dict
+        )
 
         # Існують випадки коли у сповіщенні "DesignerDetails": None, корекція даних має проходити
         app_data = {
