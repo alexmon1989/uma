@@ -1,42 +1,109 @@
+import base64
+import datetime
+import json
+import os
+from abc import ABC, abstractmethod
 from collections import defaultdict
+from typing import TYPE_CHECKING, Any
 
-from typing import TYPE_CHECKING
+from django.conf import settings
+
+from apps.search.models import ObjType, IpcAppList, ScheduleType
+
 if TYPE_CHECKING:
     from apps.wkm.models import WKMMark
 
 
-def wkm_to_dict(record: 'WKMMark') -> dict:
-    """Повертає представлення моделі у вигляді словника."""
-    res = {
-        'PublicationDetails': [
-            {
-                'PublicationDate': record.bulletin.bulletin_date.strftime('%Y-%m-%d'),
-                'PublicationIdentifier': record.bulletin.bull_str,
-            }
-        ],
-        'DecisionDate': record.decision_date.strftime('%Y-%m-%d') if record.decision_date else None,
-        'OrderDate': record.order_date.strftime('%Y-%m-%d') if record.order_date else None,
-        'RightsDate': record.rights_date.strftime('%Y-%m-%d') if record.rights_date else None,
-        'CourtComments': {
-            'CourtCommentsUA': record.court_comments_ua,
-            'CourtCommentsEN': record.court_comments_eng,
-            'CourtCommentsRU': record.court_comments_rus,
-        },
-        'WordMarkSpecification': {
-            'MarkSignificantVerbalElement': [
-                {
-                    '#text': record.keywords,
-                    '@sequenceNumber': 1
-                }
-            ]
-        },
-        'HolderDetails': {
-            'Holder': []
+class WKMConverter(ABC):
+    """
+    Інтерфейс конвертера для перетворення даних добре відомої ТМ у певну структуру даних.
+
+    :cvar apps.search.models.WKMMark _record: екземпляр моделі добре відомої ТМ
+    :cvar Any _res: результат конвертації.
+    """
+    _record: 'WKMMark'
+    _res: dict
+
+    def __init__(self, record: 'WKMMark') -> None:
+        self._record = record
+        self._res = {}
+
+    @abstractmethod
+    def convert(self) -> Any:
+        raise NotImplemented
+
+
+class WKMJSONConverter(WKMConverter):
+    """
+    Реалізація конвертера для отримання даних добре відомої ТМ у вигляді словника.
+
+    :cvar apps.search.models.WKMMark _record: екземпляр моделі добре відомої ТМ
+    :cvar dict _res: результат конвертації.
+    """
+
+    def convert(self) -> dict:
+        """
+        Головний метод класу, який формує кінцевий результат роботи конвертатора.
+
+        :return результат конвертації
+        :rtype dict
+        """
+        self.add_publication_details()
+        self.add_dates()
+        self.add_word_mark_specification()
+        self.add_court_comments()
+        self.add_mark_image_details()
+        self.add_vienna_classes()
+        self.add_holders()
+        self.add_nice_classes()
+        return self._res
+
+    def add_publication_details(self) -> None:
+        self._res['PublicationDetails'] = [{
+            'PublicationDate': self._record.bulletin.bulletin_date.strftime('%Y-%m-%d'),
+            'PublicationIdentifier': self._record.bulletin.bull_str,
+        }]
+
+    def add_dates(self) -> None:
+        self._res['DecisionDate'] = self._record.decision_date.strftime('%Y-%m-%d') if self._record.decision_date else None
+        self._res['OrderDate'] = self._record.order_date.strftime('%Y-%m-%d') if self._record.order_date else None
+        self._res['RightsDate'] = self._record.rights_date.strftime('%Y-%m-%d') if self._record.rights_date else None
+
+    def add_word_mark_specification(self) -> None:
+        self._res['WordMarkSpecification'] = {
+            'MarkSignificantVerbalElement': [{
+                '#text': self._record.keywords,
+                '@sequenceNumber': 1
+            }]
         }
-    }
-    for i, owner in enumerate(record.owners.order_by('pk').all(), 1):
-        res['HolderDetails']['Holder'].append(
-            {
+
+    def add_court_comments(self) -> None:
+        if self._record.court_comments_ua:
+            self._res.setdefault('CourtComments', {})['CourtCommentsUA'] = self._record.court_comments_ua
+        if self._record.court_comments_eng:
+            self._res.setdefault('CourtComments', {})['CourtCommentsEN'] = self._record.court_comments_eng
+        if self._record.court_comments_rus:
+            self._res.setdefault('CourtComments', {})['CourtCommentsRU'] = self._record.court_comments_rus
+
+    def add_mark_image_details(self) -> None:
+        if self._record.mark_image:
+            self._res.setdefault('MarkImageDetails', {}).setdefault('MarkImage', {}).update({
+                'MarkImageFileFormat': 'JPG',
+                'MarkImageFilename': f"{self._record.id}.jpg",
+            })
+
+    def add_vienna_classes(self) -> None:
+        vienna_classes = [
+            klass.class_number for klass in self._record.wkmvienna_set.order_by('class_number').all()
+        ]
+        if vienna_classes:
+            self._res.setdefault('MarkImageDetails', {}).setdefault('MarkImage', {}).setdefault(
+                'MarkImageCategory', {}
+            ).setdefault('CategoryCodeDetails', {}).setdefault('CategoryCode', vienna_classes)
+
+    def add_holders(self) -> None:
+        for i, owner in enumerate(self._record.owners.order_by('pk').all(), 1):
+            self._res.setdefault('HolderDetails', {}).setdefault('Holder', []).append({
                 'HolderAddressBook': {
                     'FormattedNameAddress': {
                         'Name': {
@@ -49,31 +116,102 @@ def wkm_to_dict(record: 'WKMMark') -> dict:
                     }
                 },
                 'HolderSequenceNumber': i
-            }
+            })
+
+    def add_nice_classes(self) -> None:
+        nice_classes = defaultdict(list)
+        for klass in self._record.wkmclass_set.order_by('class_number', 'ord_num').all():
+            nice_classes[klass.class_number].append({
+                'ClassificationTermLanguageCode': 'UA',
+                'ClassificationTermText': klass.products
+            })
+        for klass in nice_classes:
+            self._res.setdefault('GoodsServicesDetails', {}).setdefault(
+                'GoodsServices', {}).setdefault('ClassDescriptionDetails', {}).setdefault(
+                'ClassDescription', []).append(
+                {
+                    'ClassNumber': klass,
+                    'ClassificationTermDetails': {
+                        'ClassificationTerm': nice_classes[klass]
+                    }
+                })
+
+
+class WKMImportService:
+    _wkm: 'WKMMark'
+    _obj_type: ObjType
+
+    def __init__(self, wkm: 'WKMMark'):
+        self._wkm = wkm
+        self._obj_type = ObjType.objects.filter(code='WKM').first()
+
+    @property
+    def _files_path(self) -> str:
+        """Повертає шлях до файлів добре відомого знака у файловому сховищі СІС."""
+        return os.path.join(
+            settings.MEDIA_ROOT,
+            'WKM',
+            str(self._wkm.rights_date.year),
+            str(self._wkm.id),
+            ''
         )
 
-    classes = defaultdict(list)
-    for klass in record.wkmclass_set.order_by('class_number', 'ord_num').all():
-        classes[klass.class_number].append({
-            'ClassificationTermLanguageCode': 'UA',
-            'ClassificationTermText': klass.products
-        })
+    def _create_files(self) -> None:
+        """Створює файли добре відомого знаку (json з бібліографією та зображення) у файловому сховищі СІС."""
+        os.makedirs(self._files_path, exist_ok=True)
+        self._create_biblio_file()
+        self._create_image()
 
-    res['GoodsServicesDetails'] = {
-        'GoodsServices': {
-            'ClassDescriptionDetails': {
-                'ClassDescription': []
-            }
+    def _create_biblio_file(self) -> None:
+        """Створює файли json з бібліографією у файловому сховищі СІС."""
+        files_path_for_json = self._files_path.replace(settings.MEDIA_ROOT, '//bear/share/').replace('/', '\\')
+        wkm_converter = WKMConverter(self._wkm)
+        data = {
+            'Document': {
+                'idObjType': self._obj_type.pk,
+                'filesPath': files_path_for_json
+            },
+            'WellKnownMarkDetails': wkm_converter.convert()
         }
-    }
-    for klass in classes:
-        res['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails']['ClassDescription'].append(
-            {
-                'ClassNumber': klass,
-                'ClassificationTermDetails': {
-                    'ClassificationTerm': classes[klass]
-                }
-            }
-        )
+        with open(os.path.join(self._files_path, f"{self._wkm.id}.json"), 'w') as fp:
+            json.dump(data, fp, ensure_ascii=False)
 
-    return res
+    def _create_image(self):
+        """Створює зображення у файловому сховищі СІС."""
+        image_data = base64.b64decode(self._wkm.mark_image)
+        with open(os.path.join(self._files_path, f"{self._wkm.id}.jpg"), 'wb') as image_file:
+            image_file.write(image_data)
+
+    def _create_or_update_db_record(self) -> IpcAppList:
+        """Створює або оновлює запис у БД UMA."""
+        app = IpcAppList.objects.filter(obj_type=self._obj_type, id_parent=self._wkm.id).first()
+        if not app:
+            app = IpcAppList()
+        app.registration_date = self._wkm.rights_date
+        app.id_shedule_type = ScheduleType.objects.filter(obj_type=self._obj_type).first().pk
+        app.files_path = self._files_path.replace(settings.MEDIA_ROOT, '//bear/share/').replace('/', '\\')
+        app.id_parent = self._wkm.id
+        app.id_claim = self._wkm.id
+        app.obj_type = self._obj_type
+        app.changescount += 1
+        app.lastupdate = datetime.datetime.now()
+        app.elasticindexed = 0
+        app.save()
+
+        return app
+
+    def execute(self) -> None:
+        """
+        Головний метод класу, який виконує роботу по імпорту добре відомої ТМ у СІС.
+
+        :return: Успішність індексації.
+        :rtype: bool
+        """
+        # Створити файли з даними і зображенням у файловому сховищі
+        self._create_files()
+
+        # Створити/оновити запис у БД UMA
+        app = self._create_or_update_db_record()
+
+        # Виконати пошукову індексацію
+        # TODO:

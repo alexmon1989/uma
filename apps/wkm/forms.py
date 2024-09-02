@@ -4,9 +4,11 @@ from PIL import Image
 import io
 
 from .models import WKMMark
+from .services import WKMImportService
 
 
 class WKMMarkAdminForm(forms.ModelForm):
+    """Клас форми для створення/редагування добре відомої ТМ."""
     image = forms.ImageField(required=False, label='Зображення')
     ready_for_search_indexation = forms.BooleanField(
         required=False,
@@ -22,7 +24,7 @@ class WKMMarkAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.mark_image:
-            # Создаем файл изображения из бинарных данных
+            # Створюємо файл зображення з бінарних даних
             image = Image.open(io.BytesIO(self.instance.mark_image))
             output = io.BytesIO()
             image.save(output, format='JPEG')
@@ -34,11 +36,15 @@ class WKMMarkAdminForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         if self.cleaned_data.get('image'):
-            # Сохраняем изображение в BinaryField
             image = self.cleaned_data['image']
             image_data = image.read()
             instance.mark_image = image_data
 
         if commit:
             instance.save()
+
+        if self.cleaned_data.get('ready_for_search_indexation'):
+            service = WKMImportService(instance)
+            service.execute()
+
         return instance

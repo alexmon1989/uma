@@ -13,6 +13,7 @@ class ApplicationIndexationTMValidatorTestCase(TestCase):
         app_data = {
             'TradeMark': {
                 'TrademarkDetails': {
+                    'ApplicationNumber': 'm202400001',
                     'PublicationDetails': [
                         {
                             'PublicationDate': tomorrow.strftime('%Y-%m-%d')
@@ -28,6 +29,7 @@ class ApplicationIndexationTMValidatorTestCase(TestCase):
         app_data = {
             'TradeMark': {
                 'TrademarkDetails': {
+                    'ApplicationNumber': 'm202400001',
                     'PublicationDetails': [
                         {
                             'PublicationDate': datetime.date.today().strftime('%Y-%m-%d')
@@ -43,6 +45,9 @@ class ApplicationIndexationTMValidatorTestCase(TestCase):
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         app_data = {
             'TradeMark': {
+                'TrademarkDetails': {
+                    'ApplicationNumber': 'm202400001',
+                },
                 'Transactions': {
                     'Transaction': [
                         {
@@ -58,6 +63,9 @@ class ApplicationIndexationTMValidatorTestCase(TestCase):
 
         app_data = {
             'TradeMark': {
+                'TrademarkDetails': {
+                    'ApplicationNumber': 'm202400001',
+                },
                 'Transactions': {
                     'Transaction': [
                         {
@@ -78,6 +86,7 @@ class ApplicationIndexationIDValidatorTestCase(TestCase):
         app_data = {
             'Design': {
                 'DesignDetails': {
+                    'DesignApplicationNumber': 's202400001',
                     'RecordPublicationDetails': [
                         {
                             'PublicationDate': tomorrow.strftime('%Y-%m-%d')
@@ -93,6 +102,7 @@ class ApplicationIndexationIDValidatorTestCase(TestCase):
         app_data = {
             'Design': {
                 'DesignDetails': {
+                    'DesignApplicationNumber': 's202400001',
                     'RecordPublicationDetails': [
                         {
                             'PublicationDate': datetime.date.today().strftime('%Y-%m-%d')
@@ -108,6 +118,9 @@ class ApplicationIndexationIDValidatorTestCase(TestCase):
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         app_data = {
             'Design': {
+                'DesignDetails': {
+                    'DesignApplicationNumber': 's202400001'
+                },
                 'Transactions': {
                     'Transaction': [
                         {
@@ -123,6 +136,9 @@ class ApplicationIndexationIDValidatorTestCase(TestCase):
 
         app_data = {
             'Design': {
+                'DesignDetails': {
+                    'DesignApplicationNumber': 's202400001'
+                },
                 'Transactions': {
                     'Transaction': [
                         {
@@ -142,6 +158,7 @@ class ApplicationIndexationInvUMLDValidatorTestCase(TestCase):
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         app_data = {
             'Claim': {
+                'I_21': 'a202400001',
                 'I_43.D': [tomorrow.strftime('%Y-%m-%d')]
             }
         }
@@ -151,6 +168,7 @@ class ApplicationIndexationInvUMLDValidatorTestCase(TestCase):
 
         app_data = {
             'Claim': {
+                'I_21': 'a202400001',
                 'I_43.D': [datetime.date.today().strftime('%Y-%m-%d')]
             }
         }

@@ -148,11 +148,14 @@ class ObjType(models.Model):
         :cvar int obj_type_ua: Назва типу ОПВ українською.
         :cvar int obj_type_en: Назва типу ОПВ англійською мовою.
         :cvar int order: Порядок відображення типу об'єкта у формі розширенного пошуку.
+        :cvar str code: Унікальний код типу об'єкта.
     """
     id = models.AutoField(db_column='idObjType', primary_key=True)
     obj_type_ua = models.CharField(db_column='ObjTypeUA', max_length=100)
     obj_type_en = models.CharField(db_column='ObjTypeEN', max_length=100)
     order = models.PositiveSmallIntegerField(db_column='order', blank=True, null=True)
+    code = models.CharField('Унікальний код типу об\'єкта',
+                            db_column='code', max_length=10, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.obj_type_ua

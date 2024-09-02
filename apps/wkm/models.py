@@ -1,7 +1,5 @@
 from django.db import models
 
-from apps.wkm.services import wkm_to_dict
-
 
 class WKMMark(models.Model):
     id = models.AutoField(db_column='IdMark', primary_key=True)
@@ -66,9 +64,6 @@ class WKMMark(models.Model):
         db_table = 'Mark'
         verbose_name = 'Добре відома ТМ'
         verbose_name_plural = 'Добре відомі ТМ'
-
-    def to_dict(self) -> dict:
-        return wkm_to_dict(self)
 
 
 class WKMRefOwner(models.Model):
