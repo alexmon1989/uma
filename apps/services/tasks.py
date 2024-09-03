@@ -24,7 +24,8 @@ def get_original_document(sec_code):
         while rows:
             with ZipFile(file_path, 'w') as zip_:
                 for row in rows:
-                    zip_.writestr(row[1], row[2])
+                    if row[2]:
+                        zip_.writestr(row[1], row[2])
             if cursor.nextset():
                 rows = cursor.fetchall()
             else:
