@@ -1,4 +1,4 @@
-import base64
+import io
 import datetime
 import json
 import os
@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from PIL import Image
 
 from apps.search.models import ObjType, IpcAppList, ScheduleType
 
@@ -192,9 +193,9 @@ class WKMImportService:
 
     def _create_image(self):
         """Створює зображення у файловому сховищі СІС."""
-        image_data = base64.b64decode(self._wkm.mark_image)
-        with open(os.path.join(self._files_path, f"{self._wkm.id}.jpg"), 'wb') as image_file:
-            image_file.write(image_data)
+        image_data = self._wkm.mark_image
+        image = Image.open(io.BytesIO(image_data))
+        image.save(os.path.join(self._files_path, f"{self._wkm.id}.jpg"), format='JPEG')
 
     def _create_or_update_db_record(self) -> IpcAppList:
         """Створює або оновлює запис у БД UMA."""

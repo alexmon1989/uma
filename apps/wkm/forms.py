@@ -4,7 +4,7 @@ from PIL import Image
 import io
 
 from .models import WKMMark
-from .services import WKMImportService
+from .tasks import import_wkm
 
 
 class WKMMarkAdminForm(forms.ModelForm):
@@ -33,7 +33,7 @@ class WKMMarkAdminForm(forms.ModelForm):
                 output, 'ImageField', f"{self.instance.pk}.jpg", 'image/jpeg', output.getbuffer().nbytes, None
             )
 
-    def save(self, commit=True):
+    def save(self, commit=True) -> WKMMark:
         instance = super().save(commit=False)
         if self.cleaned_data.get('image'):
             image = self.cleaned_data['image']
@@ -44,7 +44,7 @@ class WKMMarkAdminForm(forms.ModelForm):
             instance.save()
 
         if self.cleaned_data.get('ready_for_search_indexation'):
-            service = WKMImportService(instance)
-            service.execute()
+            # Імпорт добре відомої ТМ у СІС
+            import_wkm.delay(instance.id)
 
         return instance
