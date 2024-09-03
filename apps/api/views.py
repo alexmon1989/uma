@@ -57,7 +57,7 @@ class OpenDataListView(generics.ListAPIView):
             except ObjType.DoesNotExist:
                 raise exceptions.ParseError("Невірне значення параметру obj_type")
 
-        return queryset
+        return queryset.values()
 
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
