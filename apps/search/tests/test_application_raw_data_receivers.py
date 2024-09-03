@@ -1,3 +1,5 @@
+import os.path
+
 from django.test import TestCase
 
 from unittest.mock import patch
@@ -11,7 +13,8 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSIDReceiver,
                                                                  ApplicationRawDataFSInvUMLDReceiver,
                                                                  ApplicationRawDataFSMadrid9Receiver,
-                                                                 ApplicationRawDataFSGeoReceiver)
+                                                                 ApplicationRawDataFSGeoReceiver,
+                                                                 ApplicationRawDataFSWKMReceiver)
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 
 
@@ -213,3 +216,17 @@ class ApplicationRawDataFSGeoReceiverTestCase(TestCase):
     def test_is_instance(self):
         receiver = ApplicationRawDataFSGeoReceiver(IpcAppList())
         self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
+
+
+class ApplicationRawDataFSWKMReceiverTestCase(TestCase):
+
+    def test_is_instance(self):
+        receiver = ApplicationRawDataFSGeoReceiver(IpcAppList())
+        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
+
+    def test_set_file_path(self):
+        app = IpcAppList(files_path='/test_path/', id_claim=12345)
+        receiver = ApplicationRawDataFSWKMReceiver(app)
+        receiver._set_file_path()
+        expected_path = os.path.join(app.files_path, f'{app.id_claim}.json')
+        self.assertEqual(receiver._file_path, expected_path)
