@@ -177,13 +177,15 @@ class WKMImportService:
     def _create_biblio_file(self) -> None:
         """Створює файли json з бібліографією у файловому сховищі СІС."""
         files_path_for_json = self._files_path.replace(settings.MEDIA_ROOT, '//bear/share/').replace('/', '\\')
-        wkm_converter = WKMConverter(self._wkm)
+        wkm_converter = WKMJSONConverter(self._wkm)
         data = {
             'Document': {
                 'idObjType': self._obj_type.pk,
                 'filesPath': files_path_for_json
             },
-            'WellKnownMarkDetails': wkm_converter.convert()
+            'WellKnownMark': {
+                'WellKnownMarkDetails': wkm_converter.convert()
+            }
         }
         with open(os.path.join(self._files_path, f"{self._wkm.id}.json"), 'w') as fp:
             json.dump(data, fp, ensure_ascii=False)
@@ -212,13 +214,10 @@ class WKMImportService:
 
         return app
 
-    def execute(self) -> None:
+    def execute(self) -> IpcAppList:
         """Головний метод класу, який виконує роботу по імпорту добре відомої ТМ у СІС."""
         # Створити файли з даними і зображенням у файловому сховищі
         self._create_files()
 
         # Створити/оновити запис у БД UMA
-        app = self._create_or_update_db_record()
-
-        # Виконати пошукову індексацію
-        # TODO:
+        return self._create_or_update_db_record()

@@ -7,7 +7,8 @@ from apps.search.services.application_simple_data_creators import (ApplicationSi
                                                                    ApplicationSimpleDataInvCertCreator,
                                                                    ApplicationSimpleDataMadridCreator,
                                                                    ApplicationSimpleDataGeoCreator,
-                                                                   ApplicationSimpleDataCRCreator)
+                                                                   ApplicationSimpleDataCRCreator,
+                                                                   ApplicationSimpleDataWKMCreator)
 
 
 class ApplicationSimpleDataTMCreatorTestCase(TestCase):
@@ -1216,3 +1217,80 @@ class ApplicationSimpleDataCRCreatorTestCase(TestCase):
         }
         res = self.simple_data_creator.get_data(IpcAppList(), app_data)
         self.assertEqual(res['registration_status_color'], 'green')
+
+
+class ApplicationSimpleDataWKMCreatorTestCase(TestCase):
+
+    def setUp(self) -> None:
+        self.simple_data_creator = ApplicationSimpleDataWKMCreator()
+
+    def test_get_rights_date(self):
+        app_data = {
+            'WellKnownMark': {
+                'WellKnownMarkDetails': {
+                    'RightsDate': '2024-01-01'
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['rights_date'], '2024-01-01')
+
+    def test_get_owners(self):
+        app_data = {
+            'WellKnownMark': {
+                'WellKnownMarkDetails': {
+                    'HolderDetails': {
+                        'Holder': [
+                            {
+                                'HolderAddressBook': {
+                                    'FormattedNameAddress': {
+                                        'Name': {
+                                            'FreeFormatName': {
+                                                'FreeFormatNameDetails': {
+                                                    'FreeFormatNameLine': 'Іванов Іван Іванович',
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(
+            res['owner'],
+            [
+                {'name': 'Іванов Іван Іванович'},
+            ]
+        )
+
+    def test_get_title(self):
+        app_data = {
+            'WellKnownMark': {
+                'WellKnownMarkDetails': {}
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['title'], '')
+
+        app_data = {
+            'WellKnownMark': {
+                'WellKnownMarkDetails': {
+                    'WordMarkSpecification': {
+                        'MarkSignificantVerbalElement': [
+                            {
+                                '#text': 'test',
+                            },
+                            {
+                                '#text': 'data',
+                            },
+                        ]
+                    }
+                }
+            }
+        }
+        res = self.simple_data_creator.get_data(IpcAppList(), app_data)
+        self.assertEqual(res['title'], 'test, data')

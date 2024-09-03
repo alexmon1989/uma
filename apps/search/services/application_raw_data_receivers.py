@@ -226,3 +226,11 @@ class ApplicationRawDataFSGeoReceiver(ApplicationRawDataFSReceiver):
     """Получает сырые данные ГЗ,
     получает доп. информацию, которой нет в ФС."""
     pass
+
+
+class ApplicationRawDataFSWKMReceiver(ApplicationRawDataFSReceiver):
+    """Отримує сирі дані добре відомої ТМ."""
+
+    def _set_file_path(self) -> None:
+        """Встановлює шлях до файлу з даними."""
+        self._file_path = os.path.join(self._app.real_files_path, f"{self._app.id_claim}.json")
