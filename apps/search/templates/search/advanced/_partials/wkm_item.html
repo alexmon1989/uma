@@ -3,7 +3,7 @@
 {% load i18n %}
 
 <div class="card g-brd-none rounded-0 g-mb-20 g-font-size-13">
-    <div class="d-flex justify-content-between card-header g-font-size-14 g-pl-10 g-py-4 {% if hit.Document.MarkCurrentStatusCodeType == '1000' %}g-bg-green{% else %}g-bg-bluegray-opacity-0_35{% endif %} g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+    <div class="d-flex justify-content-between card-header g-font-size-14 g-pl-10 g-py-4 g-bg-bluegray-opacity-0_35 g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
         <div>
             {{ item_num }}.
             <a href="{% url 'search:detail' pk=hit.meta.id %}"

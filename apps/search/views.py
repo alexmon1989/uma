@@ -255,7 +255,7 @@ def get_data_app_html(request):
                     code_title=F(f"ipc_code__code_value_{context['lang_code']}"),
                     ipc_code_short=F('ipc_code__code_inid')
                 ).values('ipc_code_short', 'code_title', 'enable_view')
-                if context['hit']['search_data']['obj_state'] == 1:
+                if context['hit']['search_data'].get('obj_state') == 1:
                     ipc_fields = ipc_fields.filter(
                         schedule_type__id__gte=9,
                         schedule_type__id__lte=15,
@@ -291,6 +291,8 @@ def get_data_app_html(request):
                     template = 'search/detail/agreement/detail.html'
                 elif context['hit']['Document']['idObjType'] == 16:
                     template = 'search/detail/cap/detail.html'
+                elif context['hit']['Document']['idObjType'] == 17:
+                    template = 'search/detail/wkm/detail.html'
                 else:
                     template = 'search/detail/not_found.html'
             else:

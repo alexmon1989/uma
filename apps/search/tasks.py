@@ -206,7 +206,7 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
     sort_doc_flow(hit)
 
     # Сортировка оповещений
-    if hit['search_data']['obj_state'] == 2:
+    if hit['search_data'].get('obj_state') == 2:
         search_services.application_sort_transactions(hit)
 
     hit['meta'] = {'id': id_app_number}
