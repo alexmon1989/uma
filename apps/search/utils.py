@@ -1916,7 +1916,7 @@ def filter_app_data(app_data, user):
     # Если это заявка на полезную модель или пром образец, заявка на ТМ без установленной даты подачи
     # то необходимо убрать всю "закрытую" информацию
     # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
-    if app_data['search_data']['obj_state'] == 1 and not user_has_access_to_docs(user, app_data):
+    if app_data['search_data'].get('obj_state') == 1 and not user_has_access_to_docs(user, app_data):
 
         if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
             res = {

@@ -46,6 +46,11 @@ def cap_item(context, hit, item_num):
     return {'biblio_data': biblio_data, 'hit': hit, 'item_num': item_num, 'request': context['request']}
 
 
+@register.inclusion_tag('search/advanced/_partials/wkm_item.html', takes_context=True)
+def wkm_item(context, hit, item_num):
+    return {'hit': hit, 'item_num': item_num, 'request': context['request']}
+
+
 @register.inclusion_tag('search/advanced/_partials/ld_item.html', takes_context=True)
 def ld_item(context, hit, item_num):
     biblio_data = hit['Claim'] if hit['search_data']['obj_state'] == 1 else hit['Patent']

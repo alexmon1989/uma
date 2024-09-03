@@ -1,0 +1,74 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div class="card g-brd-none rounded-0 g-mb-20 g-font-size-13">
+    <div class="d-flex justify-content-between card-header g-font-size-14 g-pl-10 g-py-4 {% if hit.Document.MarkCurrentStatusCodeType == '1000' %}g-bg-green{% else %}g-bg-bluegray-opacity-0_35{% endif %} g-brd-transparent g-font-size-14 g-font-weight-600 rounded-0 mb-0">
+        <div>
+            {{ item_num }}.
+            <a href="{% url 'search:detail' pk=hit.meta.id %}"
+               class="g-color-black-opacity-0_8 g-color-burgundy--hover g-text-underline g-text-underline--none--hover"
+            >{{ hit.search_data.title|default_if_none:"---" }}</a>
+        </div>
+
+        {% include 'search/advanced/_partials/favorites_icon.html' %}
+    </div>
+
+    <div class="g-py-5 d-flex justify-content-between">
+        <div class="g-text-underline text-info">
+            {% trans "Добре відома в Україні торговельна марка" %}
+        </div>
+    </div>
+
+    <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">
+                {% trans "Дата, на яку торговельна марка стала добре відомою в Україні" %}:
+            </h4>
+
+            {{ hit.WellKnownMark.WellKnownMarkDetails.RightsDate|parse_date|date:"d.m.Y" }}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">
+                {% trans "Дата публікації та номер бюлетеня" %}:
+            </h4>
+
+            {{ hit.WellKnownMark.WellKnownMarkDetails.PublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}<br>
+            {{ hit.WellKnownMark.WellKnownMarkDetails.PublicationDetails.0.PublicationIdentifier }}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
+            {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+
+            {% for holder in hit.WellKnownMark.WellKnownMarkDetails.HolderDetails.Holder %}
+                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md">
+            <h4 class="g-font-size-13 g-font-weight-600 g-mb-0"><abbr title="{% trans "Міжнародна класифікація товарів і послуг для реєстрації знаків та перелік товарів і послуг" %}">{% trans "МКТП" %}</abbr>:</h4>
+            {% for index in hit.WellKnownMark.WellKnownMarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                {{ index.ClassNumber }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-md-3">
+            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+               href="javascript:;"
+               data-src="{{ hit.Document.filesPath|get_image_url:hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
+                <img class="img-fluid img-thumbnail"
+                     src="{{ hit.Document.filesPath|get_image_url:hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                     alt="">
+
+                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                    <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    {% include 'search/advanced/_partials/item_details_link_block.html' %}
+</div>
