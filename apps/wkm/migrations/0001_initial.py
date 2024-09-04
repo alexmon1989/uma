@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WKMMarkOwner',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(db_column='id', primary_key=True, serialize=False)),
                 ('ord_num', models.SmallIntegerField(db_column='OrdNum')),
                 ('mark', models.ForeignKey(db_column='IdMark', on_delete=django.db.models.deletion.DO_NOTHING,
                                            to='wkmmark')),

@@ -2,81 +2,30 @@ import base64
 
 from django.contrib import admin
 from django.utils.html import format_html
+from reversion.admin import VersionAdmin
 
 from .forms import WKMMarkAdminForm
+from .widgets import MyAdminSplitDateTime
 from .models import WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, WKMClass, WKMVienna
 
 
-class MultiDBModelAdmin(admin.ModelAdmin):
-    # A handy constant for the name of the alternate database.
-    using = "WellKnownMarks"
-
-    def save_model(self, request, obj, form, change):
-        # Tell Django to save objects to the 'other' database.
-        obj.save(using=self.using)
-
-    def delete_model(self, request, obj):
-        # Tell Django to delete objects from the 'other' database
-        obj.delete(using=self.using)
-
-    def get_queryset(self, request):
-        # Tell Django to look for objects on the 'other' database.
-        return super().get_queryset(request).using(self.using)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        # Tell Django to populate ForeignKey widgets using a query
-        # on the 'other' database.
-        return super().formfield_for_foreignkey(
-            db_field, request, using=self.using, **kwargs
-        )
-
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        # Tell Django to populate ManyToMany widgets using a query
-        # on the 'other' database.
-        return super().formfield_for_manytomany(
-            db_field, request, using=self.using, **kwargs
-        )
-
-
-class MultiDBStackedInline(admin.StackedInline):
-    using = "WellKnownMarks"
-
-    def get_queryset(self, request):
-        # Tell Django to look for inline objects on the 'other' database.
-        return super().get_queryset(request).using(self.using)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        # Tell Django to populate ForeignKey widgets using a query
-        # on the 'other' database.
-        return super().formfield_for_foreignkey(
-            db_field, request, using=self.using, **kwargs
-        )
-
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        # Tell Django to populate ManyToMany widgets using a query
-        # on the 'other' database.
-        return super().formfield_for_manytomany(
-            db_field, request, using=self.using, **kwargs
-        )
-
-
-class WKMClassInline(MultiDBStackedInline):
+class WKMClassInline(admin.StackedInline):
     model = WKMClass
     extra = 0
 
 
-class WKMOwnerInline(MultiDBStackedInline):
+class WKMOwnerInline(admin.StackedInline):
     model = WKMMarkOwner
     extra = 0
 
 
-class WKMViennaInline(MultiDBStackedInline):
+class WKMViennaInline(admin.StackedInline):
     model = WKMVienna
     extra = 0
 
 
 @admin.register(WKMMark)
-class WKMMarkAdmin(MultiDBModelAdmin):
+class WKMMarkAdmin(VersionAdmin, admin.ModelAdmin):
     list_display = ('keywords', 'bulletin')
     ordering = ('id', )
     search_fields = ('keywords', )
@@ -86,6 +35,11 @@ class WKMMarkAdmin(MultiDBModelAdmin):
         WKMOwnerInline,
     )
     form = WKMMarkAdminForm
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name in ('decision_date', 'order_date', 'rights_date'):
+            kwargs['widget'] = MyAdminSplitDateTime()
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def image_tag(self, obj):
         if obj.mark_image:
@@ -109,12 +63,16 @@ class WKMMarkAdmin(MultiDBModelAdmin):
         'ready_for_search_indexation',
     )
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('bulletin')
+
 
 @admin.register(WKMRefBulletin)
-class WKMRefBulletinAdmin(MultiDBModelAdmin):
+class WKMRefBulletinAdmin(admin.ModelAdmin):
     list_display = ('bull_str', 'bulletin_date', 'bulletin_number', )
 
 
 @admin.register(WKMRefOwner)
-class WKMRefOwnerAdmin(MultiDBModelAdmin):
+class WKMRefOwnerAdmin(admin.ModelAdmin):
     list_display = ('owner_name', 'country_code', )

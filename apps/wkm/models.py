@@ -3,13 +3,13 @@ from django.db import models
 
 class WKMMark(models.Model):
     id = models.AutoField(db_column='IdMark', primary_key=True)
-    decision_date = models.DateField(
+    decision_date = models.DateTimeField(
         db_column='DecisionDate',
         verbose_name='Дата набрання чинності рішенням, яким визнано, що знак став добре відомим в Україні',
         blank=True,
         help_text='Не виводиться, якщо заповнене поле "Рішення суду (укр.)"'
     )
-    order_date = models.DateField(
+    order_date = models.DateTimeField(
         db_column='OrderDate',
         verbose_name='Дата наказу',
         blank=True,
@@ -22,7 +22,7 @@ class WKMMark(models.Model):
         verbose_name='Номер наказу',
         help_text='Не виводиться, якщо заповнене поле "Рішення суду (укр.)"'
     )
-    rights_date = models.DateField(
+    rights_date = models.DateTimeField(
         db_column='RightsDate',
         verbose_name='Дата, на яку знак став добре відомим в Україні'
     )
@@ -83,10 +83,11 @@ class WKMRefOwner(models.Model):
 
 
 class WKMMarkOwner(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
     mark = models.ForeignKey(WKMMark, db_column='IdMark', on_delete=models.DO_NOTHING)
     owner = models.ForeignKey(WKMRefOwner, on_delete=models.DO_NOTHING, db_column='IdOwner',
                               verbose_name='Найменування власника')
-    ord_num = models.SmallIntegerField(db_column='OrdNum', primary_key=True, verbose_name='Порядок відображення')
+    ord_num = models.SmallIntegerField(db_column='OrdNum', verbose_name='Порядок відображення')
 
     def __str__(self):
         return str(self.owner)

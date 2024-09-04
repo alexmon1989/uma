@@ -1,7 +1,8 @@
+import io
+
 from django import forms
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
-import io
 
 from .models import WKMMark
 from .tasks import import_wkm
@@ -34,6 +35,7 @@ class WKMMarkAdminForm(forms.ModelForm):
             )
 
     def save(self, commit=True) -> WKMMark:
+        self.cleaned_data['decision_date'] = '2004-05-17 00:00:00'
         instance = super().save(commit=False)
         if self.cleaned_data.get('image'):
             image = self.cleaned_data['image']
