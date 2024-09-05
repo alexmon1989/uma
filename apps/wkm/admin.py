@@ -26,7 +26,14 @@ class WKMViennaInline(admin.StackedInline):
 
 @admin.register(WKMMark)
 class WKMMarkAdmin(VersionAdmin, admin.ModelAdmin):
-    list_display = ('keywords', 'bulletin')
+    list_display = (
+        'keywords',
+        'get_rights_date_formatted',
+        'bulletin',
+        'get_decision_date_formatted',
+        'get_order_date_formatted',
+        'order_number',
+    )
     ordering = ('id', )
     search_fields = ('keywords', )
     inlines = (
@@ -46,6 +53,27 @@ class WKMMarkAdmin(VersionAdmin, admin.ModelAdmin):
             image_data = base64.b64encode(obj.mark_image).decode('utf-8')
             return format_html(f'<img src="data:image/jpeg;base64,{image_data}" width="150" />')
         return 'Зображення відсутнє'
+
+    def get_rights_date_formatted(self, obj):
+        if obj:
+            return obj.rights_date.strftime('%d.%m.%Y')
+
+    def get_decision_date_formatted(self, obj):
+        if obj:
+            return obj.decision_date.strftime('%d.%m.%Y')
+
+    def get_order_date_formatted(self, obj):
+        if obj:
+            return obj.order_date.strftime('%d.%m.%Y')
+
+    get_rights_date_formatted.admin_order_field = 'date'
+    get_rights_date_formatted.short_description = WKMMark._meta.get_field('rights_date').verbose_name
+
+    get_decision_date_formatted.admin_order_field = 'date'
+    get_decision_date_formatted.short_description = WKMMark._meta.get_field('decision_date').verbose_name
+
+    get_order_date_formatted.admin_order_field = 'date'
+    get_order_date_formatted.short_description = WKMMark._meta.get_field('order_date').verbose_name
 
     image_tag.short_description = 'Поточне зображення'
     readonly_fields = ['image_tag']
