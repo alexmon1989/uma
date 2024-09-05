@@ -35,18 +35,16 @@ class WKMMarkAdminForm(forms.ModelForm):
             )
 
     def save(self, commit=True) -> WKMMark:
-        self.cleaned_data['decision_date'] = '2004-05-17 00:00:00'
         instance = super().save(commit=False)
         if self.cleaned_data.get('image'):
             image = self.cleaned_data['image']
             image_data = image.read()
             instance.mark_image = image_data
 
-        if commit:
-            instance.save()
+        instance.save()
 
         if self.cleaned_data.get('ready_for_search_indexation'):
-            # Імпорт добре відомої ТМ у СІС
+            # Імпорт добре відомої ТМ у СІС (створення задачі Celery)
             import_wkm.delay(instance.id)
 
         return instance

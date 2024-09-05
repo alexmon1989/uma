@@ -225,4 +225,10 @@ class WKMImportService:
         self._create_files()
 
         # Створити/оновити запис у БД UMA
-        return self._create_or_update_db_record()
+        app = self._create_or_update_db_record()
+
+        # Пошукова індексація
+        indexation_service = ApplicationIndexationService()
+        indexation_service.index_application(app)
+
+        return app
