@@ -44,7 +44,9 @@
             {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
 
             {% for holder in hit.WellKnownMark.WellKnownMarkDetails.HolderDetails.Holder %}
-                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %}<br>{% endif %}
+                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                [{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                {% if not forloop.last %}<br>{% endif %}
             {% endfor %}
         </div>
 

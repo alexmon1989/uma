@@ -73,7 +73,15 @@ class WKMMarkConverterTest(TestCase):
 
         self.assertEqual(len(result['HolderDetails']['Holder']), 2)
         self.assertEqual(result['HolderDetails']['Holder'][0]['HolderSequenceNumber'], 1)
+        self.assertEqual(result['HolderDetails']['Holder'][0]['HolderAddressBook']['FormattedNameAddress'][
+                             'Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine'], 'Owner 1')
+        self.assertEqual(result['HolderDetails']['Holder'][0]['HolderAddressBook']['FormattedNameAddress'][
+                             'Address']['AddressCountryCode'], 'UA')
         self.assertEqual(result['HolderDetails']['Holder'][1]['HolderSequenceNumber'], 2)
+        self.assertEqual(result['HolderDetails']['Holder'][1]['HolderAddressBook']['FormattedNameAddress'][
+                             'Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine'], 'Owner 2')
+        self.assertEqual(result['HolderDetails']['Holder'][1]['HolderAddressBook']['FormattedNameAddress'][
+                             'Address']['AddressCountryCode'], 'US')
 
     def test_add_nice_classes(self):
         converter = WKMJSONConverter(self.mark)

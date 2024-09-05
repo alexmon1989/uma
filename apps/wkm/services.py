@@ -10,6 +10,7 @@ from django.conf import settings
 from PIL import Image
 
 from apps.search.models import ObjType, IpcAppList, ScheduleType
+from apps.search.services.application_indexators import ApplicationIndexationService
 
 if TYPE_CHECKING:
     from apps.wkm.models import WKMMark
@@ -107,6 +108,9 @@ class WKMJSONConverter(WKMConverter):
             self._res.setdefault('HolderDetails', {}).setdefault('Holder', []).append({
                 'HolderAddressBook': {
                     'FormattedNameAddress': {
+                        'Address': {
+                            'AddressCountryCode': owner.country_code
+                        },
                         'Name': {
                             'FreeFormatName': {
                                 'FreeFormatNameDetails': {
