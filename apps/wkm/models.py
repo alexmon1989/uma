@@ -153,3 +153,43 @@ class WKMVienna(models.Model):
         db_table = 'MarkVienna'
         verbose_name = 'Клас'
         verbose_name_plural = 'Віденська класифікація'
+
+
+class WKMDocumentType(models.Model):
+    value = models.CharField('Значення', max_length=255)
+    code = models.CharField('Код типу документа', max_length=32, blank=True, null=True)
+
+    def __str__(self):
+        return self.value
+
+    class Meta:
+        managed = False
+        db_table = 'ref_DocumentTypes'
+        verbose_name = 'Тип документа'
+        verbose_name_plural = 'Типи документів'
+
+
+class WKMDocument(models.Model):
+    """Модель документу добре відомої ТМ."""
+    document_type = models.ForeignKey(
+        WKMDocumentType,
+        on_delete=models.SET_NULL,
+        verbose_name='Тип документа',
+        null=True,
+        db_column='IdDocumentType'
+    )
+    wkm = models.ForeignKey(WKMMark,
+                            on_delete=models.SET_NULL,
+                            verbose_name='Добре відома ТМ',
+                            null=True,
+                            db_column='IdMark')
+    file = models.BinaryField(blank=True, null=True, editable=True, verbose_name='Файл')
+
+    class Meta:
+        managed = False
+        db_table = 'MarkDocuments'
+        verbose_name = 'Документ'
+        verbose_name_plural = 'Документи'
+
+    def __str__(self):
+        return self.document_type.value

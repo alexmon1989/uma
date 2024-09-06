@@ -4,9 +4,10 @@ from django.contrib import admin
 from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
-from .forms import WKMMarkAdminForm
+from .forms import WKMMarkAdminForm, WKMDocumentAdminForm
 from .widgets import MyAdminSplitDateTime
-from .models import WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, WKMClass, WKMVienna
+from .models import (WKMMark, WKMMarkOwner, WKMRefOwner, WKMRefBulletin, WKMClass, WKMVienna, WKMDocument,
+                     WKMDocumentType)
 
 
 class WKMClassInline(admin.StackedInline):
@@ -22,6 +23,26 @@ class WKMOwnerInline(admin.StackedInline):
 class WKMViennaInline(admin.StackedInline):
     model = WKMVienna
     extra = 0
+
+
+class WKMDocumentInline(admin.StackedInline):
+    model = WKMDocument
+    extra = 0
+    form = WKMDocumentAdminForm
+    fields = (
+        'document_type',
+        'my_file',
+        'file_tag',
+    )
+    readonly_fields = ['file_tag']
+
+    def file_tag(self, obj):
+        if obj.file:
+            file_data = base64.b64encode(obj.file).decode('utf-8')
+            return format_html(f'<a download="{obj.pk}" href="data:application/pdf;base64,{file_data}">Переглянути</a>')
+        return 'Файл відсутній'
+
+    file_tag.short_description = 'Поточний файл'
 
 
 @admin.register(WKMMark)
@@ -40,6 +61,7 @@ class WKMMarkAdmin(VersionAdmin, admin.ModelAdmin):
         WKMClassInline,
         WKMViennaInline,
         WKMOwnerInline,
+        WKMDocumentInline,
     )
     form = WKMMarkAdminForm
 
@@ -104,3 +126,33 @@ class WKMRefBulletinAdmin(admin.ModelAdmin):
 @admin.register(WKMRefOwner)
 class WKMRefOwnerAdmin(admin.ModelAdmin):
     list_display = ('owner_name', 'country_code', )
+
+
+@admin.register(WKMDocument)
+class WKMDocumentAdmin(admin.ModelAdmin):
+    list_display = ('wkm', 'document_type', )
+    form = WKMDocumentAdminForm
+    fields = (
+        'document_type',
+        'wkm',
+        'my_file',
+        'file_tag',
+    )
+    readonly_fields = ['file_tag']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('wkm', 'document_type')
+
+    def file_tag(self, obj):
+        if obj.file:
+            file_data = base64.b64encode(obj.file).decode('utf-8')
+            return format_html(f'<a download="{obj.pk}" href="data:application/pdf;base64,{file_data}">Переглянути</a>')
+        return 'Файл відсутній'
+
+    file_tag.short_description = 'Поточний файл'
+
+
+@admin.register(WKMDocumentType)
+class WKMDocumentTypeAdmin(admin.ModelAdmin):
+    list_display = ('value', )
