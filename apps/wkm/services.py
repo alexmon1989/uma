@@ -51,7 +51,9 @@ class WKMJSONConverter(WKMConverter):
         :rtype dict
         """
         self.add_publication_details()
-        self.add_dates()
+        self.add_decision_details()
+        self.add_order_details()
+        self.add_rights_date()
         self.add_word_mark_specification()
         self.add_court_comments()
         self.add_mark_image_details()
@@ -66,9 +68,29 @@ class WKMJSONConverter(WKMConverter):
             'PublicationIdentifier': self._record.bulletin.bull_str,
         }]
 
-    def add_dates(self) -> None:
-        self._res['DecisionDate'] = self._record.decision_date.strftime('%Y-%m-%d') if self._record.decision_date else None
-        self._res['OrderDate'] = self._record.order_date.strftime('%Y-%m-%d') if self._record.order_date else None
+    def add_decision_details(self) -> None:
+        if self._record.decision_date and self._record.decision_date.year != 1900:
+            self._res.setdefault('DecisionDetails', {})['DecisionDate'] = \
+                self._record.decision_date.strftime('%Y-%m-%d')
+        if self._record.wkmdocument_set.filter(document_type__code='decision').exists():
+            self._res.setdefault(
+                'DecisionDetails', {}).setdefault('DecisionFile', {})['DecisionFilename'] = 'decision.pdf'
+
+    def add_order_details(self) -> None:
+        if self._record.order_date and self._record.order_date.year != 1900:
+            self._res.setdefault('OrderDetails', {})['OrderDate'] = \
+                self._record.order_date.strftime('%Y-%m-%d')
+        if self._record.order_number:
+            self._res.setdefault('OrderDetails', {})['OrderNumber'] = self._record.order_number
+        order_doc_types = ['nakaz_dsiv', 'nakaz_minekonom1', 'nakaz_minekonom2']
+        order_doc = self._record.wkmdocument_set.filter(document_type__code__in=order_doc_types).last()
+        if order_doc:
+            self._res.setdefault('OrderDetails', {})['OrderFile'] = {
+                'OrderFilename': f"{order_doc.document_type.code}.pdf",
+                'OrderType': order_doc.document_type.value
+            }
+
+    def add_rights_date(self) -> None:
         self._res['RightsDate'] = self._record.rights_date.strftime('%Y-%m-%d') if self._record.rights_date else None
 
     def add_word_mark_specification(self) -> None:
@@ -178,6 +200,7 @@ class WKMImportService:
         os.makedirs(self._files_path, exist_ok=True)
         self._create_biblio_file()
         self._create_image()
+        self._create_documents()
 
     def _create_biblio_file(self) -> None:
         """Створює файли json з бібліографією у файловому сховищі СІС."""
@@ -195,11 +218,19 @@ class WKMImportService:
         with open(os.path.join(self._files_path, f"{self._wkm.id}.json"), 'w') as fp:
             json.dump(data, fp, ensure_ascii=False)
 
-    def _create_image(self):
+    def _create_image(self) -> None:
         """Створює зображення у файловому сховищі СІС."""
         image_data = self._wkm.mark_image
-        image = Image.open(io.BytesIO(image_data))
-        image.save(os.path.join(self._files_path, f"{self._wkm.id}.jpg"), format='JPEG')
+        if image_data:
+            image = Image.open(io.BytesIO(image_data))
+            image.save(os.path.join(self._files_path, f"{self._wkm.id}.jpg"), format='JPEG')
+
+    def _create_documents(self) -> None:
+        """Створює файли у файловому сховищі СІС."""
+        for doc in self._wkm.wkmdocument_set.all():
+            file_name = f"{doc.document_type.code}.pdf"
+            with open(os.path.join(self._files_path, file_name), 'wb') as f:
+                f.write(doc.file)
 
     def _create_or_update_db_record(self) -> IpcAppList:
         """Створює або оновлює запис у БД UMA."""

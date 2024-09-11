@@ -40,15 +40,53 @@
                 }
               }
             },
-            "DecisionDate": {
-              "type": "string",
-              "format": "date",
-              "description": "Дата набрання чинності рішенням"
+            "DecisionDetails": {
+              "type": "object",
+              "description": "Дані про рішення",
+              "properties": {
+                "DecisionDate": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Дата набрання чинності рішенням"
+                },
+                "DecisionFile": {
+                  "type": "object",
+                  "properties": {
+                    "DecisionFilename": {
+                      "type": "string",
+                      "description": "Відносне посилання на файл"
+                    }
+                  }
+                }
+              }
             },
-            "OrderDate": {
-              "type": "string",
-              "format": "date",
-              "description": "Дата наказу"
+            "OrderDetails": {
+              "type": "object",
+              "description": "Дані про наказ",
+              "properties": {
+                "OrderDate": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Дата наказу"
+                },
+                "OrderNumber": {
+                  "type": "string",
+                  "description": "Номер наказу"
+                },
+                "OrderFile": {
+                  "type": "object",
+                  "properties": {
+                    "OrderFilename": {
+                      "type": "string",
+                      "description": "Відносне посилання на файл"
+                    },
+                    "OrderType": {
+                      "type": "string",
+                      "description": "Тип наказу"
+                    }
+                  }
+                }
+              }
             },
             "RightsDate": {
               "type": "string",

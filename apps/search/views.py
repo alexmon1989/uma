@@ -262,7 +262,7 @@ def get_data_app_html(request):
                     )
                 else:
                     ipc_fields = ipc_fields.filter(
-                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32, 34))
+                        Q(schedule_type__id__gte=3, schedule_type__id__lte=8) | Q(schedule_type__id__in=(16, 17, 18, 19, 30, 32, 34, 35))
                     )
                 context['ipc_fields'] = ipc_fields
 

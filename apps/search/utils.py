@@ -45,6 +45,14 @@ def get_search_groups(search_data):
                 search_data
             ))
         })
+        # Поисковые запросы на документы без статуса
+        search_groups.append({
+            'obj_type': obj_type,
+            'search_params': list(filter(
+                lambda x: str(obj_type.pk) in x['obj_type'] and not x['obj_state'],
+                search_data
+            ))
+        })
     # Фильтрация пустых групп
     search_groups = filter(lambda x: len(x['search_params']) > 0, search_groups)
     return list(search_groups)
@@ -94,7 +102,10 @@ def get_elastic_results(search_groups: dict):
     for group in search_groups:
         if group['search_params']:
             # Идентификаторы schedule_type для заявок или охранных документов
-            schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34)
+            if not group.get('obj_state'):
+                schedule_type_ids = (35, )
+            else:
+                schedule_type_ids = (10, 11, 12, 13, 14, 15) if group['obj_state'] == 1 else (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34)
             qs = None
 
             for search_param in group['search_params']:
@@ -154,7 +165,8 @@ def get_elastic_results(search_groups: dict):
 
             if qs is not None:
                 qs &= Q('query_string', query=f"{group['obj_type'].pk}", default_field='Document.idObjType')
-                qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
+                if group.get('obj_state'):
+                    qs &= Q('query_string', query=f"{group['obj_state']}", default_field='search_data.obj_state')
 
                 # Не включать в список результатов заявки, по которым выдан патент
                 qs = filter_bad_apps(qs)
@@ -2091,16 +2103,22 @@ def get_ipc_codes_with_schedules(lang_code):
     res = []
     for item in qs:
         obj_states = [
-            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34) else 1
+            2 if schedule_type.schedule_type.id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34, 35) else 1
             for schedule_type in item.inidcodeschedule_set.all()
         ]
 
         if obj_states:
+            obj_types = [obj_type.id for obj_type in item.obj_types.all()]
+
+            # Добре відомі ТМ
+            if 17 in obj_types:
+                obj_states = []
+
             res.append({
                 'id': item.id,
                 'value': item.code_value_ua if lang_code == 'ua' else item.code_value_en,
                 'data_type': item.code_data_type,
-                'obj_types': [obj_type.id for obj_type in item.obj_types.all()],
+                'obj_types': obj_types,
                 'obj_states': obj_states,
             })
     return res
