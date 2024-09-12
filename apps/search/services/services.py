@@ -1082,6 +1082,20 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
         ]
         res.extend(inid_data)
 
+        # Добре відомі ТМ
+        inid_data = [
+            InidCode(17, 'image', 'Зображення знака', None, True),
+            InidCode(17, 'keywords', 'Ключові слова', None, True),
+            InidCode(17, 'decision_date', 'Дата набрання чинності рішенням, яким визнано, '
+                                          'що знак став добре відомим в Україні', None, True),
+            InidCode(17, 'rights_date', 'Дата, на яку знак став добре відомим в Україні', None, True),
+            InidCode(17, 'holder', 'Ім\'я або повне найменування власника', None, True),
+            InidCode(17, 'nice', 'Перелік товарів і/або послуг, за класами МКТП '
+                                 'для яких знак визнано добре відомим в Україні', None, True),
+            InidCode(17, 'vienna', 'Індекси Віденської класифікації', None, True),
+        ]
+        res.extend(inid_data)
+
     elif lang == 'en':
         # ТМ регистрации
         inid_data = [
@@ -1361,6 +1375,20 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
                                'on the market', 2, True),
             InidCode(16, '94', 'Term of validity of certificate of additional protection', 2, True),
             InidCode(16, '73', 'Name or full name and address of the CAP owner(s) and two-letter country code', 2, True),
+        ]
+        res.extend(inid_data)
+
+        # Добре відомі ТМ
+        inid_data = [
+            InidCode(17, 'image', 'Reproduction of the Mark', None, True),
+            InidCode(17, 'keywords', 'Key Words', None, True),
+            InidCode(17, 'decision_date', 'Effective Date of the Decision on the Declaration of the Mark '
+                                          'to be Well-Known in Ukraine', None, True),
+            InidCode(17, 'rights_date', 'Date on which the Mark was Declared to be Well-Known in Ukraine', None, True),
+            InidCode(17, 'holder', 'Name of the holder', None, True),
+            InidCode(17, 'nice', 'List of Goods and/or Services for which the Mark was Declared '
+                                 'to be Well-Known in Ukraine', None, True),
+            InidCode(17, 'vienna', 'Vienna Clasification', None, True),
         ]
         res.extend(inid_data)
     return res

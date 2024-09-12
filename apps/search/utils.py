@@ -1320,7 +1320,10 @@ def prepare_data_for_search_report(s, lang_code, user=None):
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
         obj_type = next(filter(lambda item: item[0] == h.Document.idObjType, obj_types), None)[1]
-        obj_state = obj_states[h.search_data.obj_state - 1]
+        if hasattr(h.search_data, 'obj_state'):
+            obj_state = obj_states[h.search_data.obj_state - 1]
+        else:
+            obj_state = ''
 
         nice_indexes = get_app_nice_indexes(h)
         if is_app_limited_for_user(h.to_dict(), user):
@@ -1363,7 +1366,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                 agent = ''
             ipc_indexes = get_app_ipc_indexes(h)
             icid = get_app_icid(h)
-            if h.Document.idObjType in (4, 9, 14):
+            if h.Document.idObjType in (4, 9, 14, 17):
                 code_441 = get_441_code(h)
                 image = get_tm_image_path(h)
             else:
@@ -1375,7 +1378,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
                     obj_state,
                     h.search_data.app_number if hasattr(h.search_data, 'app_number') else '',
                     app_date,
-                    h.search_data.protective_doc_number,
+                    h.search_data.protective_doc_number if hasattr(h.search_data, 'protective_doc_number') else '',
                     rights_date,
                     title,
                     applicant,
@@ -1401,6 +1404,15 @@ def get_tm_image_path(app) -> str:
     if app['Document']['idObjType'] == 4:
         try:
             image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            return f"{settings.MEDIA_ROOT}/" \
+                   f"{splitted_path[splitted_path_len-4]}" \
+                   f"/{splitted_path[splitted_path_len-3]}/" \
+                   f"{splitted_path[splitted_path_len-2]}/{image_name}"
+        except KeyError:
+            return ''
+    elif app['Document']['idObjType'] == 17:
+        try:
+            image_name = app['WellKnownMark']['WellKnownMarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
             return f"{settings.MEDIA_ROOT}/" \
                    f"{splitted_path[splitted_path_len-4]}" \
                    f"/{splitted_path[splitted_path_len-3]}/" \
@@ -1581,6 +1593,17 @@ def get_app_owner(app):
         for item in app.Patent_Certificate.I_73:
             owners.append(f"{item['N.U']} [{item['C.U']}]")
 
+    # Добре відомі ТМ
+    elif app.Document.idObjType == 17:
+        try:
+            for item in app.WellKnownMark.WellKnownMarkDetails.HolderDetails.Holder:
+                owners.append(
+                    f"{item.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
+                    f"[{item.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                )
+        except AttributeError:
+            pass
+
     return ';\r\n'.join(owners)
 
 
@@ -1661,6 +1684,12 @@ def get_app_nice_indexes(app):
     if app.Document.idObjType == 4 and hasattr(app.TradeMark.TrademarkDetails, 'GoodsServicesDetails'):
         nice_indexes = []
         for cls in app.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
+            nice_indexes.append(str(cls.ClassNumber))
+        return '; '.join(nice_indexes)
+
+    elif app.Document.idObjType == 17 and hasattr(app.WellKnownMark.WellKnownMarkDetails, 'GoodsServicesDetails'):
+        nice_indexes = []
+        for cls in app.WellKnownMark.WellKnownMarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription:
             nice_indexes.append(str(cls.ClassNumber))
         return '; '.join(nice_indexes)
 
@@ -2053,7 +2082,7 @@ def filter_app_data(app_data, user):
 
 def is_app_limited(app_data: dict):
     """Является ли заявка такой, библиографические данные которой не должны публиковаться"""
-    if app_data['search_data']['obj_state'] == 1:
+    if app_data['search_data'].get('obj_state') == 1:
         if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
             return True
         elif app_data['Document']['idObjType'] == 2:  # Полезные модели
