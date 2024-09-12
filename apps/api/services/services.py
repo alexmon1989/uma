@@ -226,10 +226,14 @@ def app_get_biblio_data(app_data: dict) -> Optional[dict]:
     elif app_data['Document']['idObjType'] == 16:
         data_biblio = app_data['Patent_Certificate']
 
+    # Добре відомі ТМ
+    elif app_data['Document']['idObjType'] == 17:
+        data_biblio = app_data['WellKnownMark']['WellKnownMarkDetails']
+
     else:
         data_biblio = None
 
-    if app_data['search_data']['obj_state'] == 2 and data_biblio:
+    if app_data['search_data'].get('obj_state') == 2 and data_biblio:
         data_biblio['registration_status_color'] = app_data['search_data']['registration_status_color']
 
     # Стадии заявки
@@ -482,6 +486,7 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
             11: self._prepare_biblio_copyright,
             12: self._prepare_biblio_copyright,
             13: self._prepare_biblio_copyright,
+            17: self._prepare_biblio_wkm,
         }
 
     def _prepare_biblio_inv_um(self) -> None:
@@ -626,6 +631,28 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
             doc_flow = self._raw_biblio['DocFlow']['Documents']
             for doc in doc_flow:
                 del doc['DocRecord']['DocBarCode']
+        except (KeyError, TypeError):
+            pass
+
+    def _prepare_biblio_wkm(self):
+        # Відносний шлях до зображення
+        try:
+            image_name = self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            self._raw_biblio['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f"{self._files_dir}{image_name}"
+        except (KeyError, TypeError):
+            pass
+
+        # Відносні шляхи до файлу рішення
+        try:
+            decision_name = self._raw_biblio['DecisionDetails']['DecisionFile']['DecisionFilename']
+            self._raw_biblio['DecisionDetails']['DecisionFile']['DecisionFilename'] = f"{self._files_dir}{decision_name}"
+        except (KeyError, TypeError):
+            pass
+
+        # Відносні шляхи до файлу наказу
+        try:
+            order_name = self._raw_biblio['OrderDetails']['OrderFile']['OrderFilename']
+            self._raw_biblio['OrderDetails']['OrderFile']['OrderFilename'] = f"{self._files_dir}{order_name}"
         except (KeyError, TypeError):
             pass
 
