@@ -1379,7 +1379,7 @@ def prepare_data_for_search_report(s, lang_code, user=None):
     return data
 
 
-def get_tm_image_path(app):
+def get_tm_image_path(app) -> str:
     """Возвращает путь к изображению ТМ на диске."""
     if type(app) is not dict:
         app = app.to_dict()
@@ -1387,11 +1387,14 @@ def get_tm_image_path(app):
     splitted_path_len = len(splitted_path)
 
     if app['Document']['idObjType'] == 4:
-        image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
-        return f"{settings.MEDIA_ROOT}/" \
-               f"{splitted_path[splitted_path_len-4]}" \
-               f"/{splitted_path[splitted_path_len-3]}/" \
-               f"{splitted_path[splitted_path_len-2]}/{image_name}"
+        try:
+            image_name = app['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            return f"{settings.MEDIA_ROOT}/" \
+                   f"{splitted_path[splitted_path_len-4]}" \
+                   f"/{splitted_path[splitted_path_len-3]}/" \
+                   f"{splitted_path[splitted_path_len-2]}/{image_name}"
+        except KeyError:
+            return ''
     else:
         # ТМ Мадрид
         image_name = f"{app['search_data']['protective_doc_number']}.jpg"
