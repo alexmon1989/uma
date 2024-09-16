@@ -19,6 +19,10 @@ class WKMOwnerInline(admin.StackedInline):
     model = WKMMarkOwner
     extra = 0
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('owner')
+
 
 class WKMViennaInline(admin.StackedInline):
     model = WKMVienna
@@ -35,6 +39,9 @@ class WKMDocumentInline(admin.StackedInline):
         'file_tag',
     )
     readonly_fields = ['file_tag']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('document_type')
 
     def file_tag(self, obj):
         if obj.file:
@@ -141,8 +148,8 @@ class WKMDocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['file_tag']
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related('wkm', 'document_type')
+        qs = super().get_queryset(request).select_related('document_type')
+        return qs
 
     def file_tag(self, obj):
         if obj.file:
