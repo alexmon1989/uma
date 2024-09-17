@@ -1,5 +1,5 @@
 from django.test import TestCase
-from apps.wkm.models import WKMMark, WKMRefBulletin, WKMMarkOwner, WKMRefOwner, WKMClass, WKMVienna
+from apps.wkm.models import WKMMark, WKMRefBulletin, WKMMarkOwner, WKMRefOwner, WKMClass, WKMVienna, WKMDocument, WKMDocumentType
 from apps.wkm.services import WKMJSONConverter
 
 
@@ -19,12 +19,21 @@ class WKMMarkConverterTest(TestCase):
         self.mark = WKMMark.objects.create(
             decision_date='2023-01-10',
             order_date='2023-01-15',
+            order_number='test_order_num',
             rights_date='2023-01-20',
             keywords='Test Keyword',
             mark_image=b'test_image_data',
             bulletin=self.bulletin,
             court_comments_ua='UA Comment',
             court_comments_eng='ENG Comment'
+        )
+        WKMDocument.objects.create(
+            wkm=self.mark,
+            document_type=WKMDocumentType.objects.create(code='decision', value='Рішення')
+        )
+        WKMDocument.objects.create(
+            wkm=self.mark,
+            document_type=WKMDocumentType.objects.create(code='nakaz_dsiv', value='Наказ ДСІВ')
         )
         self.mark.refresh_from_db()
 
@@ -92,3 +101,50 @@ class WKMMarkConverterTest(TestCase):
         self.assertEqual(len(nice_classes), 2)
         self.assertEqual(nice_classes[0]['ClassNumber'], 1)
         self.assertEqual(nice_classes[1]['ClassNumber'], 2)
+
+    def test_add_word_mark_specification(self):
+        converter = WKMJSONConverter(self.mark)
+        result = converter.convert()
+
+        expected = {
+            'WordMarkSpecification': {
+                'MarkSignificantVerbalElement': [{
+                    '#text': 'Test Keyword',
+                    '@sequenceNumber': 1
+                }]
+            }
+        }
+        self.assertIn('WordMarkSpecification', result)
+        self.assertEqual(expected['WordMarkSpecification'], result['WordMarkSpecification'])
+
+    def test_add_decision_details(self):
+        converter = WKMJSONConverter(self.mark)
+        result = converter.convert()
+
+        expected = {
+            'DecisionDetails': {
+                'DecisionDate': '2023-01-10',
+                'DecisionFile': {
+                    'DecisionFilename': 'decision.pdf'
+                }
+            }
+        }
+        self.assertIn('DecisionDetails', result)
+        self.assertEqual(expected['DecisionDetails'], result['DecisionDetails'])
+
+    def test_add_order_details(self):
+        converter = WKMJSONConverter(self.mark)
+        result = converter.convert()
+
+        expected = {
+            'OrderDetails': {
+                'OrderDate': '2023-01-15',
+                'OrderNumber': 'test_order_num',
+                'OrderFile': {
+                    'OrderFilename': 'nakaz_dsiv.pdf',
+                    'OrderType': 'Наказ ДСІВ'
+                }
+            }
+        }
+        self.assertIn('OrderDetails', result)
+        self.assertEqual(expected['OrderDetails'], result['OrderDetails'])
