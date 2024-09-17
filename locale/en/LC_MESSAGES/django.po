@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-12 12:22+0300\n"
+"POT-Creation-Date: 2024-09-16 21:51+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -772,14 +772,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/qi_item.html:50
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/advanced/_partials/tm_item.html:71
-#: apps/search/templates/search/simple/_partials/sidebar.html:55
+#: apps/search/templates/search/simple/_partials/sidebar.html:56
 #: apps/search/utils.py:1318
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
-#: apps/search/templates/search/simple/_partials/sidebar.html:55
+#: apps/search/templates/search/simple/_partials/sidebar.html:56
 #: apps/search/utils.py:1318
 msgid "Охоронний документ"
 msgstr "Protective document"
@@ -1302,39 +1302,39 @@ msgstr "Type"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:12
 #: apps/search/templates/search/advanced/_partials/sidebar.html:41
 #: apps/search/templates/search/simple/_partials/sidebar.html:12
-#: apps/search/templates/search/simple/_partials/sidebar.html:40
+#: apps/search/templates/search/simple/_partials/sidebar.html:41
 msgid "об'єкта інтелектуальної власності"
 msgstr " of intellectual property object"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:12
 #: apps/search/templates/search/advanced/_partials/sidebar.html:41
 #: apps/search/templates/search/simple/_partials/sidebar.html:12
-#: apps/search/templates/search/simple/_partials/sidebar.html:40
+#: apps/search/templates/search/simple/_partials/sidebar.html:41
 msgid "ОПВ"
 msgstr "IPO"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:41
-#: apps/search/templates/search/simple/_partials/sidebar.html:40
+#: apps/search/templates/search/simple/_partials/sidebar.html:41
 msgid "Правовий статус"
 msgstr "The legal status"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:69
-#: apps/search/templates/search/simple/_partials/sidebar.html:67
+#: apps/search/templates/search/simple/_partials/sidebar.html:69
 msgid "Статус охоронного документа"
 msgstr "Protective document state"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:87
-#: apps/search/templates/search/simple/_partials/sidebar.html:85
+#: apps/search/templates/search/simple/_partials/sidebar.html:87
 msgid "Не діє"
 msgstr "Invalid"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:89
-#: apps/search/templates/search/simple/_partials/sidebar.html:87
+#: apps/search/templates/search/simple/_partials/sidebar.html:89
 msgid "Діє"
 msgstr "Valid"
 
 #: apps/search/templates/search/advanced/_partials/sidebar.html:91
-#: apps/search/templates/search/simple/_partials/sidebar.html:89
+#: apps/search/templates/search/simple/_partials/sidebar.html:91
 #: apps/search/templates/search/templatetags/registration_status.html:16
 #: apps/search/templates/search/templatetags/registration_status.html:30
 #: apps/search/templates/search/templatetags/registration_status.html:40
@@ -2187,7 +2187,10 @@ msgid ""
 "%(decision_date)s затверджено наказом Держдепартаменту від %(order_date)s № "
 "%(order_number)s\n"
 "                                "
-msgstr "\nDecision of the Appeal Chamber d/d %(decision_date)s Approved by the Order of the State Department d/d %(order_date)s No. %(order_number)s"
+msgstr ""
+"\n"
+"Decision of the Appeal Chamber d/d %(decision_date)s Approved by the Order "
+"of the State Department d/d %(order_date)s No. %(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:35
 #, python-format
@@ -2197,7 +2200,10 @@ msgid ""
 "%(decision_date)s затверджено наказом Держслужби від %(order_date)s № "
 "%(order_number)s\n"
 "                                "
-msgstr "\nDecision of the Appeal Chamber d/d %(decision_date)s Approved by the Order of the State Service d/d %(order_date)s No. %(order_number)s"
+msgstr ""
+"\n"
+"Decision of the Appeal Chamber d/d %(decision_date)s Approved by the Order "
+"of the State Service d/d %(order_date)s No. %(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:39
 #, python-format
@@ -2207,7 +2213,11 @@ msgid ""
 "%(decision_date)s затверджено наказом Мінекономрозвитку від %(order_date)s № "
 "%(order_number)s\n"
 "                                "
-msgstr "\nDecision of the Appeal Chamber d/d %(decision_date)s Approved by the Order of the Ministry of Economic Development and Trade d/d %(order_date)s No. %(order_number)s"
+msgstr ""
+"\n"
+"Decision of the Appeal Chamber d/d %(decision_date)s Approved by the Order "
+"of the Ministry of Economic Development and Trade d/d %(order_date)s No. "
+"%(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:43
 #, python-format
@@ -2217,29 +2227,45 @@ msgid ""
 "%(decision_date)s затверджено наказом Мінекономіки від %(order_date)s № "
 "%(order_number)s\n"
 "                                "
-msgstr "\nDecision of the Appeal Chamber d/d %(decision_date)s Approved by the Order of the Ministry for Development of Economy, Trade and Agriculture d/d %(order_date)s No. %(order_number)s"
+msgstr ""
+"\n"
+"Decision of the Appeal Chamber d/d %(decision_date)s Approved by the Order "
+"of the Ministry for Development of Economy, Trade and Agriculture d/d "
+"%(order_date)s No. %(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:102
 msgid "Кл."
 msgstr "Cl."
 
 #: apps/search/templates/search/detail/wkm/_partials/breadcrumbs.html:27
-#, fuzzy
-#| msgid "Детальна інформація по об'єкту"
 msgid "Детальна інфорація щодо об'єкта"
 msgstr "Object details"
 
 #: apps/search/templates/search/detail/wkm/_partials/sidebar.html:21
 #: apps/search/templates/search/detail/wkm/detail.html:22
-#, fuzzy
-#| msgid "Сповіщення"
 msgid "Рішення"
-msgstr "Notifications"
+msgstr "Decision"
 
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:28
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:30
+msgid "Наказ ДСІВ"
+msgstr "Order"
+
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:32
+msgid "Наказ Мінекономрозвитку"
+msgstr "Order"
+
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:34
+msgid "Наказ Мінекономіки"
+msgstr "Order"
+
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:36
+msgid "Наказ НОІВ"
+msgstr "Order"
+
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:38
 #: apps/search/templates/search/detail/wkm/detail.html:30
 msgid "Наказ"
-msgstr ""
+msgstr "Order"
 
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:10
 #: apps/search/templates/search/simple/_partials/breadcrumbs.html:24
