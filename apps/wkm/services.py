@@ -82,7 +82,7 @@ class WKMJSONConverter(WKMConverter):
                 self._record.order_date.strftime('%Y-%m-%d')
         if self._record.order_number:
             self._res.setdefault('OrderDetails', {})['OrderNumber'] = self._record.order_number
-        order_doc_types = ['nakaz_dsiv', 'nakaz_minekonom1', 'nakaz_minekonom2']
+        order_doc_types = ['nakaz_dsiv', 'nakaz_minekonom1', 'nakaz_minekonom2', 'nakaz_noiv']
         order_doc = self._record.wkmdocument_set.filter(document_type__code__in=order_doc_types).last()
         if order_doc:
             self._res.setdefault('OrderDetails', {})['OrderFile'] = {
