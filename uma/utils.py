@@ -23,7 +23,7 @@ def get_datetime_now_str() -> str:
 def get_unique_filename(prefix: str = '') -> str:
     """Возвращает уникальное имя файла без расширения."""
     suffix = get_datetime_now_str()
-    return "_".join([prefix, suffix]).replace('/', '_')
+    return "_".join([prefix, suffix]).replace('/', '_').replace(' ', '_')
 
 
 def get_user_or_anonymous(user_id):

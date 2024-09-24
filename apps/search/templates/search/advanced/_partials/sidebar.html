@@ -37,31 +37,33 @@
             {% endfor %}
         </div>
 
-        <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Правовий статус" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
-        <hr class="g-brd-gray-light-v4 g-my-15">
-        <div class="g-mb-40">
-            {% for obj_state in aggregations.obj_state_terms.buckets|dictsort:"key" %}
-                <div class="form-group g-mb-5">
-                    <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
-                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                               type="checkbox"
-                               name="filter_obj_state"
-                               value="{{ obj_state.key }}"
-                               {% if obj_state.doc_count == 0 %}onclick="return false;"{% endif %}
-                               {% if obj_state.key|stringformat:"i" in get_params.filter_obj_state %}checked{% endif %}>
-                        <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
-                            <i class="fa" data-check-icon=""></i>
-                        </div>
-                        {% if obj_state.key == 1 %}{% trans "Заявка" %}{% elif obj_state.key == 2 %}{% trans "Охоронний документ" %}{% endif %}
-                        {% if obj_state.doc_count > 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}
-                            <span class="g-color-gray-light-v1">
-                                ({% if get_params.filter_obj_state %}+{% endif %}{{ obj_state.doc_count|intcomma }})
-                            </span>
-                        {% endif %}
-                    </label>
-                </div>
-            {% endfor %}
-        </div>
+        {% if aggregations.obj_state_terms.buckets %}
+            <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Правовий статус" %} <abbr title="{% trans "об'єкта інтелектуальної власності" %}">{% trans "ОПВ" %}</abbr></h2>
+            <hr class="g-brd-gray-light-v4 g-my-15">
+            <div class="g-mb-40">
+                {% for obj_state in aggregations.obj_state_terms.buckets|dictsort:"key" %}
+                    <div class="form-group g-mb-5">
+                        <label class="u-check g-pl-30 {% if obj_state.doc_count == 0 %}g-color-gray-light-v1{% endif %}">
+                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                   type="checkbox"
+                                   name="filter_obj_state"
+                                   value="{{ obj_state.key }}"
+                                   {% if obj_state.doc_count == 0 %}onclick="return false;"{% endif %}
+                                   {% if obj_state.key|stringformat:"i" in get_params.filter_obj_state %}checked{% endif %}>
+                            <div class="u-check-icon-checkbox-v4 g-absolute-centered--y g-left-0">
+                                <i class="fa" data-check-icon=""></i>
+                            </div>
+                            {% if obj_state.key == 1 %}{% trans "Заявка" %}{% elif obj_state.key == 2 %}{% trans "Охоронний документ" %}{% endif %}
+                            {% if obj_state.doc_count > 0 and obj_state.key|stringformat:"i" not in get_params.filter_obj_state %}
+                                <span class="g-color-gray-light-v1">
+                                    ({% if get_params.filter_obj_state %}+{% endif %}{{ obj_state.doc_count|intcomma }})
+                                </span>
+                            {% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% if aggregations.registration_status_color_terms.buckets %}
             <h2 class="h5 text-uppercase g-color-gray-dark-v1">{% trans "Статус охоронного документа" %}</h2>

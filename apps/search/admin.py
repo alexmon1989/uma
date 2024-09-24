@@ -93,7 +93,7 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
             'ipc_code',
             'elastic_index_field'
         ).prefetch_related('ipc_code__obj_types').filter(
-            Q(schedule_type__id__lte=19) | Q(schedule_type__id__in=(30, 32, 34))
+            Q(schedule_type__id__lte=19) | Q(schedule_type__id__in=(30, 32, 34, 35))
         ).exclude(ipc_code__obj_types=None)
 
     def ipc_code_title(self, obj):
@@ -106,7 +106,7 @@ class InidCodeScheduleAdmin(admin.ModelAdmin):
 
     def obj_status(self, obj):
         # 3, 4, 5, 6, 7, 8 - id реестров охранных документов
-        if obj.schedule_type_id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34):
+        if obj.schedule_type_id in (3, 4, 5, 6, 7, 8, 16, 17, 18, 19, 30, 32, 34, 35):
             return _('Охоронний документ')
         return _('Заявка')
 

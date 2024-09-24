@@ -1,0 +1,123 @@
+{% load uma_extras %}
+{% load search_extras %}
+{% load i18n %}
+
+<div id="biblio-data">
+    <div class="g-pb-20 d-flex justify-content-between">
+        <div>
+            {% trans "Опубліковано" %} <span
+                class="g-font-weight-600">{{ hit.WellKnownMark.WellKnownMarkDetails.PublicationDetails.0.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
+            {% trans "бюл." %} № <span
+                class="g-font-weight-600">{{ hit.WellKnownMark.WellKnownMarkDetails.PublicationDetails.0.PublicationIdentifier }}</span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-trade-mark g-font-size-13">
+            <tbody>
+                {# Дата набрання чинності рішенням, яким визнано, що знак став добре відомим в Україні #}
+                {% get_field 'decision_date' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% if hit.WellKnownMark.WellKnownMarkDetails.CourtComments.CourtCommentsUA %}
+                                {% if lang_code == 'ua' %}
+                                    {{ hit.WellKnownMark.WellKnownMarkDetails.CourtComments.CourtCommentsUA }}
+                                {% else %}
+                                    {{ hit.WellKnownMark.WellKnownMarkDetails.CourtComments.CourtCommentsEN }}
+                                {% endif %}
+                            {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date < '2011-06-14'|parse_date %}
+                                {% blocktranslate with decision_date=hit.WellKnownMark.WellKnownMarkDetails.DecisionDetails.DecisionDate|parse_date|date:"d.m.Y" order_date=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date|date:"d.m.Y" order_number=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderNumber %}
+                                    Рішення Апеляційної палати від {{ decision_date }} затверджено наказом Держдепартаменту від {{ order_date }} № {{ order_number }}
+                                {% endblocktranslate %}
+                            {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date < '2017-05-19'|parse_date %}
+                                {% blocktranslate with decision_date=hit.WellKnownMark.WellKnownMarkDetails.DecisionDetails.DecisionDate|parse_date|date:"d.m.Y" order_date=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date|date:"d.m.Y" order_number=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderNumber %}
+                                    Рішення Апеляційної палати від {{ decision_date }} затверджено наказом Держслужби від {{ order_date }} № {{ order_number }}
+                                {% endblocktranslate %}
+                            {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date < '2019-09-03'|parse_date %}
+                                {% blocktranslate with decision_date=hit.WellKnownMark.WellKnownMarkDetails.DecisionDetails.DecisionDate|parse_date|date:"d.m.Y" order_date=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date|date:"d.m.Y" order_number=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderNumber %}
+                                    Рішення Мінекономіки від {{ decision_date }} затверджено наказом Мінекономрозвитку від {{ order_date }} № {{ order_number }}
+                                {% endblocktranslate %}
+                            {% else %}
+                                {% blocktranslate with decision_date=hit.WellKnownMark.WellKnownMarkDetails.DecisionDetails.DecisionDate|parse_date|date:"d.m.Y" order_date=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderDate|parse_date|date:"d.m.Y" order_number=hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderNumber %}
+                                    Рішення Апеляційної палати від {{ decision_date }} затверджено наказом Мінекономіки від {{ order_date }} № {{ order_number }}
+                                {% endblocktranslate %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {# Дата набрання чинності рішенням, яким визнано, що знак став добре відомим в Україні #}
+                {% get_field 'rights_date' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.WellKnownMark.WellKnownMarkDetails.RightsDate %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.WellKnownMark.WellKnownMarkDetails.RightsDate|parse_date|date:"d.m.Y" }}</td>
+                    </tr>
+                {% endif %}
+
+                {# Ім'я або повне найменування власника #}
+                {% get_field 'holder' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.WellKnownMark.WellKnownMarkDetails.HolderDetails.Holder %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% for holder in hit.WellKnownMark.WellKnownMarkDetails.HolderDetails.Holder %}
+                                {{ holder.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                {% if holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {# Зображення #}
+                {% get_field 'image' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
+                               href="javascript:;"
+                               data-src="{{ hit.Document.filesPath|get_image_url:hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
+                                <img class="img-fluid img-thumbnail"
+                                     src="{{ hit.Document.filesPath|get_image_url:hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                                     alt="">
+                                <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
+                                <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
+                            </span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {# Ніццька класифікація #}
+                {% get_field 'nice' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.WellKnownMark.WellKnownMarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% for cls in hit.WellKnownMark.WellKnownMarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                                {% trans "Кл." %}&nbsp;{{ cls.ClassNumber }}:
+                                {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
+                                    {{ term.ClassificationTermText }}{% if not forloop.last and term.ClassificationTermText|default:""|slice:"-1:" != "," %};{% endif %}
+                                {% endfor %}
+                                {% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {# Індекси Віденської класифікації #}
+                {% get_field 'vienna' ipc_fields as ipc_field %}
+                {% if ipc_field.enable_view and hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.WellKnownMark.WellKnownMarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

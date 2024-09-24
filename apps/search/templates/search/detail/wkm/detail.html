@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load search_extras %}
+
+{% include 'search/detail/wkm/_partials/breadcrumbs.html' %}
+
+<div class="container g-min-height-200 g-py-20 g-py-70--lg">
+    <div class="row">
+        <div class="col-md-3 g-mb-20">
+            {% include 'search/detail/wkm/_partials/sidebar.html' %}
+        </div>
+
+        <div class="col-md-9">
+            <!-- Tab panes -->
+            <div id="nav-1-1-primary-ver" class="tab-content">
+                <div class="tab-pane fade show active" id="nav-biblio" role="tabpanel">
+                    {% include 'search/detail/_partials/biblio_header.html' %}
+
+                    {% include 'search/detail/wkm/_partials/blblio_data/biblio.html' %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-decision" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Рішення" %}</h3>
+
+                    {% if hit.WellKnownMark.WellKnownMarkDetails.DecisionDetails.DecisionFile %}
+                        {% include 'search/detail/wkm/_partials/blblio_data/decision.html' %}
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="nav-order" role="tabpanel">
+                    <h3 class="g-pb-15">{% trans "Наказ" %}</h3>
+
+                    {% if hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderFile %}
+                        {% include 'search/detail/wkm/_partials/blblio_data/order.html' %}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- End Tab panes -->
+        </div>
+    </div>
+</div>

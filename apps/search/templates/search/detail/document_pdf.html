@@ -1,16 +1,16 @@
 {% load search_extras %}
 {% load i18n %}
 
-<object data="{{ document_path }}#zoom=95&toolbar=0&navpanes=0"
+<object data="{{ document_path }}#zoom=auto&toolbar=1&navpanes=0"
         type="application/pdf"
         width="100%"
         height="{{ height }}">
     <iframe
-            src="{{ document_path }}#zoom=95&toolbar=0&navpanes=0"
+            src="{{ document_path }}#zoom=auto&toolbar=1&navpanes=0"
             width="100%"
             height="{{ height }}"
             style="border: none;">
         {% trans "Ваш браузер не підтримує PDF" %}. <a
-                href="{{ documents.cl.file_name|document_path }}">{% trans "Завантажити PDF" %}</a>.
+                href="{{ document_path }}">{% trans "Завантажити PDF" %}</a>.
     </iframe>
 </object>

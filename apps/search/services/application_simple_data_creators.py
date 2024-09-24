@@ -520,3 +520,40 @@ class ApplicationSimpleDataCRCreator(ApplicationSimpleDataCreator, BiblioDataCRR
         }
 
         return res
+
+
+class ApplicationSimpleDataWKMCreator(ApplicationSimpleDataCreator):
+    """Створює дані Добре відомої ТМ."""
+
+    def _get_rights_date(self, data: dict) -> str | None:
+        return data.get('WellKnownMark', {}).get('WellKnownMarkDetails', {}).get('RightsDate')
+
+    def _get_owners(self, data: dict) -> List[dict]:
+        res = []
+        if data.get('WellKnownMark', {}).get('WellKnownMarkDetails', {}).get('HolderDetails'):
+            for holder in data.get('WellKnownMark', {}).get('WellKnownMarkDetails', {})['HolderDetails']['Holder']:
+                res.append(
+                    {
+                        'name': holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    }
+                )
+        return res
+
+    def _get_title(self, data: dict) -> str:
+        if data.get('WellKnownMark', {}).get('WellKnownMarkDetails', {}).get('WordMarkSpecification'):
+            return ', '.join(
+                [x['#text'] for x in data['WellKnownMark']['WellKnownMarkDetails']['WordMarkSpecification'][
+                    'MarkSignificantVerbalElement']]
+            )
+        else:
+            return ''
+
+    def get_data(self, app: IpcAppList, data: dict) -> dict:
+        search_data = {
+            'rights_date': self._get_rights_date(data),
+            'owner': self._get_owners(data),
+            'title': self._get_title(data),
+        }
+
+        return search_data

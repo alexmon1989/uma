@@ -9,7 +9,8 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSMadridReceiver,
                                                                  ApplicationRawDataFSGeoReceiver,
                                                                  ApplicationRawDataFSReceiver,
-                                                                 ApplicationRawDataFSMadrid9Receiver)
+                                                                 ApplicationRawDataFSMadrid9Receiver,
+                                                                 ApplicationRawDataFSWKMReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
@@ -23,7 +24,8 @@ from apps.search.services.application_simple_data_creators import (ApplicationSi
                                                                    ApplicationSimpleDataIDCreator,
                                                                    ApplicationSimpleDataMadridCreator,
                                                                    ApplicationSimpleDataGeoCreator,
-                                                                   ApplicationSimpleDataCRCreator)
+                                                                   ApplicationSimpleDataCRCreator,
+                                                                   ApplicationSimpleDataWKMCreator)
 from apps.search.services.application_raw_data_filters import (ApplicationRawDataFilter,
                                                                ApplicationRawDataInvUMLDLimitedFilter,
                                                                ApplicationRawDataTMLimitedFilter,
@@ -175,6 +177,15 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
         elif app.obj_type_id == 16:  # Сертификат доп. охраны
             raw_data_receiver = ApplicationRawDataFSInvCertReceiver(app)
             simple_data_creator = ApplicationSimpleDataInvCertCreator()
+
+            return ApplicationGetFullDataService(
+                app,
+                raw_data_receiver,
+                simple_data_creator
+            )
+        elif app.obj_type_id == 17:  # Добре відома ТМ
+            raw_data_receiver = ApplicationRawDataFSWKMReceiver(app)
+            simple_data_creator = ApplicationSimpleDataWKMCreator()
 
             return ApplicationGetFullDataService(
                 app,

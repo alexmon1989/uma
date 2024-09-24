@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.forms import formset_factory
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Q, Index
@@ -88,7 +89,7 @@ def get_ipc_code_choices():
 class AdvancedSearchForm(forms.Form):
     """Расширенная форма поиска."""
     obj_type = forms.MultipleChoiceField()
-    obj_state = forms.MultipleChoiceField(choices=((1, 1), (2, 2)))
+    obj_state = forms.MultipleChoiceField(choices=(('', ''), (1, 1), (2, 2)), required=False)
     ipc_code = forms.ChoiceField()
     value = forms.CharField()
 
@@ -96,6 +97,13 @@ class AdvancedSearchForm(forms.Form):
         super(AdvancedSearchForm, self).__init__(*args, **kwargs)
         self.fields['obj_type'].choices = get_obj_type_choices()
         self.fields['ipc_code'].choices = get_ipc_code_choices()
+
+    def clean_obj_state(self):
+        data = self.cleaned_data["obj_state"]
+        if not data and self.cleaned_data['obj_type'] != ['17']:
+            # obj_state є необов'язковим для заповнення полем тільки якщо пошук відбувається лише по добре відомих ТМ
+            raise ValidationError("Required field")
+        return data
 
     def clean(self):
         """Валидация поискового запроса."""

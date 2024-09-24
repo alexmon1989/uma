@@ -43,11 +43,14 @@
                     <multiselect v-model="objState"
                                  :options="objStates"
                                  :placeholder="translations.objState"
+                                 :disabled="objType.length > 0 && objType[0].id === 17"
+                                 v-validate="{
+                                    required: !wkmSelected
+                                 }"
                                  selectLabel=""
                                  deselectLabel="⨯"
                                  selectedLabel="✓"
                                  :multiple="true"
-                                 v-validate="'required'"
                                  :searchable="false"
                                  label="value"
                                  track-by="id"
@@ -74,7 +77,7 @@
                                  label="value"
                                  track-by="id"
                                  :allowEmpty="false"
-                                 :disabled="objType.length === 0 || objState.length === 0"
+                                 :disabled="objType.length === 0 || (objState.length === 0 && !wkmSelected)"
                                  :data-vv-name="'form-' + index + '-ipc_code'"
                                  v-validate="'required'"
                                  ref="multiselect"
@@ -89,7 +92,7 @@
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
                     <div v-if="dataType !== 'date'">
                         <input type="text"
-                               class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8"
+                               class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8 g-min-height-40"
                                :name="'form-' + index + '-value'"
                                v-model="value"
                                ref="value"
@@ -302,7 +305,7 @@
                 // Фильтр по типам объектов пром. собств. и их состояниям.
                 let ipcCodes = [];
 
-                if (this.objType.length > 0 && this.objState.length > 0) {
+                if (this.wkmSelected || (this.objType.length > 0 && this.objState.length > 0)) {
                     ipcCodes = this.ipcCodes
                         .filter(i => this.objType.every(j => i.obj_types.includes(j.id)))
                         .filter(i => this.objState.every(j => i.obj_states.includes(j.id)));
@@ -310,6 +313,10 @@
 
                 return ipcCodes;
             },
+
+            wkmSelected: function () {
+                return this.objType.length > 0 && this.objType[0].id === 17
+            }
         },
         watch: {
             dataType: function (val, oldVal) {
@@ -327,11 +334,48 @@
                 if (val.length === 0) {
                     this.$refs.multiselect.deactivate();
                 }
+            },
+
+            objType: function (val, oldVal) {
+              if (val.length && val[0].id === 17) {
+                this.objState = []
+              }
             }
         }
     }
 </script>
 
 <style lang="scss">
+  .multiselect {
+    color: #555;
+  }
 
+  .multiselect__tags {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .multiselect--disabled {
+    background-color: inherit;
+    opacity: 1;
+
+    .multiselect__tags {
+      background-color: #e9ecef;
+
+      .multiselect__placeholder {
+        color: #555;
+        opacity: .5;
+      }
+    }
+
+    .multiselect__select {
+      background: #e9ecef;
+      border-radius: 4px;
+    }
+  }
+
+  .mx-input {
+    border: 1px solid #ddd !important;
+    max-height: 40px;
+  }
 </style>

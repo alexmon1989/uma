@@ -62,6 +62,8 @@
                     {% agreement_item hit forloop.counter0|add:results.start_index %}
                 {% elif hit.Document.idObjType == 16 %}
                     {% cap_item hit forloop.counter0|add:results.start_index %}
+                {% elif hit.Document.idObjType == 17 %}
+                    {% wkm_item hit forloop.counter0|add:results.start_index %}
                 {% endif %}
             {% endfor %}
 

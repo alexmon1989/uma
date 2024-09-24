@@ -23,7 +23,7 @@ class ReportItem(ABC):
     application_data: dict
     ipc_fields: List[InidCode]  # Список полей для отображения с флагом доступно ли поле для отображения
 
-    def _get_inid(self, obj_type_id: int, code: str, obj_state: int = 1) -> InidCode | None:
+    def _get_inid(self, obj_type_id: int, code: str, obj_state: int | None = 1) -> InidCode | None:
         """Возвращает признак необходимости отображения поля."""
         try:
             return next(
@@ -513,6 +513,189 @@ class ReportItemDocxTM(ReportItemDocx):
         self._write_526()
         self._write_591()
         self._write_511()
+
+        return self._paragraph
+
+
+class ReportItemDocxWKM(ReportItemDocx):
+    """Торговая марка."""
+    _paragraph: Paragraph
+    document: Document
+    obj_type_id = 17
+
+    def _write_image(self) -> None:
+        """Додає зображення."""
+        inid = self._get_inid(self.obj_type_id, 'image', None)
+        mark_image_filename = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get(
+            'MarkImageDetails', {}
+        ).get(
+            'MarkImage', {}
+        ).get(
+            'MarkImageFilename'
+        )
+        if inid and inid.visible and mark_image_filename:
+            path = Path(self.application_data['Document']['filesPath'].replace('\\', '/'))
+            parts_len = len(path.parts)
+
+            # Путь к изображению на диске
+            mark_image_filepath = Path(settings.MEDIA_ROOT) / path.parts[parts_len - 3]
+            mark_image_filepath /= mark_image_filepath / path.parts[parts_len - 2]
+            mark_image_filepath /= path.parts[parts_len - 1]
+            mark_image_filepath /= mark_image_filename
+
+            run = self._paragraph.add_run()
+            run.add_picture(str(mark_image_filepath), width=Inches(2.5))
+            self._paragraph.add_run('\r')
+
+    def _write_keywords(self) -> None:
+        """Записує ключові слова."""
+        inid = self._get_inid(self.obj_type_id, 'keywords', None)
+        keywords = self.application_data['search_data']['title']
+        print(keywords)
+        if inid and inid.visible and keywords:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(keywords).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_decision_date(self) -> None:
+        """Записує Дата набрання чинності рішенням, яким визнано, що знак став добре відомим в Україні."""
+        inid = self._get_inid(self.obj_type_id, 'decision_date', None)
+        court_comments_ua = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get('CourtComments', {}).get('CourtCommentsUA')
+        court_comments_en = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get('CourtComments', {}).get('CourtCommentsEN')
+        res = {}
+        if court_comments_ua:
+            res['ua'] = court_comments_ua
+            res['en'] = court_comments_en
+        else:
+            decision_date = self.application_data['WellKnownMark']['WellKnownMarkDetails']['DecisionDetails']['DecisionDate']
+            decision_date = datetime.strptime(decision_date, '%Y-%m-%d')
+            decision_date_formatted = decision_date.strftime('%d.%m.%Y')
+            order_date = self.application_data['WellKnownMark']['WellKnownMarkDetails']['OrderDetails']['OrderDate']
+            order_date = datetime.strptime(order_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            order_number = self.application_data['WellKnownMark']['WellKnownMarkDetails']['OrderDetails']['OrderNumber']
+
+            if decision_date < datetime.strptime('2011-06-14', '%Y-%m-%d'):
+                res['ua'] = f"Рішення Апеляційної палати від {decision_date_formatted} затверджено наказом " \
+                            f"Держдепартаменту  від {order_date} № {order_number}"
+                res['en'] = f"Decision of the Appeal Chamber d/d {decision_date_formatted} " \
+                            f"Approved by the Order of the State Department d/d {order_date} No. {order_number}"
+
+            if decision_date < datetime.strptime('2017-05-19', '%Y-%m-%d'):
+                res['ua'] = f"Рішення Апеляційної палати від {decision_date_formatted} затверджено наказом Держслужби" \
+                      f" від {order_date} № {order_number}"
+                res['en'] = f"Decision of the Appeal Chamber d/d {decision_date_formatted} " \
+                            f"Approved by the Order of the State Service d/d {order_date} No. {order_number}"
+
+            if decision_date < datetime.strptime('2011-06-14', '%Y-%m-%d'):
+                res['ua'] = f"Рішення Апеляційної палати від {decision_date_formatted} затверджено " \
+                            f"наказом Мінекономрозвитку від {order_date} № {order_number}"
+                res['en'] = f"Decision of the Appeal Chamber d/d {decision_date_formatted} Approved by the Order " \
+                            f"of the Ministry of Economic Development and Trade d/d {order_date} No. {order_number}"
+
+            if decision_date < datetime.strptime('2011-06-14', '%Y-%m-%d'):
+                res['ua'] = f"Рішення Апеляційної палати від {decision_date_formatted} затверджено " \
+                            f"наказом Мінекономіки від {order_date} № {order_number}"
+                res['en'] = f"Decision of the Appeal Chamber d/d {decision_date_formatted} " \
+                            f"Approved by the Order of the Ministry for Development of Economy, " \
+                            f"Trade and Agriculture d/d  No. {order_number}"
+
+        if inid and inid.visible and res:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(res[self.lang_code]).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_rights_date(self) -> None:
+        inid = self._get_inid(self.obj_type_id, 'rights_date', None)
+        rights_date = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get('RightsDate')
+        rights_date = datetime.strptime(rights_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        if inid and inid.visible and rights_date:
+            self._paragraph.add_run(f"{inid.title}: ")
+            self._paragraph.add_run(rights_date).bold = True
+            self._paragraph.add_run('\r')
+
+    def _write_holder(self) -> None:
+        inid = self._get_inid(self.obj_type_id, 'holder', None)
+        holders = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get(
+            'HolderDetails', {}
+        ).get(
+            'Holder'
+        )
+        if inid and inid.visible and holders:
+            self._paragraph.add_run(f"{inid.title}:")
+            for holder in holders:
+                self._paragraph.add_run('\r')
+                try:
+                    self._paragraph.add_run(
+                        holder['HolderAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
+                            'FreeFormatNameDetails']['FreeFormatNameLine']
+                    ).bold = True
+                except KeyError:
+                    pass
+
+                try:
+                    country = holder['HolderAddressBook']['FormattedNameAddress']['Address']['AddressCountryCode']
+                    self._paragraph.add_run(
+                        f" ({country})"
+                    )
+                except KeyError:
+                    pass
+            self._paragraph.add_run('\r')
+
+    def _write_nice(self) -> None:
+        inid = self._get_inid(self.obj_type_id, 'nice', None)
+        if 'GoodsServicesDetails' in self.application_data['WellKnownMark']['WellKnownMarkDetails'] and \
+                self.application_data['WellKnownMark']['WellKnownMarkDetails']['GoodsServicesDetails'] is not None:
+            goods = self.application_data['WellKnownMark']['WellKnownMarkDetails']['GoodsServicesDetails'].get(
+                'GoodsServices', {}
+            ).get(
+                'ClassDescriptionDetails', {}
+            ).get(
+                'ClassDescription'
+            )
+            if inid and inid.visible and goods:
+                self._paragraph.add_run(f"{inid.title}: ")
+                goods_classes_str = ', '.join([str(x['ClassNumber']) for x in goods])
+                self._paragraph.add_run(goods_classes_str).bold = True
+                for item in goods:
+                    self._paragraph.add_run('\r')
+                    self._paragraph.add_run(f"Кл. {item['ClassNumber']}:\t").bold = True
+                    if 'ClassificationTermDetails' in item:
+                        terms = item['ClassificationTermDetails']['ClassificationTerm']
+                        values_str = '; '.join([x['ClassificationTermText'] for x in terms])
+                        self._paragraph.add_run(values_str)
+                self._paragraph.add_run('\r')
+
+    def _write_vienna(self) -> None:
+        inid = self._get_inid(self.obj_type_id, 'vienna', None)
+        vienna_classes = self.application_data['WellKnownMark']['WellKnownMarkDetails'].get(
+            'MarkImageDetails', {}
+        ).get(
+            'MarkImage', {}
+        ).get(
+            'MarkImageCategory', {}
+        ).get(
+            'CategoryCodeDetails', {}
+        ).get(
+            'CategoryCode'
+        )
+        if inid and inid.visible and vienna_classes:
+            self._paragraph.add_run(f"{inid.title}:")
+            for vienna_class in vienna_classes:
+                self._paragraph.add_run(f"\r{vienna_class}").bold = True
+            self._paragraph.add_run('\r')
+
+    def write(self, document: Document) -> Paragraph:
+        """Записывает информацию о ТМ в абзац и возвращает его."""
+        self.document = document
+        self._paragraph = self.document.add_paragraph('')
+
+        self._write_image()
+        self._write_keywords()
+        self._write_decision_date()
+        self._write_rights_date()
+        self._write_holder()
+        self._write_nice()
+        self._write_vienna()
 
         return self._paragraph
 
@@ -2349,6 +2532,12 @@ class ReportWriterDocx(ReportWriter):
             'ua': 'Сертифікат додаткової охорони прав на винахід ',
             'en': 'Certificate of additional protection of invention rights',
         },
+        {
+            'obj_type_id': 17,
+            'obj_state': None,
+            'ua': 'Добре відома в Україні торговельна марка',
+            'en': 'Well-Known Mark in Ukraine',
+        },
     ]
 
     def _set_font(self, document: Document(), font_name='Times New Roman'):
@@ -2373,7 +2562,7 @@ class ReportWriterDocx(ReportWriter):
             p.add_run(f"{str(i + 1)}. ").bold = True
             obj_type_title = self._get_obj_type_title(
                 item.application_data['Document']['idObjType'],
-                item.application_data['search_data']['obj_state'],
+                item.application_data['search_data'].get('obj_state'),
                 item.lang_code,
             )
             if obj_type_title:
@@ -2416,6 +2605,7 @@ class ReportWriterDocxCreator(ReportWriterCreator):
             13: ReportItemCopyrightOfficialWork,
             14: ReportItemDocxMadrid14,
             16: ReportItemCAP,
+            17: ReportItemDocxWKM,
         }
         report_items = []
         for app in applications:

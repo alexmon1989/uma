@@ -56,6 +56,8 @@ class Migration(migrations.Migration):
                 ('file_server_name', models.CharField(blank=True, db_column='FileServerName', max_length=250, null=True)),
                 ('net_share_name', models.CharField(blank=True, db_column='NetShareName', max_length=500, null=True)),
                 ('order', models.PositiveSmallIntegerField(db_column='order', blank=True, null=True)),
+                ('code', models.CharField('Унікальний код типу об\'єкта',
+                                          db_column='code', max_length=10, unique=True, null=True, blank=True)),
             ],
             options={
                 'db_table': 'cl_IP_ObjTypes',

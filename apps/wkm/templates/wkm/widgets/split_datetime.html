@@ -1,0 +1,6 @@
+<div class="datetime">
+  {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
+  <div style="visibility: hidden; position: absolute; top: -9999px; left: -9999px">
+      {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
+  </div>
+</div>
