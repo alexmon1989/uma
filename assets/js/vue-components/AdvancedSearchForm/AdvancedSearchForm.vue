@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="handleSubmit"
-          class="g-brd-around g-brd-gray-light-v4 g-px-30 g-py-20">
+          class="g-brd-around g-brd-gray-light-v4 g-px-30 g-py-20 advanced-search-form">
         <input type="hidden" name="form-TOTAL_FORMS" :value="totalForms"/>
         <input type="hidden" name="form-INITIAL_FORMS" :value="initialData['form-INITIAL_FORMS'] || 1"/>
         <input type="hidden" name="form-MAX_NUM_FORMS" :value="initialData['form-MAX_NUM_FORMS']"/>

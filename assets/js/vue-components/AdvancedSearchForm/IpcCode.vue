@@ -346,36 +346,38 @@
 </script>
 
 <style lang="scss">
-  .multiselect {
-    color: #555;
-  }
+ .advanced-search-form {
+   .multiselect {
+     color: #555;
+   }
 
-  .multiselect__tags {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
+   .multiselect__tags {
+     border: 1px solid #ddd;
+     border-radius: 4px;
+   }
 
-  .multiselect--disabled {
-    background-color: inherit;
-    opacity: 1;
+   .multiselect--disabled {
+     background-color: inherit;
+     opacity: 1;
 
-    .multiselect__tags {
-      background-color: #e9ecef;
+     .multiselect__tags {
+       background-color: #e9ecef;
 
-      .multiselect__placeholder {
-        color: #555;
-        opacity: .5;
-      }
-    }
+       .multiselect__placeholder {
+         color: #555;
+         opacity: .5;
+       }
+     }
 
-    .multiselect__select {
-      background: #e9ecef;
-      border-radius: 4px;
-    }
-  }
+     .multiselect__select {
+       background: #e9ecef;
+       border-radius: 4px;
+     }
+   }
 
-  .mx-input {
-    border: 1px solid #ddd !important;
-    max-height: 40px;
-  }
+   .mx-input {
+     border: 1px solid #ddd !important;
+     max-height: 40px;
+   }
+ }
 </style>

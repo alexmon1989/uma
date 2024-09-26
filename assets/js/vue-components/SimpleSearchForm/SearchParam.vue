@@ -49,7 +49,7 @@
                              v-if="type === 'date'"
                              v-on:confirm="onDateConfirm"
                 ></date-picker>
-                <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-pt-10 g-pb-11"
+                <input class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8 g-min-height-40"
                        type="text"
                        autocomplete="off"
                        :name="'form-' + index + '-value'"
@@ -68,7 +68,7 @@
 
         <div class="col-md-1 g-mb-30 g-mb-15--md g-pl-8--md">
             <button type="button"
-                    class="btn btn-block btn-md u-btn-pink g-pt-10 g-pb-11 rounded-0"
+                    class="btn btn-block btn-md u-btn-pink  g-pt-9 g-pb-8 rounded-0 g-min-height-40"
                     @click="$emit('remove-search-parameter', index)"
                     :disabled="searchParametersCount === 1"
             ><i class="fa fa-minus"></i></button>
@@ -138,13 +138,49 @@
 </script>
 
 <style lang="scss">
-    .mx-datepicker-btn-confirm {
+    .simple-search-form {
+
+      .mx-datepicker-btn-confirm {
         color: #037fe2 !important;
         border-color: #037fe2 !important;
-    }
+      }
 
-    .mx-datepicker-btn-confirm:hover {
+      .mx-datepicker-btn-confirm:hover {
         color: lighten(#037fe2, 20%) !important;
         border-color: lighten(#037fe2, 20%) !important;
+      }
+
+      .multiselect {
+        color: #555;
+      }
+
+      .multiselect__tags {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .multiselect--disabled {
+        background-color: inherit;
+        opacity: 1;
+
+        .multiselect__tags {
+          background-color: #e9ecef;
+
+          .multiselect__placeholder {
+            color: #555;
+            opacity: .5;
+          }
+        }
+
+        .multiselect__select {
+          background: #e9ecef;
+          border-radius: 4px;
+        }
+      }
+
+      .mx-input {
+        border: 1px solid #ddd !important;
+        max-height: 40px;
+      }
     }
 </style>
