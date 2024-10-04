@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
+from django.utils import translation
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
@@ -675,6 +676,9 @@ def create_simple_search_results_file_xlsx(user_id, get_params, lang_code):
         if s.count() <= 500:
             s = s.source(['search_data', 'Document', 'Claim', 'Patent', 'Patent_Certificate', 'TradeMark',
                           'MadridTradeMark', 'Design', 'Geo', 'Certificate', 'WellKnownMark'])
+
+            # Активация языка пользователя
+            translation.activate(lang_code)
 
             # Данные для Excel-файла
             data = prepare_data_for_search_report(s, lang_code, user)
