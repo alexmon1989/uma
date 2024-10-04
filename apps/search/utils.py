@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.utils.translation import gettext as _
 from django.db.models import Prefetch
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.aggs import Terms, Nested
-from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcAppList, PaidServicesSettings, IpcCode
+from .models import ObjType, InidCodeSchedule, OrderService, SortParameter, IpcCode
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -1255,22 +1254,22 @@ def create_search_res_doc(data, file_path):
 
     # Заголовки
     titles = [
-        _("Тип об'єкта промислової власності"),
-        _("Стан об'єкта промислової власності"),
-        _("Номер заявки"),
-        _("Дата подання заявки"),
-        _("Номер охоронного документа"),
-        _("Дата охоронного документа"),
-        _("Ключові слова"),
-        _("Заявник"),
-        _("Власник"),
-        _('Винахідник\автор'),
-        _("Представник"),
-        _("МПК"),
-        _("МКТП"),
-        _("МКПЗ"),
-        _("(441) Дата публікації відомостей про заявку та номер бюлетня"),
-        _("Зображення ТМ"),
+        "Тип об'єкта промислової власності",
+        "Стан об'єкта промислової власності",
+        "Номер заявки",
+        "Дата подання заявки",
+        "Номер охоронного документа",
+        "Дата охоронного документа",
+        "Ключові слова",
+        "Заявник",
+        "Власник",
+        'Винахідник\автор',
+        "Представник",
+        "МПК",
+        "МКТП",
+        "МКПЗ",
+        "(441) Дата публікації відомостей про заявку та номер бюлетня",
+        "Зображення ТМ",
     ]
 
     bold = workbook.add_format({'bold': True})
@@ -1315,7 +1314,7 @@ def get_resized_image_for_report(img_path):
 
 def prepare_data_for_search_report(s, lang_code, user=None):
     """Подготавливает данные для файла Excel."""
-    obj_states = [_('Заявка'), _('Охоронний документ')]
+    obj_states = ['Заявка', 'Охоронний документ']
     obj_types = ObjType.objects.order_by('id').values_list('id', f"obj_type_{lang_code}")
     data = list()
     for h in s.params(size=1000, preserve_order=True).scan():
