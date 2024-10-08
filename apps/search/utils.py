@@ -1640,10 +1640,14 @@ def get_app_inventor(app):
     elif app.Document.idObjType in (10, 13):
         try:
             for item in app.Certificate.CopyrightDetails.AuthorDetails.Author:
-                inventors.append(
-                    f"{item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine} "
-                    f"[{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
-                )
+                if 'RepresentNameFormDetails' in item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName \
+                        and item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm:
+                    author = item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm
+                else:
+                    author = item.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine
+                    if 'AddressCountryCode' in item.AuthorAddressBook.FormattedNameAddress.Address:
+                        author = f"{author} [{item.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode}]"
+                inventors.append(author)
         except AttributeError:
             pass
 
