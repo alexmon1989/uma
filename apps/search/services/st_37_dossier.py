@@ -31,6 +31,8 @@ DOCUMENT_KIND: dict = {
          'a utility model',
 }
 
+DTD_FILE = os.path.join(settings.MEDIA_ROOT, 'st_37_dossier', 'ST37AuthorityFile_V2-2.dtd')
+
 
 @dataclass
 class DocumentId:
@@ -553,19 +555,47 @@ class St37XMLFileCreator(St37FileCreator):
         return file_path
 
 
+class St37FileValidator(ABC):
+    file_path: str
+
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+    @abstractmethod
+    def validate(self) -> None:
+        raise NotImplementedError
+
+
+class St37XMLFileValidator(St37FileValidator):
+
+    def validate(self) -> None:
+
+        with open(DTD_FILE) as f:
+            dtd = etree.DTD(f)
+
+        tree = etree.parse(self.file_path)
+
+        if not dtd.validate(tree):
+            error_msg = dtd.error_log.filter_from_errors()
+            raise ValueError(f"DTD Validation failed: {error_msg}")
+
+
 class St37DossierCreatorService:
     """Класс, що являє собою сервіс формування файлу відомчого досьє."""
     repository: St37DocumentsRepository
     coverage_calculator: St37CoverageCalculator
     file_creator: St37FileCreator
+    file_validator: St37FileValidator | None = None
 
     def __init__(self,
                  repository: St37DocumentsRepository,
                  coverage_calculator: St37CoverageCalculator,
-                 file_creator: St37FileCreator):
+                 file_creator: St37FileCreator,
+                 file_validator: St37FileValidator = None):
         self.repository = repository
         self.coverage_calculator = coverage_calculator
         self.file_creator = file_creator
+        self.file_validator = file_validator
 
     def execute(self) -> str:
         # Отримання списку патентних документів
@@ -578,4 +608,10 @@ class St37DossierCreatorService:
         # Створення файлу відомчого досьє
         self.file_creator.documents = documents
         self.file_creator.coverage = coverage
-        return self.file_creator.create_file()
+        file_path = self.file_creator.create_file()
+
+        # Валідація створеного файлу
+        if self.file_validator:
+            self.file_validator.validate()
+
+        return file_path
