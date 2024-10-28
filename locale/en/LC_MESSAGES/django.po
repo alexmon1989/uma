@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-16 21:51+0300\n"
+"POT-Creation-Date: 2024-10-28 13:45+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -896,7 +896,7 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/tasks.py:48 apps/search/tasks.py:233 apps/search/tasks.py:293
+#: apps/search/tasks.py:49 apps/search/tasks.py:234 apps/search/tasks.py:294
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -2291,7 +2291,7 @@ msgstr "Legend"
 #: apps/search/templates/search/templatetags/app_stages_id.html:25
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:24
 #: apps/search/templates/search/templatetags/app_stages_kzpt.html:24
-#: apps/search/templates/search/templatetags/app_stages_tm.html:24
+#: apps/search/templates/search/templatetags/app_stages_tm.html:27
 msgid ""
 "Стадія, на якій припинено діловодство за заявкою (вважається неподаною, "
 "відхиленою, відкликаною; відмовлено в реєстрації)"
@@ -2302,20 +2302,24 @@ msgstr ""
 #: apps/search/templates/search/templatetags/app_stages_id.html:29
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:28
 #: apps/search/templates/search/templatetags/app_stages_kzpt.html:28
-#: apps/search/templates/search/templatetags/app_stages_tm.html:28
+#: apps/search/templates/search/templatetags/app_stages_tm.html:32
 msgid "Поточна стадія"
 msgstr "Current stage"
 
 #: apps/search/templates/search/templatetags/app_stages_id.html:36
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:34
 #: apps/search/templates/search/templatetags/app_stages_kzpt.html:35
-#: apps/search/templates/search/templatetags/app_stages_tm.html:35
+#: apps/search/templates/search/templatetags/app_stages_tm.html:39
 msgid "Пройдена стадія"
 msgstr "Passed stage"
 
 #: apps/search/templates/search/templatetags/app_stages_inv_um.html:39
 msgid "Стадія, що не використовується у діловодстві за заявкою"
 msgstr "The stage, which is not used in the prosecution of the application"
+
+#: apps/search/templates/search/templatetags/app_stages_tm.html:25
+msgid "Тимчасово заблокована"
+msgstr "Temporarily blocked"
 
 #: apps/search/templates/search/templatetags/registration_status.html:9
 #: apps/search/templates/search/templatetags/registration_status.html:47
