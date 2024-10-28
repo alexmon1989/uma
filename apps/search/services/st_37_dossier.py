@@ -39,7 +39,7 @@ class DocumentId:
     country: str
     doc_number: str
     kind: str
-    date: str | None = None
+    date: str
 
 
 @dataclass
@@ -51,7 +51,7 @@ class PublicationReference:
 class ApplicationReference:
     country: str
     doc_number: str
-    filing_date: str | None = None
+    filing_date: str
 
 
 @dataclass
@@ -158,13 +158,13 @@ class St37DocumentsRepository:
             country='UA',
             doc_number=str(biblio_data['I_11']),
             kind=biblio_data['I_13'],
-            date=biblio_data['I_45.D'][-1].replace('-', '') if 'I_45.D' in biblio_data else None
+            date=biblio_data['I_45.D'][-1].replace('-', '') if 'I_45.D' in biblio_data else ''
         )
         publication_reference = PublicationReference(document_id=document_id)
         application_reference = ApplicationReference(
             doc_number=biblio_data['I_21'],
             country='UA',
-            filing_date=biblio_data['I_43.D'][-1] if 'I_43.D' in biblio_data else None
+            filing_date=biblio_data['I_43.D'][-1] if 'I_43.D' in biblio_data else ''
         )
 
         docs = {
