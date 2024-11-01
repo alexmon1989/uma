@@ -2164,3 +2164,8 @@ def delete_files_in_directory(directory: str, ext: str) -> None:
     for file in filtered_files:
         path_to_file = os.path.join(directory, file)
         os.remove(path_to_file)
+
+
+def clean_string_for_xml(input_string: str):
+    """Видаляє зі строки символи, що не сумісні з XML."""
+    return re.sub(r'[\x00-\x1F\x7F]', '', input_string)

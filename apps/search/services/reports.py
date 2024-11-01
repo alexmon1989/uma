@@ -1,6 +1,7 @@
 from apps.search.dataclasses import InidCode
 from apps.search.templatetags.search_extras import get_person_name, get_person_country
 from apps.bulletin.services import bulletin_get_number_by_date, bulletin_get_number_with_year_by_date
+from apps.search.utils import clean_string_for_xml
 from templatetags.uma_extras import list_of_dicts_unique
 
 from typing import List
@@ -433,6 +434,7 @@ class ReportItemDocxTM(ReportItemDocx):
                     if 'ClassificationTermDetails' in item:
                         terms = item['ClassificationTermDetails']['ClassificationTerm']
                         values_str = '; '.join([x['ClassificationTermText'] for x in terms])
+                        values_str = clean_string_for_xml(values_str)
                         self._paragraph.add_run(values_str)
                 self._paragraph.add_run('\r')
 
