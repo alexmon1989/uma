@@ -20,8 +20,11 @@ def cead_get_id_doc(barcode: str) -> str | None:
     return None
 
 
-def application_has_sanctions(id_obj_type: int, app_number: str, reg_number: str = None) -> bool:
+def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_number: str = None) -> bool:
     """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
+    if app_number is None and reg_number is None:
+        return False
+
     # Тип об'єкта у БД GLOC
     gloc_obj_types = {
         1: [300, 301],

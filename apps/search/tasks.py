@@ -125,7 +125,7 @@ def perform_simple_search(user_id, get_params):
         item['meta'] = i.meta.to_dict()
         item['Document']['has_sanctions'] = application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
-            app_number=item['search_data']['app_number'],
+            app_number=item['search_data'].get('app_number'),
             reg_number=item['search_data'].get('protective_doc_number')
         )
         items.append(filter_app_data(item, user))
@@ -167,7 +167,7 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
 
     hit['Document']['has_sanctions'] = application_has_sanctions(
         id_obj_type=hit['Document']['idObjType'],
-        app_number=hit['search_data']['app_number'],
+        app_number=hit['search_data'].get('app_number'),
         reg_number=hit['search_data'].get('protective_doc_number')
     )
 
@@ -279,7 +279,7 @@ def perform_advanced_search(user_id, get_params):
         item['meta'] = i.meta.to_dict()
         item['Document']['has_sanctions'] = application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
-            app_number=item['search_data']['app_number'],
+            app_number=item['search_data'].get('app_number'),
             reg_number=item['search_data'].get('protective_doc_number')
         )
         items.append(filter_app_data(item, user))
@@ -337,7 +337,7 @@ def perform_transactions_search(get_params):
         item['meta'] = i.meta.to_dict()
         item['Document']['has_sanctions'] = application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
-            app_number=item['search_data']['app_number'],
+            app_number=item['search_data'].get('app_number'),
             reg_number=item['search_data'].get('protective_doc_number')
         )
         items.append(item)
@@ -406,7 +406,7 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
         item['meta'] = i.meta.to_dict()
         item['Document']['has_sanctions'] = application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
-            app_number=item['search_data']['app_number'],
+            app_number=item['search_data'].get('app_number'),
             reg_number=item['search_data'].get('protective_doc_number')
         )
         items.append(filter_app_data(item, user))
