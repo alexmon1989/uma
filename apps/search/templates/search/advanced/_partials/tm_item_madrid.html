@@ -29,6 +29,7 @@
             {% elif hit.search_data.protective_doc_number == '1502939' %}
                 {% trans "Дані станом на" %} <strong>25.10.2023</strong>
             {% endif %}
+            {% has_sanctions hit=hit %}
         </div>
     </div>
 

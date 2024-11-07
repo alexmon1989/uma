@@ -33,9 +33,12 @@
             {% endif %}
         </div>
 
-        {% if hit.search_data.obj_state == 2 %}
-            {% registration_status hit=hit %}
-        {% endif %}
+        <div>
+            {% if hit.search_data.obj_state == 2 %}
+                {% registration_status hit=hit %}
+            {% endif %}
+            {% has_sanctions hit=hit %}
+        </div>
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
