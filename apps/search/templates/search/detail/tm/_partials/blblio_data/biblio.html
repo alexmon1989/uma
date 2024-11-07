@@ -24,10 +24,13 @@
     {% endif %}
 
     {% if hit.search_data.obj_state == 2 %}
-        <div class="g-pb-10 d-flex justify-content-end">
+        <div class="g-pb-5 d-flex justify-content-end">
             {% registration_status hit=hit %}
         </div>
     {% endif %}
+
+    {% has_sanctions hit=hit %}
+
 
     <div class="table-responsive">
         <table class="table table-sm table-trade-mark g-font-size-13">

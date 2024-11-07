@@ -141,6 +141,11 @@ def registration_status_color(hit):
     return get_registration_status_color(hit)
 
 
+@register.inclusion_tag('search/templatetags/has_sanctions.html')
+def has_sanctions(hit):
+    """Виводить повідомлення про наявність санкцій."""
+    return {'hit': hit}
+
 @register.simple_tag
 def is_first_year_paid_inv_um(collections: List[dict]) -> bool:
     """Возвращает признак того что оплачен первый сбор поддержки действия патента."""
