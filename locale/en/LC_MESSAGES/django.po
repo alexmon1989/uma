@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-07 13:48+0200\n"
+"POT-Creation-Date: 2024-11-11 12:19+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1628,7 +1628,7 @@ msgstr "Actual Receipt Date"
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/documents_without_links.html:21
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:30
 #: apps/search/templates/search/detail/id/_partials/state_of_affair/documents_without_links.html:26
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/collections.html:22
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/collections.html:23
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:25
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents_without_links.html:21
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/collections.html:22
@@ -1642,7 +1642,7 @@ msgid "Назва документа"
 msgstr "Protective document"
 
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/collections.html:60
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/collections.html:60
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/collections.html:66
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/collections.html:60
 msgid "Збори відсутні"
 msgstr "There are no fees"
@@ -1706,7 +1706,6 @@ msgid "Платежі (зараховані)"
 msgstr "Payments (credited)"
 
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/payments.html:18
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/payments.html:18
 #: apps/search/templates/search/detail/ld/_partials/state_of_affair/payments.html:18
 msgid "Сума оплати"
 msgstr "Amount of payment"
@@ -1949,12 +1948,22 @@ msgstr "Abstract"
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:80
 #: apps/search/templates/search/detail/inv_um/detail.html:96
 msgid "Додаткова охорона"
-msgstr ""
+msgstr "Additional protection"
 
 #: apps/search/templates/search/detail/inv_um/_partials/sidebar.html:90
 #: apps/search/templates/search/detail/ld/_partials/sidebar.html:80
 msgid "Архів документів (.zip)"
 msgstr "Archive of documents (.zip)"
+
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/collections.html:22
+msgid "Планова сума сплати"
+msgstr "Planned amount of payment"
+
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/payments.html:18
+#, fuzzy
+#| msgid "Сума оплати"
+msgid "Сума сплати"
+msgstr "Amount of payment"
 
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:17
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:35
