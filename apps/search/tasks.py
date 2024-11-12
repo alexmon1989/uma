@@ -10,7 +10,6 @@ from django_celery_results.models import TaskResult
 from django.utils.timezone import now
 from django.utils import translation
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
-from .services.external import application_has_sanctions
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
@@ -123,10 +122,10 @@ def perform_simple_search(user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        item['Document']['has_sanctions'] = application_has_sanctions(
+        item['Document']['has_sanctions'] = search_services.application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
             app_number=item['search_data'].get('app_number'),
-            reg_number=item['search_data'].get('protective_doc_number')
+            reg_number=str(item['search_data'].get('protective_doc_number'))
         )
         items.append(filter_app_data(item, user))
     results = {
@@ -165,10 +164,10 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
     if not hit:
         return {}
 
-    hit['Document']['has_sanctions'] = application_has_sanctions(
+    hit['Document']['has_sanctions'] = search_services.application_has_sanctions(
         id_obj_type=hit['Document']['idObjType'],
         app_number=hit['search_data'].get('app_number'),
-        reg_number=hit['search_data'].get('protective_doc_number')
+        reg_number=str(hit['search_data'].get('protective_doc_number'))
     )
 
     user = get_user_or_anonymous(user_id)
@@ -277,10 +276,10 @@ def perform_advanced_search(user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        item['Document']['has_sanctions'] = application_has_sanctions(
+        item['Document']['has_sanctions'] = search_services.application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
             app_number=item['search_data'].get('app_number'),
-            reg_number=item['search_data'].get('protective_doc_number')
+            reg_number=str(item['search_data'].get('protective_doc_number'))
         )
         items.append(filter_app_data(item, user))
     results = {
@@ -335,10 +334,10 @@ def perform_transactions_search(get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        item['Document']['has_sanctions'] = application_has_sanctions(
+        item['Document']['has_sanctions'] = search_services.application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
             app_number=item['search_data'].get('app_number'),
-            reg_number=item['search_data'].get('protective_doc_number')
+            reg_number=str(item['search_data'].get('protective_doc_number'))
         )
         items.append(item)
     results = {
@@ -404,10 +403,10 @@ def perform_favorites_search(favorites_ids, user_id, get_params):
     for i in s[res_from:res_to]:
         item = i.to_dict()
         item['meta'] = i.meta.to_dict()
-        item['Document']['has_sanctions'] = application_has_sanctions(
+        item['Document']['has_sanctions'] = search_services.application_has_sanctions(
             id_obj_type=item['Document']['idObjType'],
             app_number=item['search_data'].get('app_number'),
-            reg_number=item['search_data'].get('protective_doc_number')
+            reg_number=str(item['search_data'].get('protective_doc_number'))
         )
         items.append(filter_app_data(item, user))
     results = {

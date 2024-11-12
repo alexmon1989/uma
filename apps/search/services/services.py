@@ -16,6 +16,7 @@ from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited, AppDocuments
 from apps.bulletin import services as bulletin_services
+from apps.search.services.external import gloc_get_sanctioned_objects
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
 from apps.my_auth.services import UserService
@@ -762,6 +763,34 @@ def application_get_documents(app_id: int) -> dict:
                     # Реферат англ.
                     res['ab_en'] = document
     return res
+
+
+def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_number: str = None) -> bool:
+    """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
+    # Відповідність ідентифікаторів типів об'єктів у СІС та ГЛОК
+    gloc_obj_types = {
+        1: (300, 301),
+        2: (302, 303),
+        3: (309, 310),
+        4: (304, 305),
+        5: (311, 312),
+        6: (307, 308),
+        9: (306,),
+        14: (306,),
+    }
+
+    if (app_number is None and reg_number is None) or id_obj_type not in gloc_obj_types:
+        return False
+
+    # Отримання списку санкційних об'єктів
+    rr_sanctioned_objects = gloc_get_sanctioned_objects()
+
+    for sanctioned_obj in rr_sanctioned_objects:
+        if sanctioned_obj['obj_number'] in (app_number, reg_number) \
+                and sanctioned_obj['id_obj_type'] in gloc_obj_types[id_obj_type]:
+            return True
+
+    return False
 
 
 def application_get_indexed_count() -> int:
