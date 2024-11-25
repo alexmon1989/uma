@@ -863,8 +863,9 @@ class ReportItemDocxMadrid(ReportItemDocx):
 
             self._paragraph.add_run(f"({inid.code})").bold = True
             self._paragraph.add_run(f"\t{inid.title}: ")
-            self._paragraph.add_run(f"{app_date}, ").bold = True
-            self._paragraph.add_run(base_app['BASAPPN']).bold = True
+            self._paragraph.add_run(f"{app_date}").bold = True
+            if 'BASAPPN' in base_app:
+                self._paragraph.add_run(f", {base_app['BASAPPN']}").bold = True
             self._paragraph.add_run('\r')
 
     def _write_891(self) -> None:
