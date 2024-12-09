@@ -7,8 +7,7 @@
         <div class="g-pb-20">
             {% trans "Опубліковано" %} <span
                 class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationDate|parse_date|date:"d.m.Y" }}</span>,
-            {% trans "бюл." %} №{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationNumber }}<span
-                class="g-font-weight-600"></span>
+            {% trans "бюл." %} № <span class="g-font-weight-600">{{ hit.Certificate.CopyrightDetails.PublicationDetails.Publication.PublicationNumber }}</span>
         </div>
     {% endif %}
 
