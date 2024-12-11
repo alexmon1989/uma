@@ -130,6 +130,11 @@
 
         <div class="col-md">
             <h4 class="g-font-size-13 g-font-weight-600 g-mb-0"><abbr title="{% trans "Міжнародна класифікація товарів і послуг для реєстрації знаків та перелік товарів і послуг" %}">{% trans "МКТП" %}</abbr>:</h4>
+
+            {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                <span class="g-color-red">*</span>
+            {% endif %}
+
             {% for index in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                 {{ index.ClassNumber }}{% if not forloop.last %}, {% endif %}
             {% endfor %}
