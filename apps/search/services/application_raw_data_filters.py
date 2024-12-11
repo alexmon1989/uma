@@ -17,19 +17,35 @@ class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
 
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
-            if 'ApplicantDetails' in data['TradeMark']['TrademarkDetails']:
+            limited_app = AppLimited.objects.filter(
+                app_number=data['TradeMark']['TrademarkDetails']['ApplicationNumber'],
+                obj_type_id=data['Document']['idObjType']
+            ).first()
+            if 'ApplicantDetails' in data['TradeMark']['TrademarkDetails'] \
+                    and not limited_app.settings_dict.get('ApplicantDetails', False):
                 del data['TradeMark']['TrademarkDetails']['ApplicantDetails']
-
-            if 'HolderDetails' in data['TradeMark']['TrademarkDetails']:
+            if 'HolderDetails' in data['TradeMark']['TrademarkDetails'] \
+                    and not limited_app.settings_dict.get('HolderDetails', False):
                 del data['TradeMark']['TrademarkDetails']['HolderDetails']
+            if 'RepresentativeDetails' in data['TradeMark']['TrademarkDetails'] \
+                    and not limited_app.settings_dict.get('RepresentativeDetails', True):
+                del data['TradeMark']['TrademarkDetails']['RepresentativeDetails']
 
-            if 'CorrespondenceAddress' in data['TradeMark']['TrademarkDetails']:
+            if 'CorrespondenceAddress' in data['TradeMark']['TrademarkDetails'] \
+                    and not limited_app.settings_dict.get('CorrespondenceAddress', False):
                 del data['TradeMark']['TrademarkDetails']['CorrespondenceAddress']
 
+            if 'GoodsServicesDetails' in data['TradeMark']['TrademarkDetails'] \
+                    and not limited_app.settings_dict.get('GoodsServicesDetails', True):
+                del data['TradeMark']['TrademarkDetails']['GoodsServicesDetails']
+
             if 'MarkImageDetails' in data['TradeMark']['TrademarkDetails']:
-                if 'MarkImageColourClaimedText' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']:
+                if 'MarkImageColourClaimedText' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'] \
+                        and not limited_app.settings_dict.get('MarkImageColourClaimedText', False):
                     del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']
-                del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+                if 'MarkImageFilename' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'] \
+                        and not limited_app.settings_dict.get('MarkImageFilename', False):
+                    del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
 
 
 class ApplicationRawDataIDLimitedFilter(ApplicationRawDataFilter):
@@ -110,14 +126,6 @@ class ApplicationRawDataCRLimitedFilter(ApplicationRawDataFilter):
                 del biblio_data['HolderDetails']
             if 'PromulgationData' in biblio_data and not limited_app.settings_dict.get('PromulgationData', False):
                 del biblio_data['PromulgationData']
-            if 'RegistrationKind' in biblio_data and not limited_app.settings_dict.get('RegistrationKind', False):
-                del biblio_data['RegistrationKind']
-            if 'RegistrationKindCode' in biblio_data \
-                    and not limited_app.settings_dict.get('RegistrationKindCode', False):
-                del biblio_data['RegistrationKindCode']
-            if 'RegistrationOfficeCode' in biblio_data \
-                    and not limited_app.settings_dict.get('RegistrationOfficeCode', False):
-                del biblio_data['RegistrationOfficeCode']
             if 'RepresentativeDetails' in biblio_data \
                     and not limited_app.settings_dict.get('RepresentativeDetails', False):
                 del biblio_data['RepresentativeDetails']
@@ -190,9 +198,6 @@ class ApplicationRawDataDecisionLimitedFilter(ApplicationRawDataFilter):
             if 'RegistrationKindCode' in biblio_data \
                     and not limited_app.settings_dict.get('RegistrationKindCode', False):
                 del biblio_data['RegistrationKindCode']
-            if 'RegistrationOfficeCode' in biblio_data \
-                    and not limited_app.settings_dict.get('RegistrationOfficeCode', False):
-                del biblio_data['RegistrationOfficeCode']
             if 'RepresentativeDetails' in biblio_data \
                     and not limited_app.settings_dict.get('RepresentativeDetails', False):
                 del biblio_data['RepresentativeDetails']

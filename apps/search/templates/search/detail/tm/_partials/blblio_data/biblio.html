@@ -327,21 +327,28 @@
             {% endif %}
 
             {% get_field '740' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% for representative in hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
-                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
-                            <br>
-                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
-                                [{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
-                            {% endif %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% for representative in hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
+                                {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameDetails.FreeFormatNameLine }}
+                                <br>
+                                {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}
+                                    [{{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]
+                                {% endif %}
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '750' ipc_fields as ipc_field %}
@@ -427,47 +434,47 @@
             {% endif %}
 
             {% get_field '591' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for color in hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText %}
+                            {{ color|get:"#text" }}{% if not forloop.last %};{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '511.I' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
                 {% if hit.Document.is_limited %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
                     </tr>
-                {% elif hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText|length > 0 %}
+                {% elif hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td>
-                            {% for color in hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageColourClaimedText %}
-                                {{ color|get:"#text" }}{% if not forloop.last %};{% endif %}
+                            {% for cls in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
+                                <div class="d-flex justify-content-start">
+                                    <div class="g-pr-6 text-nowrap">Кл. {{ cls.ClassNumber }}:</div>
+                                    <div class="text-justify mktp-indexes">
+                                    <span class="more hidden">
+                                        {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
+                                            {{ term.ClassificationTermText }}{% if not forloop.last and term.ClassificationTermText|default:""|slice:"-1:" != "," %};{% endif %}
+                                        {% endfor %}
+                                    </span>
+                                        <a href="#"
+                                           class="show-indexes g-font-size-12"
+                                           title="{% trans "Показати" %}"
+                                        ><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
                             {% endfor %}
                         </td>
                     </tr>
                 {% endif %}
-            {% endif %}
-
-            {% get_field '511.I' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>
-                        {% for cls in hit.TradeMark.TrademarkDetails.GoodsServicesDetails.GoodsServices.ClassDescriptionDetails.ClassDescription %}
-                            <div class="d-flex justify-content-start">
-                                <div class="g-pr-6 text-nowrap">Кл. {{ cls.ClassNumber }}:</div>
-                                <div class="text-justify mktp-indexes">
-                                <span class="more hidden">
-                                    {% for term in cls.ClassificationTermDetails.ClassificationTerm %}
-                                        {{ term.ClassificationTermText }}{% if not forloop.last and term.ClassificationTermText|default:""|slice:"-1:" != "," %};{% endif %}
-                                    {% endfor %}
-                                </span>
-                                    <a href="#"
-                                       class="show-indexes g-font-size-12"
-                                       title="{% trans "Показати" %}"
-                                    ><i class="fa fa-plus"></i></a>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </td>
-                </tr>
             {% endif %}
             </tbody>
         </table>

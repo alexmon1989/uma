@@ -11,13 +11,19 @@ from apps.search.services.application_raw_data_filters import (ApplicationRawDat
 
 
 class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.obj_type = ObjType.objects.create(obj_type_ua='Торговельні марки')
 
     def setUp(self) -> None:
         self.filter = ApplicationRawDataTMLimitedFilter()
         self.app_data = {
-            'Document': {},
+            'Document': {
+                'idObjType': self.obj_type.pk
+            },
             'TradeMark': {
                 'TrademarkDetails': {
+                    'ApplicationNumber': 'm202400001',
                     'ApplicantDetails': {},
                     'HolderDetails': {},
                     'CorrespondenceAddress': {},
@@ -27,6 +33,8 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
                             'MarkImageFilename': 'test data'
                         }
                     },
+                    'RepresentativeDetails': {},
+                    'GoodsServicesDetails': {},
                 }
             }
         }
@@ -35,7 +43,9 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
         self.filter.filter_data(self.app_data)
         self.assertIn('ApplicantDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertIn('HolderDetails', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn('RepresentativeDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertIn('CorrespondenceAddress', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn('GoodsServicesDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertIn(
             'MarkImageColourClaimedText',
             self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
@@ -45,8 +55,13 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
             self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
         )
 
-    def test_filter_data_limited(self):
+    def test_filter_data_limited_default(self):
         self.app_data['Document']['is_limited'] = True
+        AppLimited.objects.all().delete()
+        AppLimited.objects.create(
+            app_number=self.app_data['TradeMark']['TrademarkDetails']['ApplicationNumber'],
+            obj_type_id=self.app_data['Document']['idObjType']
+        )
         self.filter.filter_data(self.app_data)
         self.assertNotIn('ApplicantDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertNotIn('HolderDetails', self.app_data['TradeMark']['TrademarkDetails'])
@@ -59,6 +74,39 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
             'MarkImageFilename',
             self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
         )
+        self.assertIn('RepresentativeDetails', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn('GoodsServicesDetails', self.app_data['TradeMark']['TrademarkDetails'])
+
+    def test_filter_data_limited(self):
+        self.app_data['Document']['is_limited'] = True
+        AppLimited.objects.all().delete()
+        AppLimited.objects.create(
+            app_number=self.app_data['TradeMark']['TrademarkDetails']['ApplicationNumber'],
+            obj_type_id=self.app_data['Document']['idObjType'],
+            settings_json=json.dumps({
+                'ApplicantDetails': True,
+                'HolderDetails': True,
+                'CorrespondenceAddress': True,
+                'MarkImageColourClaimedText': True,
+                'MarkImageFilename': True,
+                'RepresentativeDetails': False,
+                'GoodsServicesDetails': False,
+            })
+        )
+        self.filter.filter_data(self.app_data)
+        self.assertIn('ApplicantDetails', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn('HolderDetails', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn('CorrespondenceAddress', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertIn(
+            'MarkImageColourClaimedText',
+            self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
+        )
+        self.assertIn(
+            'MarkImageFilename',
+            self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
+        )
+        self.assertNotIn('RepresentativeDetails', self.app_data['TradeMark']['TrademarkDetails'])
+        self.assertNotIn('GoodsServicesDetails', self.app_data['TradeMark']['TrademarkDetails'])
 
 
 class ApplicationRawDataIDLimitedFilterTestCase(TestCase):
@@ -87,7 +135,6 @@ class ApplicationRawDataIDLimitedFilterTestCase(TestCase):
         self.assertIn('DesignSpecimenDetails', self.app_data['Design']['DesignDetails'])
 
     def test_filter_data_limited(self):
-        self.app_data['Document']['is_limited'] = True
         self.filter.filter_data(self.app_data)
         self.assertNotIn('ApplicantDetails', self.app_data['Design']['DesignDetails'])
         self.assertNotIn('HolderDetails', self.app_data['Design']['DesignDetails'])
