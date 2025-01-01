@@ -74,7 +74,7 @@ class IpcAppList(models.Model):
 
 
 class AppLimited(TimeStampedModel):
-    """Модель заявки, которая публикуется с ограниченнм набором данных."""
+    """Модель даних обмежень заявки."""
     app_number = models.CharField('Номер заявки', max_length=16, db_index=True)
     obj_type = models.ForeignKey(
         'ObjType',

@@ -22,6 +22,7 @@ documentation for details.
 .. toctree::
    components/search_system
    components/search_indexation
+   components/cead_limits_import
    :maxdepth: 3
    :caption: Компоненти:
 

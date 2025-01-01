@@ -42,7 +42,16 @@ class CeadLimitsService:
     }
 
     def get_list(self, datetime_from: datetime.datetime, datetime_to: datetime.datetime) -> List[Tuple[str, int]]:
-        """Повертає список заявок, до яких були застосовані обмеження за період часу."""
+        """Повертає список заявок, до яких були застосовані обмеження за період часу.
+
+        :param datetime_from: Дата та час початку періоду
+        :type datetime_from: datetime.datetime
+        :param datetime_to: Дата та час закінчення періоду
+        :type datetime_to: datetime.datetime
+
+        :return: список номерів заявок з їх типами ОПВ
+        :rtype: List[Tuple[str, int]]
+        """
         query = 'EXEC [ext].[uma_GetLimitObjects] @dateBegin = %s, @dateEnd = %s'
 
         res = []

@@ -4,8 +4,11 @@ from abc import ABC, abstractmethod
 from apps.search.models import AppLimited
 
 
-class LimitsMucToJSONConverter(ABC):
-    """Інтерфейс конвертора налаштувань обмежень з MUC у JSON."""
+class LimitsMucToDictConverter(ABC):
+    """Інтерфейс конвертора налаштувань обмежень з MUC у dict.
+
+    :cvar muc_limits set: Набір обмежень MUC.
+    """
     muc_limits: set
 
     def __init__(self, muc_limits: set | None = None):
@@ -14,13 +17,17 @@ class LimitsMucToJSONConverter(ABC):
         self.muc_limits = muc_limits
 
     @abstractmethod
-    def convert(self) -> str:
+    def convert(self) -> dict:
+        """
+        :return: dict з інформацією про обмеження.
+        :rtype: dict
+        """
         pass
 
 
-class LimitsMucToJSONConverterInvUMLD(LimitsMucToJSONConverter):
-    """Реалізація конвертора налаштувань обмежень з MUC у JSON для винаходів, КМ, топографій."""
-    def convert(self) -> str:
+class LimitsMucToDictConverterInvUMLD(LimitsMucToDictConverter):
+    """Реалізація конвертора налаштувань обмежень з MUC у dict для винаходів, КМ, топографій."""
+    def convert(self) -> dict:
         res = {
             'I_71': 1 not in self.muc_limits,
             'I_72': 2 not in self.muc_limits,
@@ -35,12 +42,12 @@ class LimitsMucToJSONConverterInvUMLD(LimitsMucToJSONConverter):
             'I_74': 11 not in self.muc_limits,
         }
 
-        return json.dumps(res, indent=4)
+        return res
 
 
-class LimitsMucToJSONConverterID(LimitsMucToJSONConverter):
-    """Реалізація конвертора налаштувань обмежень з MUC у JSON для промислових зразків."""
-    def convert(self) -> str:
+class LimitsMucToDictConverterID(LimitsMucToDictConverter):
+    """Реалізація конвертора налаштувань обмежень з MUC у dict для промислових зразків."""
+    def convert(self) -> dict:
         res = {
             'DesignSpecimenDetails': 40 not in self.muc_limits,
             'ApplicantDetails': 41 not in self.muc_limits,
@@ -51,12 +58,12 @@ class LimitsMucToJSONConverterID(LimitsMucToJSONConverter):
             'RepresentativeDetails': 46 not in self.muc_limits,
         }
 
-        return json.dumps(res, indent=4)
+        return res
 
 
-class LimitsMucToJSONConverterCR(LimitsMucToJSONConverter):
-    """Реалізація конвертора налаштувань обмежень з MUC у JSON для авторського права."""
-    def convert(self) -> str:
+class LimitsMucToDictConverterCR(LimitsMucToDictConverter):
+    """Реалізація конвертора налаштувань обмежень з MUC у dict для авторського права."""
+    def convert(self) -> dict:
         res = {
             'AuthorDetails': 12 not in self.muc_limits,
             'ApplicantDetails': 12 not in self.muc_limits,
@@ -69,12 +76,12 @@ class LimitsMucToJSONConverterCR(LimitsMucToJSONConverter):
             'NameShort': 17 not in self.muc_limits,
         }
 
-        return json.dumps(res, indent=4)
+        return res
 
 
-class LimitsMucToJSONConverterDecision(LimitsMucToJSONConverter):
-    """Реалізація конвертора налаштувань обмежень з MUC у JSON для договорів авторського права."""
-    def convert(self) -> str:
+class LimitsMucToDictConverterDecision(LimitsMucToDictConverter):
+    """Реалізація конвертора налаштувань обмежень з MUC у dict для договорів авторського права."""
+    def convert(self) -> dict:
         res = {
             'LicenseeDetails': 18 not in self.muc_limits,
             'LicensorDetails': 18 not in self.muc_limits,
@@ -88,79 +95,107 @@ class LimitsMucToJSONConverterDecision(LimitsMucToJSONConverter):
             'RepresentativeDetails': 39 not in self.muc_limits,
         }
 
-        return json.dumps(res, indent=4)
+        return res
 
 
-MUC_TO_JSON_CONVERTERS = {
-    1: LimitsMucToJSONConverterInvUMLD,
-    2: LimitsMucToJSONConverterInvUMLD,
-    3: LimitsMucToJSONConverterInvUMLD,
-    6: LimitsMucToJSONConverterID,
-    10: LimitsMucToJSONConverterCR,
-    11: LimitsMucToJSONConverterDecision,
-    12: LimitsMucToJSONConverterDecision,
-    13: LimitsMucToJSONConverterCR,
+# Конвертери з MUC у dict
+MUC_TO_DICT_CONVERTERS = {
+    1: LimitsMucToDictConverterInvUMLD,
+    2: LimitsMucToDictConverterInvUMLD,
+    3: LimitsMucToDictConverterInvUMLD,
+    6: LimitsMucToDictConverterID,
+    10: LimitsMucToDictConverterCR,
+    11: LimitsMucToDictConverterDecision,
+    12: LimitsMucToDictConverterDecision,
+    13: LimitsMucToDictConverterCR,
+}
+
+
+# Статуси обмежень
+LIMITS_STATUS = {
+    'SET': 922,  # Встановлено обмеження
+    'REMOVED': 923,  # Знято обмеження
+    'NONE': 924  # Відсутні обмеження
 }
 
 
 class LimitsService:
-    """Клас сервісу, що обмежує дані ОПВ на основі даних з ЦЕАД (MUC)."""
-    app_number: str  # номер заявки
-    obj_type_id: int  # тип об'єкта
-    limits_status: int  # статус обмежень
-    muc_limits: set  # перелік обмежень (MUC)
-    muc_to_json_converter: LimitsMucToJSONConverter  # конвертер MUC у JSON
+    """Клас сервісу, що обмежує дані ОПВ (фактично записує у БД дані щодо обмежень).
+
+    :cvar app_number str: Номер заявки.
+    :cvar obj_type_id int: Тип об'єкта.
+    :cvar limits_status int: Статус обмежень.
+    :cvar limits dict: Перелік обмежень.
+    :cvar app_limited AppLimited: Модель обмеженої заявки
+    """
+    app_number: str
+    obj_type_id: int
+    limits_status: int
+    muc_limits: set
+    app_limited: AppLimited = None
 
     def __init__(self,
                  app_number: str,
                  obj_type_id: int,
                  limits_status: int,
-                 muc_limits: set,
-                 muc_to_json_converter: LimitsMucToJSONConverter):
+                 limits: dict):
         self.app_number = app_number
         self.obj_type_id = obj_type_id
         self.limits_status = limits_status
-        self.muc_limits = muc_limits
-        self.muc_to_json_converter = muc_to_json_converter
+        self.limits = limits
+
+    def _handle_no_limits(self) -> bool:
+        if self.app_limited:
+            self.app_limited.delete()
+            return True
+        return False
+
+    def _handle_limits(self) -> bool:
+        if not self.app_limited:
+            # Якщо запис відсутній, то відбувається його створення
+            return self._create_new_record()
+        else:
+            # Якщо запис наявний, то необхідно оновити його
+            return self._update_existing_record()
+
+    def _create_new_record(self) -> bool:
+        """Створює новий запис обмеженої заявки."""
+        AppLimited.objects.create(
+            app_number=self.app_number,
+            obj_type_id=self.obj_type_id,
+            settings_json=json.dumps(self.limits, indent=4),
+            cancelled=self.limits_status == LIMITS_STATUS['REMOVED']
+        )
+        return True
+
+    def _update_existing_record(self) -> bool:
+        """Оновлює запис обмеженої заявки."""
+        need_update = False
+
+        limits_json = json.dumps(self.limits, indent=4)
+        if self.app_limited.settings_json != limits_json:
+            self.app_limited.settings_json = limits_json
+            need_update = True
+
+        cancelled = self.limits_status == LIMITS_STATUS['REMOVED']
+        if self.app_limited.cancelled != cancelled:
+            self.app_limited.cancelled = cancelled
+            need_update = True
+
+        if need_update:
+            self.app_limited.save()
+            return True
+
+        return False
 
     def process(self) -> bool:
         # Отримання даних про обмеження з БД UMA
-        app_limited = AppLimited.objects.filter(
+        self.app_limited = AppLimited.objects.filter(
             app_number=self.app_number,
             obj_type_id=self.obj_type_id
         ).first()
 
-        # Обробка статусів: 922 - встановлено обмеження, 923 - знято обмеження, 924 - відсутні обмеження
-        if self.limits_status == 924:
-            if app_limited:
-                app_limited.delete()
+        if self.limits_status == LIMITS_STATUS['NONE']:
+            return self._handle_no_limits()
         else:
-            self.muc_to_json_converter.muc_limits = self.muc_limits
-            limits_json = self.muc_to_json_converter.convert()
-
-            if not app_limited:
-                # Якщо запис відсутній, то відбуваєтсья його створення
-                AppLimited.objects.create(
-                    app_number=self.app_number,
-                    obj_type_id=self.obj_type_id,
-                    settings_json=limits_json,
-                    cancelled=self.limits_status == 923
-                )
-                return True
-            else:
-                # Якщо запис наявний, то необхідно оновити його
-                need_update = False
-
-                if app_limited.settings_json != limits_json:
-                    app_limited.settings_json = limits_json
-                    need_update = True
-
-                cancelled = self.limits_status == 923
-                if app_limited.cancelled != cancelled:
-                    app_limited.cancelled = cancelled
-                    need_update = True
-
-                if need_update:
-                    app_limited.save()
-                    return True
-            return False
+            return self._handle_limits()

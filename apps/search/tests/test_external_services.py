@@ -1,7 +1,9 @@
+import datetime
+
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 
-from apps.search.services.external import gloc_get_sanctioned_objects
+from apps.search.services.external import gloc_get_sanctioned_objects, CeadLimitsService
 
 
 class TestGlocGetSanctionedObjects(TestCase):
@@ -55,3 +57,50 @@ class TestGlocGetSanctionedObjects(TestCase):
 
         # Перевірка, що дані було закешовано
         mock_cache.set.assert_called_once_with("rr_sanctioned_objects", expected_result, 3600)
+
+
+class CeadLimitsServiceTests(TestCase):
+    def setUp(self):
+        self.service = CeadLimitsService()
+
+    @patch('apps.search.services.external.connections')
+    def test_get_list_returns_correct_results(self, mock_connections):
+        """Тест метода get_list для коректного повернення даних за період."""
+        mock_cursor = MagicMock()
+        mock_connections.__getitem__.return_value.cursor.return_value.__enter__.return_value = mock_cursor
+
+        # Эмулируем возвращаемые данные курсора
+        mock_cursor.fetchone.side_effect = [
+            ('a202400001', 1),
+            ('u202400002', 8),
+            None  # Кінець даних
+        ]
+
+        datetime_from = datetime.datetime(2024, 1, 1, 0, 0, 0)
+        datetime_to = datetime.datetime(2024, 1, 31, 23, 59, 59)
+
+        result = self.service.get_list(datetime_from, datetime_to)
+
+        expected_result = [
+            ('a202400001', 1),
+            ('u202400002', 2),
+        ]
+        self.assertEqual(result, expected_result)
+
+    @patch('apps.search.services.external.connections')
+    def test_get_limit_details_with_restrictions(self, mock_connections):
+        """Тест метода get_limit_details, є обмеження та статус 922."""
+        mock_cursor = MagicMock()
+        mock_connections['e_archive'].cursor.return_value.__enter__.return_value = mock_cursor
+
+        # Емуляція даних
+        mock_cursor.fetchall.return_value = [(1,), (2,), (3,)]
+        mock_cursor.fetchone.side_effect = [(922,)]
+
+        app_number = 'a202400001'
+        obj_type_id = 1
+
+        result = self.service.get_limit_details(app_number, obj_type_id)
+
+        expected_result = (922, {1, 2, 3})
+        self.assertEqual(result, expected_result)
