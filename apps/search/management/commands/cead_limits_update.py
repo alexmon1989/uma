@@ -24,7 +24,7 @@ class Command(BaseCommand):
             app_number=app[0],
             obj_type_id=app[1]
         )
-        muc_to_json_converter = MUC_TO_DICT_CONVERTERS[app[1]]()
+        muc_to_json_converter = MUC_TO_DICT_CONVERTERS[app[1]](muc_limits=muc_limits)
 
         sis_limits_service = LimitsService(
             app_number=app[0],
