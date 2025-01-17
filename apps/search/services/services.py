@@ -776,6 +776,10 @@ def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_numb
         5: (311, 312),
         6: (307, 308),
         9: (306,),
+        10: (317,),
+        11: (319, 320),
+        12: (319, 320),
+        13: (318,),
         14: (306,),
     }
 

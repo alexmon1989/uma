@@ -26,6 +26,7 @@
         {% if hit.Document.ShowRegistrationStatus %}
             {% registration_status hit=hit %}
         {% endif %}
+        {% has_sanctions hit=hit %}
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">
