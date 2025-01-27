@@ -9,7 +9,7 @@ from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, AppLimited
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
-from apps.bulletin.services import bulletin_get_number_with_year_by_date
+from apps.bulletin.services import bulletin_get_number_with_year_by_date, bulletin_get_number_by_date
 from apps.bulletin.models import EBulletinData
 
 
@@ -111,6 +111,9 @@ class ApplicationRawDataFSTMReceiver(ApplicationRawDataFSReceiver):
             ).first()
             if bulletin_item:
                 data['TradeMark']['TrademarkDetails']['Code_441'] = bulletin_item.publication_date.strftime('%Y-%m-%d')
+                data['TradeMark']['TrademarkDetails']['Code_441_BulNumber'] = bulletin_get_number_by_date(
+                    bulletin_item.publication_date
+                )
 
     def get_data(self) -> dict:
         data = super().get_data()

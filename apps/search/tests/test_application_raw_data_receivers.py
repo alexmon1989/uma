@@ -119,8 +119,15 @@ class ApplicationRawDataFSTMReceiverTestCase(TestCase):
         self.assertNotIn('Code_441', data['TradeMark']['TrademarkDetails'])
 
         EBulletinData.objects.create(app_number='m202400001', publication_date='2024-07-04')
+        ClListOfficialBulletinsIp.objects.create(
+            bul_date='2024-07-04',
+            date_from='2024-07-04',
+            date_to='2024-07-04',
+            bul_number=1,
+        )
         data = receiver.get_data()
         self.assertEqual(data['TradeMark']['TrademarkDetails']['Code_441'], '2024-07-04')
+        self.assertEqual(data['TradeMark']['TrademarkDetails']['Code_441_BulNumber'], 1)
 
         # Значение 441 из файла имеет преимущество
         test_data['TradeMark']['TrademarkDetails']['Code_441'] = '2024-01-01'
