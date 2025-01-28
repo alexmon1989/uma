@@ -128,7 +128,7 @@
                         </th>
                         <td>
                             {% for item in hit.TradeMark.TrademarkDetails.ExhibitionPriorityDetails.ExhibitionPriority %}
-                                {% if ipc_field_230_d.enable_view %}{{ item.ExhibitionDate }}{% endif %}<!--
+                                {% if ipc_field_230_d.enable_view %}{{ item.ExhibitionDate|parse_date|date:"d.m.Y" }}{% endif %}<!--
                                 -->{% if ipc_field_230_c.enable_view and item.ExhibitionCountryCode %}<!--
                                     -->{% if ipc_field_230_d.enable_view %},&nbsp;{% endif %}<!--
                                     -->{{ item.ExhibitionCountryCode }}
