@@ -1,10 +1,13 @@
-from django.views.generic import TemplateView
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.db.models import F, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
 from django.utils.http import urlencode
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import user_passes_test
@@ -202,6 +205,27 @@ def add_filter_params(request):
     path = urlparse(referer).path
 
     return redirect(f"{path}?{get_params}")
+
+
+class ObjectDetailRedirectView(RedirectView):
+    """Переадресовує на сторінку ОПВ, використовує GET-параметри app_number, obj_type."""
+    permanent = True
+    pattern_name = "search:detail"
+
+    @method_decorator(cache_page(60 * 15))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        app_number = self.request.GET.get("app_number")
+        obj_type_id = self.request.GET.get("obj_type")
+
+        if app_number and obj_type_id:
+            app = IpcAppList.objects.filter(app_number=app_number, obj_type_id=obj_type_id).order_by('-pk').first()
+            if app:
+                return reverse(self.pattern_name, kwargs={"pk": app.pk})
+
+        raise Http404
 
 
 class ObjectDetailView(DetailView):
