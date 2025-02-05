@@ -1,6 +1,8 @@
 <div class="datetime">
   {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
   <div style="visibility: hidden; position: absolute; top: -9999px; left: -9999px">
-      {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
+      {% with widget=widget.subwidgets.1 %}
+        <input type="{{ widget.type }}" name="{{ widget.name }}" value="00:00:00">
+      {% endwith %}
   </div>
 </div>

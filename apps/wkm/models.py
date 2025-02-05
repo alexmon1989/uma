@@ -39,7 +39,7 @@ class WKMMark(models.Model):
         'WKMRefBulletin',
         db_column='IdBulletin',
         on_delete=models.DO_NOTHING,
-        blank=True,
+        blank=False,
         null=True,
         verbose_name='Бюлетень'
     )

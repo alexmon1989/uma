@@ -107,6 +107,7 @@ class WKMMarkAdmin(VersionAdmin, admin.ModelAdmin):
     image_tag.short_description = 'Поточне зображення'
     readonly_fields = ['image_tag']
     fields = (
+        'bulletin',
         'keywords',
         'decision_date',
         'rights_date',
