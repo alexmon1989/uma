@@ -26,17 +26,7 @@
            href="#nav-order"
            role="tab"
         >
-        {% if hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderFile.OrderType == 'Наказ ДСІВ' %}
-            {% trans "Наказ ДСІВ" %}
-        {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderFile.OrderType == 'Наказ Мінекономрозвитку' %}
-            {% trans "Наказ Мінекономрозвитку" %}
-        {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderFile.OrderType == 'Наказ Мінекономіки' %}
-            {% trans "Наказ Мінекономіки" %}
-        {% elif hit.WellKnownMark.WellKnownMarkDetails.OrderDetails.OrderFile.OrderType == 'Наказ НОІВ' %}
-            {% trans "Наказ НОІВ" %}
-        {% else %}
-            {% trans "Наказ" %}
-        {% endif %}
+        {% trans "Наказ" %}
         </a>
     </li>
 </ul>
