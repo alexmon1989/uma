@@ -257,7 +257,7 @@
 
             {% get_field '731' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant%}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -293,7 +293,7 @@
 
             {% get_field '732' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -328,7 +328,7 @@
 
             {% get_field '740' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.RepresentativeDetails.Representative %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -353,7 +353,7 @@
 
             {% get_field '750' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.CorrespondenceAddress %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -380,7 +380,7 @@
 
             {% get_field '540' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -447,7 +447,7 @@
 
             {% get_field '511.I' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.GoodsServicesDetails%}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
