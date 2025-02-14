@@ -35,6 +35,19 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
                     },
                     'RepresentativeDetails': {},
                     'GoodsServicesDetails': {},
+                },
+                'Transactions': {
+                    'Transaction': [
+                        {
+                            'TransactionBody': {
+                                'ApplicantDetails': {},
+                                'HolderDetails': {},
+                                'CorrespondenceAddress': {},
+                                'RepresentativeDetails': {},
+                                'GoodsServicesDetails': {},
+                            }
+                        }
+                    ]
                 }
             }
         }
@@ -54,6 +67,12 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
             'MarkImageFilename',
             self.app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']
         )
+        transaction_body = self.app_data['TradeMark']['Transactions']['Transaction'][0]['TransactionBody']
+        self.assertIn('ApplicantDetails', transaction_body)
+        self.assertIn('HolderDetails', transaction_body)
+        self.assertIn('RepresentativeDetails', transaction_body)
+        self.assertIn('CorrespondenceAddress', transaction_body)
+        self.assertIn('GoodsServicesDetails', transaction_body)
 
     def test_filter_data_limited_default(self):
         self.app_data['Document']['is_limited'] = True
@@ -76,6 +95,13 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
         )
         self.assertIn('RepresentativeDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertIn('GoodsServicesDetails', self.app_data['TradeMark']['TrademarkDetails'])
+
+        transaction_body = self.app_data['TradeMark']['Transactions']['Transaction'][0]['TransactionBody']
+        self.assertNotIn('ApplicantDetails', transaction_body)
+        self.assertNotIn('HolderDetails', transaction_body)
+        self.assertIn('RepresentativeDetails', transaction_body)
+        self.assertNotIn('CorrespondenceAddress', transaction_body)
+        self.assertIn('GoodsServicesDetails', transaction_body)
 
     def test_filter_data_limited(self):
         self.app_data['Document']['is_limited'] = True
@@ -107,6 +133,13 @@ class ApplicationRawDataTMLimitedFilterTestCase(TestCase):
         )
         self.assertNotIn('RepresentativeDetails', self.app_data['TradeMark']['TrademarkDetails'])
         self.assertNotIn('GoodsServicesDetails', self.app_data['TradeMark']['TrademarkDetails'])
+
+        transaction_body = self.app_data['TradeMark']['Transactions']['Transaction'][0]['TransactionBody']
+        self.assertIn('ApplicantDetails', transaction_body)
+        self.assertIn('HolderDetails', transaction_body)
+        self.assertNotIn('RepresentativeDetails', transaction_body)
+        self.assertIn('CorrespondenceAddress', transaction_body)
+        self.assertNotIn('GoodsServicesDetails', transaction_body)
 
 
 class ApplicationRawDataIDLimitedFilterTestCase(TestCase):

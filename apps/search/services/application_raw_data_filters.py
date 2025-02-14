@@ -15,37 +15,58 @@ class ApplicationRawDataFilter(ABC):
 class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
     """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации."""
 
+    def _filter_limited_bibliography(self, biblio_data: dict, limited_settings: dict) -> None:
+        """Фільтрує бібліографічні дані обмежених публікацій."""
+        if 'ApplicantDetails' in biblio_data and not limited_settings.get('ApplicantDetails', False):
+            del biblio_data['ApplicantDetails']
+        if 'HolderDetails' in biblio_data and not limited_settings.get('HolderDetails', False):
+            del biblio_data['HolderDetails']
+        if 'RepresentativeDetails' in biblio_data \
+                and not limited_settings.get('RepresentativeDetails', True):
+            del biblio_data['RepresentativeDetails']
+        if 'CorrespondenceAddress' in biblio_data and not limited_settings.get('CorrespondenceAddress', False):
+            del biblio_data['CorrespondenceAddress']
+        if 'GoodsServicesDetails' in biblio_data and not limited_settings.get('GoodsServicesDetails', True):
+            del biblio_data['GoodsServicesDetails']
+        if 'MarkImageDetails' in biblio_data:
+            if 'MarkImageColourClaimedText' in biblio_data['MarkImageDetails']['MarkImage'] \
+                    and not limited_settings.get('MarkImageColourClaimedText', False):
+                del biblio_data['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']
+            if 'MarkImageFilename' in biblio_data['MarkImageDetails']['MarkImage'] \
+                    and not limited_settings.get('MarkImageFilename', False):
+                del biblio_data['MarkImageDetails']['MarkImage']['MarkImageFilename']
+
+    def _filter_limited_transactions(self, transactions: list, limited_settings: dict) -> None:
+        """Фільтрує дані сповіщень обмежених публікацій."""
+        for transaction in transactions:
+            if 'TransactionBody' in transaction:
+                transaction_body = transaction['TransactionBody']
+                if 'ApplicantDetails' in transaction_body and not limited_settings.get('ApplicantDetails', False):
+                    del transaction_body['ApplicantDetails']
+                if 'HolderDetails' in transaction_body and not limited_settings.get('HolderDetails', False):
+                    del transaction_body['HolderDetails']
+                if 'RepresentativeDetails' in transaction_body \
+                        and not limited_settings.get('RepresentativeDetails', True):
+                    del transaction_body['RepresentativeDetails']
+                if 'CorrespondenceAddress' in transaction_body \
+                        and not limited_settings.get('CorrespondenceAddress', False):
+                    del transaction_body['CorrespondenceAddress']
+                if 'GoodsServicesDetails' in transaction_body \
+                        and not limited_settings.get('GoodsServicesDetails', True):
+                    del transaction_body['GoodsServicesDetails']
+
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
             limited_app = AppLimited.objects.filter(
                 app_number=data['TradeMark']['TrademarkDetails']['ApplicationNumber'],
                 obj_type_id=data['Document']['idObjType']
             ).first()
-            if 'ApplicantDetails' in data['TradeMark']['TrademarkDetails'] \
-                    and not limited_app.settings_dict.get('ApplicantDetails', False):
-                del data['TradeMark']['TrademarkDetails']['ApplicantDetails']
-            if 'HolderDetails' in data['TradeMark']['TrademarkDetails'] \
-                    and not limited_app.settings_dict.get('HolderDetails', False):
-                del data['TradeMark']['TrademarkDetails']['HolderDetails']
-            if 'RepresentativeDetails' in data['TradeMark']['TrademarkDetails'] \
-                    and not limited_app.settings_dict.get('RepresentativeDetails', True):
-                del data['TradeMark']['TrademarkDetails']['RepresentativeDetails']
-
-            if 'CorrespondenceAddress' in data['TradeMark']['TrademarkDetails'] \
-                    and not limited_app.settings_dict.get('CorrespondenceAddress', False):
-                del data['TradeMark']['TrademarkDetails']['CorrespondenceAddress']
-
-            if 'GoodsServicesDetails' in data['TradeMark']['TrademarkDetails'] \
-                    and not limited_app.settings_dict.get('GoodsServicesDetails', True):
-                del data['TradeMark']['TrademarkDetails']['GoodsServicesDetails']
-
-            if 'MarkImageDetails' in data['TradeMark']['TrademarkDetails']:
-                if 'MarkImageColourClaimedText' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'] \
-                        and not limited_app.settings_dict.get('MarkImageColourClaimedText', False):
-                    del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageColourClaimedText']
-                if 'MarkImageFilename' in data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'] \
-                        and not limited_app.settings_dict.get('MarkImageFilename', False):
-                    del data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            self._filter_limited_bibliography(data['TradeMark']['TrademarkDetails'], limited_app.settings_dict)
+            if 'Transactions' in data['TradeMark'] and 'Transaction' in data['TradeMark']['Transactions']:
+                self._filter_limited_transactions(
+                    data['TradeMark']['Transactions']['Transaction'],
+                    limited_app.settings_dict
+                )
 
 
 class ApplicationRawDataIDLimitedFilter(ApplicationRawDataFilter):
