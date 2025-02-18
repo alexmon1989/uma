@@ -72,22 +72,44 @@ class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
 class ApplicationRawDataIDLimitedFilter(ApplicationRawDataFilter):
     """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации."""
 
+    def _filter_limited_bibliography(self, biblio_data: dict) -> None:
+        """Фільтрує бібліографічні дані обмежених публікацій."""
+        if 'ApplicantDetails' in biblio_data:
+            del biblio_data['ApplicantDetails']
+
+        if 'DesignerDetails' in biblio_data:
+            del biblio_data['DesignerDetails']
+
+        if 'HolderDetails' in biblio_data:
+            del biblio_data['HolderDetails']
+
+        if 'CorrespondenceAddress' in biblio_data:
+            del biblio_data['CorrespondenceAddress']
+
+        if 'DesignSpecimenDetails' in biblio_data:
+            del biblio_data['DesignSpecimenDetails']
+
+    def _filter_limited_transactions(self, transactions: list) -> None:
+        """Фільтрує дані сповіщень обмежених публікацій."""
+        for transaction in transactions:
+            if 'TransactionBody' in transaction:
+                transaction_body = transaction['TransactionBody']
+                if 'DesignerDetails' in transaction_body:
+                    del transaction_body['DesignerDetails']
+                if 'HolderDetails' in transaction_body:
+                    del transaction_body['HolderDetails']
+                if 'CorrespondenceAddress' in transaction_body:
+                    del transaction_body['CorrespondenceAddress']
+                if 'DesignSpecimenDetails' in transaction_body:
+                    del transaction_body['DesignSpecimenDetails']
+
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
-            if 'ApplicantDetails' in data['Design']['DesignDetails']:
-                del data['Design']['DesignDetails']['ApplicantDetails']
-
-            if 'DesignerDetails' in data['Design']['DesignDetails']:
-                del data['Design']['DesignDetails']['DesignerDetails']
-
-            if 'HolderDetails' in data['Design']['DesignDetails']:
-                del data['Design']['DesignDetails']['HolderDetails']
-
-            if 'CorrespondenceAddress' in data['Design']['DesignDetails']:
-                del data['Design']['DesignDetails']['CorrespondenceAddress']
-
-            if 'DesignSpecimenDetails' in data['Design']['DesignDetails']:
-                del data['Design']['DesignDetails']['DesignSpecimenDetails']
+            self._filter_limited_bibliography(data['Design']['DesignDetails'])
+            if 'Transactions' in data['Design'] and 'Transaction' in data['Design']['Transactions']:
+                self._filter_limited_transactions(
+                    data['Design']['Transactions']['Transaction']
+                )
 
 
 class ApplicationRawDataInvUMLDLimitedFilter(ApplicationRawDataFilter, BiblioDataInvUMLDRawGetMixin):

@@ -155,6 +155,18 @@ class ApplicationRawDataIDLimitedFilterTestCase(TestCase):
                     'HolderDetails': {},
                     'CorrespondenceAddress': {},
                     'DesignSpecimenDetails': {},
+                },
+                'Transactions': {
+                    'Transaction': [
+                        {
+                            'TransactionBody': {
+                                'HolderDetails': {},
+                                'DesignerDetails': {},
+                                'CorrespondenceAddress': {},
+                                'DesignSpecimenDetails': {},
+                            }
+                        }
+                    ]
                 }
             }
         }
@@ -167,13 +179,26 @@ class ApplicationRawDataIDLimitedFilterTestCase(TestCase):
         self.assertIn('CorrespondenceAddress', self.app_data['Design']['DesignDetails'])
         self.assertIn('DesignSpecimenDetails', self.app_data['Design']['DesignDetails'])
 
+        transaction_body = self.app_data['Design']['Transactions']['Transaction'][0]['TransactionBody']
+        self.assertIn('HolderDetails', transaction_body)
+        self.assertIn('DesignerDetails', transaction_body)
+        self.assertIn('CorrespondenceAddress', transaction_body)
+        self.assertIn('DesignSpecimenDetails', transaction_body)
+
     def test_filter_data_limited(self):
+        self.app_data['Document']['is_limited'] = True
         self.filter.filter_data(self.app_data)
         self.assertNotIn('ApplicantDetails', self.app_data['Design']['DesignDetails'])
         self.assertNotIn('HolderDetails', self.app_data['Design']['DesignDetails'])
         self.assertNotIn('HolderDetails', self.app_data['Design']['DesignDetails'])
         self.assertNotIn('CorrespondenceAddress', self.app_data['Design']['DesignDetails'])
         self.assertNotIn('DesignSpecimenDetails', self.app_data['Design']['DesignDetails'])
+
+        transaction_body = self.app_data['Design']['Transactions']['Transaction'][0]['TransactionBody']
+        self.assertNotIn('HolderDetails', transaction_body)
+        self.assertNotIn('DesignerDetails', transaction_body)
+        self.assertNotIn('CorrespondenceAddress', transaction_body)
+        self.assertNotIn('DesignSpecimenDetails', transaction_body)
 
 
 class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
