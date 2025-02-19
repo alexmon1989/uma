@@ -223,6 +223,16 @@ class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
                 'I_73': 'Test Data',
                 'I_98': 'Test Data',
                 'I_98_Index': 'Test Data',
+            },
+            'TRANSACTIONS': {
+                'TRANSACTION': [
+                    {
+                        'INID_71': 'Test Data',
+                        'INID_72': 'Test Data',
+                        'INID_73': 'Test Data',
+                        'INID_98': 'Test Data',
+                    }
+                ]
             }
         }
 
@@ -236,6 +246,12 @@ class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
         self.assertIn('I_73', self.app_data['Patent'])
         self.assertIn('I_98', self.app_data['Patent'])
         self.assertIn('I_98_Index', self.app_data['Patent'])
+
+        transaction = self.app_data['TRANSACTIONS']['TRANSACTION'][0]
+        self.assertIn('INID_71', transaction)
+        self.assertIn('INID_72', transaction)
+        self.assertIn('INID_73', transaction)
+        self.assertIn('INID_98', transaction)
 
     def test_filter_limited_default(self):
         self.app_data['Document']['is_limited'] = True
@@ -253,6 +269,12 @@ class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
         self.assertNotIn('I_73', self.app_data['Patent'])
         self.assertNotIn('I_98', self.app_data['Patent'])
         self.assertNotIn('I_98_Index', self.app_data['Patent'])
+
+        transaction = self.app_data['TRANSACTIONS']['TRANSACTION'][0]
+        self.assertNotIn('INID_71', transaction)
+        self.assertNotIn('INID_72', transaction)
+        self.assertNotIn('INID_73', transaction)
+        self.assertNotIn('INID_98', transaction)
 
     def test_filter_limited_not_default(self):
         self.app_data['Document']['is_limited'] = True
@@ -281,6 +303,12 @@ class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
         self.assertIn('I_98', self.app_data['Patent'])
         self.assertIn('I_98_Index', self.app_data['Patent'])
 
+        transaction = self.app_data['TRANSACTIONS']['TRANSACTION'][0]
+        self.assertIn('INID_71', transaction)
+        self.assertIn('INID_72', transaction)
+        self.assertIn('INID_73', transaction)
+        self.assertIn('INID_98', transaction)
+
         AppLimited.objects.all().delete()
         AppLimited.objects.create(
             app_number=self.app_data['Patent']['I_21'],
@@ -305,6 +333,12 @@ class ApplicationRawDataInvUMLDLimitedFilterTestCase(TestCase):
         self.assertNotIn('I_73', self.app_data['Patent'])
         self.assertNotIn('I_98', self.app_data['Patent'])
         self.assertNotIn('I_98_Index', self.app_data['Patent'])
+
+        transaction = self.app_data['TRANSACTIONS']['TRANSACTION'][0]
+        self.assertNotIn('INID_71', transaction)
+        self.assertNotIn('INID_72', transaction)
+        self.assertNotIn('INID_73', transaction)
+        self.assertNotIn('INID_98', transaction)
 
 
 class ApplicationRawDataCRLimitedFilterTestCase(TestCase):

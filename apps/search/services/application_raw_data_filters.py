@@ -116,6 +116,35 @@ class ApplicationRawDataInvUMLDLimitedFilter(ApplicationRawDataFilter, BiblioDat
     """Фильтрует сырые данные изобретения, полезной модели, топографии
      в случае если она является ограниченной для публикации."""
 
+    def _filter_limited_bibliography(self, biblio_data: dict, limited_settings: dict) -> None:
+        if 'AB' in biblio_data and not limited_settings.get('AB', False):
+            del biblio_data['AB']
+        if 'CL' in biblio_data and not limited_settings.get('CL', False):
+            del biblio_data['CL']
+        if 'DE' in biblio_data and not limited_settings.get('DE', False):
+            del biblio_data['DE']
+        if 'I_71' in biblio_data and not limited_settings.get('I_71', False):
+            del biblio_data['I_71']
+        if 'I_72' in biblio_data and not limited_settings.get('I_72', False):
+            del biblio_data['I_72']
+        if 'I_73' in biblio_data and not limited_settings.get('I_73', False):
+            del biblio_data['I_73']
+        if 'I_98' in biblio_data and not limited_settings.get('I_98', False):
+            del biblio_data['I_98']
+        if 'I_98_Index' in biblio_data and not limited_settings.get('I_98_Index', False):
+            del biblio_data['I_98_Index']
+
+    def _filter_limited_transactions(self, transactions: list, limited_settings: dict) -> None:
+        for transaction in transactions:
+            if 'INID_71' in transaction and not limited_settings.get('I_71', False):
+                del transaction['INID_71']
+            if 'INID_72' in transaction and not limited_settings.get('I_72', False):
+                del transaction['INID_72']
+            if 'INID_73' in transaction and not limited_settings.get('I_73', False):
+                del transaction['INID_73']
+            if 'INID_98' in transaction and not limited_settings.get('I_98', False):
+                del transaction['INID_98']
+
     def filter_data(self, data: dict) -> None:
         if data['Document'].get('is_limited'):
             biblio_data = self.get_biblio_data(data)
@@ -124,23 +153,9 @@ class ApplicationRawDataInvUMLDLimitedFilter(ApplicationRawDataFilter, BiblioDat
                 app_number=biblio_data['I_21'],
                 obj_type_id=data['Document']['idObjType']
             ).first()
-
-            if 'AB' in biblio_data and not limited_app.settings_dict.get('AB', False):
-                del biblio_data['AB']
-            if 'CL' in biblio_data and not limited_app.settings_dict.get('CL', False):
-                del biblio_data['CL']
-            if 'DE' in biblio_data and not limited_app.settings_dict.get('DE', False):
-                del biblio_data['DE']
-            if 'I_71' in biblio_data and not limited_app.settings_dict.get('I_71', False):
-                del biblio_data['I_71']
-            if 'I_72' in biblio_data and not limited_app.settings_dict.get('I_72', False):
-                del biblio_data['I_72']
-            if 'I_73' in biblio_data and not limited_app.settings_dict.get('I_73', False):
-                del biblio_data['I_73']
-            if 'I_98' in biblio_data and not limited_app.settings_dict.get('I_98', False):
-                del biblio_data['I_98']
-            if 'I_98_Index' in biblio_data and not limited_app.settings_dict.get('I_98_Index', False):
-                del biblio_data['I_98_Index']
+            self._filter_limited_bibliography(biblio_data, limited_app.settings_dict)
+            if 'TRANSACTIONS' in data and 'TRANSACTION' in data['TRANSACTIONS']:
+                self._filter_limited_transactions(data['TRANSACTIONS']['TRANSACTION'], limited_app.settings_dict)
 
 
 class ApplicationRawDataCRLimitedFilter(ApplicationRawDataFilter):
