@@ -11,7 +11,8 @@ class Command(BaseCommand):
         service = St37DossierCreatorService(
             repository=St37DocumentsRepository(),
             coverage_calculator=St37CoverageCalculator(),
-            file_creator=St37XMLFileCreator()
+            file_creator=St37XMLFileCreator(),
+            obj_types=[1]  # Лише винаходи
         )
         service.execute()
 

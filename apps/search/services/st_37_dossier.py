@@ -24,7 +24,7 @@ DOCUMENT_KIND: dict = {
     'C1': 'Specification for a patent for an invention granted on the basis of a positive decision of '
           'the Patent Office of the former USSR',
     'C2': 'Specification for a patent for an invention granted on the ground of a national '
-          'application. Specification for a patent for an invention granted on the graund of '
+          'application. Specification for a patent for an invention granted on the ground of '
           'an application filed with the Patent Office of the former USSR for which no positive '
           'decision was taken',
     'U': 'Specification for a patent for a utility model. Specification for a declarative patent for '
@@ -130,14 +130,17 @@ class St37CoverageCalculator:
 class St37DocumentsRepository:
     """Репозиторій для отримання патентних документів."""
 
-    def get_documents(self) -> List[AuthorityFileEntry]:
+    def get_documents(self, obj_types: List[int] = None) -> List[AuthorityFileEntry]:
         """Повертає список з патентними документами для досьє."""
-        apps = IpcAppList.objects.filter(obj_type_id__in=[1, 2]).exclude(
+
+        if obj_types is None:
+            obj_types = [1, 2]
+
+        apps = IpcAppList.objects.filter(obj_type_id__in=obj_types).exclude(
             registration_date__isnull=True
         ).prefetch_related(
             Prefetch('appdocuments_set', queryset=AppDocuments.objects.filter(file_type='pdf'))
         ).order_by('pk')
-
         res = []
         for app in apps.iterator(chunk_size=1000):
             # Отримання даних з пошукового індексу (бібліографічні дані)
@@ -582,6 +585,7 @@ class St37XMLFileValidator(St37FileValidator):
 
 class St37DossierCreatorService:
     """Класс, що являє собою сервіс формування файлу відомчого досьє."""
+    obj_types: List[int]
     repository: St37DocumentsRepository
     coverage_calculator: St37CoverageCalculator
     file_creator: St37FileCreator
@@ -591,15 +595,17 @@ class St37DossierCreatorService:
                  repository: St37DocumentsRepository,
                  coverage_calculator: St37CoverageCalculator,
                  file_creator: St37FileCreator,
-                 file_validator: St37FileValidator = None):
+                 file_validator: St37FileValidator = None,
+                 obj_types: List[int] = None):
         self.repository = repository
         self.coverage_calculator = coverage_calculator
         self.file_creator = file_creator
         self.file_validator = file_validator
+        self.obj_types = obj_types
 
     def execute(self) -> str:
         # Отримання списку патентних документів
-        documents = self.repository.get_documents()
+        documents = self.repository.get_documents(self.obj_types)
 
         # Підрахунок кількості типів документів та виключень
         self.coverage_calculator.documents = documents
