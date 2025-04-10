@@ -90,63 +90,16 @@
                 <!-- Значення -->
                 <div class="col-md-3 g-px-8--md"
                      :class="{ 'u-has-error-v1': errors.has('form-' + index + '-value') }">
-                    <div v-if="dataType !== 'date'">
-                        <input type="text"
-                               class="form-control form-control-md g-brd-gray-light-v3 g-rounded-4 g-px-14 g-pt-9 g-pb-8 g-min-height-40"
-                               :name="'form-' + index + '-value'"
-                               v-model="value"
-                               ref="value"
-                               @focus="onValueFocus"
-                               @blur="onValueBlur"
-                               :disabled="ipcCode.length === 0 || ipcCodesFiltered.length === 0"
-                               autocomplete="off"
-                               :placeholder="translations.value"
-                               data-vv-delay="500"
-                               v-validate="{
-                                required: true,
-                                validQuery: [ipcCode, objType, objState]
-                           }">
-                        <small class="form-control-feedback"
-                               v-if="errors.has('form-' + index + '-value')"
-                        >{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
-
-                        <div class="d-flex justify-content-around g-pt-5"
-                             @focus="valueFocused = true">
-                            <button type="button"
-                                    v-for="(operator, index) in logicalOperators"
-                                    v-show="valueFocused && operator.dataTypes.includes(dataType)"
-                                    ref="logical_operator"
-                                    class="btn btn-xs btn-secondary"
-                                    @click="onLogicalOperatorBtnClick(operator.value)"
-                            >{{ operator.value }}
-                            </button>
-                        </div>
-                    </div>
-                    <div v-else>
-                        <date-picker :input-name="'form-' + index + '-value'"
-                             :name="'form-' + index + '-value'"
-                             class="w-100 h-100 g-rounded-4 g-color-main g-color-primary--hover date-picker"
-                             v-model="value"
-                             ref="value"
-                             range
-                             :lang="lang"
-                             :first-day-of-week="1"
-                             format="DD.MM.YYYY"
-                             value-type="format"
-                             v-validate="{
-                                  required: true,
-                                  validQuery: [ipcCode, objType, objState]
-                             }"
-                             data-vv-delay="500"
-                             placeholder="Оберіть діапазон дат"
-                             confirm
-                             :shortcuts="false"
-                             v-on:confirm="onDateConfirm"
-                        ></date-picker>
-                        <small class="form-control-feedback"
-                               v-if="errors.has('form-' + index + '-value')"
-                        >{{ translations.validationErrors[errors.firstRule('form-' + index + '-value')] }}</small>
-                    </div>
+                    <value-field
+                        :data-type="dataType"
+                        :index="index"
+                        :ipc-code="ipcCode"
+                        :obj-state="objState"
+                        :obj-type="objType"
+                        :ipc-codes-filtered="ipcCodesFiltered"
+                        :initial-value="value"
+                        @updateValue="onUpdateValue"
+                    ></value-field>
                 </div>
                 <!-- END Значення -->
             </div>
@@ -166,10 +119,11 @@
     import DatePicker from 'vue2-datepicker';
     import {translations} from "./mixins/translations";
     import datePickerMixin from './../../vue-mixins/date_picker_mixin.js';
+    import ValueField from './Fields/ValueField.vue'
 
     export default {
         name: "ipcCode",
-        components: {DatePicker},
+        components: {ValueField, DatePicker},
         inject: ['$validator'],
         mixins: [translations, datePickerMixin],
         props: {
@@ -180,36 +134,8 @@
             initialData: Object,
         },
         methods: {
-            // Обработчик события нажатия на кнопку "Логический оператор".
-            // Добавляет в позицию курсора значение логического оператора.
-            onLogicalOperatorBtnClick: function (text) {
-                const $value = $(this.$refs.value);
-                const cursorPos = $value.prop('selectionStart');
-                const v = $value.val();
-                const textBefore = v.substring(0,  cursorPos);
-                const textAfter  = v.substring(cursorPos, v.length);
-
-                this.value = textBefore + text + textAfter;
-
-                this.$nextTick(function () {
-                    this.$refs.value.focus();
-                    let newCursorPos = cursorPos + text.length;
-                    this.$refs.value.setSelectionRange(newCursorPos, newCursorPos);
-                });
-            },
-
-            // Обработчик события потери фокуса поля "Значение".
-            onValueBlur: function (e) {
-                this.valueFocused = this.$refs.logical_operator.includes(e.relatedTarget);
-                // Для срабатывания нажатия других кнопок
-                if (!this.valueFocused && e.relatedTarget) {
-                    e.relatedTarget.click();
-                }
-            },
-
-            // Обработчик приобретения фокуса полем "Значение".
-            onValueFocus: function (e) {
-                this.valueFocused = true;
+            onUpdateValue: function (val) {
+              this.value = val
             },
         },
         mounted() {
@@ -232,8 +158,6 @@
                     }
                 }
             });
-
-            this.lang = this.translations.transactionDateLang;
         },
         data: function () {
             return {
@@ -245,51 +169,6 @@
                 objState: [], // выбранные состояния объектов пром. собств.
                 ipcCode: [], // выбранный код ИНИД
                 value: '', // введенное значение для поиска
-                valueFocused: false,
-                // Логические операторы. dataTypes определяет какие доступны для каких типов кодов ИНИД
-                logicalOperators: [
-                    {
-                        'value': ' ' + gettext('ТА') + ' ',
-                        'dataTypes': ['date', 'integer', 'geography', 'varchar']
-                    },
-                    {
-                        'value': ' ' + gettext('АБО') + ' ',
-                        'dataTypes': ['date', 'integer', 'geography', 'varchar']
-                    },
-                    {
-                        'value': ' ' + gettext('НЕ') + ' ',
-                        'dataTypes': ['date', 'integer', 'geography', 'varchar']
-                    },
-                    {
-                        'value': '(',
-                        'dataTypes': ['date', 'integer', 'geography', 'varchar']
-                    },
-                    {
-                        'value': ')',
-                        'dataTypes': ['date', 'integer', 'geography', 'varchar']
-                    },
-                    {
-                        'value': '*',
-                        'dataTypes': ['geography', 'varchar']
-                    },
-                    {
-                        'value': '?',
-                        'dataTypes': ['geography', 'varchar']
-                    },
-                    {
-                        'value': '<',
-                        'dataTypes': ['date', 'integer']
-                    },
-                    {
-                        'value': '>',
-                        'dataTypes': ['date', 'integer']
-                    },
-                    {
-                        'value': '=',
-                        'dataTypes': ['date', 'integer']
-                    },
-                ],
-                lang: 'en',
             }
         },
         computed: {
@@ -319,8 +198,10 @@
             }
         },
         watch: {
-            dataType: function (val, oldVal) {
-                if (oldVal && val !== oldVal && (val === "date" || oldVal === "date")) {
+            dataType(val, oldVal) {
+                const isSpecialType = type => type === "date" || type === "boolean";
+
+                if (oldVal && val !== oldVal && (isSpecialType(val) || isSpecialType(oldVal))) {
                     this.value = '';
                 }
             },

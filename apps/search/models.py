@@ -177,6 +177,8 @@ class IpcCode(models.Model):
     code_xml_struct = models.CharField(db_column='CodeXMLStruct', max_length=50, blank=True, null=True)
     code_inid = models.CharField(db_column='CodeINID', max_length=20, blank=True, null=True,
                                  verbose_name='Значення коду ІНІД')
+    default_value = models.CharField(db_column='DefaultValue', max_length=255, blank=True, null=True,
+                                     verbose_name='Значення за замовчуванням')
 
     def __str__(self):
         return self.code_value_ua

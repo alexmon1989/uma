@@ -125,18 +125,6 @@ def get_elastic_results(search_groups: dict):
                             f"{inid_schedule.elastic_index_field.field_name}.exact^3",
                             f"{inid_schedule.elastic_index_field.field_name}.*",
                         ]
-
-                        # if '*' in query:
-                        #     fields = [
-                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
-                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
-                        #     ]
-                        # else:
-                        #     fields = [
-                        #         # f"{inid_schedule.elastic_index_field.field_name}^2",
-                        #         f"{inid_schedule.elastic_index_field.field_name}.exact^2",
-                        #         f"{inid_schedule.elastic_index_field.field_name}.*",
-                        #     ]
                     else:
                         fields = [
                             f"{inid_schedule.elastic_index_field.field_name}",
@@ -2151,6 +2139,7 @@ def get_ipc_codes_with_schedules(lang_code):
                 'id': item.id,
                 'value': item.code_value_ua if lang_code == 'ua' else item.code_value_en,
                 'data_type': item.code_data_type,
+                'default_value': item.default_value if item.default_value else '',
                 'obj_types': obj_types,
                 'obj_states': obj_states,
             })

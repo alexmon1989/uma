@@ -5,6 +5,8 @@ export const translations = {
                 startText: gettext('Для початку роботи заповніть форму пошуку'),
                 selectParameter: gettext('Оберіть параметр пошуку'),
                 value: gettext('Значення'),
+                yes: gettext('Так'),
+                valueDate: gettext('Оберіть діапазон дат'),
                 addBtnText: gettext('Додати параметр'),
                 searchBtnText: gettext('Показати результати'),
                 performingSearch: gettext('Виконуємо пошук...'),
