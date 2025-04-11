@@ -48,6 +48,7 @@ export default {
     objState: Array,
     ipcCodesFiltered: Array,
     initialValue: [String, Array],
+    dataType: String
   },
   data: function () {
     return {

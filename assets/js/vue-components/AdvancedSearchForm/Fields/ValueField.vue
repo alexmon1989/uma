@@ -7,6 +7,7 @@
         :obj-type="objType"
         :ipc-codes-filtered="ipcCodesFiltered"
         :initial-value="initialValue"
+        :dataType="dataType"
     ></text-value>
   </div>
 
