@@ -24,7 +24,7 @@
         </div>
 
         <div>
-            {% if hit.DocumentidObjType == 9 %}
+            {% if hit.Document.idObjType == 9 %}
                 {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
                     {% trans "Дані станом на" %} <strong>{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</strong>
                 {% elif hit.search_data.protective_doc_number == '1502939' %}
