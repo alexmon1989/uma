@@ -292,7 +292,11 @@
                         <img class="img-fluid u-block-hover__main--zoom-v1"
                              src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}"
                              alt="">
-                        <p>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</p>
+                        {% if image.SpecimenIndex %}
+                            <p>{{ image.SpecimenIndex }}</p>
+                        {% else %}
+                            <p>{{ forloop.parentloop.counter }}.{{ forloop.counter }}</p>
+                        {% endif %}
                     </div>
                 {% endfor %}
             {% endfor %}
@@ -309,7 +313,11 @@
                            data-src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}">
                             <img class="img-fluid u-block-hover__main--zoom-v1"
                                  src="{{ hit.Document.filesPath|get_image_url:image.SpecimenFilename }}" alt="">
-                            <strong class="h5 d-block w-100 u-bg-overlay__inner g-absolute-centered g-px-20 g-font-weight-400 g-color-white g-mt-10"> {{ forloop.parentloop.counter }}.{{ forloop.counter }} </strong>
+                            {% if image.SpecimenIndex %}
+                                <strong class="h5 d-block w-100 u-bg-overlay__inner g-absolute-centered g-px-20 g-font-weight-400 g-color-white g-mt-10"> {{ image.SpecimenIndex }} </strong>
+                            {% else %}
+                                <strong class="h5 d-block w-100 u-bg-overlay__inner g-absolute-centered g-px-20 g-font-weight-400 g-color-white g-mt-10"> {{ forloop.parentloop.counter }}.{{ forloop.counter }} </strong>
+                            {% endif %}
                         </a>
                     </div>
                 {% endfor %}

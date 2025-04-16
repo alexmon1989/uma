@@ -136,7 +136,11 @@
                             <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
                         </span>
                     </a>
-                    <div class="text-center">1.1</div>
+                    {% if hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenIndex %}
+                        <div class="text-center">{{ hit.Design.DesignDetails.DesignSpecimenDetails.0.DesignSpecimen.0.SpecimenIndex }}</div>
+                    {% else %}
+                        <div class="text-center">1.1</div>
+                    {% endif %}
                 </div>
             {% endif %}
 
