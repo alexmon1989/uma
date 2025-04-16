@@ -5,7 +5,7 @@
 <div id="biblio-data">
     {% if hit.search_data.obj_state == 2 %}
         <div class="g-pb-20 d-flex justify-content-between">
-            {% if hit.DocumentidObjType == 9 %}
+            {% if hit.Document.idObjType == 9 %}
                 {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
                     <div>
                         {% trans "Опубліковано" %} <span

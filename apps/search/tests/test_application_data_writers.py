@@ -240,9 +240,8 @@ class ApplicationESInvUMLDWriterTestCase(TestCase):
 
 class ApplicationESMadridWriterTestCase(TestCase):
 
-    @mock.patch("apps.search.services.application_data_writers.ApplicationESMadridWriter._write_450")
     @mock.patch("apps.search.services.application_data_writers.ApplicationESWriter._write_es")
-    def test_write_441(self, mock_write_es, mock_write_450):
+    def test_write_441(self, mock_write_es):
         app = IpcAppList.objects.create(registration_number='12345', id_shedule_type=1)
 
         app_data = {

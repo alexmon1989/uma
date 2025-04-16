@@ -2,10 +2,7 @@ from abc import ABC, abstractmethod
 import json
 import os
 import logging
-
-from django.conf import settings
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q
+import datetime
 
 from apps.search.models import IpcAppList, AppLimited
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
@@ -175,17 +172,6 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
         except AttributeError:
             data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = self._app.registration_date.strftime('%Y-%m-%d')
 
-    def _set_ua_bul(self, data: dict) -> None:
-        """Встановлює дані українського бюлетеня, у якому були опубліковані дані міжнародної реєстрації."""
-        ua_bul_number_year = madrid_notif_get_ua_bul(data['MadridTradeMark']['TradeMarkDetails']['ENN']['@PUBDATE'])
-        if ua_bul_number_year:
-            ua_bul_number_date = bulletin_get_date_by_num_and_year(ua_bul_number_year[0], ua_bul_number_year[1])
-            data['MadridTradeMark']['TradeMarkDetails']['UkrainianBulletin'] = {
-                'BulNumber': ua_bul_number_year[0],
-                'BulYear': ua_bul_number_year[1],
-                'BulDate': ua_bul_number_date
-            }
-
     def get_data(self) -> dict:
         data_from_file = super().get_data()
 
@@ -202,7 +188,6 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
             }
 
             self._set_441(data)
-            self._set_ua_bul(data)
 
             return data
 
@@ -212,31 +197,30 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
 class ApplicationRawDataFSMadrid9Receiver(ApplicationRawDataFSMadridReceiver):
     """Получает сырые данные международных ТМ с распространением на территорию Украины,
     получает доп. информацию, которой нет в ФС."""
+    pass
 
-    def _set_450(self, data: dict) -> None:
-        """Если это "Міжнародна реєстрація торговельної марки з поширенням на територію України",
-        то надо проверить есть ли аналогичная "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
-        и взять у неё 450 код."
-        """
-        if data:
-            es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
-            q = Q(
-                'bool',
-                must=[
-                    Q('match', Document__idObjType=14),
-                    Q('match', search_data__protective_doc_number=self._app.registration_number),
-                ],
-            )
-            s = Search(index=settings.ELASTIC_INDEX_NAME).using(es).query(q).execute()
-            if s:
-                hit = s[0].to_dict()
-                data['MadridTradeMark']['TradeMarkDetails']['ENN'] = hit['MadridTradeMark']['TradeMarkDetails']['ENN']
+
+class ApplicationRawDataFSMadrid14Receiver(ApplicationRawDataFSMadridReceiver):
+    """Получает сырые данные международных ТМ с распространением на территорию Украины,
+    получает доп. информацию, которой нет в ФС."""
+
+    def _set_ua_bul(self, data: dict) -> None:
+        """Встановлює дані українського бюлетеня, у якому були опубліковані дані міжнародної реєстрації."""
+        pubdate = datetime.datetime.strptime(
+            data['MadridTradeMark']['TradeMarkDetails']['ENN']['@PUBDATE'], '%Y%m%d'
+        ).strftime('%Y-%m-%d')
+        ua_bul_number_year = madrid_notif_get_ua_bul(pubdate)
+        if ua_bul_number_year:
+            ua_bul_number_date = bulletin_get_date_by_num_and_year(ua_bul_number_year[0], ua_bul_number_year[1])
+            data['MadridTradeMark']['TradeMarkDetails']['UkrainianBulletin'] = {
+                'BulNumber': ua_bul_number_year[0],
+                'BulYear': ua_bul_number_year[1],
+                'BulDate': ua_bul_number_date
+            }
 
     def get_data(self) -> dict:
         data = super().get_data()
-
-        self._set_450(data)
-
+        self._set_ua_bul(data)
         return data
 
 

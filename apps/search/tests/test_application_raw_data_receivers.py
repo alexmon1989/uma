@@ -14,7 +14,8 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSInvUMLDReceiver,
                                                                  ApplicationRawDataFSMadrid9Receiver,
                                                                  ApplicationRawDataFSGeoReceiver,
-                                                                 ApplicationRawDataFSWKMReceiver)
+                                                                 ApplicationRawDataFSWKMReceiver,
+                                                                 ApplicationRawDataFSMadrid14Receiver)
 from apps.bulletin.models import EBulletinData, ClListOfficialBulletinsIp
 
 
@@ -174,50 +175,48 @@ class ApplicationRawDataFSInvUMLDReceiverTestCase(TestCase):
         self.assertEqual(data['Patent']['I_43_bul_str'], '1/2024')
 
 
-class ApplicationRawDataFSMadridReceiverTestCase(TestCase):
-
-    def test_is_instance(self):
-        receiver = ApplicationRawDataFSMadridReceiver(IpcAppList())
-        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
-
-    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_ua_bul')
-    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
-    def test_get_data(self, mock_set_441, mock_set_ua_bul):
-        with open('/tmp/11111.json', 'w') as fp:
-            json.dump({'test': 'data'}, fp)
-
-        app = IpcAppList(obj_type_id=14, registration_number='11111', app_number=11111, files_path='/tmp/')
-        receiver = ApplicationRawDataFSMadridReceiver(app)
-        data = receiver.get_data()
-        
-        self.assertEqual(data['Document']['idObjType'], 14)
-        self.assertEqual(data['Document']['filesPath'], '/tmp/')
-        self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
-        mock_set_441.assert_called()
-        mock_set_ua_bul.assert_called()
-
-
-class ApplicationRawDataFSMadrid9ReceiverTestCase(TestCase):
+class ApplicationRawDataFSMadridReceiver9TestCase(TestCase):
 
     def test_is_instance(self):
         receiver = ApplicationRawDataFSMadrid9Receiver(IpcAppList())
-        self.assertIsInstance(receiver, ApplicationRawDataFSMadridReceiver)
+        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
 
     @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
-    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadrid9Receiver._set_450')
-    def test_get_data(self, mock_set_450, mock_set_441):
+    def test_get_data(self, mock_set_441):
         with open('/tmp/11111.json', 'w') as fp:
             json.dump({'test': 'data'}, fp)
 
         app = IpcAppList(obj_type_id=9, registration_number='11111', app_number=11111, files_path='/tmp/')
         receiver = ApplicationRawDataFSMadrid9Receiver(app)
         data = receiver.get_data()
-
+        
         self.assertEqual(data['Document']['idObjType'], 9)
         self.assertEqual(data['Document']['filesPath'], '/tmp/')
         self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
-        mock_set_450.assert_called()
         mock_set_441.assert_called()
+
+
+class ApplicationRawDataFSMadridReceiver14TestCase(TestCase):
+
+    def test_is_instance(self):
+        receiver = ApplicationRawDataFSMadrid14Receiver(IpcAppList())
+        self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
+
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadrid14Receiver._set_ua_bul')
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
+    def test_get_data(self, mock_set_441, mock_set_ua_bul):
+        with open('/tmp/11111.json', 'w') as fp:
+            json.dump({'test': 'data'}, fp)
+
+        app = IpcAppList(obj_type_id=14, registration_number='11111', app_number=11111, files_path='/tmp/')
+        receiver = ApplicationRawDataFSMadrid14Receiver(app)
+        data = receiver.get_data()
+
+        self.assertEqual(data['Document']['idObjType'], 14)
+        self.assertEqual(data['Document']['filesPath'], '/tmp/')
+        self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
+        mock_set_441.assert_called()
+        mock_set_ua_bul.assert_called()
 
 
 class ApplicationRawDataFSGeoReceiverTestCase(TestCase):

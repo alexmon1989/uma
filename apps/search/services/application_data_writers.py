@@ -192,30 +192,6 @@ class ApplicationESInvCertWriter(ApplicationESWriter):
 
 class ApplicationESMadridWriter(ApplicationESWriter):
     """Пишет данные международной ТМ в индекс ElasticSearch, данные об индексации в БД, другую информацию."""
-
-    def _write_450(self):
-        """Если это "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні", которая появляется
-        позже чем "Міжнародна реєстрація торговельної марки з поширенням на територію України" с тем же номером,
-        то необхожимо обновить 450-й код у "Міжнародна реєстрація торговельної марки з поширенням на територію України"
-        """
-        if self._app.obj_type_id == 14:
-            q = Q(
-                'bool',
-                must=[
-                    Q('match', Document__idObjType=9),
-                    Q('match', search_data__protective_doc_number=self._app.registration_number),
-                ],
-            )
-            s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es).query(q).execute()
-            if s:
-                hit = s[0].to_dict()
-                hit['MadridTradeMark']['TradeMarkDetails']['ENN'] = self._app_data['MadridTradeMark']['TradeMarkDetails']['ENN']
-                self.es.index(index=settings.ELASTIC_INDEX_NAME,
-                              doc_type='_doc',
-                              id=s[0].meta.id,
-                              body=hit,
-                              request_timeout=30)
-
     def _write_441(self) -> None:
         """Запись в БД для бюлетня."""
         EBulletinData.objects.update_or_create(
@@ -226,7 +202,6 @@ class ApplicationESMadridWriter(ApplicationESWriter):
 
     def write(self):
         super().write()
-        self._write_450()
         self._write_441()
 
 

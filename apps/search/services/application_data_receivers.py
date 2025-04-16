@@ -6,11 +6,11 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSInvCertReceiver,
                                                                  ApplicationRawDataFSTMReceiver,
                                                                  ApplicationRawDataFSIDReceiver,
-                                                                 ApplicationRawDataFSMadridReceiver,
                                                                  ApplicationRawDataFSGeoReceiver,
                                                                  ApplicationRawDataFSReceiver,
                                                                  ApplicationRawDataFSMadrid9Receiver,
-                                                                 ApplicationRawDataFSWKMReceiver)
+                                                                 ApplicationRawDataFSWKMReceiver,
+                                                                 ApplicationRawDataFSMadrid14Receiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
@@ -164,7 +164,7 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 raw_data_fixer
             )
         elif app.obj_type_id == 14:  # Международные ТМ, зарегистрированные в Украине
-            raw_data_receiver = ApplicationRawDataFSMadridReceiver(app)
+            raw_data_receiver = ApplicationRawDataFSMadrid14Receiver(app)
             simple_data_creator = ApplicationSimpleDataMadridCreator()
             raw_data_fixer = ApplicationRawDataFSMadridFixer()
 
