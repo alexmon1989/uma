@@ -140,7 +140,11 @@
                         <td>
                             {% for item in hit.Design.DesignDetails.DesignSpecimenDetails %}
                                 {% if item.Colors %}
-                                    {{ forloop.counter }}-й варіант - {{ item.Colors.Color }}
+                                    {% if item.DesignSpecimen.0.SpecimenIdentifier %}
+                                        {{ item.DesignSpecimen.0.SpecimenIdentifier }}-й варіант - {{ item.Colors.Color }}
+                                    {% else %}
+                                        {{ forloop.counter }}-й варіант - {{ item.Colors.Color }}
+                                    {% endif %}
                                     {% for color in item.Colors %}{{ color.Color }}{% if not forloop.last %};&nbsp;{% endif %}{% endfor %}{% if not forloop.last %};{% endif %}<br>
                                 {% endif %}
                             {% endfor %}
