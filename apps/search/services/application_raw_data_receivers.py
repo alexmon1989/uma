@@ -9,11 +9,14 @@ from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, AppLimited
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
-from apps.bulletin.services import bulletin_get_number_with_year_by_date, bulletin_get_number_by_date
+from apps.bulletin.services import bulletin_get_number_with_year_by_date, bulletin_get_number_by_date, \
+    bulletin_get_date_by_num_and_year
 from apps.bulletin.models import EBulletinData
 
 
 # Get an instance of a logger
+from apps.search.services.external import madrid_notif_get_ua_bul
+
 logger = logging.getLogger(__name__)
 
 
@@ -172,6 +175,17 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
         except AttributeError:
             data['MadridTradeMark']['TradeMarkDetails']['Code_441'] = self._app.registration_date.strftime('%Y-%m-%d')
 
+    def _set_ua_bul(self, data: dict) -> None:
+        """Встановлює дані українського бюлетеня, у якому були опубліковані дані міжнародної реєстрації."""
+        ua_bul_number_year = madrid_notif_get_ua_bul(data['MadridTradeMark']['TradeMarkDetails']['ENN']['@PUBDATE'])
+        if ua_bul_number_year:
+            ua_bul_number_date = bulletin_get_date_by_num_and_year(ua_bul_number_year[0], ua_bul_number_year[1])
+            data['MadridTradeMark']['TradeMarkDetails']['UkrainianBulletin'] = {
+                'BulNumber': ua_bul_number_year[0],
+                'BulYear': ua_bul_number_year[1],
+                'BulDate': ua_bul_number_date
+            }
+
     def get_data(self) -> dict:
         data_from_file = super().get_data()
 
@@ -188,6 +202,7 @@ class ApplicationRawDataFSMadridReceiver(ApplicationRawDataFSReceiver):
             }
 
             self._set_441(data)
+            self._set_ua_bul(data)
 
             return data
 

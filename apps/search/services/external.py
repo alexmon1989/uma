@@ -177,3 +177,32 @@ def gloc_get_sanctioned_objects() -> List[dict]:
             )
         cache.set(cache_key, rr_sanctioned_objects, 3600)
         return rr_sanctioned_objects
+
+
+def madrid_notif_get_ua_bul(date: str) -> tuple[int, int] | None:
+    """Повертає номер та рік українськрого бюлетеня, у якому були відображені дані мадридського бюлетеня."""
+    cache_key = f"madrid_notif_bulletin_{date}"
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return cached_result
+
+    with connections['ellav'].cursor() as cursor:
+        query = f"""
+            SELECT BulletinNumber, BulletinYear
+            FROM OPENQUERY(
+                [HIPPO,51433],
+                'SELECT BulletinNumber, BulletinYear
+                 FROM MadridNotif.dbo.GazetteBulletins
+                 WHERE IsDeleted = 0 AND GazettePublicationDate = ''{date}''
+                 ORDER BY GazettePublicationDate'
+            )
+        """
+        cursor.execute(query)
+        res = cursor.fetchone()
+        if res:
+            result = (res[0], res[1])
+            cache.set(cache_key, result, timeout=3600)
+            return result
+
+        cache.set(cache_key, None, timeout=3600)
+        return None

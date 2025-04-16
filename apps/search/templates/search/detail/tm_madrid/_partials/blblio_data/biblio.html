@@ -5,13 +5,22 @@
 <div id="biblio-data">
     {% if hit.search_data.obj_state == 2 %}
         <div class="g-pb-20 d-flex justify-content-between">
-            {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
-                <div>
-                    {% trans "Опубліковано" %} <span
-                        class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</span>,
-                    {% trans "бюл." %} №{{ code_441_bul_number }}<span
-                        class="g-font-weight-600"></span>
-                </div>
+            {% if hit.DocumentidObjType == 9 %}
+                {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                    <div>
+                        {% trans "Опубліковано" %} <span
+                            class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</span>,
+                        {% trans "бюл." %} <span class="g-font-weight-600">№{{ code_441_bul_number }}</span>
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if hit.MadridTradeMark.TradeMarkDetails.UkrainianBulletin %}
+                    <div>
+                        {% trans "Публікація відомостей про надання охорони в Україні:" %} <span
+                            class="g-font-weight-600">{{ hit.MadridTradeMark.TradeMarkDetails.UkrainianBulletin.BulDate|parse_date|date:"d.m.Y" }}</span>,
+                        {% trans "бюл." %} <span class="g-font-weight-600">№{{ hit.MadridTradeMark.TradeMarkDetails.UkrainianBulletin.BulNumber }}</span>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}
@@ -19,10 +28,16 @@
     {% if hit.search_data.obj_state == 2 %}
         <div class="g-pb-10 d-flex justify-content-end">
             <div>
-                {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
-                    {% trans "Дані станом на" %} <strong>{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</strong>
-                {% elif hit.search_data.protective_doc_number == '1502939' %}
-                    {% trans "Дані станом на" %} <strong>25.10.2023</strong>
+                {% if hit.DocumentidObjType == 9 %}
+                    {% if hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+                        {% trans "Дані станом на" %} <strong>{{ hit.MadridTradeMark.TradeMarkDetails.Code_441|parse_date|date:"d.m.Y" }}</strong>
+                    {% elif hit.search_data.protective_doc_number == '1502939' %}
+                        {% trans "Дані станом на" %} <strong>25.10.2023</strong>
+                    {% endif %}
+                {% else %}
+                    {% if hit.MadridTradeMark.TradeMarkDetails.UkrainianBulletin.BulDate %}
+                        {% trans "Дані станом на" %}<strong>&nbsp;{{ hit.MadridTradeMark.TradeMarkDetails.UkrainianBulletin.BulDate|parse_date|date:"d.m.Y" }}</strong>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

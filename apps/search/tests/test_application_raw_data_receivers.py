@@ -180,8 +180,9 @@ class ApplicationRawDataFSMadridReceiverTestCase(TestCase):
         receiver = ApplicationRawDataFSMadridReceiver(IpcAppList())
         self.assertIsInstance(receiver, ApplicationRawDataFSReceiver)
 
+    @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_ua_bul')
     @patch('apps.search.services.application_raw_data_receivers.ApplicationRawDataFSMadridReceiver._set_441')
-    def test_get_data(self, mock_set_441):
+    def test_get_data(self, mock_set_441, mock_set_ua_bul):
         with open('/tmp/11111.json', 'w') as fp:
             json.dump({'test': 'data'}, fp)
 
@@ -193,6 +194,7 @@ class ApplicationRawDataFSMadridReceiverTestCase(TestCase):
         self.assertEqual(data['Document']['filesPath'], '/tmp/')
         self.assertEqual(data['MadridTradeMark']['TradeMarkDetails']['test'], 'data')
         mock_set_441.assert_called()
+        mock_set_ua_bul.assert_called()
 
 
 class ApplicationRawDataFSMadrid9ReceiverTestCase(TestCase):

@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-05 14:45+0200\n"
+"POT-Creation-Date: 2025-04-16 14:29+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -95,6 +95,7 @@ msgstr "Home"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:689
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:711
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:729
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:761
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:13
 #: apps/search/templates/search/detail/qi/_partials/transactions.html:12
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:13
@@ -182,16 +183,16 @@ msgstr "Open in new window"
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:117
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:130
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:73
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:228
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:64
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:72
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:239
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:79
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:87
 msgid "бюл. №"
 msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:459
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:196
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:470
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:211
 msgid "Показати"
 msgstr "Show"
 
@@ -204,6 +205,7 @@ msgstr "Name or full name and address of the patent owner"
 #: apps/bulletin_new/templates/bulletin_new/transactions/_partials/id.html:44
 #: apps/search/templates/search/detail/id/_partials/transactions.html:84
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:297
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:773
 msgid "Очікувана дата закінчення строку дії патенту"
 msgstr "Expected expiration date of the patent"
 
@@ -713,6 +715,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:697
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:719
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:737
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:769
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:21
 #: apps/search/templates/search/detail/qi/_partials/transactions.html:20
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:21
@@ -746,7 +749,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:801
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:822
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:843
-#: apps/search/utils.py:1260
+#: apps/search/utils.py:1248
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -774,14 +777,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/advanced/_partials/tm_item.html:74
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1318
+#: apps/search/utils.py:1306
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1318
+#: apps/search/utils.py:1306
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -950,14 +953,14 @@ msgstr "Agreement participants"
 
 #: apps/search/templates/search/advanced/_partials/agreement_item.html:98
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:114
-#: apps/search/templates/search/advanced/_partials/id_item.html:145
+#: apps/search/templates/search/advanced/_partials/id_item.html:149
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:173
 #: apps/search/templates/search/advanced/_partials/tm_item.html:162
 #: apps/search/templates/search/detail/agreement/_partials/blblio_data/biblio.html:132
 #: apps/search/templates/search/detail/copyright/_partials/blblio_data/biblio.html:226
-#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:323
+#: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:335
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:355
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:474
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:485
 msgid "інформація тимчасово обмежена"
 msgstr "information is temporarily limited"
 
@@ -997,7 +1000,7 @@ msgstr "Date of state registration of additional protection"
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:150
 #: apps/search/templates/search/advanced/_partials/ld_item.html:101
 #: apps/search/templates/search/advanced/_partials/tm_item.html:111
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:57
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:63
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:43
 msgid "Власник(и)"
 msgstr "Owner(s)"
@@ -1061,6 +1064,7 @@ msgstr "Copyright for the work"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:683
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:705
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:741
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:777
 msgid "Підстава"
 msgstr "Reason"
 
@@ -1127,7 +1131,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:62
 #: apps/search/templates/search/advanced/_partials/tm_item.html:86
-#: apps/search/utils.py:1261
+#: apps/search/utils.py:1249
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1160,7 +1164,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:120
-#: apps/search/utils.py:1271
+#: apps/search/utils.py:1259
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1195,7 +1199,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/utils.py:1269
+#: apps/search/utils.py:1257
 msgid "МПК"
 msgstr "IPC"
 
@@ -1421,7 +1425,7 @@ msgid "Дата реєстрації знака"
 msgstr "Registration date"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:132
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:64
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:70
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:54
 msgid ""
 "Міжнародна класифікація товарів і послуг для реєстрації знаків та перелік "
@@ -1431,9 +1435,9 @@ msgstr ""
 "Registration of Marks"
 
 #: apps/search/templates/search/advanced/_partials/tm_item.html:132
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:64
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:70
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:54
-#: apps/search/utils.py:1270
+#: apps/search/utils.py:1258
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -1450,22 +1454,24 @@ msgstr ""
 msgid "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
 msgstr "International trademark registration registered in Ukraine"
 
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:28
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:30
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:23
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:25
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:29
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:31
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:35
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:33
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:35
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:39
 msgid "Дані станом на"
 msgstr "Data as of"
 
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:39
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:45
 msgid "Міжнародна реєстрація"
 msgstr "International registration"
 
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:44
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:50
 msgid "Номер міжнародної реєстрації"
 msgstr "International registration date"
 
-#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:50
+#: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:56
 msgid "Дата міжнародної реєстрації"
 msgstr "International registration number"
 
@@ -1559,7 +1565,7 @@ msgstr "Print bibliographic data"
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:10
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:10
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:17
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:10
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:11
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:8
 msgid "Опубліковано"
 msgstr "Published"
@@ -1573,7 +1579,8 @@ msgstr "Published"
 #: apps/search/templates/search/detail/qi/_partials/blblio_data/biblio.html:12
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:12
 #: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:19
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:12
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:13
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:21
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:10
 msgid "бюл."
 msgstr "bul."
@@ -2014,6 +2021,7 @@ msgstr "Amount of payment"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:565
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:587
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:609
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:765
 msgid "Номер патенту (деклараційного патенту)"
 msgstr "Patent number (declaration patent number)"
 
@@ -2056,7 +2064,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1266
+#: apps/search/utils.py:1254
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2155,17 +2163,17 @@ msgstr "Open"
 msgid "Дата надходження матеріалів заявки до НОІВ"
 msgstr "Date of receipt of application materials to the UANIPIO"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:75
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:86
 msgid "частково"
 msgstr "partly"
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:127
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:159
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:138
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:170
 msgid "Кл.:"
 msgstr "Cl."
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:402
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:420
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:413
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:431
 msgid "Так"
 msgstr "Yes"
 
@@ -2209,11 +2217,15 @@ msgstr ""
 msgid "до"
 msgstr "to"
 
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:164
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:19
+msgid "Публікація відомостей про надання охорони в Україні:"
+msgstr "Publication of information on the provision of protection in Ukraine:"
+
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:179
 msgid "Рухова торговельна марка"
 msgstr "Motion mark"
 
-#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:172
+#: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:187
 msgid "Звукова торговельна марка"
 msgstr "Sound mark"
 
@@ -2272,6 +2284,7 @@ msgstr ""
 "%(order_date)s No. %(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:47
+#, python-format
 msgid ""
 "\n"
 "                                    Рішення Апеляційної палати від "
@@ -2282,7 +2295,8 @@ msgid ""
 msgstr ""
 "\n"
 "Decision of the Appeal Chamber d/d %(decision_date)s Approved by the Order "
-"of the Ukrainian National Office for Intellectual Property and Innovations d/d %(order_date)s No. %(order_number)s"
+"of the Ukrainian National Office for Intellectual Property and Innovations d/"
+"d %(order_date)s No. %(order_number)s"
 
 #: apps/search/templates/search/detail/wkm/_partials/blblio_data/biblio.html:106
 msgid "Кл."
@@ -2297,23 +2311,7 @@ msgstr "Object details"
 msgid "Рішення"
 msgstr "Decision"
 
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:30
-msgid "Наказ ДСІВ"
-msgstr "Order"
-
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:32
-msgid "Наказ Мінекономрозвитку"
-msgstr "Order"
-
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:34
-msgid "Наказ Мінекономіки"
-msgstr "Order"
-
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:36
-msgid "Наказ НОІВ"
-msgstr "Order"
-
-#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:38
+#: apps/search/templates/search/detail/wkm/_partials/sidebar.html:29
 #: apps/search/templates/search/detail/wkm/detail.html:30
 msgid "Наказ"
 msgstr "Order"
@@ -2455,43 +2453,43 @@ msgstr "Transaction search"
 msgid "Географічне зазначення зареєстровано"
 msgstr "The geographical indication is registered"
 
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1246
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1259
+#: apps/search/utils.py:1247
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1262
+#: apps/search/utils.py:1250
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1263
+#: apps/search/utils.py:1251
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1264
+#: apps/search/utils.py:1252
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1265
+#: apps/search/utils.py:1253
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1267
+#: apps/search/utils.py:1255
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1268
+#: apps/search/utils.py:1256
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1272
+#: apps/search/utils.py:1260
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1273
+#: apps/search/utils.py:1261
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2575,6 +2573,18 @@ msgstr "Database administrator"
 #: templates/templatetags/footer_contacts.html:9
 msgid "Телефон"
 msgstr "Phone"
+
+#~ msgid "Наказ ДСІВ"
+#~ msgstr "Order"
+
+#~ msgid "Наказ Мінекономрозвитку"
+#~ msgstr "Order"
+
+#~ msgid "Наказ Мінекономіки"
+#~ msgstr "Order"
+
+#~ msgid "Наказ НОІВ"
+#~ msgstr "Order"
 
 #~ msgid ""
 #~ "Рішення Апеляційної палати від %(decision_date)s затверджено наказом "
