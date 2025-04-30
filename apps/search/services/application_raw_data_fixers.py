@@ -355,19 +355,25 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
         if biblio_data.get('I_98.Index') is not None:
             biblio_data['I_98_Index'] = biblio_data.pop('I_98.Index')
 
-    def fix_transactions(self, app_data: dict) -> None:
+    def _fix_transactions(self, app_data: dict) -> None:
         if app_data.get('TRANSACTIONS'):
-            # Дополнительное поле с датой бюлетня для поиска по ней
             if type(app_data['TRANSACTIONS']['TRANSACTION']) is dict:
                 app_data['TRANSACTIONS']['TRANSACTION'] = [app_data['TRANSACTIONS']['TRANSACTION']]
+
+            # Визначення та присвоєння додаткового поля дати бюлетеня для пошуку по сповіщенням
             for transaction in app_data['TRANSACTIONS']['TRANSACTION']:
                 bul_date = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', transaction['BULLETIN'])
                 try:
                     bul_date_groups = bul_date.groups()
                     d = f"{bul_date_groups[2]}-{bul_date_groups[1]}-{bul_date_groups[0]}"
                     transaction['BULLETIN_DATE'] = d
-                except (ValueError, IndexError, AttributeError):  # Строка бюлетня не содержит дату
+                except (ValueError, IndexError, AttributeError):  # Строка бюлетеня не містить дату
                     pass
+            # У списку сповіщень залишаються тільки ті, що містять номер бюлетеня
+            app_data['TRANSACTIONS']['TRANSACTION'] = list(filter(
+                lambda x: 'BULLETIN_DATE' in x,
+                app_data['TRANSACTIONS']['TRANSACTION']
+            ))
 
     def fix_data(self, app_data: dict) -> None:
         biblio_data = self.get_biblio_data(app_data)
@@ -375,7 +381,7 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
         self._fix_i_72(biblio_data)
         self._fix_i_73(biblio_data)
         self._fix_i_98(biblio_data)
-        self.fix_transactions(app_data)
+        self._fix_transactions(app_data)
 
 
 class ApplicationRawDataFSMadridFixer(ApplicationRawDataFixer):

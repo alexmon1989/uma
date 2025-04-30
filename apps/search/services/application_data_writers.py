@@ -167,8 +167,8 @@ class ApplicationESInvUMLDWriter(ApplicationESWriter, BiblioDataInvUMLDRawGetMix
                         os.remove(doc.real_file_path)
 
     def _update_notification_date(self):
-        """Обновляет notification_date - дату последнего оповещения по охранному документу в бюллетене."""
-        if 'TRANSACTIONS' in self._app_data:
+        """Оновлює notification_date - дату дату останнього сповіщення у бюлетені по об'єкту."""
+        if self._app_data.get('TRANSACTIONS', {}).get('TRANSACTION'):
             # Самая свежая дата оповещения
             notification_date = max(
                 item['BULLETIN_DATE'] for item in self._app_data['TRANSACTIONS']['TRANSACTION']

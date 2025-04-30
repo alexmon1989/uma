@@ -2,7 +2,35 @@ from unittest import mock
 
 from django.test import TestCase
 from apps.search.services.application_raw_data_fixers import ApplicationRawDataFSTMFixer, ApplicationRawDataFSIDFixer, \
-    ApplicationRawDataFSMadridFixer, ApplicationRawDataFSGeoFixer, ApplicationRawDataFSCRFixer
+    ApplicationRawDataFSMadridFixer, ApplicationRawDataFSGeoFixer, ApplicationRawDataFSCRFixer, \
+    ApplicationRawDataFSInvUMLDFixer
+
+
+class TestApplicationRawDataFSInvUMLDFixer(TestCase):
+    def setUp(self) -> None:
+        self.fixer = ApplicationRawDataFSInvUMLDFixer()
+
+    def test_fix_transactions(self):
+        # Сповіщення, у якому відсутня дата бюлетеня, видаляється
+        app_data = {
+            'TRANSACTIONS': {
+                'TRANSACTION': [
+                    {
+                        "BULLETIN": "",
+                    },
+                    {
+                        "BULLETIN": ", ",
+                    },
+                    {
+                        "BULLETIN": "1, 30.04.2025",
+                    },
+                ]
+            }
+        }
+        self.fixer._fix_transactions(app_data)
+        print(app_data)
+        self.assertEqual(len(app_data['TRANSACTIONS']['TRANSACTION']), 1)
+        self.assertEqual(app_data['TRANSACTIONS']['TRANSACTION'][0]['BULLETIN_DATE'], '2025-04-30')
 
 
 class TestApplicationTMRawDataFixerFSTestCase(TestCase):
