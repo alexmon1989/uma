@@ -61,6 +61,21 @@ class LimitsMucToDictConverterID(LimitsMucToDictConverter):
         return res
 
 
+class LimitsMucToDictConverterTM(LimitsMucToDictConverter):
+    """Реалізація конвертора налаштувань обмежень з MUC у dict для торвговельних марок."""
+    def convert(self) -> dict:
+        res = {
+            'ApplicantDetails': 47 not in self.muc_limits,
+            'HolderDetails': 48 not in self.muc_limits,
+            'RepresentativeDetails': 49 not in self.muc_limits,
+            'CorrespondenceAddress': 50 not in self.muc_limits,
+            'MarkImageColourClaimedText': 51 not in self.muc_limits,
+            'MarkImageFilename': 51 not in self.muc_limits,
+        }
+
+        return res
+
+
 class LimitsMucToDictConverterCR(LimitsMucToDictConverter):
     """Реалізація конвертора налаштувань обмежень з MUC у dict для авторського права."""
     def convert(self) -> dict:
@@ -103,6 +118,7 @@ MUC_TO_DICT_CONVERTERS = {
     1: LimitsMucToDictConverterInvUMLD,
     2: LimitsMucToDictConverterInvUMLD,
     3: LimitsMucToDictConverterInvUMLD,
+    4: LimitsMucToDictConverterTM,
     6: LimitsMucToDictConverterID,
     10: LimitsMucToDictConverterCR,
     11: LimitsMucToDictConverterDecision,
