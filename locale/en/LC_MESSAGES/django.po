@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 14:29+0300\n"
+"POT-Creation-Date: 2025-06-04 12:39+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -870,7 +870,7 @@ msgstr "Registered industrial design"
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1553
+#: apps/search/services/services.py:1579
 msgid ""
 "Завантаження неможливе, оскільки документ не дозволений для завантаження "
 "представникам НАЗК."
@@ -878,7 +878,7 @@ msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1556
+#: apps/search/services/services.py:1582
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не дозволений(і) для завантаження представникам НАЗК:"
@@ -886,13 +886,13 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/services/services.py:1566
+#: apps/search/services/services.py:1592
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1568
+#: apps/search/services/services.py:1594
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -900,7 +900,7 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/tasks.py:49 apps/search/tasks.py:245 apps/search/tasks.py:310
+#: apps/search/tasks.py:50 apps/search/tasks.py:249 apps/search/tasks.py:314
 msgid "Некоректні умови пошуку"
 msgstr "Wrong search params!"
 
@@ -939,7 +939,7 @@ msgid "Об'єкт авторського права"
 msgstr "Copyright object"
 
 #: apps/search/templates/search/advanced/_partials/agreement_item.html:59
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:96
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:98
 msgid "Автор(и)"
 msgstr "Author(s)"
 
@@ -952,7 +952,7 @@ msgid "Сторони договору"
 msgstr "Agreement participants"
 
 #: apps/search/templates/search/advanced/_partials/agreement_item.html:98
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:114
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:116
 #: apps/search/templates/search/advanced/_partials/id_item.html:149
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:173
 #: apps/search/templates/search/advanced/_partials/tm_item.html:162
@@ -1017,21 +1017,21 @@ msgstr "Copyright for the work"
 msgid "Авторське право на службовий твір"
 msgstr "Copyright for an official work"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:35
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:37
 #: apps/search/templates/search/detail/copyright/only_transaction/detail.html:41
 #, fuzzy
 #| msgid "Договір про передачу (відчуження) майнових прав на твір"
 msgid "Попередній власник майнових прав на твір"
 msgstr "Agreement on the transfer (alienation) of property rights to the work"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:42
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:44
 #: apps/search/templates/search/detail/copyright/only_transaction/detail.html:51
 #, fuzzy
 #| msgid "Авторське право на твір"
 msgid "Власник майнових прав на твір"
 msgstr "Copyright for the work"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:50
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:52
 #: apps/search/templates/search/detail/copyright/_partials/transactions.html:26
 #: apps/search/templates/search/detail/copyright/only_transaction/detail.html:61
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:65
@@ -1068,7 +1068,7 @@ msgstr "Copyright for the work"
 msgid "Підстава"
 msgstr "Reason"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:56
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:58
 #: apps/search/templates/search/advanced/_partials/id_item.html:44
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:78
 #: apps/search/templates/search/advanced/_partials/ld_item.html:51
@@ -1076,7 +1076,7 @@ msgstr "Reason"
 msgid "Заявник(и)"
 msgstr "Applicant(s)"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:68
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:70
 #: apps/search/templates/search/advanced/_partials/id_item.html:53
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:88
 #: apps/search/templates/search/advanced/_partials/ld_item.html:58
@@ -1084,18 +1084,18 @@ msgstr "Applicant(s)"
 msgid "Повний список заявників"
 msgstr "Full list of applicants"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:80
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:82
 #: apps/search/templates/search/advanced/_partials/ld_item.html:86
 #: apps/search/templates/search/advanced/_partials/qi_item.html:68
 #: apps/search/templates/search/advanced/_partials/tm_item.html:93
 msgid "Свідоцтво"
 msgstr "Certificate"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:85
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:87
 msgid "Номер свідоцтва про реєстрацію авторського права на твір"
 msgstr "The number of the copyright registration certificate for the work"
 
-#: apps/search/templates/search/advanced/_partials/copyright_item.html:91
+#: apps/search/templates/search/advanced/_partials/copyright_item.html:93
 msgid "Дата реєстрації авторського права"
 msgstr "Registration date"
 
@@ -1735,29 +1735,29 @@ msgid "Дії"
 msgstr "Actions"
 
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/documents.html:59
-#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:62
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:59
-#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:61
-#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:62
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:62
+#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:63
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:62
+#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:64
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:63
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:65
 msgid "Сформувати посилання для завантаження"
 msgstr "Create url for downloading"
 
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/documents.html:71
-#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:74
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:71
-#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:73
-#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:74
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:74
+#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:75
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:74
+#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:76
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:75
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:77
 msgid "Завантажити обрані"
 msgstr "Download selected"
 
 #: apps/search/templates/search/detail/cap/_partials/state_of_affair/documents.html:73
-#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:77
-#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:73
-#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:75
-#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:77
-#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:77
+#: apps/search/templates/search/detail/id/_partials/state_of_affair/documents.html:78
+#: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/documents.html:76
+#: apps/search/templates/search/detail/ld/_partials/state_of_affair/documents.html:78
+#: apps/search/templates/search/detail/qi/_partials/state_of_affair/documents.html:78
+#: apps/search/templates/search/detail/tm/_partials/state_of_affair/documents.html:80
 msgid "Документи відсутні"
 msgstr "There are no documents"
 
@@ -2369,6 +2369,14 @@ msgstr "The stage, which is not used in the prosecution of the application"
 #: apps/search/templates/search/templatetags/app_stages_tm.html:25
 msgid "Тимчасово заблокована"
 msgstr "Temporarily blocked"
+
+#: apps/search/templates/search/templatetags/document_tracking_number.html:6
+msgid "Трекінг-номер відправлення (Укрпошта)"
+msgstr "Shipment tracking number (Ukrposhta)"
+
+#: apps/search/templates/search/templatetags/document_tracking_number.html:9
+msgid "Відстежити відправлення на сайті Укрпошти"
+msgstr "View shipment details on the Ukrposhta website"
 
 #: apps/search/templates/search/templatetags/has_sanctions.html:6
 msgid "Під санкціями"
