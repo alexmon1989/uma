@@ -573,7 +573,6 @@ def app_stages_inv_um(app):
         stages[4]['status'] = 'not-used'
 
     # Определение текущей стадии или стадии, на которой было остановлено делопроизводство
-    print(stages)
     for i, s in enumerate(stages):
         if s['status'] == 'done':
             if i != 0:
