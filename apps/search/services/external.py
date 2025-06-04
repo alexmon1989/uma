@@ -234,7 +234,7 @@ def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
                     INNER JOIN GNOF.dbo.rr_documents rd ( NOLOCK ) ON rd.id = lo.idObject2 
                 WHERE
                     re.barCode IS NOT NULL 
-                    AND re.DSNNumber IS NOT NULL
+                    AND re.idType <> 234
                     AND re.sendDate IS NOT NULL
                     AND rd.regNum IN ({doc_numbers_str})'
             )
