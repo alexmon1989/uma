@@ -5,6 +5,7 @@ import copy
 import os
 from zipfile import ZipFile
 
+from dateutil.relativedelta import relativedelta
 from django.utils import translation
 from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
@@ -834,13 +835,16 @@ def application_fill_notification_date():
     IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
 
 
-def application_set_documents_tracking_numbers(app_data: dict) -> None:
-    """Присвоює в дані документів значення трек-номерів Укрпошти."""
+def application_set_documents_tracking_numbers(app_data: dict, years: int = 3) -> None:
+    """Присвоює в дані документів (не старіші years років) значення трек-номерів Укрпошти."""
+    years_ago = datetime.date.today() - relativedelta(years=years)
     if app_data['Document']['idObjType'] in (1, 2, 3):
         docs = app_data.get('DOCFLOW', {}).get('DOCUMENTS', [])
         doc_numbers = [
             x['DOCRECORD']['DOCREGNUMBER'] for x in docs
-            if x['DOCRECORD'].get('DOCREGNUMBER') and x['DOCRECORD'].get('DOCSENDINGDATE')
+            if x['DOCRECORD'].get('DOCREGNUMBER')
+               and x['DOCRECORD'].get('DOCSENDINGDATE')
+               and datetime.datetime.strptime(x['DOCRECORD']['DOCSENDINGDATE'], '%Y-%m-%d').date() > years_ago
         ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
@@ -854,11 +858,13 @@ def application_set_documents_tracking_numbers(app_data: dict) -> None:
             5: 'Geo',
             6: 'Design',
         }
-
         docs = app_data[section_names[app_data['Document']['idObjType']]].get('DocFlow', {}).get('Documents', [])
         doc_numbers = [
             x['DocRecord']['DocRegNumber'] for x in docs
-            if x['DocRecord'].get('DocRegNumber') and x['DocRecord'].get('DocDirection') == 'Outcoming'
+            if x['DocRecord'].get('DocRegNumber')
+               and x['DocRecord'].get('DocDirection') == 'Outcoming'
+               and x['DocRecord'].get('DocRegDate')
+               and datetime.datetime.strptime(x['DocRecord']['DocRegDate'], '%Y-%m-%d').date() > years_ago
         ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
