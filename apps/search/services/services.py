@@ -838,7 +838,10 @@ def application_set_documents_tracking_numbers(app_data: dict) -> None:
     """Присвоює в дані документів значення трек-номерів Укрпошти."""
     if app_data['Document']['idObjType'] in (1, 2, 3):
         docs = app_data.get('DOCFLOW', {}).get('DOCUMENTS', [])
-        doc_numbers = [x['DOCRECORD']['DOCREGNUMBER'] for x in docs if x['DOCRECORD'].get('DOCREGNUMBER')]
+        doc_numbers = [
+            x['DOCRECORD']['DOCREGNUMBER'] for x in docs
+            if x['DOCRECORD'].get('DOCREGNUMBER') and x['DOCRECORD'].get('DOCSENDINGDATE')
+        ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
             for doc in docs:
@@ -851,8 +854,12 @@ def application_set_documents_tracking_numbers(app_data: dict) -> None:
             5: 'Geo',
             6: 'Design',
         }
+
         docs = app_data[section_names[app_data['Document']['idObjType']]].get('DocFlow', {}).get('Documents', [])
-        doc_numbers = [x['DocRecord']['DocRegNumber'] for x in docs if x['DocRecord'].get('DocRegNumber')]
+        doc_numbers = [
+            x['DocRecord']['DocRegNumber'] for x in docs
+            if x['DocRecord'].get('DocRegNumber') and x['DocRecord'].get('DocDirection') == 'Outcoming'
+        ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
             for doc in docs:
