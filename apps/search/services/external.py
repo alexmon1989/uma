@@ -222,21 +222,35 @@ def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
             SELECT doc_number, track_number
             FROM OPENQUERY(
                 [FOX,51433],
-                'SELECT
-                    rd.regNum as [doc_number],
-                    re.barCode AS [track_number]
-                FROM
-                    GNOF.dbo.rr_envelopes re ( NOLOCK )
-                    INNER JOIN GNOF.dbo.link_objects_num lo ( NOLOCK ) ON lo.idreestr1 = 229 
-                                                            AND lo.idobject1 = re.id 
-                                                            AND lo.idreestr2 = 205 
-                                                            AND lo.idlink = 105
-                    INNER JOIN GNOF.dbo.rr_documents rd ( NOLOCK ) ON rd.id = lo.idObject2 
-                WHERE
-                    re.barCode IS NOT NULL 
-                    AND re.idType <> 234
-                    AND re.sendDate IS NOT NULL
-                    AND rd.regNum IN ({doc_numbers_str})'
+                'WITH MainTS AS (
+                    SELECT idMainDocTS
+                    FROM GNOF.dbo.rr_documents WITH (NOLOCK)
+                    WHERE regNum IN ({doc_numbers_str})
+                ),
+                Docs AS (
+                    SELECT rd.id, rd.regNum, rd.idMainDocTS
+                    FROM GNOF.dbo.rr_documents rd WITH (NOLOCK)
+                    WHERE rd.idMainDocTS IN (SELECT idMainDocTS FROM MainTS)
+                ),
+                Barcodes AS (
+                    SELECT DISTINCT re.barCode, rd.idMainDocTS
+                    FROM GNOF.dbo.rr_documents rd WITH (NOLOCK)
+                    INNER JOIN GNOF.dbo.link_objects_num lo WITH (NOLOCK)
+                        ON lo.idObject2 = rd.id
+                        AND lo.idreestr2 = 205
+                        AND lo.idreestr1 = 229
+                        AND lo.idlink = 105
+                    INNER JOIN GNOF.dbo.rr_envelopes re WITH (NOLOCK)
+                        ON re.id = lo.idObject1
+                    WHERE re.idType <> 234
+                      AND re.sendDate IS NOT NULL
+                      AND re.barCode IS NOT NULL
+                )
+                SELECT d.regNum AS [doc_number], b.barCode AS [track_number]
+                    FROM Docs d
+                    LEFT JOIN Barcodes b
+                            ON d.idMainDocTS = b.idMainDocTS
+                    WHERE d.regNum IN ({doc_numbers_str})'
             )
         """
         cursor.execute(query)
