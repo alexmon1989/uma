@@ -211,3 +211,37 @@ def madrid_notif_get_ua_bul(date: str) -> tuple[int, int] | None:
 
         cache.set(cache_key, None, timeout=3600)
         return None
+
+
+def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
+    """Повертає словник із трек-номерами документів."""
+    with connections['ellav'].cursor() as cursor:
+        escaped_doc_numbers = [s.replace("'", "''") for s in doc_numbers]
+        doc_numbers_str = ", ".join(f"''{s}''" for s in escaped_doc_numbers)
+        query = f"""
+            SELECT doc_number, track_number
+            FROM OPENQUERY(
+                [FOX,51433],
+                'SELECT
+                    rd.regNum as [doc_number],
+                    re.barCode AS [track_number]
+                FROM
+                    GNOF.dbo.rr_envelopes re ( NOLOCK )
+                    INNER JOIN GNOF.dbo.link_objects_num lo ( NOLOCK ) ON lo.idreestr1 = 229 
+                                                            AND lo.idobject1 = re.id 
+                                                            AND lo.idreestr2 = 205 
+                                                            AND lo.idlink = 105
+                    INNER JOIN GNOF.dbo.rr_documents rd ( NOLOCK ) ON rd.id = lo.idObject2 
+                WHERE
+                    re.barCode IS NOT NULL 
+                    AND re.DSNNumber IS NOT NULL
+                    AND re.sendDate IS NOT NULL
+                    AND rd.regNum IN ({doc_numbers_str})'
+            )
+        """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        res = {}
+        for row in results:
+            res[row[0]] = row[1]
+        return res

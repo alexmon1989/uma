@@ -16,7 +16,7 @@ from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited, AppDocuments
 from apps.bulletin import services as bulletin_services
-from apps.search.services.external import gloc_get_sanctioned_objects
+from apps.search.services.external import gloc_get_sanctioned_objects, gnof_get_tracking_numbers
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
 from apps.my_auth.services import UserService
@@ -832,6 +832,32 @@ def application_fill_notification_date():
     for res in results:
         ids.append(res.meta.id)
     IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
+
+
+def application_set_documents_tracking_numbers(app_data: dict) -> None:
+    """Присвоює в дані документів значення трек-номерів Укрпошти."""
+    if app_data['Document']['idObjType'] in (1, 2, 3):
+        docs = app_data.get('DOCFLOW', {}).get('DOCUMENTS', [])
+        doc_numbers = [x['DOCRECORD']['DOCREGNUMBER'] for x in docs if x['DOCRECORD'].get('DOCREGNUMBER')]
+        if doc_numbers:
+            tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
+            for doc in docs:
+                if doc['DOCRECORD'].get('DOCREGNUMBER'):
+                    doc['DOCRECORD']['TRACKINGNUMBER'] = tracking_numbers.get(doc['DOCRECORD']['DOCREGNUMBER'])
+
+    elif app_data['Document']['idObjType'] in (4, 5, 6):
+        section_names = {
+            4: 'TradeMark',
+            5: 'Geo',
+            6: 'Design',
+        }
+        docs = app_data[section_names[app_data['Document']['idObjType']]].get('DocFlow', {}).get('Documents', [])
+        doc_numbers = [x['DocRecord']['DocRegNumber'] for x in docs if x['DocRecord'].get('DocRegNumber')]
+        if doc_numbers:
+            tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
+            for doc in docs:
+                if doc['DocRecord'].get('DocRegNumber'):
+                    doc['DocRecord']['TrackingNumber'] = tracking_numbers.get(doc['DocRecord']['DocRegNumber'])
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:

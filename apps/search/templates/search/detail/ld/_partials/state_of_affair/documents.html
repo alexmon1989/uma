@@ -48,7 +48,10 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {{ doc.DOCRECORD.DOCTYPE }}
+                                    {% if doc.DOCRECORD.DOCTYPE %}
+                                        <span class="g-font-weight-600">{{ doc.DOCRECORD.DOCTYPE }}</span>
+                                    {% endif %}
+                                    {% document_tracking_number tracking_number=doc.DOCRECORD.TRACKINGNUMBER %}
                                 </td>
                                 <td class="text-center">
                                     {% if doc.DOCRECORD.DOCREGNUMBER %}

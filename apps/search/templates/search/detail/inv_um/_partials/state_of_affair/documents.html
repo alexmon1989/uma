@@ -47,7 +47,10 @@
                                         {{ doc.DOCRECORD.DOCSENDINGDATE|parse_date|date:"d.m.Y" }}
                                     {% endif %}
                                 </td>
-                                <td>{{ doc.DOCRECORD.DOCTYPE }}</td>
+                                <td>
+                                    {{ doc.DOCRECORD.DOCTYPE }}
+                                    {% document_tracking_number tracking_number=doc.DOCRECORD.TRACKINGNUMBER %}
+                                </td>
                                 <td class="text-center">
                                     {% if doc.DOCRECORD.DOCREGNUMBER %}
                                         {{ doc.DOCRECORD.DOCREGNUMBER }}

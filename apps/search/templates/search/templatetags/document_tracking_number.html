@@ -1,0 +1,14 @@
+{% load static %}
+{% load i18n %}
+
+{% if tracking_number %}
+    <div class="g-mt-10">
+        <em>{% trans 'Трекінг-номер відправлення (Укрпошта)' %}:</em>
+        <a href="https://track.ukrposhta.ua/tracking_UA.html?barcode={{ tracking_number }}"
+           class="g-font-weight-600"
+           title="{% trans 'Відстежити відправлення на сайті Укрпошти' %}"
+           target="_blank"
+        >{{ tracking_number }}</a>
+        <img src="{% static 'img/icons/ukrposhta-mini-16.png' %}" alt="">
+    </div>
+{% endif %}

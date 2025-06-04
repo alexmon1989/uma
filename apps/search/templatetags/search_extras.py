@@ -662,3 +662,11 @@ def designer_should_be_publicated_in_transaction(designer_name: str, designer_bi
             'FreeFormatNameDetails']['FreeFormatNameLine']:
             return designer['Publicated']
     return True
+
+
+@register.inclusion_tag('search/templatetags/document_tracking_number.html')
+def document_tracking_number(tracking_number: str | None) -> dict:
+    """Формує HTML з даними трек-номера відправлення."""
+    return {
+        'tracking_number': tracking_number
+    }

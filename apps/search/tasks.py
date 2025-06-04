@@ -10,6 +10,7 @@ from django_celery_results.models import TaskResult
 from django.utils.timezone import now
 from django.utils import translation
 from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
+from .services import application_set_documents_tracking_numbers
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
@@ -213,6 +214,9 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
             hit['Design']['DocFlow']['Documents'] = search_services.application_filter_documents_tm_id(
                 hit['Design'].get('DocFlow', {}).get('Documents', [])
             )
+
+    # Присвоєння трекінг-номерів документів
+    application_set_documents_tracking_numbers(hit)
 
     # Сортировка документов заявки по дате
     sort_doc_flow(hit)
