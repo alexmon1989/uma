@@ -1264,9 +1264,20 @@ def create_search_res_doc(data, file_path):
     bold = workbook.add_format({'bold': True})
     worksheet.write_row(0, 0, titles, bold)
 
+    max_img_width = 0
     for row_num, row_data in enumerate(data):
         for col_num, col_data in enumerate(row_data):
             if col_num == 15 and col_data and os.path.exists(col_data):
+                image_data, pixel_height, pixel_width = get_resized_image_for_report(col_data)
+
+                row_height = pixel_height / 1.25
+                worksheet.set_row(row_num + 1, row_height)
+
+                col_width = max((pixel_width - 5) / 6.9, 1)
+                if col_width > max_img_width:
+                    worksheet.set_column(col_num, col_num, col_width)
+                    max_img_width = col_width
+
                 worksheet.insert_image(
                     row_num + 1,
                     col_num,
@@ -1274,9 +1285,7 @@ def create_search_res_doc(data, file_path):
                     {
                         'x_offset': 2,
                         'y_offset': 2,
-                        'x_scale': 0.3,
-                        'y_scale': 0.3,
-                        'image_data': get_resized_image_for_report(col_data)
+                        'image_data': image_data
                     }
                 )
             else:
@@ -1285,20 +1294,31 @@ def create_search_res_doc(data, file_path):
     workbook.close()
 
 
-def get_resized_image_for_report(img_path):
-    """Изменяет размер изображения для отчёта и возвращает BytesIO."""
-    fixed_height = 120
+def get_resized_image_for_report(img_path: str) -> tuple[io.BytesIO, int, int]:
+    """Возвращает BytesIO изображения, высоту и ширину в пикселях."""
+    fixed_height = 80
     image = Image.open(img_path)
 
-    height_percent = (fixed_height / float(image.size[1]))
-    width_size = int((float(image.size[0]) * float(height_percent)))
-    image = image.resize((width_size, fixed_height), Image.NEAREST)
+    orig_width, orig_height = image.size
+
+    if orig_height > fixed_height:
+        height_percent = fixed_height / float(orig_height)
+        width_size = int(orig_width * height_percent)
+        image = image.resize((width_size, fixed_height), Image.NEAREST)
+        final_height = fixed_height
+        final_width = width_size
+    else:
+        final_height = orig_height
+        final_width = orig_width
+
     if image.mode in ("RGBA", "P"):
         image = image.convert("RGB")
 
     img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format='JPEG', optimize=True, quality=50)
-    return img_byte_arr
+    image.save(img_byte_arr, format='JPEG', optimize=True, quality=60)
+    img_byte_arr.seek(0)
+
+    return img_byte_arr, final_height, final_width
 
 
 def prepare_data_for_search_report(s, lang_code, user=None):
