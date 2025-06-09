@@ -536,13 +536,19 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
                     except ValueError:
                         item['@sequenceNumber'] = 1
 
-        # Fix типа данных поля 'ClassNumber' секции 'GoodsServicesDetails'
         if self._raw_biblio.get('GoodsServicesDetails') \
                 and 'ClassDescription' in self._raw_biblio['GoodsServicesDetails']['GoodsServices'][
             'ClassDescriptionDetails']:
             for item in self._raw_biblio['GoodsServicesDetails']['GoodsServices']['ClassDescriptionDetails'][
                 'ClassDescription']:
+                # Fix типу даних 'ClassNumber' секции 'GoodsServicesDetails'
                 item['ClassNumber'] = int(item['ClassNumber'])
+                # Встановлення пробілу в усіх ClassificationTermText крім першого
+                terms = item.get('ClassificationTermDetails', {}).get('ClassificationTerm', [])
+                for term in terms[1:]:
+                    text = term.get('ClassificationTermText')
+                    if text and not text.startswith(' '):
+                        term['ClassificationTermText'] = f' {text}'
 
         # Fix типа данных поля '@sequenceNumber' секции 'MarkImageDetails'
         if 'MarkImageDetails' in self._raw_biblio:
