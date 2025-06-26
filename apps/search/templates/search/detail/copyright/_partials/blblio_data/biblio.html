@@ -11,7 +11,7 @@
         </div>
     {% endif %}
 
-    {% if hit.Document.ShowRegistrationStatus %}
+    {% if hit.Document.RegistrationStatus == 'Реєстрація недійсна' %}
         <div class="g-pb-10 d-flex justify-content-end">
             {% registration_status hit=hit %}
         </div>

@@ -12,6 +12,12 @@
         </div>
     {% endif %}
 
+    {% if hit.Document.RegistrationStatus == 'Реєстрація недійсна' %}
+        <div class="g-pb-10 d-flex justify-content-end">
+            {% registration_status hit=hit %}
+        </div>
+    {% endif %}
+
     {% has_sanctions hit=hit %}
 
     <div class="table-responsive">

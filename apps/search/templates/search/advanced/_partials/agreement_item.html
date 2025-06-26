@@ -23,7 +23,12 @@
             {% endif %}
         </div>
 
-        {% has_sanctions hit=hit %}
+        <div>
+            {% if hit.Document.RegistrationStatus == 'Реєстрація недійсна' %}
+                {% registration_status hit=hit %}
+            {% endif %}
+            {% has_sanctions hit=hit %}
+        </div>
     </div>
 
     <div class="row g-color-black-opacity-0_9 g-line-height-1_3">

@@ -24,7 +24,7 @@
         </div>
 
         <div>
-            {% if hit.Document.ShowRegistrationStatus %}
+            {% if hit.Document.RegistrationStatus == 'Реєстрація недійсна' %}
                 {% registration_status hit=hit %}
             {% endif %}
             {% has_sanctions hit=hit %}
