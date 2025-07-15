@@ -777,6 +777,32 @@
                                 <li><span class="g-font-weight-600">{% trans "Підстава" %}:</span> {{ transaction.REASON }}</li>
                             {% endif %}
                         </ul>
+                    {% elif transaction.PUBLICATIONNAME == "Додаткова охорона прав на винаходи" %}
+                        <ul class="g-pl-20">
+                            {% if transaction.BULLETIN %}
+                                <li><span class="g-font-weight-600">{% trans "Бюлетень" %}:</span> {{ transaction.BULLETIN }}</li>
+                            {% endif %}
+
+                            {% if transaction.OTHER3 %}
+                                <li><span class="g-font-weight-600">(11) {% trans "Номер патенту" %}:</span> {{ transaction.OTHER3 }}</li>
+                            {% endif %}
+
+                            {% if transaction.OTHER4 %}
+                                <li><span class="g-font-weight-600">{% trans "Номер та дата реєстрації сертифіката додаткової охорони" %}:</span> {{ transaction.OTHER4 }}</li>
+                            {% endif %}
+
+                            {% if transaction.OTHER5 %}
+                                <li><span class="g-font-weight-600">(73) {% trans "Ім’я або повне найменування, адреса та код країни володільця патенту" %}:</span> {{ transaction.OTHER5 }}</li>
+                            {% endif %}
+
+                            {% with transaction.OTHER4|split:"," as number_date %}
+                                {% for cap in hit.cap %}
+                                    {% if cap.I_11 == number_date.0 %}
+                                        <li><span class="g-font-weight-600">(94) {% trans "Строк дії сертифіката додаткової охорони" %}:</span> {{ cap.I_94.From|parse_date|date:"d.m.Y" }} - {{ cap.I_94.To|parse_date|date:"d.m.Y" }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </ul>
                     {% else %}
                         {{ transaction }}
                     {% endif %}

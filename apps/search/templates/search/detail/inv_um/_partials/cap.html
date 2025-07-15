@@ -7,7 +7,7 @@
             <tr>
                 <th class="g-px-10" width="20%">{{ item.I_95|safe }}</th>
                 <td>
-                    <ul>
+                    <ul class="g-pl-20">
                         <li><span class="g-font-weight-600">{% trans "Номер СДО" %}:</span> <a href="{% url 'search:detail' pk=item.id %}">{{ item.I_11 }}</a></li>
                         <li><span class="g-font-weight-600">{% trans "Дата державної реєстрації додаткової охорони" %}:</span> {{ item.I_16|parse_date|date:"d.m.Y" }}</li>
                         <li>

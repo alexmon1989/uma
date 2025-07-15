@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 12:39+0300\n"
+"POT-Creation-Date: 2025-07-15 14:24+0300\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -96,6 +96,7 @@ msgstr "Home"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:711
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:729
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:761
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:783
 #: apps/search/templates/search/detail/ld/_partials/transactions.html:13
 #: apps/search/templates/search/detail/qi/_partials/transactions.html:12
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:13
@@ -126,9 +127,11 @@ msgstr "Home"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:695
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:731
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:749
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:793
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:814
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:835
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:792
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:836
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:869
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:890
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:911
 #: templates/_partials/footer.html:55 templates/_partials/header.html:87
 msgid "Бюлетень"
 msgstr "Bulletin"
@@ -236,6 +239,8 @@ msgstr "Name or full name and address of the successor of the certificate"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:369
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:439
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:787
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:830
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:848
 msgid "Реєстраційний номер рішення"
 msgstr "Registration number of the decision"
 
@@ -587,16 +592,12 @@ msgid "Реєстраційний номер"
 msgstr "Registration number"
 
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/filter_form.html:27
-#, fuzzy
-#| msgid "Спеціалізація"
 msgid "Спеціалізації діяльності"
 msgstr "Specialization"
 
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/filter_form.html:33
-#, fuzzy
-#| msgid "Налаштування"
 msgid "Адреса для листування"
-msgstr "Settings"
+msgstr "Address"
 
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/filter_form.html:40
 msgid "Фільтрувати"
@@ -636,10 +637,8 @@ msgid "ПІБ, Я-А"
 msgstr "Name, desc"
 
 #: apps/patent_attorneys/templates/patent_attorneys/list/_partials/table.html:53
-#, fuzzy
-#| msgid "Зараховані платежі відсутні"
 msgid "Патентні повірені відсутні."
-msgstr "There are no credited payments"
+msgstr "There are no records"
 
 #: apps/payments/templates/payments/index/_partials/breadcrumbs.html:10
 #: apps/payments/templates/payments/index/_partials/breadcrumbs.html:24
@@ -746,9 +745,11 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:703
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:739
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:757
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:801
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:822
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:843
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:800
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:844
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:877
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:898
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:919
 #: apps/search/utils.py:1248
 msgid "Номер заявки"
 msgstr "Application number"
@@ -777,14 +778,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/advanced/_partials/tm_item.html:74
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1306
+#: apps/search/utils.py:1326
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1306
+#: apps/search/utils.py:1326
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -796,13 +797,13 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/services/services.py:91
+#: apps/search/services/services.py:92
 #: apps/search/templatetags/search_extras.py:523
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/services/services.py:97 apps/search/services/services.py:241
-#: apps/search/services/services.py:326
+#: apps/search/services/services.py:98 apps/search/services/services.py:242
+#: apps/search/services/services.py:327
 #: apps/search/templatetags/search_extras.py:326
 #: apps/search/templatetags/search_extras.py:404
 #: apps/search/templatetags/search_extras.py:442
@@ -810,30 +811,30 @@ msgstr "Patent registered"
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/services/services.py:103
+#: apps/search/services/services.py:104
 #: apps/search/templatetags/search_extras.py:535
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/services/services.py:109 apps/search/services/services.py:245
+#: apps/search/services/services.py:110 apps/search/services/services.py:246
 #: apps/search/templatetags/search_extras.py:330
 #: apps/search/templatetags/search_extras.py:541
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/services/services.py:114
+#: apps/search/services/services.py:115
 #: apps/search/templatetags/search_extras.py:546
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/services/services.py:120 apps/search/services/services.py:249
+#: apps/search/services/services.py:121 apps/search/services/services.py:250
 #: apps/search/templatetags/search_extras.py:334
 #: apps/search/templatetags/search_extras.py:552
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/services/services.py:126 apps/search/services/services.py:253
-#: apps/search/services/services.py:334
+#: apps/search/services/services.py:127 apps/search/services/services.py:254
+#: apps/search/services/services.py:335
 #: apps/search/templatetags/search_extras.py:338
 #: apps/search/templatetags/search_extras.py:412
 #: apps/search/templatetags/search_extras.py:450
@@ -841,8 +842,8 @@ msgstr "Formal examination"
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/services/services.py:133 apps/search/services/services.py:257
-#: apps/search/services/services.py:338
+#: apps/search/services/services.py:134 apps/search/services/services.py:258
+#: apps/search/services/services.py:339
 #: apps/search/templatetags/search_extras.py:342
 #: apps/search/templatetags/search_extras.py:416
 #: apps/search/templatetags/search_extras.py:454
@@ -854,23 +855,23 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/services/services.py:237
+#: apps/search/services/services.py:238
 #: apps/search/templatetags/search_extras.py:322
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/services/services.py:322
+#: apps/search/services/services.py:323
 #: apps/search/templatetags/search_extras.py:400
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/services/services.py:330
+#: apps/search/services/services.py:331
 #: apps/search/templatetags/search_extras.py:408
 #: apps/search/templatetags/search_extras.py:446
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1579
+#: apps/search/services/services.py:1592
 msgid ""
 "Завантаження неможливе, оскільки документ не дозволений для завантаження "
 "представникам НАЗК."
@@ -878,7 +879,7 @@ msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1582
+#: apps/search/services/services.py:1595
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не дозволений(і) для завантаження представникам НАЗК:"
@@ -886,13 +887,13 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/services/services.py:1592
+#: apps/search/services/services.py:1605
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1594
+#: apps/search/services/services.py:1607
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -922,41 +923,41 @@ msgstr "Agreement on the transfer of the right to use the work"
 msgid "Договір про передачу (відчуження) майнових прав на твір"
 msgstr "Agreement on the transfer (alienation) of property rights to the work"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:33
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:38
 msgid "Договір"
 msgstr "Agreement"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:38
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:43
 msgid "Номер реєстрації договору"
 msgstr "Agreement number"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:44
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:49
 msgid "Дата реєстрації договору"
 msgstr "Agreement date"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:50
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:55
 msgid "Об'єкт авторського права"
 msgstr "Copyright object"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:59
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:64
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:98
 msgid "Автор(и)"
 msgstr "Author(s)"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:69
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:74
 msgid "Повний список авторів"
 msgstr "Full list of authors"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:81
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:86
 msgid "Сторони договору"
 msgstr "Agreement participants"
 
-#: apps/search/templates/search/advanced/_partials/agreement_item.html:98
+#: apps/search/templates/search/advanced/_partials/agreement_item.html:103
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:116
 #: apps/search/templates/search/advanced/_partials/id_item.html:149
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:173
 #: apps/search/templates/search/advanced/_partials/tm_item.html:162
-#: apps/search/templates/search/detail/agreement/_partials/blblio_data/biblio.html:132
+#: apps/search/templates/search/detail/agreement/_partials/blblio_data/biblio.html:138
 #: apps/search/templates/search/detail/copyright/_partials/blblio_data/biblio.html:226
 #: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:335
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:355
@@ -1019,17 +1020,13 @@ msgstr "Copyright for an official work"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:37
 #: apps/search/templates/search/detail/copyright/only_transaction/detail.html:41
-#, fuzzy
-#| msgid "Договір про передачу (відчуження) майнових прав на твір"
 msgid "Попередній власник майнових прав на твір"
-msgstr "Agreement on the transfer (alienation) of property rights to the work"
+msgstr "Previous owner of the copyright to the work"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:44
 #: apps/search/templates/search/detail/copyright/only_transaction/detail.html:51
-#, fuzzy
-#| msgid "Авторське право на твір"
 msgid "Власник майнових прав на твір"
-msgstr "Copyright for the work"
+msgstr "Owner of the copyright to the work"
 
 #: apps/search/templates/search/advanced/_partials/copyright_item.html:52
 #: apps/search/templates/search/detail/copyright/_partials/transactions.html:26
@@ -1232,6 +1229,7 @@ msgstr "Full list of IPC indexes"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:539
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:413
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:427
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:787
 msgid "Номер патенту"
 msgstr "Patent number"
 
@@ -1287,9 +1285,11 @@ msgstr "Certificate of Ukraine on topography (layout) of IC"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:699
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:735
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:753
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:797
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:818
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:839
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:796
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:840
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:873
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:894
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:915
 msgid "Номер свідоцтва"
 msgstr "Certificate number"
 
@@ -1477,16 +1477,12 @@ msgstr "International registration number"
 
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:19
 #: apps/search/templates/search/detail/wkm/_partials/breadcrumbs.html:16
-#, fuzzy
-#| msgid "Свідоцтво України на торговельну марку"
 msgid "Добре відома в Україні торговельна марка"
-msgstr "Trademark certificate of Ukraine"
+msgstr "A well-known trademark in Ukraine"
 
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:27
-#, fuzzy
-#| msgid "Міжнародна реєстрація торговельної марки, що зареєстрована в Україні"
 msgid "Дата, на яку торговельна марка стала добре відомою в Україні"
-msgstr "International trademark registration registered in Ukraine"
+msgstr "The date on which the trademark became well-known in Ukraine"
 
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:35
 #: apps/search/templates/search/detail/id/_partials/transactions.html:14
@@ -1514,7 +1510,7 @@ msgstr "International trademark registration registered in Ukraine"
 #: apps/search/templates/search/detail/id/_partials/transactions.html:535
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:755
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:523
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:806
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:882
 msgid "Дата публікації та номер бюлетеня"
 msgstr "Date of publication and bulletin number"
 
@@ -1616,7 +1612,7 @@ msgid "Статус невідомий"
 msgstr "Status is unknown"
 
 #: apps/search/templates/search/detail/cap/_partials/blblio_data/biblio.html:74
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:864
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:940
 msgid "від"
 msgstr "from"
 
@@ -1812,10 +1808,8 @@ msgid "Слід читати"
 msgstr "Should be read as"
 
 #: apps/search/templates/search/detail/copyright/only_transaction/_partials/breadcrumbs.html:31
-#, fuzzy
-#| msgid "Загальна інформація"
 msgid "Детальна інформація"
-msgstr "Dashboard"
+msgstr "Details"
 
 #: apps/search/templates/search/detail/detail.html:5
 msgid "Детальна інформація по об'єкту"
@@ -1870,6 +1864,7 @@ msgstr "Name or full name and address of the successor of the patent owner"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:388
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:412
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:762
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:805
 msgid "Ім'я або повне найменування та адреса ліцензіара"
 msgstr "Name or full name and address of the licensor"
 
@@ -1877,6 +1872,8 @@ msgstr "Name or full name and address of the licensor"
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:400
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:424
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:773
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:816
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:857
 msgid "Ім'я або повне найменування та адреса ліцензіата"
 msgstr "Name or full name and address of the licensee"
 
@@ -1996,8 +1993,6 @@ msgid "Планова сума сплати"
 msgstr "Planned amount of payment"
 
 #: apps/search/templates/search/detail/inv_um/_partials/state_of_affair/payments.html:18
-#, fuzzy
-#| msgid "Сума оплати"
 msgid "Сума сплати"
 msgstr "Amount of payment"
 
@@ -2128,6 +2123,18 @@ msgstr "Name or full name and address of the patent owner"
 msgid "Номер та дата сертифіката додаткової охорони"
 msgstr "Number and date of the certificate of additional protection"
 
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:791
+msgid "Номер та дата реєстрації сертифіката додаткової охорони"
+msgstr "Number and date of the certificate of additional protection"
+
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:795
+msgid "Ім’я або повне найменування, адреса та код країни володільця патенту"
+msgstr "Name or full name and address of the patent owner"
+
+#: apps/search/templates/search/detail/inv_um/_partials/transactions.html:801
+msgid "Строк дії сертифіката додаткової охорони"
+msgstr "Term of validity of certificate of additional protection"
+
 #: apps/search/templates/search/detail/inv_um/detail.html:47
 #: apps/search/templates/search/detail/ld/detail.html:47
 msgid "Реферат (UA)"
@@ -2188,6 +2195,7 @@ msgid "Дата закінчення строку дії свідоцтва"
 msgstr "Expiration date of the certificate"
 
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:783
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:826
 msgid ""
 "Дата публікації відомостей про видачу ліцензії на використання знака та "
 "номер бюлетня"
@@ -2195,25 +2203,33 @@ msgstr ""
 "Date of publication of information on the issuance of a license to issue a "
 "sign and bulletin number"
 
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:827
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:852
+msgid ""
+"Дата публікації відомостей про видачу ліцензії на використання торговельної "
+"марки та номер бюлетня"
+msgstr ""
+"Date of publication of information on the issuance of a license to issue a "
+"sign and bulletin number"
+
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:903
 msgid "Номер та дата рішення"
 msgstr "Number and date of the decision"
 
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:848
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:924
 msgid "Імʼя або повне найменування та адреса установника управління"
 msgstr "The name or full name and address"
 
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:855
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:931
 msgid "Імʼя або повне найменування та адреса управителя"
 msgstr "Name or full name and address"
 
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:862
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:938
 msgid "Дата та номер договору управління майном, строк дії договору"
 msgstr ""
 "Date and number of the property management contract, term of validity of the "
 "contract"
 
-#: apps/search/templates/search/detail/tm/_partials/transactions.html:865
+#: apps/search/templates/search/detail/tm/_partials/transactions.html:941
 msgid "до"
 msgstr "to"
 
@@ -2428,16 +2444,13 @@ msgid "Дію реєстрації припинено, але може бути 
 msgstr "Ceased to be effective, but is subject to renewal"
 
 #: apps/search/templates/search/templatetags/registration_status.html:60
+#: apps/search/templates/search/templatetags/registration_status.html:71
 msgid "Реєстрація недійсна"
 msgstr "Registration is invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:69
 msgid "Договір діє"
 msgstr "Valid"
-
-#: apps/search/templates/search/templatetags/registration_status.html:71
-msgid "Договір не діє"
-msgstr "Invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:73
 msgid "Дію договора припинено, але може бути поновлено"
@@ -2581,6 +2594,9 @@ msgstr "Database administrator"
 #: templates/templatetags/footer_contacts.html:9
 msgid "Телефон"
 msgstr "Phone"
+
+#~ msgid "Договір не діє"
+#~ msgstr "Invalid"
 
 #~ msgid "Наказ ДСІВ"
 #~ msgstr "Order"

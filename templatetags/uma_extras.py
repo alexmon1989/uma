@@ -92,3 +92,8 @@ def json_to_dict(value):
 @register.filter
 def is_list(value: Any) -> bool:
     return type(value) == list
+
+
+@register.filter
+def split(value: str, key: str) -> list[str]:
+    return value.split(key)
