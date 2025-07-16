@@ -61,6 +61,7 @@ $sKnownHosts = array(
     "ocsp.acsk.uipv.org",
     "ca.tax.gov.ua",
     "ca.diia.gov.ua",
+    'ca.monobank.ua'
 );
 
 function is_known_host($value) {
