@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 import datetime
 import re
+import os
+
+from django.conf import settings
 
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin, BiblioDataCRRawGetMixin
 from apps.search.services.external import cead_get_id_doc
@@ -200,6 +203,24 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
                     if id_doc_cead:
                         doc['DocRecord']['DocIdDocCEAD'] = id_doc_cead
 
+    def _fix_image_extension(self, app_data: dict):
+        """Виправляє регістр розширення файлу зображення."""
+        files_path = os.path.join(
+            settings.MEDIA_ROOT,
+            app_data['Document']['filesPath'].replace('\\\\bear\\share\\', '').replace('\\', '/')
+        )
+        image_name = app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename']
+
+        name, ext = os.path.splitext(image_name)
+
+        # Перебір усіх файлів у каталозі
+        for f in os.listdir(files_path):
+            f_name, f_ext = os.path.splitext(f)
+            # Порівняння імені та розширення файлу без врахування регістру
+            if f_name.lower() == name.lower() and f_ext.lower() == ext.lower():
+                app_data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage']['MarkImageFilename'] = f
+                break
+
     def fix_data(self, app_data: dict) -> None:
         self._fix_files_path(app_data)
         self._fix_sections(app_data)
@@ -212,6 +233,7 @@ class ApplicationRawDataFSTMFixer(ApplicationRawDataFixer):
         self._fix_exhibition_termination_date(app_data)
         self._fix_transactions(app_data)
         self._fix_id_doc_cead(app_data)
+        self._fix_image_extension(app_data)
 
 
 class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
