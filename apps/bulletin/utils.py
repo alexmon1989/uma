@@ -120,7 +120,7 @@ def prepare_tm_data(record):
         'value': None,
         'type': 'image'
     }
-    if data.get('MarkImageDetails', {}).get('MarkImage', {}):
+    if data.get('MarkImageDetails', {}).get('MarkImage', {}).get('MarkImageFilename'):
         image_name = data['MarkImageDetails']['MarkImage']['MarkImageFilename']
         files_path = hit['Document']['filesPath']
         splitted_path = files_path.replace("\\", "/").split('/')
