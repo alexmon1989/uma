@@ -259,3 +259,74 @@ def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
         for row in results:
             res[row[0]] = row[1]
         return res
+
+
+def fox_get_out_docs(app_number: str) -> list:
+    with connections['ellav'].cursor() as cursor:
+        query = f"""
+            SELECT *
+            FROM OPENQUERY([FOX,51433], '
+                select
+                    cd.NameWithIndex as docname,
+                    ad1.value as datesend,
+                    as1.value as regnum
+                from
+                    VP3.dbo.rr_exp_claim rc
+                    join VP3.dbo.link_object lo on (
+                      lo.idreestr1 = 204 and lo.idobject1 = rc.id
+                      and lo.idreestr2 = 205 and lo.idlink = 105
+                    )
+                    join VP3.dbo.rr_document rd on (
+                      rd.id = lo.idobject2
+                    )
+                    join VP3.dbo.cl_document cd on (
+                      cd.id = rd.iddoctype
+                    )
+                    left join VP3.dbo.ap_date ad1 on (
+                      ad1.idreestr = 205 and ad1.idobject = lo.idobject2 and ad1.idlink = 230
+                    )
+                    left join VP3.dbo.ap_date ai on (
+                      ai.idreestr = 205 and ai.idobject = lo.idobject2 and ai.idlink = 417
+                    )
+                    left join VP3.dbo.ap_string as1 on (
+                      as1.idreestr = 205 and as1.idobject = lo.idobject2 and as1.idlink = 229
+                    )
+                where
+                    rc.inputNumber = ''{app_number}''
+                    and ai.id is null
+                            
+                UNION
+                
+                select
+                        cd.NameWithIndex as docname,
+                        ad1.value as datesend,
+                        as1.value as regnum
+                from
+                        VP3.dbo.rr_patent rc
+                        join VP3.dbo.link_object lo on (
+                            lo.idreestr1 = 224 and lo.idobject1 = rc.id
+                            and lo.idreestr2 = 205 and lo.idlink = 105
+                        )
+                        join VP3.dbo.rr_document rd on (
+                            rd.id = lo.idobject2
+                        )
+                        join VP3.dbo.cl_document cd on (
+                            cd.id = rd.iddoctype
+                        )
+                        left join VP3.dbo.ap_date ad1 on (
+                            ad1.idreestr = 205 and ad1.idobject = lo.idobject2 and ad1.idlink = 230
+                        )
+                        left join VP3.dbo.ap_date ai on (
+                            ai.idreestr = 205 and ai.idobject = lo.idobject2 and ai.idlink = 417
+                        )
+                        left join VP3.dbo.ap_string as1 on (
+                            as1.idreestr = 205 and as1.idobject = lo.idobject2 and as1.idlink = 229
+                        )
+                where
+                        rc.inputNumber = ''{app_number}''
+                        and ai.id is null
+            ')
+        """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        return results

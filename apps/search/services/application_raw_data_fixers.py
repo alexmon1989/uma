@@ -6,7 +6,7 @@ import os
 from django.conf import settings
 
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin, BiblioDataCRRawGetMixin
-from apps.search.services.external import cead_get_id_doc
+from apps.search.services.external import cead_get_id_doc, fox_get_out_docs
 
 
 class ApplicationRawDataFixer(ABC):
@@ -397,6 +397,23 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
                 app_data['TRANSACTIONS']['TRANSACTION']
             ))
 
+    def _fix_out_documents(self, app_data: dict) -> None:
+        """Видаляє вихідні документи, які не були відправлені."""
+        if app_data.get('DOCFLOW', {}).get('DOCUMENTS'):
+            if 'Claim' in app_data:
+                out_docs = fox_get_out_docs(app_data['Claim']['I_21'])
+            else:
+                out_docs = fox_get_out_docs(app_data['Patent']['I_21'])
+
+            for i, doc in enumerate(app_data['DOCFLOW']['DOCUMENTS']):
+                doc_number = doc['DOCRECORD'].get('DOCREGNUMBER')
+                doc_type = doc['DOCRECORD'].get('DOCTYPE')
+
+                if doc_number and doc_type:
+                    for out_doc in out_docs:
+                        if doc_type == out_doc[0] and doc_number == out_doc[2] and not out_doc[1]:
+                            del app_data['DOCFLOW']['DOCUMENTS'][i]
+
     def fix_data(self, app_data: dict) -> None:
         biblio_data = self.get_biblio_data(app_data)
         self._fix_i_71(biblio_data)
@@ -404,6 +421,7 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
         self._fix_i_73(biblio_data)
         self._fix_i_98(biblio_data)
         self._fix_transactions(app_data)
+        self._fix_out_documents(app_data)
 
 
 class ApplicationRawDataFSMadridFixer(ApplicationRawDataFixer):
