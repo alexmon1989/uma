@@ -52,7 +52,7 @@
 
         <div class="col-md">
             <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Заявник(и)" %}:</h4>
-            {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+            {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}<span class="g-color-red">*</span>{% endif %}
 
             {% for applicant in hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                 {% if forloop.counter <= 2 %}
@@ -109,7 +109,7 @@
         {% if hit.search_data.obj_state == 2 %}
             <div class="col-md">
                 <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Власник(и)" %}:</h4>
-                {% if hit.Document.is_limited %}<span class="g-color-red">*</span>{% endif %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}<span class="g-color-red">*</span>{% endif %}
 
                 {% for holder in hit.TradeMark.TrademarkDetails.HolderDetails.Holder %}
                     {% if forloop.counter <= 2 %}
@@ -140,7 +140,7 @@
             {% endfor %}
         </div>
 
-            {% if not hit.Document.is_limited %}
+            {% if hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename  %}
                 <div class="col-md-3">
                     <a class="js-fancybox d-block u-block-hover u-bg-overlay g-bg-primary-opacity-0_8--hover--after g-transition-0_3"
                        href="javascript:;"
