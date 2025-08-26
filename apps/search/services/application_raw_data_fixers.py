@@ -411,8 +411,12 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
 
                 if doc_number and doc_type:
                     for out_doc in out_docs:
-                        if doc_type == out_doc[0] and doc_number == out_doc[2] and not out_doc[1]:
-                            del app_data['DOCFLOW']['DOCUMENTS'][i]
+                        if doc_type == out_doc[0] and doc_number == out_doc[2]:
+                            if not out_doc[1]:  # Відсутня дата відправки
+                                del app_data['DOCFLOW']['DOCUMENTS'][i]
+                            else:
+                                doc['DOCRECORD']['DOCSENDINGDATE'] = out_doc[1].strftime("%Y-%m-%d")
+                            break
 
     def fix_data(self, app_data: dict) -> None:
         biblio_data = self.get_biblio_data(app_data)
