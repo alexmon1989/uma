@@ -129,6 +129,8 @@ class ApplicationRawDataInvUMLDLimitedFilter(ApplicationRawDataFilter, BiblioDat
             del biblio_data['I_72']
         if 'I_73' in biblio_data and not limited_settings.get('I_73', False):
             del biblio_data['I_73']
+        if 'I_74' in biblio_data and not limited_settings.get('I_74', False):
+            del biblio_data['I_74']
         if 'I_98' in biblio_data and not limited_settings.get('I_98', False):
             del biblio_data['I_98']
         if 'I_98_Index' in biblio_data and not limited_settings.get('I_98_Index', False):
