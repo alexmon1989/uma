@@ -8,7 +8,7 @@ import datetime
 
 class Command(BaseCommand):
     """Сервіс для отримання вихідниї документів по винаходах та корисних моделях, що були відправлені вчора.
-    Встановлює запис заявки/патенту як непроіндексований, якщо.
+    Встановлює запис заявки/патенту як непроіндексований.
     """
 
     def _fox_get_app_numbers(self, date: str) -> list[str]:
@@ -56,5 +56,5 @@ class Command(BaseCommand):
         yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime('%Y-%m-%d')
         results = self._fox_get_app_numbers(yesterday)
         for item in results:
-            IpcAppList.objects.filter(app_number=item[0]).update(elasticindexed=0)
+            IpcAppList.objects.filter(app_number=item[0], obj_type_id__in=[1, 2]).update(elasticindexed=0)
         print('Finished')
