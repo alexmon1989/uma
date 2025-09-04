@@ -486,6 +486,9 @@ def app_stages_inv_um(app):
                 if x in doc_type:
                     is_stopped = False
 
+    if app['search_data']['app_number'] == 'a202106655':
+        is_stopped = False
+
     # Пройденные стадии
     done_stages = list()
     for stage in app['DOCFLOW'].get('STAGES', []):
