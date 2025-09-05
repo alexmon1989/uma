@@ -10,8 +10,9 @@ class Command(BaseCommand):
     """Сервіс для отримання вихідниї документів по винаходах та корисних моделях, що були відправлені вчора.
     Встановлює запис заявки/патенту як непроіндексований.
     """
+    _date: str
 
-    def _fox_get_app_numbers(self, date: str) -> list[str]:
+    def _fox_get_applications(self) -> list[str]:
         with connections['ellav'].cursor() as cursor:
             query = f"""
                 SELECT *
@@ -27,10 +28,17 @@ class Command(BaseCommand):
                           ad1.idreestr = 205 and ad1.idobject = lo.idobject2 and ad1.idlink = 230
                         )
                     where
-                        ad1.value = ''{date}''
-                    
-                    UNION
-                    
+                        ad1.value = ''{self._date}''')
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            return results
+
+    def _fox_get_patents(self) -> list[str]:
+        with connections['ellav'].cursor() as cursor:
+            query = f"""
+                SELECT *
+                FROM OPENQUERY([FOX,51433], '
                     select    
                         rc.inputNumber
                     from
@@ -46,7 +54,7 @@ class Command(BaseCommand):
                           ai.idreestr = 205 and ai.idobject = lo.idobject2 and ai.idlink = 417
                         )
                     where
-                        ad1.value = ''{date}''')
+                        ad1.value = ''{self._date}''')
             """
             cursor.execute(query)
             results = cursor.fetchall()
@@ -54,7 +62,26 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime('%Y-%m-%d')
-        results = self._fox_get_app_numbers(yesterday)
-        for item in results:
-            IpcAppList.objects.filter(app_number=item[0], obj_type_id__in=[1, 2]).update(elasticindexed=0)
+        self._date = yesterday
+
+        applications = self._fox_get_applications()
+        for item in applications:
+            IpcAppList.objects.filter(
+                app_number=item[0],
+                obj_type_id__in=[1, 2],
+                registration_date__isnull=True
+            ).update(
+                elasticindexed=0
+            )
+
+        patents = self._fox_get_applications()
+        for item in patents:
+            IpcAppList.objects.filter(
+                app_number=item[0],
+                obj_type_id__in=[1, 2],
+                registration_date__isnull=False
+            ).update(
+                elasticindexed=0
+            )
+
         print('Finished')
