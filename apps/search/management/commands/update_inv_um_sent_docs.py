@@ -74,7 +74,7 @@ class Command(BaseCommand):
                 elasticindexed=0
             )
 
-        patents = self._fox_get_applications()
+        patents = self._fox_get_patents()
         for item in patents:
             IpcAppList.objects.filter(
                 app_number=item[0],
