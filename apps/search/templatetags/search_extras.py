@@ -116,8 +116,8 @@ def get_image_url_madrid_tm(file_path, image_name):
 
 
 @register.inclusion_tag('search/detail/document_pdf.html')
-def document_pdf(path, height=500):
-    return {'document_path': path, 'height': height}
+def document_pdf(path: str, height: int = 500, ver: str | None = None) -> dict[str, str | int | None]:
+    return {'document_path': path, 'height': height, 'ver': ver}
 
 
 @register.simple_tag
