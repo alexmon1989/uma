@@ -405,24 +405,18 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
             else:
                 out_docs = fox_get_out_docs(app_data['Patent']['I_21'])
 
-            # Результуючий список документів
-            res = []
-
-            for i, doc in enumerate(app_data['DOCFLOW']['DOCUMENTS']):
-                doc_number = doc['DOCRECORD'].get('DOCREGNUMBER')
-                doc_type = doc['DOCRECORD'].get('DOCTYPE')
+            for i in range(len(app_data['DOCFLOW']['DOCUMENTS']) - 1, -1, -1):
+                doc_number = app_data['DOCFLOW']['DOCUMENTS'][i]['DOCRECORD'].get('DOCREGNUMBER')
+                doc_type = app_data['DOCFLOW']['DOCUMENTS'][i]['DOCRECORD'].get('DOCTYPE')
 
                 if doc_number and doc_type:
                     for out_doc in out_docs:
                         if doc_type == out_doc[0] and doc_number == out_doc[2]:
-                            if out_doc[1]:  # Є дата відправки
-                                doc['DOCRECORD']['DOCSENDINGDATE'] = out_doc[1].strftime("%Y-%m-%d")
-                                res.append(doc)
+                            if not out_doc[1]:  # Відсутня дата відправки
+                                del app_data['DOCFLOW']['DOCUMENTS'][i]
+                            else:
+                                app_data['DOCFLOW']['DOCUMENTS'][i]['DOCRECORD']['DOCSENDINGDATE'] = out_doc[1].strftime("%Y-%m-%d")
                             break
-                else:
-                    res.append(doc)
-
-            app_data['DOCFLOW']['DOCUMENTS'] = res
 
     def fix_data(self, app_data: dict) -> None:
         biblio_data = self.get_biblio_data(app_data)
