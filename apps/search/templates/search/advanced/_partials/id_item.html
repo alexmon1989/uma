@@ -55,7 +55,7 @@
                            data-trigger="focus"
                            data-content="
                                    {% for applicant_ in hit.Design.DesignDetails.ApplicantDetails.Applicant %}{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ applicant_.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>{% endfor %}"
-                        >(+{{ hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
+                        >(+{{ hit.Design.DesignDetails.ApplicantDetails.Applicant|length|add:"-2" }})</a>
                     {% endif %}
                 {% endfor %}
             </div>
