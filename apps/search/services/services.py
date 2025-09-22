@@ -5,11 +5,13 @@ import copy
 import os
 from zipfile import ZipFile
 
+import pyodbc
 from dateutil.relativedelta import relativedelta
 from django.utils import translation
 from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
 from django.db.models import Max
+from django.db import connections
 from django.conf import settings
 
 from elasticsearch import Elasticsearch
@@ -1466,12 +1468,55 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
     return res
 
 
-def document_get_receive_date_cead(id_doc_cead: int) -> datetime.datetime | None:
-    """Получает (из ЦЕАД) дату получения документа заявителем."""
-    item = DeliveryDateCead.objects.using('e_archive').filter(id_doc_cead=id_doc_cead).first()
-    if item:
-        return item.receive_date
-    return None
+class DocumentReceiveDateService:
+    """Сервіс, що повертає дату отримання документа."""
+
+    def __init__(self, obj_type_id: int, doc: ApplicationDocument):
+        self.obj_type_id = obj_type_id
+        self.doc = doc
+
+    def _get_receive_date_tm_id(self) -> datetime.datetime | None:
+        """Получает (из ЦЕАД) дату получения документа заявителем."""
+        item = DeliveryDateCead.objects.using('e_archive').filter(id_doc_cead=self.doc.id_doc_cead).first()
+        if item:
+            return item.receive_date
+        return None
+
+    def _get_receive_date_inv_um(self) -> datetime.datetime | None:
+        """Получает (из ЦЕАД) дату получения документа заявителем."""
+        with connections['ellav'].cursor() as cursor:
+            query = f"""
+                SELECT *
+                FROM OPENQUERY([FOX,51433], '
+                    select
+                        FORMAT(ad1.value, ''yyyy-MM-dd'') as datereceive
+                    from
+                        VP3.dbo.rr_document rd
+                        join VP3.dbo.cl_document cd on (
+                          cd.id = rd.iddoctype
+                        )
+                        left join VP3.dbo.ap_date ad1 on (
+                          ad1.idreestr = 205 and ad1.idobject = rd.id and ad1.idlink = 285
+                        )
+                        left join VP3.dbo.ap_string as1 on (
+                          as1.idreestr = 205 and as1.idobject = rd.id and as1.idlink = 229
+                        )
+                    where
+                        as1.value = ''{self.doc.reg_number}''
+                ')
+            """
+            cursor.execute(query)
+            row = cursor.fetchone()
+            if row and row[0]:
+                return datetime.datetime.strptime(row[0], '%Y-%m-%d')
+            return None
+
+    def get_receive_date(self) -> datetime.datetime | None:
+        if self.obj_type_id in (1, 2):
+            return self._get_receive_date_inv_um()
+        elif self.obj_type_id in (4, 6):
+            return self._get_receive_date_tm_id()
+        return None
 
 
 class DownloadDocumentsService:
@@ -1487,7 +1532,10 @@ class DownloadDocumentsService:
     order: OrderService
 
     # Типы документов для проверки есть ли у них дата доставки
-    _doc_types_to_check = ['Т-8', 'Т-19', 'П-8', 'П-19', 'Т8', 'Т19', 'П8', 'П19']
+    _doc_types_to_check = [
+        'Т-8', 'Т-19', 'П-8', 'П-19', 'Т8', 'Т19', 'П8', 'П19',
+        'В8', 'В9', 'В50', 'В-8', 'В-9', 'В-50'
+    ]
 
     def _set_application(self) -> None:
         """Получает данные заявки из ElasticSearch."""
@@ -1612,13 +1660,17 @@ class DownloadDocumentsService:
 
     def _set_docs_wo_receive_date(self) -> None:
         """Проверяет, все ли документы для скачивания имеют дату получения.
-        Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19'"""
+        Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19', 'В-8', 'В-9', 'В-50'"""
         self.documents_wo_receive_date = []
         for id_doc_cead in self.cead_ids:
             for doc in self.documents:
                 if int(doc.id_doc_cead) == int(id_doc_cead) \
                         and any([x in doc.title for x in self._doc_types_to_check]):
-                    receive_date = document_get_receive_date_cead(id_doc_cead)
+                    service = DocumentReceiveDateService(
+                        obj_type_id=self.application_data['Document']['idObjType'],
+                        doc=doc
+                    )
+                    receive_date = service.get_receive_date()
                     if not receive_date:
                         self.documents_wo_receive_date.append(doc)
 
