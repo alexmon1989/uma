@@ -326,6 +326,28 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
                     if id_doc_cead:
                         doc['DocRecord']['DocIdDocCEAD'] = id_doc_cead
 
+    def _fix_image_extension(self, app_data: dict):
+        """Приводить усі розширення файлів зображення до нижнього регістру."""
+        # Назви файлів зображень з каталогу
+        files_path = os.path.join(
+            settings.MEDIA_ROOT,
+            app_data['Document']['filesPath'].replace('\\\\bear\\share\\', '').replace('\\', '/')
+        )
+        images_in_folder = [f for f in os.listdir(files_path) if not f.endswith('.json')]
+
+        # Виправлення назв файлів у даних заявки на такі, що фактично знаходяться у каталозі
+        for des_specimen_detail in app_data['Design']['DesignDetails'].get('DesignSpecimenDetails', []):
+            for des_specimen in des_specimen_detail['DesignSpecimen']:
+                for image in images_in_folder:
+                    des_specimen_name, des_specimen_ext = os.path.splitext(
+                        des_specimen['SpecimenFilename']
+                    )
+                    image_name, image_ext = os.path.splitext(image)
+                    if des_specimen_name.lower() == image_name.lower() \
+                            and des_specimen_ext.lower() == image_ext.lower():
+                        des_specimen['SpecimenFilename'] = image
+                        break
+
     def fix_data(self, app_data: dict) -> None:
         self._fix_files_path(app_data)
         self._fix_indication_details(app_data)
@@ -335,6 +357,7 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
         self._fix_priority_date(app_data)
         self._fix_transactions(app_data)
         self._fix_id_doc_cead(app_data)
+        self._fix_image_extension(app_data)
 
 
 class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUMLDRawGetMixin):
