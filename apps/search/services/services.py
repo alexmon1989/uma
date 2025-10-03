@@ -511,7 +511,7 @@ def application_get_cap_list(i_68: str) -> List[dict]:
                     {
                         "query_string": {
                             "query": i_68.replace('/', '//'),
-                            "default_field": "Patent_Certificate.I_68"
+                            "default_field": "Patent_Certificate.I_68.exact"
                         }
                     }
                 ]
