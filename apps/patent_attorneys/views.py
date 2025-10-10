@@ -1,7 +1,7 @@
 from django.views.generic.list import ListView
 from django.http import Http404
 
-from .models import PatentAttorneyExt
+from .models import PatentAttorneyNew
 from .forms import SortPaginationForm, FilterForm
 from .selectors import patent_attorney_list
 
@@ -9,7 +9,7 @@ from .selectors import patent_attorney_list
 class PatentAttorneyListView(ListView):
     """Отображает страницу со списком патентных поверенных."""
 
-    model = PatentAttorneyExt
+    model = PatentAttorneyNew
     template_name = 'patent_attorneys/list/index.html'
     sort_pagination_form = None
     filter_form = None

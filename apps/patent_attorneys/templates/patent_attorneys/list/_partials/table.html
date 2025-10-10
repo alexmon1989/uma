@@ -5,7 +5,7 @@
         <table class="table table-sm table-bordered table-striped g-font-size-13 g-mb-0">
             <thead>
             <tr>
-                <th class="g-min-width-170">Реєстраційний номер / номер свідоцтва</th>
+                <th class="g-min-width-170">Реєстраційний номер, який є номером свідоцтва</th>
                 <th class="g-min-width-200">Дата реєстрації патентного повіреного в Реєстрі</th>
                 <th class="g-min-width-200">Прізвище, ім’я, по батькові (за наявності) патентного повіреного</th>
                 <th>Стать</th>
@@ -31,7 +31,7 @@
                     <td>{{ item.reg_num }}</td>
                     <td>{{ item.dat_reg|date:"SHORT_DATE_FORMAT" }}</td>
                     <td>{{ item.prizv }} {{ item.name }} {{ item.po_batk }}</td>
-                    <td>{% if item.sex == 0 %}Ж{% elif item.sex == 1 %}Ч{% endif %}</td>
+                    <td>{{ item.sex|default_if_none:"" }}</td>
                     <td class="text-nowrap">{{ item.dat_at_kom|date:"SHORT_DATE_FORMAT" }}, №{{ item.num_at_kom }}</td>
                     <td>{{ item.special }}</td>
                     <td>
@@ -39,11 +39,11 @@
                         {% if item.phones %}<br>{{ item.phones }}{% endif %}
                         {% if item.e_mail %}<br>{{ item.e_mail }}{% endif %}
                     </td>
-                    <td>{{ item.mis_rob|linebreaksbr }}</td>
-                    <td>{{ item.public_orgs|linebreaksbr }}</td>
-                    <td>{{ item.event_list|linebreaksbr }}</td>
-                    <td>{{ item.sanctions_list|linebreaksbr }}</td>
-                    <td>{{ item.competence_list|linebreaksbr }}</td>
+                    <td>{% if item.mis_rob %}{{ item.mis_rob|linebreaksbr }}{% endif %}</td>
+                    <td>{% if item.public_orgs %}{{ item.public_orgs|linebreaksbr }}{% endif %}</td>
+                    <td>{% if item.event_list %}{{ item.event_list|linebreaksbr }}{% endif %}</td>
+                    <td>{% if item.sanctions_list %}{{ item.sanctions_list|linebreaksbr }}{% endif %}</td>
+                    <td>{% if item.competence_list %}{{ item.competence_list|linebreaksbr }}{% endif %}</td>
                     <td>{{ item.last_update|date:"SHORT_DATE_FORMAT" }}</td>
                 </tr>
             {% endfor %}

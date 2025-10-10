@@ -3,13 +3,13 @@ from typing import Iterable
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-from .models import PatentAttorneyExt
+from .models import PatentAttorneyNew
 
 
 def patent_attorney_list(name: str = None, reg_num: int = None, special: str = None, postal_address: str = None,
-                         sort_by: str = None) -> Iterable[PatentAttorneyExt]:
+                         sort_by: str = None) -> Iterable[PatentAttorneyNew]:
     """Возвращает список патентных поверенных."""
-    qs = PatentAttorneyExt.objects.all()
+    qs = PatentAttorneyNew.objects.all()
 
     # Сортировка
     if sort_by:
