@@ -9,7 +9,7 @@ from django.db.models import F
 from django_celery_results.models import TaskResult
 from django.utils.timezone import now
 from django.utils import translation
-from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService
+from .models import SimpleSearchField, AppDocuments, ObjType, IpcAppList, OrderService, AppLimited
 from .services import application_set_documents_tracking_numbers
 from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow, get_search_groups,
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
@@ -1061,9 +1061,23 @@ def create_shared_docs_archive(id_app_number):
         file_name
     )
 
+    # Дані обмежень
+    app_limited = AppLimited.objects.filter(app_number=app.app_number).first()
+
     # Создание архива
     zip_ = ZipFile(file_path, "a")
     for document in app.appdocuments_set.filter(file_type='pdf').all():
+
+        # Визначення чи є обмежені документи
+        if app_limited and not app_limited.cancelled:
+            # 100 - реферат, 99 - опис, 98 - формула, 101 - опубл. опис
+            if document.enter_num == 100 and not app_limited.settings_dict.get('AB'):
+                continue
+            if document.enter_num in (99, 101) and not app_limited.settings_dict.get('DE'):
+                continue
+            if document.enter_num == 98 and not app_limited.settings_dict.get('CL'):
+                continue
+
         try:
             zip_.write(
                 document.file_name.replace('\\\\bear\\share\\', settings.DOCUMENTS_MOUNT_FOLDER).replace('\\', '/'),
