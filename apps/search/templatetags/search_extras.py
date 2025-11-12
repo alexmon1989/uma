@@ -486,7 +486,7 @@ def app_stages_inv_um(app):
                 if x in doc_type:
                     is_stopped = False
 
-    if app['search_data']['app_number'] == 'a202106655':
+    if app['search_data']['app_number'] in ('a202106655', 'u202403931'):
         is_stopped = False
 
     # Пройденные стадии
