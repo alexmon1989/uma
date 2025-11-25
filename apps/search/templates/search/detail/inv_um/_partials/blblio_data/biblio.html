@@ -270,6 +270,8 @@
                                     {% if not forloop.last %}<br>{% endif %}
                                 </span>
                             {% endfor %}
+
+                            {% include 'search/detail/_partials/sanctions.html' with person_type='заявник' %}
                         </td>
                     </tr>
                 {% endif %}
@@ -327,6 +329,8 @@
                                     {% if not forloop.last %}<br>{% endif %}
                                 </span>
                             {% endfor %}
+
+                            {% include 'search/detail/_partials/sanctions.html' with person_type='власник' %}
                         </td>
                     </tr>
                 {% endif %}

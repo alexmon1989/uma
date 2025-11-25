@@ -143,8 +143,17 @@ def registration_status_color(hit):
 
 @register.inclusion_tag('search/templatetags/has_sanctions.html')
 def has_sanctions(hit):
-    """Виводить повідомлення про наявність санкцій."""
-    return {'hit': hit}
+    """Виводить label про наявність санкцій."""
+    # Якщо є охоронний документ, то під санкціями має бути власник для виводу label
+    if hit['search_data']['obj_state'] == 2:
+        for sanction in hit.get('sanctions', []):
+            if 'власник' in sanction['entity_role'].lower():
+                return {'has_sanctions': True}
+        return {'has_sanctions': False}
+
+    # У випадку заявки для виводу label під санкціями може бути будь-хто
+    return {'has_sanctions': len(hit.get('sanctions', [])) > 0}
+
 
 @register.simple_tag
 def is_first_year_paid_inv_um(collections: List[dict]) -> bool:

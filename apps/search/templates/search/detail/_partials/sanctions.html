@@ -1,0 +1,12 @@
+{% load i18n %}
+{% load uma_extras %}
+
+{% if hit.sanctions %}
+    <div class="g-mt-5">
+        {% for sanction in hit.sanctions %}
+            {% if person_type in sanction.entity_role|lower %}
+                <p class="g-mb-0 g-color-red g-font-weight-600">{% trans 'Під санкціями з' %} {{ sanction.term_start|parse_date|date:"d.m.Y" }}. {{ sanction.source }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}

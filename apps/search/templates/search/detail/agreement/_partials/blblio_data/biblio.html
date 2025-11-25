@@ -106,6 +106,8 @@
                         {% for person in hit.Decision.DecisionDetails.AuthorDetails.Author %}
                             {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
+
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='автор' %}
                     </td>
                 </tr>
             {% endif %}
@@ -127,6 +129,9 @@
                         {% for item in hit.Decision.DecisionDetails.LicenseeDetails.Licensee %}
                             {{ item.LicenseeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}{% if not forloop.last %};{% endif %}
                         {% endfor %}
+
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='особа якій передають' %}
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='особа яка передає' %}
                     </td>
                 </tr>
             {% endif %}

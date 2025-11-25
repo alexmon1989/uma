@@ -2,9 +2,19 @@
 Сервисы, которые обращаются к внешним системам и ресурсам.
 """
 import datetime
+import io
+import subprocess
+import tempfile
+import uuid
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from functools import lru_cache
+from pathlib import Path
+from typing import List, Tuple, Set, Type, Any
 
 import pyodbc
-from typing import List, Tuple, Set
+from pypdf import PdfReader
+
 from django.db import connections
 from django.core.cache import cache
 
@@ -157,27 +167,41 @@ class CeadLimitsService:
             return status, {x[0] for x in muc_list}
 
 
-def gloc_get_sanctioned_objects() -> List[dict]:
+def gloc_get_sanctioned_objects() -> dict[str, list[dict]]:
     """Отримує санкційні об'єкти з БД GLOC, кешує результат на 1 год."""
     cache_key = "rr_sanctioned_objects"
     rr_sanctioned_objects = cache.get(cache_key)
     if rr_sanctioned_objects:
         return rr_sanctioned_objects
 
-    rr_sanctioned_objects = []
+    rr_sanctioned_objects = defaultdict(list)
     with connections['gloc'].cursor() as cursor:
         cursor.setinputsizes([(pyodbc.SQL_VARCHAR, 255)])
-        query = "SELECT DISTINCT ObjNumber, idObjType " \
-                "FROM rr_sanctioned_objects " \
-                "WHERE idState = 125 ORDER BY idObjType"
+        query = f"""
+            SELECT DISTINCT
+                s_o.ObjNumber,
+                s_o.idObjType,
+                s_o.EntityRole,
+                s.Source,
+                s.TermStart
+            FROM
+                rr_sanctioned_objects AS s_o
+                INNER JOIN rr_sanctioned AS s
+                        ON s_o.idSanctioned = s.Id
+            WHERE
+                idState = 125 AND s.TermEnd >= '{datetime.datetime.now().strftime('%Y-%m-%d')}'
+        """
         cursor.execute(query)
         results = cursor.fetchall()
         for row in results:
-            obj_number, obj_type = row
-            rr_sanctioned_objects.append(
+            obj_number, obj_type, entity_role, source, term_start = row
+            rr_sanctioned_objects[obj_number].append(
                 {
                     'obj_number': obj_number,
-                    'id_obj_type': obj_type
+                    'id_obj_type': obj_type,
+                    'entity_role': entity_role,
+                    'source': source,
+                    'term_start': term_start,
                 }
             )
         cache.set(cache_key, rr_sanctioned_objects, 3600)
@@ -330,3 +354,283 @@ def fox_get_out_docs(app_number: str) -> list:
         cursor.execute(query)
         results = cursor.fetchall()
         return results
+
+
+class ClaimDataSource(ABC):
+    """Отримує дані файлу формули."""
+
+    @abstractmethod
+    def get_claim_data(self) -> dict | None:
+        pass
+
+
+class K50ClaimDataSource(ClaimDataSource):
+    """Отримує дані файлу формули з типом документа К50 (первинний документ)."""
+
+    def __init__(self, application_number: str):
+        self.application_number = application_number
+
+    def get_claim_data(self) -> dict | None:
+        query = f"""
+            SELECT
+                TOP 1 b_d.BlobPDF, b_d.LangDOC, e_a.FaktDate
+            FROM
+                ZayavkiDOC AS z_d
+                INNER JOIN BlobDOC AS b_d 
+                    ON z_d.idDoc = b_d.idDoc 
+                INNER JOIN EArchive AS e_a 
+                    ON e_a.idDoc = z_d.idDoc 
+            WHERE
+                z_d.ZayavkaNumber = '{self.application_number}' 
+                AND z_d.DocTypeCODE IN ('К50', 'ДІ-3')
+                AND b_d.BlobPDF IS NOT NULL
+            ORDER BY e_a.FaktDate ASC
+        """
+        result = self._execute_query(query)
+
+        if not result:
+            return None
+
+        return {
+            'body': result[0],
+            'language': result[1],
+            'date': result[2],
+            'file_type': 'pdf'
+        }
+
+    def _execute_query(self, query: str) -> tuple:
+        with connections['e_archive'].cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result
+
+
+class C6ClaimDataSource(ClaimDataSource):
+    """Отримує дані файлу формули з типом документа C6 (формула експертизи)."""
+
+    def __init__(self, application_number: str, publication_date: datetime.date):
+        self.application_number = application_number
+        self.publication_date = publication_date
+
+    def get_claim_data(self) -> dict | None:
+        query = f"""
+            SELECT *
+            FROM OPENQUERY([FOX,51433], '
+                SELECT TOP 1 CAST(body AS varbinary(max)) AS body, language, operdate
+                FROM (
+                    SELECT CAST(body AS varbinary(max)) AS body, language, operdate
+                    FROM FOR3.dbo.rr_for
+                    WHERE idDocType = 583 
+                      AND InputNumber = ''{self.application_number}'' 
+                      AND operdate < ''{self.publication_date}''
+
+                    UNION ALL
+
+                    SELECT CAST(body AS varbinary(max)) AS body, language, operdate
+                    FROM FOR3.dbo.rr_for_archive
+                    WHERE idDocType = 583 
+                      AND InputNumber = ''{self.application_number}'' 
+                      AND operdate < ''{self.publication_date}''
+                ) AS combined
+                ORDER BY operdate DESC;
+            ');
+        """
+        result = self._execute_query(query)
+
+        if not result:
+            return None
+
+        return {
+            'body': result[0],
+            'language': result[1],
+            'date': result[2],
+            'file_type': 'doc'
+        }
+
+    def _execute_query(self, query: str) -> tuple:
+        with connections['e_archive'].cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result
+
+
+class ClaimDataSourceFactory:
+    DATE_SWITCH = datetime.date(2023, 5, 24)  # Дата, до якої необхідно отримувати документ К50, а після - С6
+
+    def create(self, application_number: str, publication_date: datetime.date) -> ClaimDataSource:
+        if publication_date < ClaimDataSourceFactory.DATE_SWITCH:
+            return K50ClaimDataSource(application_number)
+        return C6ClaimDataSource(application_number, publication_date)
+
+
+class FileConverter(ABC):
+
+    @abstractmethod
+    def convert(self, body: bytes) -> bytes:
+        pass
+
+
+class DocToPdfConverter(FileConverter):
+
+    def convert(self, body: bytes) -> bytes:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+
+            # Генерація унікальних імен файлів
+            uid = uuid.uuid4().hex
+            input_path = tmpdir_path / f"{uid}.doc"
+            output_path = tmpdir_path / f"{uid}.pdf"
+
+            input_path.write_bytes(body)
+
+            # Конвертація LibreOffice
+            result = subprocess.run(
+                [
+                    "libreoffice",
+                    "--headless",
+                    "--convert-to", "pdf",
+                    "--outdir", str(tmpdir_path),
+                    str(input_path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            # if result.returncode != 0:
+            #     raise RuntimeError(f"LibreOffice failed: {result.stderr}")
+
+            # Повернення PDF як bytes
+            return output_path.read_bytes()
+
+
+class FileConverterFactory:
+
+    def create(self, file_type: str) -> FileConverter:
+        if file_type == 'doc':
+            return DocToPdfConverter()
+        else:
+            raise ValueError(f"Unsupported file type: {file_type}")
+
+
+class TextExtractor(ABC):
+
+    @abstractmethod
+    def extract(self, body: bytes) -> str:
+        pass
+
+
+class TextFromPdfExtractor(TextExtractor):
+
+    def extract(self, body: bytes) -> str:
+        pdf_file = io.BytesIO(body)
+        reader = PdfReader(pdf_file)
+
+        result = ''
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                result += text + ' '
+
+        return result.strip()
+
+
+class TextExtractorFactory:
+
+    def create(self, file_type: str) -> TextExtractor:
+        if file_type == 'pdf':
+            return TextFromPdfExtractor()
+        else:
+            raise ValueError(f"Unsupported file type: {file_type}")
+
+
+class ApplicationGetClaimService:
+    def __init__(
+            self,
+            application_number: str,
+            publication_date: datetime.date,
+            source_factory: ClaimDataSourceFactory,
+            converter_factory: FileConverterFactory,
+            text_extractor_factory: TextExtractorFactory
+    ):
+        self.application_number = application_number
+        self.publication_date = publication_date
+        self.source = source_factory.create(application_number, publication_date)
+        self.converter_factory = converter_factory
+        self.text_extractor_factory = text_extractor_factory
+
+    @lru_cache(maxsize=32)
+    def process_claim(self) -> dict | None:
+
+        # Отримання даних
+        claim_data = self.source.get_claim_data()
+
+        if not claim_data:  # не знайдено документ формули
+            return None
+
+        # Конвертація у pdf (за необхідності)
+        if claim_data['file_type'] != 'pdf':
+            converter = self.converter_factory.create(claim_data['file_type'])
+            body = converter.convert(claim_data['body'])
+        else:
+            body = claim_data['body']
+
+        # Отримання тексту
+        text_extractor = self.text_extractor_factory.create('pdf')
+        text = text_extractor.extract(body)
+
+        return {
+            'date': claim_data['date'],
+            'language': claim_data['language'],
+            'body': body,
+            'text': text
+        }
+
+
+class DrawingSource(ABC):
+    application_number: str
+
+    def __init__(self, application_number: str):
+        self.application_number = application_number
+
+    @abstractmethod
+    def get_image(self) -> bytes:
+        pass
+
+
+class DrawingSourceVP3(DrawingSource):
+    def get_image(self) -> bytes | None:
+        query = f"""
+            SELECT *
+            FROM OPENQUERY([FOX,51433], '
+                select db.body
+                from VP3.dbo.rr_exp_claim c
+                join VP3.dbo.link_object l on l.idReestr1 = 204 and l.idReestr2 = 205 and l.idObject1 = c.id
+                join VP3.dbo.rr_document d on d.id = l.idObject2
+                join VP3.dbo.cl_document cd on cd.id = d.idDocType
+                join VP3.dbo.link_document_body lb on lb.idReestr = 205 and lb.idObject = d.id
+                join VP3.dbo.rr_document_body db on db.id = lb.idBody
+                where c.inputNumber = ''{self.application_number}'' 
+                    and cd.shortName = ''С7А''
+            ');
+        """
+        with connections['ellav'].cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result[0] if result and result[0] else None
+
+
+class DrawingSourceFactory:
+    @staticmethod
+    def create(application_number: str) -> DrawingSource:
+        return DrawingSourceVP3(application_number)
+
+
+class ApplicationGetDrawingService:
+    """Сервіс отримує бінарні дані документа C7A (головне креслення)."""
+    def __init__(self, application_number: str, source_factory: Type[DrawingSourceFactory]):
+        self.application_number = application_number
+        self.source_factory = source_factory
+
+    def get_image(self) -> bytes | None:
+        data_source = self.source_factory.create(self.application_number)
+        return data_source.get_image()

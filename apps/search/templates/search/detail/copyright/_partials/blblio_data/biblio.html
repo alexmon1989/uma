@@ -151,6 +151,8 @@
                         {% for person in hit.Certificate.CopyrightDetails.ApplicantDetails.Applicant %}
                             {{ person.ApplicantAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} [{{ person.ApplicantAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]<br>
                         {% endfor %}
+
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='заявник' %}
                     </td>
                 </tr>
             {% endif %}
@@ -185,6 +187,8 @@
                             {% endif %}
                             <br>
                         {% endfor %}
+
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='автор' %}
                     </td>
                 </tr>
             {% endif %}
@@ -202,6 +206,8 @@
                         {% for person in hit.Certificate.CopyrightDetails.HolderDetails.Holder %}
                             {{ person.HolderAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
                         {% endfor %}
+
+                        {% include 'search/detail/_partials/sanctions.html' with person_type='власник' %}
                     </td>
                 </tr>
             {% endif %}

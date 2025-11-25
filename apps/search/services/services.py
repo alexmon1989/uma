@@ -768,6 +768,38 @@ def application_get_documents(app_id: int) -> dict:
     return res
 
 
+def application_get_sanctions(*numbers: str, id_obj_type: int) -> list[dict]:
+    """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
+    gloc_obj_types = {
+        1: (300, 301),
+        2: (302, 303),
+        3: (309, 310),
+        4: (304, 305),
+        5: (311, 312),
+        6: (307, 308),
+        9: (306,),
+        10: (317,),
+        11: (319, 320),
+        12: (319, 320),
+        13: (318,),
+        14: (306,),
+    }
+
+    # Отримання списку санкційних об'єктів
+    rr_sanctioned_objects = gloc_get_sanctioned_objects()
+
+    # Санкційні дані об'єкта
+    result = []
+    for number in numbers:
+        if not number:
+            continue
+
+        data = [x for x in rr_sanctioned_objects[number] if x['id_obj_type'] in gloc_obj_types[id_obj_type]]
+        result.extend(data)
+
+    return result
+
+
 def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_number: str = None) -> bool:
     """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
     # Відповідність ідентифікаторів типів об'єктів у СІС та ГЛОК

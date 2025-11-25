@@ -172,6 +172,8 @@
                                 {% endif %}
                                 {% if not forloop.last %};<br>{% endif %}
                             {% endfor %}
+
+                            {% include 'search/detail/_partials/sanctions.html' with person_type='заявник' %}
                         </td>
                     </tr>
                 {% endif %}
@@ -220,6 +222,8 @@
                                 <br>({{ holder.HolderAddressBook.FormattedNameAddress.Address.AddressCountryCode }})
                                 {% if not forloop.last %};<br>{% endif %}
                             {% endfor %}
+
+                            {% include 'search/detail/_partials/sanctions.html' with person_type='власник' %}
                         </td>
                     </tr>
                 {% endif %}
