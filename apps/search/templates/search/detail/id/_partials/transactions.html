@@ -574,9 +574,11 @@
                             {% endif %}
 
                             {% if transaction.TransactionBody.DecisionDetails %}
-                                <li><span
-                                        class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}
-                                </li>
+                                {% if transaction|get:"@name" == 'Визнання прав на промисловий зразок недійсними Апеляційною палатою повністю' %}
+                                    <li><span class="g-font-weight-600">{% trans "Рішення Апеляційної палати, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                {% else %}
+                                    <li><span class="g-font-weight-600">{% trans "Назва суду, номер та дата прийняття рішення" %}:</span> {{ transaction.TransactionBody.DecisionDetails.Decision.CourtName }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Number }}; {{ transaction.TransactionBody.DecisionDetails.Decision.Date|parse_date|date:"d.m.Y" }}</li>
+                                {% endif %}
                             {% endif %}
                         </ul>
                     {% else %}
