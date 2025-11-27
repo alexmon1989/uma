@@ -204,8 +204,127 @@ def gloc_get_sanctioned_objects() -> dict[str, list[dict]]:
                     'term_start': term_start,
                 }
             )
-        cache.set(cache_key, rr_sanctioned_objects, 3600)
-        return rr_sanctioned_objects
+
+    cache.set(cache_key, rr_sanctioned_objects, 3600)
+    return rr_sanctioned_objects
+
+
+class SanctionedObjectsService:
+    """Отримує дані щодо санкційних об'єктів права інтелектуальної власності."""
+
+    CACHE_KEY = 'rr_sanctioned_objects'
+    CACHE_TTL = 3600
+
+    def __init__(self):
+        self._gloc_sanctioned_objects: list[dict] = []
+        self._vp3_sanctioned_objects: dict[str, list[dict]] = defaultdict(list)
+        self.rr_sanctioned_objects: dict[str, list[dict]] = defaultdict(list)
+
+    def _gloc_get_sanctioned_objects(self) -> None:
+        """Отримує дані щодо санкцій з БД GLOC (усі типи об'єктів)."""
+        result = []
+        with connections['gloc'].cursor() as cursor:
+            cursor.setinputsizes([(pyodbc.SQL_VARCHAR, 255)])
+            query = f"""
+                    SELECT DISTINCT
+                        s_o.ObjNumber,
+                        s_o.idObjType,
+                        s_o.EntityRole,
+                        s.Source,
+                        s.TermStart
+                    FROM
+                        rr_sanctioned_objects AS s_o
+                        INNER JOIN rr_sanctioned AS s
+                                ON s_o.idSanctioned = s.Id
+                    WHERE
+                        idState = 125 AND s.TermEnd >= '{datetime.datetime.now().strftime('%Y-%m-%d')}'
+                """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            for row in results:
+                obj_number, obj_type, entity_role, source, term_start = row
+                result.append(
+                    {
+                        'obj_number': obj_number,
+                        'id_obj_type': obj_type,
+                        'entity_role': entity_role,
+                        'source': source,
+                        'term_start': term_start,
+                    }
+                )
+        self._gloc_sanctioned_objects = result
+
+    def _vp3_get_sanctioned_objects(self) -> None:
+        """Отримує дані щодо санкцій з БД VP3 (винаходи, корисні моделі, топографії)."""
+        result = defaultdict(list)
+        with connections['vp3'].cursor() as cursor:
+            cursor.setinputsizes([(pyodbc.SQL_VARCHAR, 255)])
+            query = f"""
+                SELECT 
+                    l.name,
+                    s.ObjNum,
+                    CASE 
+                        WHEN s.ObjType = 'Заявка' THEN c.propertyType
+                        WHEN s.ObjType = 'Патент' THEN p.propertyType
+                        ELSE NULL
+                    END AS propertyType
+                FROM rr_sanctioned_objects AS s
+                LEFT JOIN rr_exp_claim AS c
+                    ON c.id = s.ObjIdO
+                LEFT JOIN rr_patent AS p
+                    ON p.id = s.ObjIdO
+                INNER JOIN cl_links AS l
+                    ON l.id = s.IdEntityLink
+                WHERE s.idState = 912 
+                    AND s.ObjType IN ('Патент', 'Заявка') 
+                    AND s.sancTermEnd >= '{datetime.datetime.now().strftime('%Y-%m-%d')}'
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            for row in results:
+                entity_role, obj_number, property_type = row
+                result[obj_number].append(
+                    {
+                        'obj_number': obj_number,
+                        'entity_role': entity_role,
+                        'property_type': property_type
+                    }
+                )
+        self._vp3_sanctioned_objects = result
+
+    def _merge_sanctioned_objects(self) -> None:
+        """Заповнює список санкційних об'єктів даними, отриманими з двох БД"""
+        self.rr_sanctioned_objects = defaultdict(list)
+
+        for gloc_item in self._gloc_sanctioned_objects:
+
+            item = gloc_item.copy()
+
+            for vp3_item in self._vp3_sanctioned_objects.get(gloc_item['obj_number'], []):
+                obj_type = gloc_item['id_obj_type']
+
+                if obj_type in (300, 301) and vp3_item['property_type'] == 'В':
+                    item['entity_role'] = 'власник' if vp3_item['entity_role'] == 'володілець' else vp3_item[
+                        'entity_role']
+
+                elif obj_type in (302, 303) and vp3_item['property_type'] == 'К':
+                    item['entity_role'] = 'власник' if vp3_item['entity_role'] == 'володілець' else vp3_item[
+                        'entity_role']
+
+            self.rr_sanctioned_objects[gloc_item['obj_number']].append(item)
+
+    def get_objects(self) -> dict:
+        rr_sanctioned_objects = cache.get(self.CACHE_KEY)
+        if rr_sanctioned_objects:
+            return rr_sanctioned_objects
+
+        self._gloc_get_sanctioned_objects()
+        self._vp3_get_sanctioned_objects()
+        self._merge_sanctioned_objects()
+
+        cache.set(self.CACHE_KEY, self.rr_sanctioned_objects, self.CACHE_TTL)
+
+        return self.rr_sanctioned_objects
 
 
 def madrid_notif_get_ua_bul(date: str) -> tuple[int, int] | None:

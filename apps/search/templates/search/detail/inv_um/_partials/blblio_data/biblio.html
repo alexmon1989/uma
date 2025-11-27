@@ -299,8 +299,9 @@
                                     {% endif %}
                                     {% if not forloop.last %}<br>{% endif %}
                                 </span>
-
                             {% endfor %}
+
+                            {% include 'search/detail/_partials/sanctions.html' with person_type='винахідник' %}
                         </td>
                     </tr>
                 {% endif %}

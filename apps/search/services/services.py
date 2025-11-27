@@ -19,7 +19,8 @@ from elasticsearch_dsl import Search, Q
 
 from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited, AppDocuments
 from apps.bulletin import services as bulletin_services
-from apps.search.services.external import gloc_get_sanctioned_objects, gnof_get_tracking_numbers
+from apps.search.services.external import gloc_get_sanctioned_objects, gnof_get_tracking_numbers, \
+    SanctionedObjectsService
 from apps.search.utils import filter_bad_apps, user_has_access_to_docs
 from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
 from apps.my_auth.services import UserService
@@ -786,7 +787,8 @@ def application_get_sanctions(*numbers: str, id_obj_type: int) -> list[dict]:
     }
 
     # Отримання списку санкційних об'єктів
-    rr_sanctioned_objects = gloc_get_sanctioned_objects()
+    sanctions_service = SanctionedObjectsService()
+    rr_sanctioned_objects = sanctions_service.get_objects()
 
     # Санкційні дані об'єкта
     result = []
