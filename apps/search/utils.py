@@ -315,6 +315,7 @@ def extend_doc_flow(hit):
         'bool',
         must=[
             Q('match', search_data__app_number=hit['search_data']['app_number']),
+            Q('match', Document__idObjType=hit['Document']['idObjType']),
             Q('match', search_data__obj_state=1)
         ]
     )
