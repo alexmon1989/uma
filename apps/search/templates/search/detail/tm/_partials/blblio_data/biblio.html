@@ -248,16 +248,23 @@
             {% endif %}
 
             {% get_field '531' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageCategory.CategoryCodeDetails.CategoryCode|join:"<br>" }}</td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '731' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant%}
+                {% if hit.Document.is_limited and not hit.TradeMark.TrademarkDetails.ApplicantDetails.Applicant %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>

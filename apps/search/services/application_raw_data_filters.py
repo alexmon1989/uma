@@ -35,6 +35,9 @@ class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
             if 'MarkImageFilename' in biblio_data['MarkImageDetails']['MarkImage'] \
                     and not limited_settings.get('MarkImageFilename', False):
                 del biblio_data['MarkImageDetails']['MarkImage']['MarkImageFilename']
+            if 'MarkImageCategory' in biblio_data['MarkImageDetails']['MarkImage'] \
+                    and not limited_settings.get('MarkImageCategory', False):
+                del biblio_data['MarkImageDetails']['MarkImage']['MarkImageCategory']
 
     def _filter_limited_transactions(self, transactions: list, limited_settings: dict) -> None:
         """Фільтрує дані сповіщень обмежених публікацій."""
