@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 
 from django import template
 from django.conf import settings
@@ -12,6 +13,29 @@ import re
 from typing import List
 
 register = template.Library()
+
+
+@register.filter
+def filter_71_72_no_ru(persons: list[dict]) -> list[dict]:
+    result = []
+
+    for person in persons:
+        if 'I_72.N.R' not in person and 'I_71.N.R' not in person:
+            result.append(person)
+
+    return result
+
+
+@register.filter
+def filter_73_no_ru(persons: list[dict]) -> list[dict]:
+    result = []
+
+    for person in persons:
+        lang = person.get('I_73.L')
+        if lang != 'RU':
+            result.append(person)
+
+    return result
 
 
 @register.filter
