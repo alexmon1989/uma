@@ -12,7 +12,7 @@ from apps.bulletin.models import EBulletinData
 
 
 # Get an instance of a logger
-from apps.search.services.external import madrid_notif_get_ua_bul
+from apps.search.services.external import madrid_notif_get_ua_bul, fox_get_object_persons
 
 logger = logging.getLogger(__name__)
 
@@ -146,12 +146,34 @@ class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver, BiblioDa
             if bull_str:
                 biblio_data['I_45_bul_str'] = bull_str
 
+    def _set_i_73(self, biblio_data: dict, obj_type_id: int) -> None:
+        if biblio_data.get('I_11'):
+            # Отримання списку власників з АС "Винаходи"
+            holders = fox_get_object_persons(biblio_data['I_11'], obj_type_id, '73')
+            if holders:
+                result = []
+                for holder in holders:
+                    item = {}
+                    if holder['name']:
+                        item['I_73.N'] = holder['name'].strip()
+                    if holder['gov_code']:
+                        item['EDRPOU'] = holder['gov_code'].strip()
+                    if holder['country_code']:
+                        item['I_73.C'] = holder['country_code'].strip()
+                    if holder['language_code']:
+                        item['I_73.L'] = holder['language_code'].strip()
+                    if holder['enter_num']:
+                        item['I_73.O'] = int(holder['enter_num'])
+                    result.append(item)
+                biblio_data['I_73'] = result
+
     def get_data(self) -> dict:
         data = super().get_data()
 
         biblio_data = self.get_biblio_data(data)
         self._set_i_43_bul_str(biblio_data)
         self._set_i_45_bul_str(biblio_data)
+        self._set_i_73(biblio_data, data['Document']['idObjType'])
 
         return data
 

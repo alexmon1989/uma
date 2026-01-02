@@ -404,6 +404,48 @@ def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
         return res
 
 
+def fox_get_object_persons(input_number: str | int, obj_type_id: int, biblio_code: str) -> list[dict]:
+    """
+    Отримує інформацію з АС Винаходи стосовно завників, винахідників та власників.
+
+    В залежності від бібліографічного коду у параметр input_number необхідно передавати:
+     - номер заявки (для отримання даних заявників, винахідників);
+     - номер патенту (для отримання даних власників).
+    """
+    # Словник запитів у БД залежно від бібліографічного коду
+    queries = {
+        '71': 'EXEC [dbo].[ext_sis_getClaimApplicant] @InputNumber = %s, @PropertyType = %s',   # заявник
+        '72': 'EXEC [dbo].[ext_sis_getClaimInventor] @InputNumber = %s, @PropertyType = %s',    # винахідник
+        '73': 'EXEC [dbo].[ext_sis_getPatentOwner] @PatentNumber = %s, @PropertyType = %s',     # власник
+    }
+
+    # Коди типів об'єктів
+    obj_types = {
+        1: 'В',
+        2: 'К',
+        3: 'Т',
+    }
+
+    result = []
+
+    with connections['vp3'].cursor() as cursor:
+        cursor.setinputsizes([(pyodbc.SQL_VARCHAR, 255)])
+        cursor.execute(queries[biblio_code], [input_number, obj_types[obj_type_id]])
+        rows = cursor.fetchall()
+
+        for item in rows:
+            result.append({
+                'name': item[0],
+                'gov_code': item[1],
+                'address': item[2],
+                'country_code': item[3],
+                'language_code': item[4],
+                'enter_num': item[5],
+            })
+
+    return result
+
+
 def fox_get_out_docs(app_number: str) -> list:
     with connections['ellav'].cursor() as cursor:
         query = f"""
