@@ -171,9 +171,10 @@ class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver, BiblioDa
         data = super().get_data()
 
         biblio_data = self.get_biblio_data(data)
-        self._set_i_43_bul_str(biblio_data)
-        self._set_i_45_bul_str(biblio_data)
-        self._set_i_73(biblio_data, data['Document']['idObjType'])
+        if biblio_data:
+            self._set_i_43_bul_str(biblio_data)
+            self._set_i_45_bul_str(biblio_data)
+            self._set_i_73(biblio_data, data.get('Document', {}).get('idObjType'))
 
         return data
 
