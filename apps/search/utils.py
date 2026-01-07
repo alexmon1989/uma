@@ -1541,9 +1541,7 @@ def get_app_owner(app):
         if biblio_data.get('I_73'):
             i_73 = [i for n, i in enumerate(biblio_data['I_73']) if i not in biblio_data['I_73'][n + 1:]]
             for item in i_73:
-                item.pop('EDRPOU', '')
-                item_values = sorted(list(item.values()), key=len)
-                owners.append(f"{item_values[1]} [{item_values[0]}]")
+                owners.append(f"{item['I_73.N']} [{item['I_73.C']}]")
 
     # Знаки для товаров и услуг
     elif app.Document.idObjType == 4:
