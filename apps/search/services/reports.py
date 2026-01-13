@@ -2485,13 +2485,13 @@ class ReportWriterDocx(ReportWriter):
             'obj_type_id': 6,
             'obj_state': 1,
             'ua': 'Заявка на промисловий зразок',
-            'en': 'Industrial design Application',
+            'en': 'Industrial design application',
         },
         {
             'obj_type_id': 6,
             'obj_state': 2,
-            'ua': 'Патент України на промисловий зразок',
-            'en': 'Patent of Ukraine for industrial design',
+            'ua': 'Свідоцтво на промисловий зразок',
+            'en': 'Industrial design certificate',
         },
         {
             'obj_type_id': 9,

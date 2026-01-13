@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-26 12:27+0200\n"
+"POT-Creation-Date: 2026-01-13 11:49+0200\n"
 "PO-Revision-Date: 2018-11-07 09:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -145,7 +145,7 @@ msgstr "Bulletin"
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:198
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:267
 #: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:297
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:326
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:327
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:145
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:186
 #: apps/search/templates/search/detail/ld/_partials/blblio_data/biblio.html:207
@@ -194,7 +194,7 @@ msgstr "bul."
 
 #: apps/bulletin_new/templates/bulletin_new/detail/tm.html:291
 #: apps/bulletin_new/templates/bulletin_new/detail/tm_madrid.html:81
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:474
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:481
 #: apps/search/templates/search/detail/tm_madrid/_partials/blblio_data/biblio.html:211
 msgid "Показати"
 msgstr "Show"
@@ -750,7 +750,7 @@ msgstr "Thank you, your order was successfully paid."
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:877
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:898
 #: apps/search/templates/search/detail/tm/_partials/transactions.html:919
-#: apps/search/utils.py:1248
+#: apps/search/utils.py:1249
 msgid "Номер заявки"
 msgstr "Application number"
 
@@ -778,14 +778,14 @@ msgstr "Object state"
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/advanced/_partials/tm_item.html:74
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1326
+#: apps/search/utils.py:1327
 msgid "Заявка"
 msgstr "Application"
 
 #: apps/search/admin.py:57 apps/search/admin.py:110
 #: apps/search/templates/search/advanced/_partials/sidebar.html:56
 #: apps/search/templates/search/simple/_partials/sidebar.html:56
-#: apps/search/utils.py:1326
+#: apps/search/utils.py:1327
 msgid "Охоронний документ"
 msgstr "Protective document"
 
@@ -797,57 +797,57 @@ msgstr "INID code"
 msgid "Невірний діапазон дат"
 msgstr "Wrong date range"
 
-#: apps/search/services/services.py:94
-#: apps/search/templatetags/search_extras.py:535
+#: apps/search/services/services.py:95
+#: apps/search/templatetags/search_extras.py:559
 msgid "Патент зареєстровано"
 msgstr "Patent registered"
 
-#: apps/search/services/services.py:100 apps/search/services/services.py:244
-#: apps/search/services/services.py:329
-#: apps/search/templatetags/search_extras.py:335
-#: apps/search/templatetags/search_extras.py:413
-#: apps/search/templatetags/search_extras.py:451
-#: apps/search/templatetags/search_extras.py:541
+#: apps/search/services/services.py:101 apps/search/services/services.py:245
+#: apps/search/services/services.py:330
+#: apps/search/templatetags/search_extras.py:359
+#: apps/search/templatetags/search_extras.py:437
+#: apps/search/templatetags/search_extras.py:475
+#: apps/search/templatetags/search_extras.py:565
 msgid "Підготовка до державної реєстрації та публікації"
 msgstr "Preparation to state registration and publication"
 
-#: apps/search/services/services.py:106
-#: apps/search/templatetags/search_extras.py:547
+#: apps/search/services/services.py:107
+#: apps/search/templatetags/search_extras.py:571
 msgid "Очікування документа про сплату державного мита"
 msgstr "Waiting for documents on the payment of the fees"
 
-#: apps/search/services/services.py:112 apps/search/services/services.py:248
-#: apps/search/templatetags/search_extras.py:339
-#: apps/search/templatetags/search_extras.py:553
+#: apps/search/services/services.py:113 apps/search/services/services.py:249
+#: apps/search/templatetags/search_extras.py:363
+#: apps/search/templatetags/search_extras.py:577
 msgid "Кваліфікаційна експертиза"
 msgstr "Substantive examination"
 
-#: apps/search/services/services.py:117
-#: apps/search/templatetags/search_extras.py:558
+#: apps/search/services/services.py:118
+#: apps/search/templatetags/search_extras.py:582
 msgid "Очікування клопотання про проведення кваліфікаційної експертизи"
 msgstr "Waiting for request for conducting substantive examination"
 
-#: apps/search/services/services.py:123 apps/search/services/services.py:252
-#: apps/search/templatetags/search_extras.py:343
-#: apps/search/templatetags/search_extras.py:564
+#: apps/search/services/services.py:124 apps/search/services/services.py:253
+#: apps/search/templatetags/search_extras.py:367
+#: apps/search/templatetags/search_extras.py:588
 msgid "Формальна експертиза"
 msgstr "Formal examination"
 
-#: apps/search/services/services.py:129 apps/search/services/services.py:256
-#: apps/search/services/services.py:337
-#: apps/search/templatetags/search_extras.py:347
-#: apps/search/templatetags/search_extras.py:421
-#: apps/search/templatetags/search_extras.py:459
-#: apps/search/templatetags/search_extras.py:570
+#: apps/search/services/services.py:130 apps/search/services/services.py:257
+#: apps/search/services/services.py:338
+#: apps/search/templatetags/search_extras.py:371
+#: apps/search/templatetags/search_extras.py:445
+#: apps/search/templatetags/search_extras.py:483
+#: apps/search/templatetags/search_extras.py:594
 msgid "Встановлення дати подання"
 msgstr "According of the filling date"
 
-#: apps/search/services/services.py:136 apps/search/services/services.py:260
-#: apps/search/services/services.py:341
-#: apps/search/templatetags/search_extras.py:351
-#: apps/search/templatetags/search_extras.py:425
-#: apps/search/templatetags/search_extras.py:463
-#: apps/search/templatetags/search_extras.py:577
+#: apps/search/services/services.py:137 apps/search/services/services.py:261
+#: apps/search/services/services.py:342
+#: apps/search/templatetags/search_extras.py:375
+#: apps/search/templatetags/search_extras.py:449
+#: apps/search/templatetags/search_extras.py:487
+#: apps/search/templatetags/search_extras.py:601
 msgid ""
 "Реєстрація первинних документів, попередня експертиза та введення відомостей "
 "до бази даних"
@@ -855,23 +855,23 @@ msgstr ""
 "Registration of primary documents, preliminary examination and entering data "
 "into database"
 
-#: apps/search/services/services.py:240
-#: apps/search/templatetags/search_extras.py:331
+#: apps/search/services/services.py:241
+#: apps/search/templatetags/search_extras.py:355
 msgid "Торговельну марку зареєстровано"
 msgstr "Registered trademark"
 
-#: apps/search/services/services.py:325
-#: apps/search/templatetags/search_extras.py:409
+#: apps/search/services/services.py:326
+#: apps/search/templatetags/search_extras.py:433
 msgid "Промисловий зразок зареєстровано"
 msgstr "Registered industrial design"
 
-#: apps/search/services/services.py:333
-#: apps/search/templatetags/search_extras.py:417
-#: apps/search/templatetags/search_extras.py:455
+#: apps/search/services/services.py:334
+#: apps/search/templatetags/search_extras.py:441
+#: apps/search/templatetags/search_extras.py:479
 msgid "Експертиза заявки"
 msgstr "Examination"
 
-#: apps/search/services/services.py:1672
+#: apps/search/services/services.py:1674
 msgid ""
 "Завантаження неможливе, оскільки документ не дозволений для завантаження "
 "представникам НАЗК."
@@ -879,7 +879,7 @@ msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1675
+#: apps/search/services/services.py:1677
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не дозволений(і) для завантаження представникам НАЗК:"
@@ -887,13 +887,13 @@ msgstr ""
 "Downloading is not possible because there are document(s) in the download "
 "list that have not been received by the addressee:"
 
-#: apps/search/services/services.py:1685
+#: apps/search/services/services.py:1687
 msgid "Завантаження неможливе, оскільки документ не був отриманий адресатом."
 msgstr ""
 "Downloading is not possible because the document has not been received by "
 "the addressee."
 
-#: apps/search/services/services.py:1687
+#: apps/search/services/services.py:1689
 msgid ""
 "Завантаження неможливе, оскільки у списку для завантаження є документ(и), що "
 "не був(ли) отримані адресатом:"
@@ -960,8 +960,8 @@ msgstr "Agreement participants"
 #: apps/search/templates/search/detail/agreement/_partials/blblio_data/biblio.html:143
 #: apps/search/templates/search/detail/copyright/_partials/blblio_data/biblio.html:232
 #: apps/search/templates/search/detail/id/_partials/blblio_data/biblio.html:339
-#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:366
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:489
+#: apps/search/templates/search/detail/inv_um/_partials/blblio_data/biblio.html:367
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:496
 msgid "інформація тимчасово обмежена"
 msgstr "information is temporarily limited"
 
@@ -1109,12 +1109,12 @@ msgstr "Add to favorites"
 #: apps/search/templates/search/advanced/_partials/id_item.html:20
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:17
 msgid "Заявка на промисловий зразок"
-msgstr "Industrial design Application"
+msgstr "Industrial design application"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:22
 #: apps/search/templates/search/detail/id/_partials/breadcrumbs.html:19
-msgid "Патент України на промисловий зразок"
-msgstr "Patent of Ukraine for industrial design"
+msgid "Свідоцтво на промисловий зразок"
+msgstr "Industrial design certificate"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:39
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:52
@@ -1128,7 +1128,7 @@ msgstr "For this application, it is possible to review only its status."
 #: apps/search/templates/search/advanced/_partials/ld_item.html:80
 #: apps/search/templates/search/advanced/_partials/qi_item.html:62
 #: apps/search/templates/search/advanced/_partials/tm_item.html:86
-#: apps/search/utils.py:1249
+#: apps/search/utils.py:1250
 msgid "Дата подання заявки"
 msgstr "Date of application"
 
@@ -1161,7 +1161,7 @@ msgid "Міжнародна класифікація промислових зр
 msgstr "International Classification for Industrial Designs"
 
 #: apps/search/templates/search/advanced/_partials/id_item.html:120
-#: apps/search/utils.py:1259
+#: apps/search/utils.py:1260
 msgid "МКПЗ"
 msgstr "ICID"
 
@@ -1196,7 +1196,7 @@ msgid "Повний список винахідників"
 msgstr "Full list of inventors"
 
 #: apps/search/templates/search/advanced/_partials/inv_um_item.html:99
-#: apps/search/utils.py:1257
+#: apps/search/utils.py:1258
 msgid "МПК"
 msgstr "IPC"
 
@@ -1437,7 +1437,7 @@ msgstr ""
 #: apps/search/templates/search/advanced/_partials/tm_item.html:132
 #: apps/search/templates/search/advanced/_partials/tm_item_madrid.html:70
 #: apps/search/templates/search/advanced/_partials/wkm_item.html:54
-#: apps/search/utils.py:1258
+#: apps/search/utils.py:1259
 msgid "МКТП"
 msgstr "ICGS"
 
@@ -2067,7 +2067,7 @@ msgstr "Inventor"
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:271
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:487
 #: apps/search/templates/search/detail/inv_um/_partials/transactions.html:529
-#: apps/search/utils.py:1254
+#: apps/search/utils.py:1255
 msgid "Власник"
 msgstr "Owner(s)"
 
@@ -2187,8 +2187,8 @@ msgstr "partly"
 msgid "Кл.:"
 msgstr "Cl."
 
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:417
-#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:435
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:424
+#: apps/search/templates/search/detail/tm/_partials/blblio_data/biblio.html:442
 msgid "Так"
 msgstr "Yes"
 
@@ -2418,17 +2418,14 @@ msgid "Під санкціями"
 msgstr "Under sanctions"
 
 #: apps/search/templates/search/templatetags/registration_status.html:9
-#: apps/search/templates/search/templatetags/registration_status.html:47
 msgid "Патент діє"
 msgstr "Valid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:11
-#: apps/search/templates/search/templatetags/registration_status.html:49
 msgid "Патент не діє"
 msgstr "Invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:16
-#: apps/search/templates/search/templatetags/registration_status.html:51
 msgid "Дію патента припинено, але може бути поновлено"
 msgstr "Ceased to be effective, but is subject to renewal"
 
@@ -2437,15 +2434,18 @@ msgid "Очікує першу сплату збору за підтриманн
 msgstr "Awaiting the first payment of the maintenance fee"
 
 #: apps/search/templates/search/templatetags/registration_status.html:26
+#: apps/search/templates/search/templatetags/registration_status.html:47
 #: apps/search/templates/search/templatetags/registration_status.html:58
 msgid "Свідоцтво діє"
 msgstr "Valid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:28
+#: apps/search/templates/search/templatetags/registration_status.html:49
 msgid "Свідоцтво не діє"
 msgstr "Invalid"
 
 #: apps/search/templates/search/templatetags/registration_status.html:30
+#: apps/search/templates/search/templatetags/registration_status.html:51
 #: apps/search/templates/search/templatetags/registration_status.html:62
 msgid "Дію свідоцтва припинено, але може бути поновлено"
 msgstr "The certificate is suspended but may be renewed"
@@ -2489,47 +2489,47 @@ msgstr "Transaction search"
 msgid "По сповіщенням"
 msgstr "Transaction search"
 
-#: apps/search/templatetags/search_extras.py:447
+#: apps/search/templatetags/search_extras.py:471
 msgid "Географічне зазначення зареєстровано"
 msgstr "The geographical indication is registered"
 
-#: apps/search/utils.py:1246
+#: apps/search/utils.py:1247
 msgid "Тип об'єкта промислової власності"
 msgstr "Industrial property object type"
 
-#: apps/search/utils.py:1247
+#: apps/search/utils.py:1248
 msgid "Стан об'єкта промислової власності"
 msgstr "Industrial property object status"
 
-#: apps/search/utils.py:1250
+#: apps/search/utils.py:1251
 msgid "Номер охоронного документа"
 msgstr "Protective document number"
 
-#: apps/search/utils.py:1251
+#: apps/search/utils.py:1252
 msgid "Дата охоронного документа"
 msgstr "Protective document date"
 
-#: apps/search/utils.py:1252
+#: apps/search/utils.py:1253
 msgid "Ключові слова"
 msgstr "Keywords"
 
-#: apps/search/utils.py:1253
+#: apps/search/utils.py:1254
 msgid "Заявник"
 msgstr "Applicant"
 
-#: apps/search/utils.py:1255
+#: apps/search/utils.py:1256
 msgid "Винахідник\\автор"
 msgstr "Inventor\\author"
 
-#: apps/search/utils.py:1256
+#: apps/search/utils.py:1257
 msgid "Представник"
 msgstr "Presenter"
 
-#: apps/search/utils.py:1260
+#: apps/search/utils.py:1261
 msgid "(441) Дата публікації відомостей про заявку та номер бюлетня"
 msgstr "(441) Date of publication and bulletin number"
 
-#: apps/search/utils.py:1261
+#: apps/search/utils.py:1262
 msgid "Зображення ТМ"
 msgstr "Trademark image"
 
@@ -2613,6 +2613,9 @@ msgstr "Database administrator"
 #: templates/templatetags/footer_contacts.html:9
 msgid "Телефон"
 msgstr "Phone"
+
+#~ msgid "Патент України на промисловий зразок"
+#~ msgstr "Patent of Ukraine for industrial design"
 
 #~ msgid "Тимчасово заблокована"
 #~ msgstr "Temporarily blocked"
