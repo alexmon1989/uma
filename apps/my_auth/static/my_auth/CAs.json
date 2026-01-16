@@ -114,20 +114,6 @@
   },
   {
     "issuerCNs": [
-      "КНЕДП АЦСК АТ \"Альфа-Банк\"",
-      "Акредитований центр сертифікації ключів АТ \"Альфа-Банк\"",
-      "КНЕДП АТ \"СЕНС БАНК\""
-    ],
-    "address": "ca.alfabank.kiev.ua",
-    "ocspAccessPointAddress": "ca.alfabank.kiev.ua/services/ocsp/",
-    "ocspAccessPointPort": "80",
-    "cmpAddress": "ca.alfabank.kiev.ua",
-    "tspAddress": "ca.alfabank.kiev.ua",
-    "tspAddressPort": "80",
-    "codeEDRPOU": "23494714"
-  },
-  {
-    "issuerCNs": [
       "КНЕДП АТ \"СЕНС БАНК\"",
       "КНЕДП АЦСК АТ \"Альфа-Банк\"",
       "Акредитований центр сертифікації ключів АТ \"Альфа-Банк\""
@@ -233,6 +219,19 @@
   },
   {
     "issuerCNs": [
+      "КНЕДП НГУ"
+    ],
+    "address": "ca.ngu.gov.ua",
+    "ocspAccessPointAddress": "ca.ngu.gov.ua/services/ocsp/",
+    "ocspAccessPointPort": "80",
+    "cmpAddress": "ca.ngu.gov.ua",
+    "tspAddress": "ca.ngu.gov.ua",
+    "tspAddressPort": "80",
+    "directAccess": true,
+    "codeEDRPOU": "08803804"
+  },
+  {
+    "issuerCNs": [
       "КНЕДП \"АЦСК ринку електричної енергії\"",
       "АЦСК ринку електричної енергії"
     ],
@@ -247,7 +246,8 @@
   {
     "issuerCNs": [
       "КНЕДП - АЦСК МВС України",
-      "АЦСК МВС України"
+      "АЦСК МВС України",
+      "QTSP of the MIAU"
     ],
     "address": "ca.mvs.gov.ua",
     "ocspAccessPointAddress": "ca.mvs.gov.ua/services/ocsp/",
@@ -301,7 +301,9 @@
   },
   {
     "issuerCNs": [
-      "КНЕДП АТ \"ТАСКОМБАНК\""
+      "КНЕДП АТ \"ТАСКОМБАНК\"",
+      "QTSP-RSA of JSC TASCOMBANK",
+      "QTSP-ECDSA of JSC TASCOMBANK"
     ],
     "address": "ca.tascombank.ua",
     "ocspAccessPointAddress": "ca.tascombank.ua/services/ocsp/",
@@ -393,7 +395,8 @@
   },
   {
     "issuerCNs": [
-      "КНЕДП СБ України"
+      "КНЕДП СБ України",
+      "QTSP SSU"
     ],
     "address": "knedp.ssu.gov.ua",
     "ocspAccessPointAddress": "va1-knedp.ssu.gov.ua/services/ocsp/",
