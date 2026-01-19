@@ -2177,3 +2177,11 @@ def delete_files_in_directory(directory: str, ext: str) -> None:
 def clean_string_for_xml(input_string: str):
     """Видаляє зі строки символи, що не сумісні з XML."""
     return re.sub(r'[\x00-\x1F\x7F]', '', input_string)
+
+
+def is_str_integer(value: str) -> bool:
+    try:
+        int(value)
+    except ValueError:
+        return False
+    return True

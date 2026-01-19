@@ -15,7 +15,7 @@ from .utils import (prepare_query, sort_results, filter_results, extend_doc_flow
                     get_elastic_results, get_search_in_transactions, get_transactions_types, get_completed_order,
                     create_selection_inv_um_ld, get_data_for_selection_tm, create_selection_tm,
                     prepare_data_for_search_report, create_search_res_doc, sort_doc_flow,
-                    filter_app_data, filter_bad_apps)
+                    filter_app_data, filter_bad_apps, is_str_integer)
 from .dataclasses import ServiceExecuteResult, ServiceExecuteResultError
 from apps.search.services.reports import ReportWriterDocxCreator
 from uma.utils import get_unique_filename, get_user_or_anonymous
@@ -34,10 +34,11 @@ from typing import List
 @shared_task
 def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
+    page = get_params['page'][0] if get_params.get('page') else 1
     formset = get_search_form('simple', get_params)
     # Валидация запроса
     try:
-        if not formset.is_valid():
+        if not formset.is_valid() or not is_str_integer(page):
             errors = []
             errors.extend(formset.errors)
             errors.extend(formset.non_form_errors())
@@ -117,7 +118,7 @@ def perform_simple_search(user_id, get_params):
         results_on_page = 100
     elif results_on_page < 10:
         results_on_page = 10
-    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_from = results_on_page * (int(page) - 1)
     res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
@@ -233,10 +234,11 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
 @shared_task
 def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
+    page = get_params['page'][0] if get_params.get('page') else 1
     formset = get_search_form('advanced', get_params)
     # Валидация запроса
     try:
-        if not formset.is_valid():
+        if not formset.is_valid() or not is_str_integer(page):
             errors = []
             errors.extend(formset.errors)
             errors.extend(formset.non_form_errors())
@@ -274,7 +276,7 @@ def perform_advanced_search(user_id, get_params):
         results_on_page = 100
     elif results_on_page < 10:
         results_on_page = 10
-    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_from = results_on_page * (int(page) - 1)
     res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
@@ -301,10 +303,11 @@ def perform_advanced_search(user_id, get_params):
 @shared_task
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
+    page = get_params['page'][0] if get_params.get('page') else 1
     form = get_search_form('transactions', get_params)
     # Валидация запроса
     try:
-        if not form.is_valid():
+        if not form.is_valid() or not is_str_integer(page):
             return {
                 'validation_errors': form.errors,
                 'get_params': get_params
@@ -332,7 +335,7 @@ def perform_transactions_search(get_params):
         results_on_page = 100
     elif results_on_page < 10:
         results_on_page = 10
-    res_from = results_on_page * (int(get_params['page'][0]) - 1) if get_params.get('page') else 0
+    res_from = results_on_page * (int(page) - 1)
     res_to = res_from + results_on_page
     items = []
     for i in s[res_from:res_to]:
