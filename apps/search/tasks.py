@@ -35,10 +35,11 @@ from typing import List
 def perform_simple_search(user_id, get_params):
     """Задача для выполнения простого поиска."""
     page = get_params['page'][0] if get_params.get('page') else 1
+    show = get_params['show'][0] if get_params.get('show') else 10
     formset = get_search_form('simple', get_params)
     # Валидация запроса
     try:
-        if not formset.is_valid() or not is_str_integer(page):
+        if not formset.is_valid() or not is_str_integer(page) or not is_str_integer(show):
             errors = []
             errors.extend(formset.errors)
             errors.extend(formset.non_form_errors())
@@ -113,7 +114,7 @@ def perform_simple_search(user_id, get_params):
     # Фильтрация, агрегация
     s, aggregations = filter_results(s, get_params)
 
-    results_on_page = int(get_params.get('show', [10])[0])
+    results_on_page = int(show)
     if results_on_page > 100:
         results_on_page = 100
     elif results_on_page < 10:
@@ -235,10 +236,11 @@ def get_app_details(id_app_number: int, user_id: int) -> dict:
 def perform_advanced_search(user_id, get_params):
     """Задача для выполнения расширенного поиска."""
     page = get_params['page'][0] if get_params.get('page') else 1
+    show = get_params['show'][0] if get_params.get('show') else 10
     formset = get_search_form('advanced', get_params)
     # Валидация запроса
     try:
-        if not formset.is_valid() or not is_str_integer(page):
+        if not formset.is_valid() or not is_str_integer(page) or not is_str_integer(show):
             errors = []
             errors.extend(formset.errors)
             errors.extend(formset.non_form_errors())
@@ -271,7 +273,7 @@ def perform_advanced_search(user_id, get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    results_on_page = int(get_params.get('show', [10])[0])
+    results_on_page = int(show)
     if results_on_page > 100:
         results_on_page = 100
     elif results_on_page < 10:
@@ -304,10 +306,11 @@ def perform_advanced_search(user_id, get_params):
 def perform_transactions_search(get_params):
     """Выполняет поиск в транзациях"""
     page = get_params['page'][0] if get_params.get('page') else 1
+    show = get_params['show'][0] if get_params.get('show') else 10
     form = get_search_form('transactions', get_params)
     # Валидация запроса
     try:
-        if not form.is_valid() or not is_str_integer(page):
+        if not form.is_valid() or not is_str_integer(page) or not is_str_integer(show):
             return {
                 'validation_errors': form.errors,
                 'get_params': get_params
@@ -330,7 +333,7 @@ def perform_transactions_search(get_params):
     s, aggregations = filter_results(s, get_params)
 
     # Пагинация
-    results_on_page = int(get_params.get('show', [10])[0])
+    results_on_page = int(show)
     if results_on_page > 100:
         results_on_page = 100
     elif results_on_page < 10:
