@@ -615,9 +615,11 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
         # Полные пути к изображениям
         try:
-            images = self._raw_biblio['DesignSpecimenDetails'][0]['DesignSpecimen']
-            for image in images:
-                image['SpecimenFilename'] = f"{self._files_dir}{image['SpecimenFilename']}"
+            images_groups = self._raw_biblio['DesignSpecimenDetails']
+            for images_group in images_groups:
+                images = images_group['DesignSpecimen']
+                for image in images:
+                    image['SpecimenFilename'] = f"{self._files_dir}{image['SpecimenFilename']}"
         except (KeyError, TypeError):
             pass
 
