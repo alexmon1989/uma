@@ -23,8 +23,8 @@
                             {% trans "Заявка на корисну модель" %}
                         {% endif %}
                     {% elif hit.search_data.obj_state == 2 %}
-                        {% if biblo_data.I_12 %}
-                            {{ biblio_data.I_12 }}
+                        {% if hit.Patent.I_12 %}
+                            {{ hit.Patent.I_12 }}
                         {% else %}
                             {% if hit.Document.idObjType == 1 %}
                                 {% trans "Патент на винахід" %}
