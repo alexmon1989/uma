@@ -360,8 +360,27 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
         self._fix_image_extension(app_data)
 
 
+# Мапінг кодів 12 та 13 патентів на винаходи та корисні моделі
+MAPPING_I_12_I_13 = {
+    'Деклараційний патент на винахід': 'A',
+    'Патент (на 20 р.) по заявці, поданій в СРСР': 'C2',
+    'Патент України (на 20 р.)': 'C2',
+    'Патент України без експертизи по суті (5 р.)': 'A',
+    'Патент України без експертизи по суті по заявці, поданій в СРСР (5 р.)': 'C2',
+    'Патент України, перереєстрований з СРСР (на 20 р.)': 'C1',
+    'Перереєстроване авторське свідоцтво СРСР': 'A1',
+    'Деклараційний патент на корисну модель': 'U',
+    'Патент на корисну модель': 'U',
+    'Патент України на корисну модель (5 р.)': 'U',
+}
+
+
 class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUMLDRawGetMixin):
     """Исправляет данные изобретения, полезной модели, топографии, которые были получены с файловой системы."""
+
+    def _fix_i_13(self, biblio_data: dict) -> None:
+        if 'I_12' in biblio_data and biblio_data['I_12'] in MAPPING_I_12_I_13:
+            biblio_data['I_13'] = MAPPING_I_12_I_13[biblio_data['I_12']]
 
     def _fix_i_71(self, biblio_data: dict) -> None:
         i_71 = biblio_data.get('I_71', [])
@@ -443,6 +462,7 @@ class ApplicationRawDataFSInvUMLDFixer(ApplicationRawDataFixer, BiblioDataInvUML
 
     def fix_data(self, app_data: dict) -> None:
         biblio_data = self.get_biblio_data(app_data)
+        self._fix_i_13(biblio_data)
         self._fix_i_71(biblio_data)
         self._fix_i_72(biblio_data)
         self._fix_i_73(biblio_data)
