@@ -313,6 +313,45 @@ class SanctionedObjectsService:
 
             self.rr_sanctioned_objects[gloc_item['obj_number']].append(item)
 
+    def _exclude_sanctions(self):
+        """Видалення із результуючого списку "зайвих" санкцій."""
+        # (obj_number, id_obj_type, entity_role)
+        exclusions_set = {
+            ('233851', 305, 'Ім’я або повне найменування та адреса власника (власників) свідоцтва'),
+            ('227077', 305, 'Ім’я або повне найменування та адреса власника (власників) свідоцтва'),
+            ('233852', 305, 'Ім’я або повне найменування та адреса власника (власників) свідоцтва'),
+            ('243588', 305, 'Ім’я або повне найменування та адреса власника (власників) свідоцтва'),
+            ('238651', 305, 'Ім’я або повне найменування та адреса власника (власників) свідоцтва'),
+        }
+        for obj_num in list(self.rr_sanctioned_objects.keys()):
+            self.rr_sanctioned_objects[obj_num] = [
+                obj for obj in self.rr_sanctioned_objects[obj_num]
+                if (obj['obj_number'], obj['id_obj_type'], obj['entity_role']) not in exclusions_set
+            ]
+            if not self.rr_sanctioned_objects[obj_num]:
+                del self.rr_sanctioned_objects[obj_num]
+
+    def _append_sanctions(self):
+        """Додання санкцій у результуючий список."""
+        self.rr_sanctioned_objects['34558'].append(
+            {
+                'obj_number': '34558',
+                'id_obj_type': 308,
+                'entity_role': 'Власник(и)',
+                'source': 'Указ 191/2023. Додаток 1',
+                'term_start': '2023-04-01',
+            }
+        )
+        self.rr_sanctioned_objects['37879'].append(
+            {
+                'obj_number': '37879',
+                'id_obj_type': 308,
+                'entity_role': 'Власник(и)',
+                'source': 'Указ 191/2023. Додаток 1',
+                'term_start': '2023-04-01',
+            }
+        )
+
     def get_objects(self) -> dict:
         rr_sanctioned_objects = cache.get(self.CACHE_KEY)
         if rr_sanctioned_objects:
@@ -321,6 +360,8 @@ class SanctionedObjectsService:
         self._gloc_get_sanctioned_objects()
         self._vp3_get_sanctioned_objects()
         self._merge_sanctioned_objects()
+        self._exclude_sanctions()
+        self._append_sanctions()
 
         cache.set(self.CACHE_KEY, self.rr_sanctioned_objects, self.CACHE_TTL)
 
