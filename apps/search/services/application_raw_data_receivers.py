@@ -4,6 +4,8 @@ import os
 import logging
 import datetime
 
+from django.db import connections
+
 from apps.search.models import IpcAppList, AppLimited
 from apps.search.mixins import BiblioDataInvUMLDRawGetMixin
 from apps.bulletin.services import bulletin_get_number_with_year_by_date, bulletin_get_number_by_date, \
@@ -125,7 +127,28 @@ class ApplicationRawDataFSTMReceiver(ApplicationRawDataFSReceiver):
 
 class ApplicationRawDataFSIDReceiver(ApplicationRawDataFSReceiver):
     """Получает сырые данные пром. образца с файловой системы, получает доп. информацию, которой нет в ФС."""
-    pass
+    def _set_expiry_date(self, data: dict) -> None:
+        if data.get('Design', {}).get('DesignDetails', {}).get('RegistrationNumber'):
+            query = """
+                        SELECT i.data_json
+                        FROM fv_claim_inid_item AS i
+                        INNER JOIN fv_od AS od
+                        ON od.claim_id = i.claim_id
+                        INNER JOIN fv_claim AS cl
+                        ON cl.id = i.claim_id
+                        WHERE cl.type_code = 'PROM_ZNAK' AND i.inid_code = '18' AND od.reg_number = %s
+                    """
+            with connections['prod_erp_cms_claim'].cursor() as cursor:
+                cursor.execute(query, [data['Design']['DesignDetails']['RegistrationNumber']])
+                row = cursor.fetchone()
+                if row:
+                    expiry_data = json.loads(row[0])
+                    data['Design']['DesignDetails']['ExpiryDate'] = expiry_data['date']
+
+    def get_data(self) -> dict:
+        data = super().get_data()
+        self._set_expiry_date(data)
+        return data
 
 
 class ApplicationRawDataFSInvUMLDReceiver(ApplicationRawDataFSReceiver, BiblioDataInvUMLDRawGetMixin):
