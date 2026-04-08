@@ -397,6 +397,20 @@ def madrid_notif_get_ua_bul(date: str) -> tuple[int, int] | None:
         return None
 
 
+def poznachennya_claim_get_termination_date(app_number: str, obj_type_id: int) -> str | None:
+    """Отримує з АС Позначення дата припинення дії(діловодства) заявки."""
+    obj_type_mapping = {
+        4: 'TORGOVI_MARKY',
+        6: 'PROM_ZNAK',
+    }
+    with connections['prod_erp_cms_claim'].cursor() as cursor:
+        query = 'SELECT fn_get_claim_termination_date(%s, %s);'
+        cursor.execute(query, [app_number, obj_type_mapping[obj_type_id]])
+        res = cursor.fetchone()
+        if res:
+            return res[0]
+
+
 def gnof_get_tracking_numbers(doc_numbers: list[str]) -> dict:
     """Повертає словник із трек-номерами документів."""
     with connections['ellav'].cursor() as cursor:

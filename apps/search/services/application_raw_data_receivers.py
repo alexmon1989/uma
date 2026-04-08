@@ -14,7 +14,8 @@ from apps.bulletin.models import EBulletinData
 
 
 # Get an instance of a logger
-from apps.search.services.external import madrid_notif_get_ua_bul, fox_get_object_persons
+from apps.search.services.external import madrid_notif_get_ua_bul, fox_get_object_persons, \
+    poznachennya_claim_get_termination_date
 
 logger = logging.getLogger(__name__)
 
@@ -145,9 +146,38 @@ class ApplicationRawDataFSIDReceiver(ApplicationRawDataFSReceiver):
                     expiry_data = json.loads(row[0])
                     data['Design']['DesignDetails']['ExpiryDate'] = expiry_data['date']
 
+    def _set_termination_details(self, data: dict) -> None:
+        """Встановлює дані щодо припинення дії реєстрації."""
+        if data.get('Design', {}).get('DesignDetails', {}).get('registration_status_color') == 'red':
+            if data.get('Transactions', {}).get('Transaction', []):
+                # Пошук відповідного сповіщення (як правило, воно останнє)
+                for transaction in data['Transactions']['Transaction'][::-1]:
+                    if 'Termination' in transaction['@type']:
+                        termination_details = {
+                            'TerminationDate': transaction['TransactionBody']['TerminationDate'],
+                            'PublicationDate': transaction['@bulletinDate'],
+                            'PublicationIdentifier': f"{transaction['@bulletinNumber']}/"
+                                                     f"{transaction['@bulletinDate'][:4]}"
+                        }
+                        data['Design']['DesignDetails']['TerminationDetails'] = termination_details
+                        break
+
+            # Отримання з АС "Позначення" якщо не вдалося заповнити даними зі сповіщення
+            if 'TerminationDetails' not in data['Design']['DesignDetails']:
+                termination_date = poznachennya_claim_get_termination_date(
+                    data['Design']['DesignDetails']['DesignApplicationNumber'],
+                    6
+                )
+                if termination_date:
+                    termination_details = {
+                        'TerminationDate': termination_date
+                    }
+                    data['Design']['DesignDetails']['TerminationDetails'] = termination_details
+
     def get_data(self) -> dict:
         data = super().get_data()
         self._set_expiry_date(data)
+        self._set_termination_details(data)
         return data
 
 
