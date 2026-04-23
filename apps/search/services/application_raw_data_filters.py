@@ -75,43 +75,57 @@ class ApplicationRawDataTMLimitedFilter(ApplicationRawDataFilter):
 class ApplicationRawDataIDLimitedFilter(ApplicationRawDataFilter):
     """Фильтрует сырые данные ТМ в случае если она является ограниченной для публикации."""
 
-    def _filter_limited_bibliography(self, biblio_data: dict) -> None:
+    def _filter_limited_bibliography(self, biblio_data: dict, limited_settings: dict) -> None:
         """Фільтрує бібліографічні дані обмежених публікацій."""
-        if 'ApplicantDetails' in biblio_data:
+        if 'ApplicantDetails' in biblio_data and not limited_settings.get('ApplicantDetails', False):
             del biblio_data['ApplicantDetails']
 
-        if 'DesignerDetails' in biblio_data:
+        if 'DesignerDetails' in biblio_data and not limited_settings.get('DesignerDetails', False):
             del biblio_data['DesignerDetails']
 
-        if 'HolderDetails' in biblio_data:
+        if 'HolderDetails' in biblio_data and not limited_settings.get('HolderDetails', False):
             del biblio_data['HolderDetails']
 
-        if 'CorrespondenceAddress' in biblio_data:
+        if 'CorrespondenceAddress' in biblio_data and not limited_settings.get('CorrespondenceAddress', False):
             del biblio_data['CorrespondenceAddress']
 
-        if 'DesignSpecimenDetails' in biblio_data:
+        if 'DesignSpecimenDetails' in biblio_data and not limited_settings.get('DesignSpecimenDetails', False):
             del biblio_data['DesignSpecimenDetails']
 
-    def _filter_limited_transactions(self, transactions: list) -> None:
+        if 'DesignTitle' in biblio_data and not limited_settings.get('DesignTitle', False):
+            del biblio_data['DesignTitle']
+
+        if 'RepresentativeDetails' in biblio_data and not limited_settings.get('RepresentativeDetails', False):
+            del biblio_data['RepresentativeDetails']
+
+    def _filter_limited_transactions(self, transactions: list, limited_settings: dict) -> None:
         """Фільтрує дані сповіщень обмежених публікацій."""
         for transaction in transactions:
             if 'TransactionBody' in transaction:
                 transaction_body = transaction['TransactionBody']
-                if 'DesignerDetails' in transaction_body:
+                if 'DesignerDetails' in transaction_body and not limited_settings.get('DesignerDetails', False):
                     del transaction_body['DesignerDetails']
-                if 'HolderDetails' in transaction_body:
+                if 'HolderDetails' in transaction_body and not limited_settings.get('HolderDetails', False):
                     del transaction_body['HolderDetails']
-                if 'CorrespondenceAddress' in transaction_body:
+                if 'CorrespondenceAddress' in transaction_body \
+                        and not limited_settings.get('CorrespondenceAddress', False):
                     del transaction_body['CorrespondenceAddress']
-                if 'DesignSpecimenDetails' in transaction_body:
+                if 'DesignSpecimenDetails' in transaction_body \
+                        and not limited_settings.get('DesignSpecimenDetails', False):
                     del transaction_body['DesignSpecimenDetails']
 
     def filter_data(self, data: dict) -> None:
+        limited_app = AppLimited.objects.filter(
+            app_number=data['Design']['DesignDetails']['DesignApplicationNumber'],
+            obj_type_id=data['Document']['idObjType']
+        ).first()
+
         if data['Document'].get('is_limited'):
-            self._filter_limited_bibliography(data['Design']['DesignDetails'])
+            self._filter_limited_bibliography(data['Design']['DesignDetails'], limited_app.settings_dict)
             if 'Transactions' in data['Design'] and 'Transaction' in data['Design']['Transactions']:
                 self._filter_limited_transactions(
-                    data['Design']['Transactions']['Transaction']
+                    data['Design']['Transactions']['Transaction'],
+                    limited_app.settings_dict
                 )
 
 

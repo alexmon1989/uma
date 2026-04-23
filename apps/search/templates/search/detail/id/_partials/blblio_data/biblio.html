@@ -124,11 +124,18 @@
             {% endif %}
 
             {% get_field '54' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.DesignTitle %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignTitle }}</td>
-                </tr>
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.DesignTitle %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.DesignTitle %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="g-font-weight-600">{{ hit.Design.DesignDetails.DesignTitle }}</td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '55' ipc_fields as ipc_field %}
@@ -155,7 +162,7 @@
 
             {% get_field '71' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.ApplicantDetails.Applicant %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -181,7 +188,7 @@
 
             {% get_field '72' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.DesignerDetails.Designer %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -208,7 +215,7 @@
 
             {% get_field '73' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.HolderDetails.Holder %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
@@ -232,32 +239,39 @@
             {% endif %}
 
             {% get_field '74' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.Design.DesignDetails.RepresentativeDetails.Representative %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td class="text-justify">
-                        {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
-                            {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
-                            {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
-                                {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine != 'address' %}
-                                    <br>
-                                    {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
-                                {% endif %}
-                            {% endif %}
-                            {% if not forloop.last %};<br>{% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
-            {% endif %}
-
-            {% get_field '98' ipc_fields as ipc_field %}
             {% if ipc_field.enable_view %}
-                {% if hit.Document.is_limited %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.RepresentativeDetails.Representative %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td><span class="g-color-red">*</span></td>
                     </tr>
-                {% elif hit.Design.DesignDetails.CorrespondenceAddress  %}
+                {% elif hit.Design.DesignDetails.RepresentativeDetails.Representative %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td class="text-justify">
+                            {% for representative in hit.Design.DesignDetails.RepresentativeDetails.Representative %}
+                                {{ representative.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }}
+                                {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine %}
+                                    {% if representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine != 'address' %}
+                                        <br>
+                                        {{ representative.RepresentativeAddressBook.FormattedNameAddress.Address.FreeFormatAddress.FreeFormatAddressLine }}
+                                    {% endif %}
+                                {% endif %}
+                                {% if not forloop.last %};<br>{% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+
+            {% get_field '98' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view %}
+                {% if hit.Document.is_limited and not hit.Design.DesignDetails.CorrespondenceAddress %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td><span class="g-color-red">*</span></td>
+                    </tr>
+                {% elif hit.Design.DesignDetails.CorrespondenceAddress %}
                     <tr>
                         <th>{{ ipc_field.code_title }}</th>
                         <td class="text-justify">
@@ -279,7 +293,7 @@
                 </tr>
             {% endif %}
 
-            {% if hit.Document.is_limited %}
+            {% if hit.Document.is_limited and not hit.Design.DesignDetails.DesignSpecimenDetails %}
                 {% get_field '55' ipc_fields as ipc_field %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
