@@ -348,6 +348,14 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
                         des_specimen['SpecimenFilename'] = image
                         break
 
+    def _fix_representative_address(self, app_data: dict) -> None:
+        for representative in app_data['Design']['DesignDetails'].get(
+                'RepresentativeDetails', {}).get('Representative', []):
+            if representative['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
+                'FreeFormatAddress']['FreeFormatAddressLine'] in ('address', '*'):
+                del representative['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
+                    'FreeFormatAddress']['FreeFormatAddressLine']
+
     def fix_data(self, app_data: dict) -> None:
         self._fix_files_path(app_data)
         self._fix_indication_details(app_data)
@@ -358,6 +366,7 @@ class ApplicationRawDataFSIDFixer(ApplicationRawDataFixer):
         self._fix_transactions(app_data)
         self._fix_id_doc_cead(app_data)
         self._fix_image_extension(app_data)
+        self._fix_representative_address(app_data)
 
 
 # Мапінг кодів 12 та 13 патентів на винаходи та корисні моделі

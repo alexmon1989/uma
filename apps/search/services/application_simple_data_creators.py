@@ -221,8 +221,12 @@ class ApplicationSimpleDataIDCreator(ApplicationSimpleDataCreator):
             name = represent['RepresentativeAddressBook']['FormattedNameAddress']['Name']['FreeFormatName'][
                 'FreeFormatNameDetails']['FreeFormatNameLine']
             address = represent['RepresentativeAddressBook']['FormattedNameAddress']['Address'][
-                'FreeFormatAddress']['FreeFormatAddressLine']
-            represents.append({'name': f"{name}, {address}"})
+                'FreeFormatAddress'].get('FreeFormatAddressLine')
+            if address:
+                item = {'name': f"{name}, {address}"}
+            else:
+                item = {'name': name}
+            represents.append(item)
         return represents
 
     def _get_inventors(self, data: dict) -> List[dict]:
