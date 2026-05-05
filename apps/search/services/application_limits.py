@@ -71,6 +71,7 @@ class LimitsMucToDictConverterTM(LimitsMucToDictConverter):
             'CorrespondenceAddress': 50 not in self.muc_limits,
             'MarkImageColourClaimedText': 51 not in self.muc_limits,
             'MarkImageFilename': 51 not in self.muc_limits,
+            'GoodsServicesDetails': 52 not in self.muc_limits,
         }
 
         return res
