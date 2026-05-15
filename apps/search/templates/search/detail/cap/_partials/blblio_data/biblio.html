@@ -5,9 +5,9 @@
 <div id="biblio-data">
     <div class="g-pb-10 d-flex justify-content-end">
         {% if hit.search_data.registration_status_color == 'green' %}
-            {% trans "СДО діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i>
+            <span>{% trans "СДО діє" %}<i class="fa fa-circle g-color-green g-ml-5"></i></span>
         {% elif hit.search_data.registration_status_color == 'red' %}
-            {% trans "СДО не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i>
+            <span>{% trans "СДО не діє" %}<i class="fa fa-circle g-color-red g-ml-5"></i></span>
         {% elif hit.search_data.registration_status_color == 'yellow' %}
             <span>{% trans "СДО діє з" %}&nbsp;<strong>{{ hit.Patent_Certificate.I_94.From|parse_date|date:"d.m.Y" }}</strong><i class="fa fa-circle g-color-yellow g-ml-5"></i></span>
         {% else %}
