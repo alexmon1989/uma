@@ -81,7 +81,7 @@
             {% endif %}
 
             {% get_field '450' ipc_fields as ipc_field %}
-            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.Code_441 %}
+            {% if ipc_field.enable_view and hit.MadridTradeMark.TradeMarkDetails.ENN %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>{{ hit.MadridTradeMark.TradeMarkDetails.ENN|get:"@PUBDATE"|parse_date|date:"d.m.Y" }}, {% trans 'бюл. №' %} {{ hit.MadridTradeMark.TradeMarkDetails.ENN|get:"@GAZNO" }}</td>
