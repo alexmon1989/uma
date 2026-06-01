@@ -19,6 +19,7 @@
                         <th class="text-nowrap text-center">{% trans "Початок очікування" %}</th>
                         <th class="text-center">{% trans "Планова дата отримання" %}</th>
                         <th class="text-center">{% trans "Фактична дата отримання" %}</th>
+                        <th class="text-center">{% trans "Планова сума сплати" %}</th>
                         <th class="text-nowrap text-center">{% trans "Назва документа" %}</th>
                     </tr>
                     </thead>
@@ -45,6 +46,11 @@
                             <td class="text-center">
                                 {% if collection.CLRECORD.CLDATEFACT %}
                                     {{ collection.CLRECORD.CLDATEFACT|parse_date|date:"d.m.Y" }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if collection.CLRECORD.CLSUMMPLAN %}
+                                    {{ collection.CLRECORD.CLSUMMPLAN }}&nbsp;{{ collection.CLRECORD.CLCURRENCYCODE }}
                                 {% endif %}
                             </td>
                             <td>
