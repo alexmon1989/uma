@@ -525,6 +525,10 @@
                                 </li>
                             {% endif %}
 
+                            {% if transaction.TransactionBody.FreeFormatText %}
+                                <li>{{ transaction.TransactionBody.FreeFormatText }}</li>
+                            {% endif %}
+
                             {% if transaction.TransactionBody.HolderDetails %}
                                 <li>
                                     <span class="g-font-weight-600">(732) {% trans "Ім'я або повне найменування та адреса власника свідоцтва" %}:</span><br>
