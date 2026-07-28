@@ -1,3 +1,4 @@
+from apps.search.services.external import SanctionedObjectsService
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -218,12 +219,18 @@ class ObjectDetailRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         app_number = self.request.GET.get("app_number")
+        reg_number = self.request.GET.get("reg_number")
         obj_type_id = self.request.GET.get("obj_type")
 
-        if app_number and obj_type_id:
-            app = IpcAppList.objects.filter(app_number=app_number, obj_type_id=obj_type_id).order_by('-pk').first()
-            if app:
-                return reverse(self.pattern_name, kwargs={"pk": app.pk})
+        if (app_number or reg_number) and obj_type_id:
+            records = IpcAppList.objects.filter(obj_type_id=obj_type_id)
+            if app_number:
+                records = records.filter(app_number=app_number)
+            if reg_number:
+                records = records.filter(registration_number=reg_number)
+            item = records.order_by('-pk').first()
+            if item:
+                return reverse(self.pattern_name, kwargs={"pk": item.pk})
 
         raise Http404
 
