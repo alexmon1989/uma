@@ -625,22 +625,62 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
 
     def _prepare_biblio_copyright(self):
         """Готовит полные библиографические данные для авторского права."""
+        authors = self._raw_biblio.get('AuthorDetails', {}).get('Author', [])
+        for author in authors:
+            # Удаление наименования автора, если аноним или псевдоним
+            try:
+                free_format_name = author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']
+                if free_format_name['RepresentNameFormDetails']['RepresentNameForm']:
+                    del free_format_name['FreeFormatNameDetails']
+            except KeyError:
+                pass
 
-        # Удаление наименования автора если аноним или псевдоним
-        try:
-            for author in self._raw_biblio['AuthorDetails']['Author']:
-                if author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['RepresentNameFormDetails']['RepresentNameForm']:
-                    del author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']
-        except KeyError:
-            pass
+            # Удаление адреса
+            try:
+                del author['AuthorAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адреса заявителя
+        applicants = self._raw_biblio.get('ApplicantDetails', {}).get('Applicant', [])
+        for applicant in applicants:
+            try:
+                del applicant['ApplicantAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адреса владельца
+        holders = self._raw_biblio.get('HolderDetails', {}).get('Holder', [])
+        for holder in holders:
+            try:
+                del holder['HolderAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адресов у лицензиаров (Licensor)
+        licensors = self._raw_biblio.get('LicensorDetails', {}).get('Licensor', [])
+
+        for licensor in licensors:
+            try:
+                del licensor['LicensorAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адресов у лицензиатов (Licensee)
+        licensees = self._raw_biblio.get('LicenseeDetails', {}).get('Licensee', [])
+        for licensee in licensees:
+            try:
+                del licensee['LicenseeAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
 
         # Удаление DocBarCode
-        try:
-            doc_flow = self._raw_biblio['DocFlow']['Documents']
-            for doc in doc_flow:
+        doc_flow = self._raw_biblio.get('DocFlow', {}).get('Documents', [])
+        for doc in doc_flow:
+            try:
                 del doc['DocRecord']['DocBarCode']
-        except (KeyError, TypeError):
-            pass
+            except (KeyError, TypeError):
+                pass
 
     def _prepare_biblio_wkm(self):
         # Відносний шлях до зображення
@@ -701,6 +741,22 @@ class BiblioDataNacpPresenter(BiblioDataPresenter):
 
     def _prepare_biblio_copyright(self, raw_biblio: dict) -> dict:
         """Возвращает библиографические данные для авт. права."""
+        authors = raw_biblio.get('AuthorDetails', {}).get('Author', [])
+        for author in authors:
+            # Удаление наименования автора, если аноним или псевдоним
+            try:
+                free_format_name = author['AuthorAddressBook']['FormattedNameAddress']['Name']['FreeFormatName']
+                if free_format_name['RepresentNameFormDetails']['RepresentNameForm']:
+                    del free_format_name['FreeFormatNameDetails']
+            except KeyError:
+                pass
+
+            # Удаление адреса
+            try:
+                del author['AuthorAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
         return {
             'Name': raw_biblio.get('Name'),
             'AuthorDetails': raw_biblio.get('AuthorDetails'),
@@ -708,6 +764,23 @@ class BiblioDataNacpPresenter(BiblioDataPresenter):
 
     def _prepare_biblio_agreement(self, raw_biblio: dict) -> dict:
         """Возвращает библиографические данные для договоров авт. права."""
+        # Удаление адресов у лицензиаров (Licensor)
+        licensors = raw_biblio.get('LicensorDetails', {}).get('Licensor', [])
+
+        for licensor in licensors:
+            try:
+                del licensor['LicensorAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адресов у лицензиатов (Licensee)
+        licensees = raw_biblio.get('LicenseeDetails', {}).get('Licensee', [])
+        for licensee in licensees:
+            try:
+                del licensee['LicenseeAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
         return {
             'Name': raw_biblio.get('Name'),
             'AuthorDetails': raw_biblio.get('AuthorDetails'),
