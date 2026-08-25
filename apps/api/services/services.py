@@ -674,6 +674,22 @@ class BiblioDataFullPresenter(BiblioDataPresenter):
             except KeyError:
                 pass
 
+        # Удаление адресов у работодателей (Employer)
+        employers = self._raw_biblio.get('EmployerDetails', {}).get('Employer', [])
+        for employer in employers:
+            try:
+                del employer['EmployerAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
+        # Удаление адресов у представителей (Representative)
+        representatives = self._raw_biblio.get('RepresentativeDetails', {}).get('Representative', [])
+        for representative in representatives:
+            try:
+                del representative['RepresentativeAddressBook']['FormattedNameAddress']['Address']
+            except KeyError:
+                pass
+
         # Удаление DocBarCode
         doc_flow = self._raw_biblio.get('DocFlow', {}).get('Documents', [])
         for doc in doc_flow:
