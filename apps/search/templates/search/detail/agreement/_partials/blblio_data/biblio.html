@@ -89,7 +89,7 @@
             {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.Annotation %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.Certificate.CopyrightDetails.Annotation }}</td>
+                    <td>{{ hit.Decision.DecisionDetails.Annotation }}</td>
                 </tr>
             {% endif %}
 
@@ -132,6 +132,93 @@
 
                         {% include 'search/detail/_partials/sanctions.html' with person_type='особа якій передають' %}
                         {% include 'search/detail/_partials/sanctions.html' with person_type='особа яка передає' %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% get_field '80' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.ContractName %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Decision.DecisionDetails.ContractName }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '81' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view %}
+                {% if hit.Decision.DecisionDetails.ContractNumber or hit.Decision.DecisionDetails.ContractNumber %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>
+                            {% if hit.Decision.DecisionDetails.ContractNumber %}
+                                {{ hit.Decision.DecisionDetails.ContractNumber }}
+                            {% endif %}
+                            {% if hit.Decision.DecisionDetails.ContractDate %}
+                                {% if hit.Decision.DecisionDetails.ContractNumber %}{% trans 'від' %}{% endif %}
+                                {{ hit.Decision.DecisionDetails.ContractDate|parse_date|date:"d.m.Y" }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+
+            {% get_field '82' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.ContractTransfer %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Decision.DecisionDetails.ContractTransfer }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '83' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.ContractTerritory %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Decision.DecisionDetails.ContractTerritory }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '84' ipc_fields as ipc_field %}
+            {% if hit.Document.is_limited %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td><span class="g-color-red">*</span></td>
+                </tr>
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.RightsGrantedTerm %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>{{ hit.Decision.DecisionDetails.RightsGrantedTerm }}</td>
+                </tr>
+            {% endif %}
+
+            {% get_field '74' ipc_fields as ipc_field %}
+            {% if ipc_field.enable_view and hit.Decision.DecisionDetails.RepresentativeDetails.Representative|length > 0 %}
+                <tr>
+                    <th>{{ ipc_field.code_title }}</th>
+                    <td>
+                        {% for person in hit.Decision.DecisionDetails.RepresentativeDetails.Representative %}
+                            {{ person.RepresentativeAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.RepresentativeAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                        {% endfor %}
                     </td>
                 </tr>
             {% endif %}
