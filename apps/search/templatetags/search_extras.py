@@ -316,7 +316,6 @@ def app_stages_tm(app):
         stages_statuses = ['done' for _ in range(6)]
     else:
         stages_statuses = ['not-active' for _ in range(6)]
-
         for i, s in enumerate(stages_statuses):
             if mark_status_code >= (i + 2) * 1000:
                 stages_statuses[i] = 'done'
@@ -519,7 +518,7 @@ def app_stages_inv_um(app):
                 if x in doc_type:
                     is_stopped = False
 
-    if app['search_data']['app_number'] in ('a202106655', 'u202403931'):
+    if app['search_data']['app_number'] in ('a202106655', 'a202103192', 'a202003437'):
         is_stopped = False
 
     # Пройденные стадии

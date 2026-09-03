@@ -769,7 +769,7 @@ def application_get_documents(app_id: int) -> dict:
     return res
 
 
-def application_get_sanctions(*numbers: str, id_obj_type: int) -> list[dict]:
+def application_get_sanctions(*numbers: tuple[str], id_obj_type: int) -> list[dict]:
     """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
     gloc_obj_types = {
         1: (300, 301),
@@ -792,6 +792,10 @@ def application_get_sanctions(*numbers: str, id_obj_type: int) -> list[dict]:
 
     # Санкційні дані об'єкта
     result = []
+
+    if id_obj_type in (10, 11, 12, 13):
+        numbers = (numbers[1], )
+
     for number in numbers:
         if not number:
             continue
@@ -813,9 +817,9 @@ def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_numb
         5: (311, 312),
         6: (307, 308),
         9: (306,),
-        10: (317,),
-        11: (319, 320),
-        12: (319, 320),
+        10: (313, 317),
+        11: (319, 320, 15),
+        12: (319, 320, 316),
         13: (318,),
         14: (306,),
     }
