@@ -109,6 +109,12 @@ class LimitsMucToDictConverterDecision(LimitsMucToDictConverter):
             'Name': 38 not in self.muc_limits,
             'NameShort': 38 not in self.muc_limits,
             'RepresentativeDetails': 39 not in self.muc_limits,
+            'ContractTransfer': 19 not in self.muc_limits,
+            'RightsGrantedTerm': 21 not in self.muc_limits,
+            'ContractNumber': 23 not in self.muc_limits,
+            'ContractDate': 23 not in self.muc_limits,
+            'ContractTerritory': 20 not in self.muc_limits,
+            'ContractName': 22 not in self.muc_limits,
         }
 
         return res
