@@ -161,7 +161,7 @@
                         <th>{{ ipc_field.code_title }}</th>
                         <td>
                             {% if hit.Decision.DecisionDetails.ContractNumber %}
-                                {{ hit.Decision.DecisionDetails.ContractNumber }}
+                                №{{ hit.Decision.DecisionDetails.ContractNumber }}
                             {% endif %}
                             {% if hit.Decision.DecisionDetails.ContractDate %}
                                 {% if hit.Decision.DecisionDetails.ContractNumber %}{% trans 'від' %}{% endif %}
