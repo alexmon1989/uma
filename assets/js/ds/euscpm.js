@@ -13,6 +13,7 @@ var EU_FALSE 				= 0;
 var XMLHTTPProxyService = "";
 var XMLHTTPDirectAccess = false;
 var XMLHTTPDirectAccessAddresses = [];
+var XMLHTTPTempDir = "";
 
 //=============================================================================
 
@@ -88,12 +89,14 @@ function EUPointerConstructor(size, isArray, moduleFreeFunc, context) {
 	this.toBoolean = function() {
 		return (this.toNumber() != EU_FALSE);
 	};
-	this.toString = function(checkEmpty) {
+	this.toString = function(checkEmpty, encoder) {
 		var string = null;
 		try {
 			var strPtr = this.toPtr();
 			if (strPtr | 0) {
-				string = CP1251PointerToUTF8(strPtr);
+				string = encoder ? 
+						encoder.decodePointer(strPtr) : 
+						CP1251PointerToUTF8(strPtr);
 				if (context != null)
 					Module._EUCtxFreeMemory(context|0, strPtr);
 				else
@@ -112,18 +115,24 @@ function EUPointerConstructor(size, isArray, moduleFreeFunc, context) {
 
 		return string;
 	};
-	this.toStringArray = function() {
+	this.toStringArray = function(encoder) {
 		var strings = null;
 		try {
 			var strPtr = this.toPtr();
 			if (strPtr | 0) {
 				strings = [];
 				while (1) {
-					var str = CP1251PointerToUTF8(strPtr);
+					var str = encoder ? 
+						encoder.decodePointer(strPtr) : 
+						CP1251PointerToUTF8(strPtr);
 					strings.push(str);
-					if (HEAPU8[((strPtr + str.length + 1)|0)] == 0)
+					while (HEAPU8[(strPtr|0)] != 0)
+						strPtr += 1;
+
+					if (HEAPU8[((strPtr + 1)|0)] == 0)
 						break;
-					strPtr = ((strPtr + str.length + 1)|0);
+
+					strPtr = ((strPtr + 1)|0);
 				}
 
 				if (context != null)
@@ -598,6 +607,27 @@ function EUSignCPModuleInitialize() {
 
 //-----------------------------------------------------------------------------
 
+/* These constants are specified by compiler and cannot be changed */
+var EU_LIBRARY_SERVICE_MEMORY_MB = 1;
+var EU_MEMORY_GROWING_STEP_MB = (EU_MAX_DATA_SIZE_MB <= 2) ? 1 : 16;
+var EU_MAX_LIBRARY_STACK_MB = EU_MEMORY_GROWING_STEP_MB * 8;
+var EU_TOTAL_MEMORY_MB = EU_MAX_LIBRARY_STACK_MB + EU_MAX_DATA_SIZE_MB * 8;
+if (EU_MAX_DATA_SIZE_MB > (EU_MAX_LIBRARY_STACK_MB - 
+		EU_LIBRARY_SERVICE_MEMORY_MB)) {
+	throw 'The EU_MAX_DATA_SIZE_MB (' + EU_MAX_DATA_SIZE_MB + 
+		' MB) constant is too big. Please set it less then ' + 
+		(EU_MAX_LIBRARY_STACK_MB - EU_LIBRARY_SERVICE_MEMORY_MB)+ ' MB';
+}
+
+if (EU_TOTAL_MEMORY_MB < EU_MAX_LIBRARY_STACK_MB)
+	EU_TOTAL_MEMORY_MB = EU_MAX_LIBRARY_STACK_MB + EU_MEMORY_GROWING_STEP_MB;
+if ((EU_TOTAL_MEMORY_MB % EU_MEMORY_GROWING_STEP_MB) != 0) {
+	EU_TOTAL_MEMORY_MB = Math.ceil(EU_TOTAL_MEMORY_MB / 
+		EU_MEMORY_GROWING_STEP_MB) * EU_MEMORY_GROWING_STEP_MB;
+}
+
+//-----------------------------------------------------------------------------
+
 var Module = {
 	preRun: [],
 	postRun: [
@@ -616,14 +646,19 @@ var Module = {
 	],
 	print: (function() {
 		return function(text) {
-			text = Array.prototype.slice.call(arguments).join(' ');
+			if (typeof EU_LOG_EVENTS != 'undefined' && 
+					EU_LOG_EVENTS) {
+				console.log(text);
+			}
 		};
 	})(),
 	printErr: function(text) {
-		text = Array.prototype.slice.call(arguments).join(' ');
-		if (0) {
-			dump(text + '\n');
-		} else {
+		if (typeof EU_LOG_EVENTS != 'undefined' &&
+			EU_LOG_EVENTS) {
+			if (console.error)
+				console.error(text);
+			else
+				console.log(text);
 		}
 	},
 	setStatus: function(text) {
@@ -672,25 +707,25 @@ var Module = {
 	},
 	errorLangCode: EU_DEFAULT_LANG,
 	MAX_DATA_SIZE: EU_MAX_DATA_SIZE_MB * EU_ONE_MB,
-	LIBRARY_STACK: EU_LIBRARY_STACK_MB * EU_ONE_MB,
-	LIBRARY_MEMORY: EU_LIBRARY_MEMORY_MB * EU_ONE_MB,
-	TOTAL_STACK: (EU_MAX_DATA_SIZE_MB + EU_LIBRARY_STACK_MB) * EU_ONE_MB,
-	TOTAL_MEMORY: (EU_LIBRARY_STACK_MB + EU_LIBRARY_MEMORY_MB + 
-		EU_MAX_DATA_SIZE_MB * 8) * EU_ONE_MB
+	TOTAL_MEMORY: EU_TOTAL_MEMORY_MB * EU_ONE_MB
 };
+
+if (EU_MAX_DATA_SIZE_MB <= 2)
+	Module['TOTAL_STACK'] = EU_MAX_LIBRARY_STACK_MB * EU_ONE_MB;
 
 //=============================================================================
 
 var EUSignCP = NewClass({
 	"Vendor": "JSC IIT",
-	"ClassVersion": "1.3.59",
+	"ClassVersion": "1.3.74",
 	"ClassName": "EUSignCP",
-	"BaseLibraryVersion": "1.3.1.123",
+	"BaseLibraryVersion": "1.3.1.222",
 	"errorLangCode": EU_DEFAULT_LANG,
 	"privKeyOwnerInfo": null,
 	"isFileSyncAPISupported": false,
 	"isFileASyncAPISupported": false,
-	"stringEncoder": new StringEncoder("UTF-8", false)
+	"stringEncoder": new StringEncoder("UTF-8", false),
+	"fieldsEncoder": new LibraryStringEncoder(1251)
 },
 function() {
 },
@@ -851,7 +886,9 @@ function() {
 	},
 //-----------------------------------------------------------------------------
 	CheckMaxDataSize: function(data) {
-		if (data.length > Module.MAX_DATA_SIZE)
+		var length = (typeof data == 'number') ? 
+			data : data.length;
+		if (length > Module.MAX_DATA_SIZE)
 			this.RaiseError(EU_ERROR_BAD_PARAMETER);
 	},
 	Base64Encode: function(data) {
@@ -1076,7 +1113,8 @@ function() {
 			};
 
 			if (path.indexOf('http://') != 0 && 
-					path.indexOf('https://') != 0) {
+					path.indexOf('https://') != 0 &&
+					path.indexOf('/') == 0) {
 				if (!location.origin) {
 					location.origin = location.protocol + 
 						"//" + location.hostname + 
@@ -1112,6 +1150,12 @@ function() {
 	},
 	AddXMLHTTPDirectAccessAddress: function(address) {
 		XMLHTTPDirectAccessAddresses.push(address);
+	},
+	SetXMLHTTPTempDir: function(path) {
+		if (path == null) {
+			this.RaiseError(EU_ERROR_BAD_PARAMETER);
+		}
+		XMLHTTPTempDir = path;
 	},
 	InitializeMandatorySettings: function() {
 		var fs = this.CreateFileStoreSettings();
@@ -1356,6 +1400,10 @@ function() {
 			this.RaiseError(error);
 		}
 
+		if (name == EU_STRING_ENCODING_PARAMETER) {
+			this.fieldsEncoder = new LibraryStringEncoder(value);
+		}
+
 		intPtr.free();
 	},
 	SetOCSPResponseExpireTime:function(expireTime) {
@@ -1366,6 +1414,26 @@ function() {
 				'number',
 				['number'],
 				[expireTime]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE)
+			this.RaiseError(error);
+	},
+	CreateTSLSettings:function() {
+		return new EndUserTSLSettings(false, false, "");
+	},
+	SetTSLSettings: function(settings) {
+		var error;
+		
+		try {
+			error = Module.ccall('EUSetTSLSettings',
+				'number',
+				['number', 'number', 'array'],
+				[IntFromBool(settings.useTSL),
+					IntFromBool(settings.autoDownloadTSL),
+					UTF8ToCP1251Array(settings.tslAddress)]);
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
 		}
@@ -1441,6 +1509,23 @@ function() {
 				['number', 'array', 'number'],
 				[IntFromBool(isFullCRL), 
 					crl, crl.length]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE)
+			this.RaiseError(error);
+	},
+	SaveTSL: function(tsl) {
+		var error;
+
+		this.CheckMaxDataSize(tsl);
+
+		try {
+			error = Module.ccall('EUSaveTSL',
+				'number',
+				['array', 'number'],
+				[tsl, tsl.length]);
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
 		}
@@ -1570,7 +1655,8 @@ function() {
 		}
 
 		var infoPtr = pPtr.toPtr();
-		var info = new EndUserCertificateInfoEx(infoPtr);
+		var info = new EndUserCertificateInfoEx(
+			infoPtr, this.fieldsEncoder);
 		Module._EUFreeCertificateInfoEx(infoPtr);
 
 		return info;
@@ -1656,7 +1742,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUFreeCertificateInfoEx(certInfoExPtr);
 
 		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
@@ -1779,7 +1866,8 @@ function() {
 		}
 
 		var infoPtr = pPtr.toPtr();
-		var info = new EndUserCertificateInfoEx(infoPtr);
+		var info = new EndUserCertificateInfoEx(
+			infoPtr, this.fieldsEncoder);
 		Module._EUFreeCertificateInfoEx(infoPtr);
 
 		return info;
@@ -1992,6 +2080,94 @@ function() {
 
 		return pkPtr.toArray();
 	},
+	MakeNewCertificateEx: function(privateKey, password,
+		uaKeysType, uaDSKeysSpec, useDSKeyAsKEP, uaKEPKeysSpec,
+		internationalKeysType, rsaKeysSpec, ecdsaKeysSpec,
+		newPrivateKeyPassword) {
+		this.CheckMaxDataSize(privateKey);
+		
+		var pkPtr = EUPointerArray();
+		var uaCertPtr = null, uaKEPCertPtr = null;
+		var rsaCertPtr = null, ecdsaCertPtr = null;
+		var cmpRequestPtr = EUPointerArray();
+		var error;
+
+		if (uaKeysType != EU_KEYS_TYPE_NONE) {
+			uaCertPtr = EUPointerArray();
+			if (!useDSKeyAsKEP)
+				uaKEPCertPtr = EUPointerArray();
+		}
+		if (internationalKeysType & EU_KEYS_TYPE_RSA_WITH_SHA)
+			rsaCertPtr = EUPointerArray();
+		if (internationalKeysType & EU_KEYS_TYPE_ECDSA_WITH_SHA)
+			ecdsaCertPtr = EUPointerArray();
+
+		var _free = function() {
+			pkPtr.free();
+			if (uaCertPtr != null)
+				uaCertPtr.free();
+			if (uaKEPCertPtr != null)
+				uaKEPCertPtr.free();
+			if (rsaCertPtr != null)
+				rsaCertPtr.free();
+			if (ecdsaCertPtr != null)
+				ecdsaCertPtr.free();
+			cmpRequestPtr.free();
+		};
+		
+		try {
+			error = Module.ccall('EUMakeNewCertificateEx',
+				'number',
+				['number', 'array', 'number', 'array',
+				  'number', 'number', 'number', 
+				  'number', 'number',
+				  'number', 'number', 'number', 'number', 'number',
+				  'number', 'array',
+				  'number', 'number',
+				  'number', 'number', 'number', 'number',
+				  'number', 'number', 'number', 'number',
+				  'number', 'number'],
+				[null, privateKey, privateKey.length, UTF8ToCP1251Array(password),
+				 uaKeysType, uaDSKeysSpec, IntFromBool(useDSKeyAsKEP), 
+				 uaKEPKeysSpec, null,
+				 internationalKeysType, rsaKeysSpec, null, ecdsaKeysSpec, null,
+				 null, UTF8ToCP1251Array(newPrivateKeyPassword), 
+				 pkPtr.ptr, pkPtr.lengthPtr, 
+				 (uaCertPtr != null) ? uaCertPtr.ptr : null,
+				 (uaCertPtr != null) ? uaCertPtr.lengthPtr : null,
+				 (uaKEPCertPtr != null) ? uaKEPCertPtr.ptr : null,
+				 (uaKEPCertPtr != null) ? uaKEPCertPtr.lengthPtr : null,
+				 (rsaCertPtr != null) ? rsaCertPtr.ptr : null,
+				 (rsaCertPtr != null) ? rsaCertPtr.lengthPtr : null,
+				 (ecdsaCertPtr != null) ? ecdsaCertPtr.ptr : null,
+				 (ecdsaCertPtr != null) ? ecdsaCertPtr.lengthPtr : null,
+				 cmpRequestPtr.ptr, cmpRequestPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			_free();
+			this.RaiseError(error);
+		}
+		
+		var certificates = [];
+		if (uaCertPtr != null)
+			certificates.push(uaCertPtr.toArray());
+		if (uaKEPCertPtr != null)
+			certificates.push(uaKEPCertPtr.toArray());
+		if (rsaCertPtr != null)
+			certificates.push(rsaCertPtr.toArray());
+		if (ecdsaCertPtr != null)
+			certificates.push(ecdsaCertPtr.toArray());
+			
+		var makeCertResult = new EndUserMakeCertificateResult(
+			pkPtr.toArray(), certificates, cmpRequestPtr.toArray());
+
+		_free();
+
+		return makeCertResult;
+	},
 	ChangeSoftwarePrivateKeyPassword: function(
 		privateKey, oldPassword, newPassword) {
 		this.CheckMaxDataSize(privateKey);
@@ -2156,7 +2332,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUCtxFreeCertificateInfoEx(pkCtx|0, certInfoExPtr);
 
 		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
@@ -2190,7 +2367,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUCtxFreeCertificateInfoEx(pkCtx|0, certInfoExPtr);
 
 		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
@@ -2334,7 +2512,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUCtxFreeCertificateInfoEx(
 			privateKeyContext.GetContext()|0, certInfoExPtr);
 
@@ -2485,6 +2664,37 @@ function() {
 
 		return certificates;
 	},
+	CtxMakeNewOwnCertificateWithCR: function(
+		privateKeyContext, uaRequest, uaKEPRequest, 
+		rsaRequest, ecdsaRequest) {
+		var pkCtx = privateKeyContext.GetContext();
+
+		try {
+			error = Module.ccall('EUCtxMakeNewOwnCertificateWithCR',
+				'number',
+				['number',
+				(uaRequest != null) ? 'array' : 'number', 'number', 
+				(uaKEPRequest != null) ? 'array' : 'number', 'number',
+				(rsaRequest != null) ? 'array' : 'number', 'number', 
+				(ecdsaRequest != null) ? 'array' : 'number', 'number'],
+				[pkCtx,
+					(uaRequest != null) ? uaRequest : 0,
+					(uaRequest != null) ? uaRequest.length : 0,
+					(uaKEPRequest != null) ? uaKEPRequest : 0,
+					(uaKEPRequest != null) ? uaKEPRequest.length : 0,
+					(rsaRequest != null) ? rsaRequest : 0,
+					(rsaRequest != null) ? rsaRequest.length : 0,
+					(ecdsaRequest != null) ? ecdsaRequest : 0,
+					(ecdsaRequest != null) ? ecdsaRequest.length : 0
+				]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			this.RaiseError(error);
+		}
+	},
 //-----------------------------------------------------------------------------
 	HashData: function(data, asBase64String) {
 		if ((typeof data) == 'string')
@@ -2530,7 +2740,7 @@ function() {
 
 		try {
 			var hash = null;
-			var chunkMaxSize = EU_MAX_DATA_SIZE_MB;
+			var chunkMaxSize = EU_MAX_DATA_SIZE_MB * EU_ONE_MB;
 			var offset = 0;
 
 			hashContext =  this.CtxHashDataBegin(
@@ -2810,6 +3020,55 @@ function() {
 
 		return intPtr.toNumber();
 	},
+	GetFileSignType: function(signIndex, signedFile,
+		onSuccess, onError) {
+		var pThis = this;
+
+		if (pThis.isFileSyncAPISupported) {
+			if (!EUFS.link(signedFile)) {
+				onError(pThis.MakeError(EU_ERROR_JS_READ_FILE));
+				return;
+			}
+		
+			var intPtr = EUPointerDWORD();
+			var error;
+
+			try {
+				error = Module.ccall('EUGetFileSignType',
+					'number',
+					['number', 'array', 'number'],
+					[signIndex, 
+						UTF8ToCP1251Array(EUFS.getFilePath(signedFile)),
+						intPtr.ptr]);
+			} catch (e) {
+				error = EU_ERROR_UNKNOWN;
+			}
+
+			if (error != EU_ERROR_NONE) {
+				intPtr.free();
+				EUFS.unlink(signedFile);
+
+				onError(pThis.MakeError(error));
+				return;
+			}
+
+			EUFS.unlink(signedFile);
+
+			onSuccess(intPtr.toNumber());
+		} else {
+			var _onSuccess = function(fileReaded) {
+				try {
+					var signType = pThis.GetSignType(
+						signIndex, fileReaded.data);
+					onSuccess(signType);
+				} catch (e) {
+					onError(e);
+				}
+			};
+
+			pThis.ReadFile(signedFile, _onSuccess, onError);
+		}
+	},
 	IsDataInSignedDataAvailable: function(sign) {
 		this.CheckMaxDataSize(sign);
 
@@ -2865,6 +3124,41 @@ function() {
 		}
 
 		return arrPtr.toArray();
+	},
+	GetDataHashFromSignedDataEx: function(signIndex, signedData) {
+		this.CheckMaxDataSize(signedData);
+
+		var isSignStr = ((typeof signedData) == 'string');
+		var intPtr = EUPointerDWORD();
+		var arrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetDataHashFromSignedDataEx',
+				'number',
+				['number', 
+					isSignStr ? 'array' : 'number',
+					(!isSignStr) ? 'array' : 'number', 'number',
+					'number', 'number', 'number', 'number'],
+				[signIndex, 
+					isSignStr ? StringToCString(signedData) : 0,
+					!isSignStr ? signedData : 0,
+					!isSignStr ? signedData.length : 0, 
+					intPtr.ptr, 0, arrPtr.ptr, arrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			arrPtr.free();
+			this.RaiseError(error);
+		}
+
+		var hashAlgo = intPtr.toNumber();
+		var hash = arrPtr.toArray();
+
+		return new EndUserDataHash(hashAlgo, hash);
 	},
 	GetSignTimeInfo: function(signIndex, sign) {
 		this.CheckMaxDataSize(sign);
@@ -3877,6 +4171,78 @@ function() {
 		else
 			return signerPtr.toArray();
 	},
+	CreateSignerBeginEx: function (signerCert, 
+		hash, noSigningTime, noContentTimeStamp) {
+		this.CheckMaxDataSize(signerCert);
+		this.CheckMaxDataSize(hash);
+
+		if ((typeof hash) == 'string')
+			hash = this.Base64Decode(hash);
+
+		var pSignerPtr = EUPointerArray();
+		var pAttrsHashPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUCreateSignerBeginEx',
+				'number',
+				['array', 'number', 'array', 'number',
+					'number', 'number',
+					'number', 'number', 'number', 'number'],
+				[signerCert, signerCert.length, hash, hash.length,
+					IntFromBool(noSigningTime),
+					IntFromBool(noContentTimeStamp),
+					pSignerPtr.ptr, pSignerPtr.lengthPtr,
+					pAttrsHashPtr.ptr, pAttrsHashPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pSignerPtr.free();
+			pAttrsHashPtr.free();
+			this.RaiseError(error);
+		}
+
+		return new EndUserSigner(
+			pSignerPtr.toArray(), pAttrsHashPtr.toArray());
+	},
+	CreateSignerEnd: function (
+		unsignedSigner, signature, asBase64String) {
+		this.CheckMaxDataSize(unsignedSigner);
+		this.CheckMaxDataSize(signature);
+
+		if ((typeof unsignedSigner) == 'string')
+			unsignedSigner = this.Base64Decode(unsignedSigner);
+
+		if ((typeof signature) == 'string')
+			signature = this.Base64Decode(signature);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUCreateSignerEnd',
+				'number',
+				['array', 'number', 'array', 'number',
+					'number', 'number'],
+				[unsignedSigner, unsignedSigner.length,
+					signature, signature.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
 	AppendSigner: function (signer, certificate, prevSign, asBase64String) {
 		this.CheckMaxDataSize(signer);
 		if (certificate != null)
@@ -4297,7 +4663,7 @@ function() {
 
 		this.CheckMaxDataSize(data);
 
-		var pPtr = EUPointer(
+		var pPtr = EUPointerArray(
 			privateKeyContext.GetContext());
 		var error;
 
@@ -4604,7 +4970,7 @@ function() {
 
 		this.CheckDataStruct(previousSign);
 
-		var pPtr = EUPointer(privateKeyContext.GetContext());
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
 		var error;
 
 		try {
@@ -4642,7 +5008,7 @@ function() {
 			this.CheckMaxDataSize(data);
 		this.CheckMaxDataSize(certificate);
 
-		var pPtr = EUPointer(context.GetContext());
+		var pPtr = EUPointerArray(context.GetContext());
 		var error;
 
 		try {
@@ -4677,7 +5043,7 @@ function() {
 		if ((typeof hash) == 'string')
 			hash = this.Base64Decode(hash);
 
-		var pPtr = EUPointer(privateKeyContext.GetContext());
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
 		var error;
 
 		try {
@@ -4715,7 +5081,7 @@ function() {
 		if ((typeof previousSign) == 'string')
 			previousSign = this.Base64Decode(previousSign);
 
-		var pPtr = EUPointer(context.GetContext());
+		var pPtr = EUPointerArray(context.GetContext());
 		var error;
 
 		try {
@@ -4730,6 +5096,38 @@ function() {
 					(certificate != null) ? certificate : 0,
 					(certificate != null) ? certificate.length : 0,
 					previousSign, previousSign.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CtxGetSignValue: function(privateKeyContext, signAlgo, 
+		hash, asBase64String) {
+		this.CheckMaxDataSize(hash);
+
+		if ((typeof hash) == 'string')
+			hash = this.Base64Decode(hash);
+
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxGetSignValue',
+				'number',
+				['number', 'number', 'array', 'number',
+					'number', 'number'],
+				[privateKeyContext.GetContext(), signAlgo,
+					hash, hash.length,
 					pPtr.ptr, pPtr.lengthPtr]);
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
@@ -4803,7 +5201,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUCtxFreeCertificateInfoEx(
 			context.GetContext()|0, certInfoExPtr);
 
@@ -4900,7 +5299,8 @@ function() {
 			var certInfoExPtr, certInfoEx;
 
 			certInfoExPtr = pCertInfoExPtr.toPtr();
-			certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+			certInfoEx = new EndUserCertificateInfoEx(
+				certInfoExPtr, this.fieldsEncoder);
 			Module._EUCtxFreeCertificateInfoEx(
 				context.GetContext()|0, certInfoExPtr);
 
@@ -5296,7 +5696,7 @@ function() {
 
 		this.CheckMaxDataSize(data);
 
-		var pPtr = EUPointer(privateKeyContext.GetContext());
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
 		var recipientCertsArray = 
 			new EUArrayFromArrayOfArray(recipientCertificates);
 		var error;
@@ -5338,7 +5738,7 @@ function() {
 			this.CheckMaxDataSize(senderCert);
 
 		var isEnvDataStr = ((typeof data) == 'string');
-		var devDataPtr = EUPointer(privateKeyContext.GetContext());
+		var devDataPtr = EUPointerArray(privateKeyContext.GetContext());
 		var infoPtr = EUPointerSenderInfo();
 		var error;
 
@@ -5380,7 +5780,7 @@ function() {
 
 		this.CheckMaxDataSize(data);
 
-		var pPtr = EUPointer(privateKeyContext.GetContext());
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
 		var recipientCertsArray = 
 			new EUArrayFromArrayOfArray(recipientCertificates);
 		var error;
@@ -5396,6 +5796,103 @@ function() {
 					recipientCertsArray.arraysPtr,
 					recipientCertsArray.arraysLengthPtr,
 					recipientAppendType, 
+					IntFromBool(signData), IntFromBool(appendCert),
+					data, data.length, pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			recipientCertsArray.free();
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		recipientCertsArray.free();
+		
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CtxEnvelopDataWithSettings2: function (
+		privateKeyContext, useDynamicKey, contentEncAlgoType,
+		recipientCertificates, recipientAppendType,
+		checkRecipientCertsOffline, checkRecipientCertsNoCRL,
+		noRecipientCertsCertCheck,
+		signData, noTSP, appendCert, data, asBase64String) {
+		if ((typeof data) == 'string')
+			data = this.StringToArray(data);
+
+		this.CheckMaxDataSize(data);
+
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
+		var recipientCertsArray = 
+			new EUArrayFromArrayOfArray(recipientCertificates);
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxEnvelopDataWithSettings2',
+				'number',
+				['number', 
+					'number', 'number', 
+					'number', 'number', 'number',
+					'number', 'number', 'number', 'number',
+					'number', 'number', 'number',
+					'array', 'number', 'number', 'number'],
+				[privateKeyContext.GetContext(),
+					IntFromBool(useDynamicKey), contentEncAlgoType,
+					recipientCertsArray.count,
+					recipientCertsArray.arraysPtr,
+					recipientCertsArray.arraysLengthPtr,
+					recipientAppendType,
+					IntFromBool(checkRecipientCertsOffline),
+					IntFromBool(checkRecipientCertsNoCRL), 
+					IntFromBool(noRecipientCertsCertCheck),
+					IntFromBool(signData), IntFromBool(noTSP),
+					IntFromBool(appendCert),
+					data, data.length, pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			recipientCertsArray.free();
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		recipientCertsArray.free();
+		
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CtxEnvelopDataRSA: function (privateKeyContext,
+		recipientCertificates, contentEncAlgoType,
+		signData, appendCert, data, asBase64String) {
+		if ((typeof data) == 'string')
+			data = this.StringToArray(data);
+
+		this.CheckMaxDataSize(data);
+
+		var pPtr = EUPointerArray(privateKeyContext.GetContext());
+		var recipientCertsArray = 
+			new EUArrayFromArrayOfArray(recipientCertificates);
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxEnvelopDataRSA',
+				'number',
+				['number', 'number', 'number', 'number',
+					'number', 'number', 'number',
+					'array', 'number', 'number', 'number'],
+				[privateKeyContext.GetContext(),
+					recipientCertsArray.count,
+					recipientCertsArray.arraysPtr,
+					recipientCertsArray.arraysLengthPtr,
+					contentEncAlgoType, 
 					IntFromBool(signData), IntFromBool(appendCert),
 					data, data.length, pPtr.ptr, pPtr.lengthPtr]);
 		} catch (e) {
@@ -5450,7 +5947,8 @@ function() {
 		var certInfoExPtr, certInfoEx;
 
 		certInfoExPtr = pCertInfoExPtr.toPtr();
-		certInfoEx = new EndUserCertificateInfoEx(certInfoExPtr);
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
 		Module._EUCtxFreeCertificateInfoEx(
 			context.GetContext()|0, certInfoExPtr);
 
@@ -5525,6 +6023,130 @@ function() {
 			infoTypePtr.toNumber(),
 			pIssuerPtr.toString(), pSerialPtr.toString(),
 			pPublicKeyIDPtr.toString());
+	},
+	AppendRecipient: function (prevEnvData,
+		recipient, asBase64String) {
+		this.CheckMaxDataSize(prevEnvData);
+		this.CheckMaxDataSize(recipient);
+
+		var isPrevEnvDataStr = ((typeof prevEnvData) == 'string');
+		var isRecipientStr = ((typeof recipient) == 'string');
+		var envDataPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUAppendRecipient',
+				'number',
+				[isPrevEnvDataStr ? 'array' : 'number', 
+					!isPrevEnvDataStr ? 'array' : 'number', 'number',
+					isRecipientStr ? 'array' : 'number', 
+					!isRecipientStr ? 'array' : 'number', 'number',
+					'number', 'number', 'number'],
+				[isPrevEnvDataStr ? StringToCString(prevEnvData)  : 0,
+					!isPrevEnvDataStr ? prevEnvData : 0,
+					!isPrevEnvDataStr ? prevEnvData.length : 0,
+					isRecipientStr ? StringToCString(recipient)  : 0,
+					!isRecipientStr ? recipient : 0,
+					!isRecipientStr ? recipient.length : 0,
+					asBase64String ? envDataPtr.ptr : 0,
+					!asBase64String ? envDataPtr.ptr : 0,
+					!asBase64String ? envDataPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			envDataPtr.free();
+			this.RaiseError(error);
+		}
+		
+		if (asBase64String)
+			return envDataPtr.toString(true);
+		else
+			return envDataPtr.toArray();
+	},
+	GetRecipient: function (envData,
+		recipientCert, asBase64String) {
+		this.CheckMaxDataSize(envData);
+		this.CheckMaxDataSize(recipientCert);
+
+		var isEnvDataStr = ((typeof envData) == 'string');
+		var recipientPtr = asBase64String ? 
+			EUPointer() : EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUGetRecipient',
+				'number',
+				[isEnvDataStr ? 'array' : 'number', 
+					!isEnvDataStr ? 'array' : 'number', 'number',
+					'array', 'number',
+					'number', 'number', 'number'],
+				[isEnvDataStr ? StringToCString(envData)  : 0,
+					!isEnvDataStr ? envData : 0,
+					!isEnvDataStr ? envData.length : 0,
+					recipientCert, recipientCert.length,
+					asBase64String ? recipientPtr.ptr : 0,
+					!asBase64String ? recipientPtr.ptr : 0,
+					!asBase64String ? recipientPtr.lengthPtr : 0]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			recipientPtr.free();
+			this.RaiseError(error);
+		}
+		
+		if (asBase64String)
+			return recipientPtr.toString(true);
+		else
+			return recipientPtr.toArray();
+	},
+	PasswordRecipientDevelopData: function(
+		envData, passwordRecipient, password) {
+		this.CheckMaxDataSize(envData);
+		this.CheckMaxDataSize(passwordRecipient);
+
+		var isEnvDataStr = ((typeof envData) == 'string');
+		var isPasswordRecipientStr = 
+			((typeof passwordRecipient) == 'string');
+		var devDataPtr = EUPointerArray();
+		var infoPtr = EUPointerSenderInfo();
+		var error;
+
+		try {
+			error = Module.ccall('EUPasswordRecipientDevelopData',
+				'number',
+				[isEnvDataStr ? 'array' : 'number',
+					!isEnvDataStr ? 'array' : 'number', 'number',
+					isPasswordRecipientStr ? 'array' : 'number',
+					!isPasswordRecipientStr ? 'array' : 'number', 'number',
+					'array', 'number', 'number', 'number'],
+				[isEnvDataStr ? StringToCString(envData)  : 0,
+					!isEnvDataStr ? envData : 0,
+					!isEnvDataStr ? envData.length : 0,
+					isPasswordRecipientStr ? 
+						StringToCString(passwordRecipient)  : 0,
+					!isPasswordRecipientStr ? passwordRecipient : 0,
+					!isPasswordRecipientStr ? passwordRecipient.length : 0,
+					UTF8ToCP1251Array(password),
+					devDataPtr.ptr, devDataPtr.lengthPtr, infoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			devDataPtr.free();
+			infoPtr.free();
+			this.RaiseError(error);
+		}
+
+		var info = new EndUserSenderInfo(infoPtr.ptr, devDataPtr.toArray());
+		devDataPtr.free();
+
+		return info;
 	},
 //-----------------------------------------------------------------------------
 	ClientSessionCreateStep1: function(expireTime) {
@@ -6114,18 +6736,36 @@ function() {
 //-----------------------------------------------------------------------------
 	AppendTransportHeader: function(caType, fileName, 
 		clientEMail, clientCert, data) {
+		return this.AppendTransportHeaderEx(
+			caType, null, null, null, fileName, 
+			clientEMail, clientCert, data);
+	},
+//-----------------------------------------------------------------------------
+	AppendTransportHeaderEx: function(caType, 
+		programName, programVersion, sendDate,
+		fileName, clientEMail, clientCert, data) {
 		this.CheckMaxDataSize(data);
 
 		var resultDataPtr = EUPointerArray();
+		var sendDatePtr = (sendDate != null) ? 
+			EUPointerSystemtime(sendDate) : 0;
 		var error;
 
 		try {
-			error = Module.ccall('EUAppendTransportHeader',
+			error = Module.ccall('EUAppendTransportHeaderEx',
 				'number',
-				['array', 'array', 'array', 
+				['array', 
+					programName ? 'array' : 'number',
+					programVersion ? 'array' : 'number', 
+					'number', 'array', 'array', 
 					'array', 'number', 'array', 'number', 
 					'number', 'number'],
 				[UTF8ToCP1251Array(caType),
+					programName ? 
+						UTF8ToCP1251Array(programName) : 0,
+					programVersion ? 
+						UTF8ToCP1251Array(programVersion) : 0,
+					sendDate ? sendDatePtr.ptr : 0,
 					UTF8ToCP1251Array(fileName),
 					UTF8ToCP1251Array(clientEMail),
 					clientCert, clientCert.length, 
@@ -6134,6 +6774,9 @@ function() {
 		} catch (e) {
 			error = EU_ERROR_UNKNOWN;
 		}
+		
+		if (sendDate != null)
+			sendDatePtr.free();
 
 		if (error != EU_ERROR_NONE) {
 			resultDataPtr.free();
@@ -6543,6 +7186,1516 @@ function() {
 		_free();
 
 		return euPrivateKey;
+	},
+	ASiCGetASiCType: function(asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetASiCType',
+				'number',
+				['array', 'number', 'number'],
+				[asicData, asicData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	ASiCGetSignType: function(asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignType',
+				'number',
+				['array', 'number', 'number'],
+				[asicData, asicData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	ASiCGetSignsCount: function(asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignsCount',
+				'number',
+				['array', 'number', 'number'],
+				[asicData, asicData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	ASiCGetSignerInfo: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignerInfo',
+				'number',
+				['number', 'array', 'number',
+					'number', 'number', 'number'],
+				[signIndex, asicData, asicData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUFreeCertificateInfoEx(certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	ASiCGetSignTimeInfo: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var pTimeInfoPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignTimeInfo',
+				'number',
+				['number', 'array', 'number', 'number'],
+				[signIndex, asicData, asicData.length,
+					pTimeInfoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pTimeInfoPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var timeInfoPtr, timeInfo;
+
+		timeInfoPtr = pTimeInfoPtr.toPtr();
+		timeInfo = new EndUserTimeInfo(timeInfoPtr);
+		Module._EUFreeTimeInfo(timeInfoPtr);
+
+		return timeInfo;
+	},
+	ASiCGetSignReferences: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignReferences',
+				'number',
+				['number', 'array', 'number', 'number'],
+				[signIndex, asicData, asicData.length,
+					pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+
+			this.RaiseError(error);
+		}
+		
+		return pPtr.toStringArray(this.fieldsEncoder);
+	},
+	ASiCGetReference: function(asicData, referenceName) {
+		this.CheckMaxDataSize(asicData);
+		
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var arrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetReference',
+				'number',
+				['array', 'number', 'array', 'number', 'number'],
+				[asicData, asicData.length, 
+					this.fieldsEncoder.encode(referenceName),
+					arrPtr.ptr, arrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			arrPtr.free();
+			this.RaiseError(error);
+		}
+
+		return arrPtr.toArray();
+	},
+	ASiCSignData: function(asicType, signType, 
+		signLevel, references, asBase64String) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCSignData',
+				'number',
+				['number', 'number', 'number', 
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[asicType, signType, signLevel, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	ASiCAppendSign: function(signLevel, referencesNames,
+		asicData, asBase64String) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var refNamesString = referencesNames != null ? 
+			intArrayFromStrings(referencesNames, this.fieldsEncoder) : 
+			0;
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCAppendSign',
+				'number',
+				['number', 
+					refNamesString ? 'array' : 'number',
+					'array', 'number', 
+					'number', 'number'],
+				[signLevel,
+					refNamesString,
+					asicData, asicData.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	ASiCVerifyData: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+		
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var infoPtr = EUPointerSignerInfo();
+		var signTimeInfo = null;
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCVerifyData',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, asicData, asicData.length,
+					infoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			infoPtr.free();
+			this.RaiseError(error);
+		}
+
+		try {
+			signTimeInfo = this.ASiCGetSignTimeInfo(
+				signIndex, asicData);
+		} catch (e) {
+			infoPtr.free();
+			throw e;
+		}
+		
+		var info = new EndUserSignInfo(infoPtr.ptr, 
+			null, signTimeInfo);
+		infoPtr.free();
+
+		return info;
+	},
+	CtxASiCSignData: function(pkContext,
+		signAlgo, asicType, signType, 
+		signLevel, references, asBase64String) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pPtr = EUPointerArray(
+			pkContext.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxASiCSignData',
+				'number',
+				['number', 'number', 
+					'number', 'number', 'number', 
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[pkContext.GetContext(), signAlgo,
+					asicType, signType, signLevel, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CtxASiCAppendSign: function(pkContext,
+		signAlgo, signLevel, referencesNames, asicData, 
+		asBase64String) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var refNamesString = referencesNames != null ? 
+			intArrayFromStrings(referencesNames, this.fieldsEncoder) :
+			0;
+
+		var pPtr = EUPointerArray(
+			pkContext.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxASiCAppendSign',
+				'number',
+				['number', 'number', 'number',
+					refNamesString ? 'array' : 'number',
+					'array', 'number', 
+					'number', 'number'],
+				[pkContext.GetContext(), signAlgo, signLevel, 
+					refNamesString, 
+					asicData, asicData.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	ASiCGetSignLevel: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCGetSignLevel',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, asicData, asicData.length, 
+					intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	CtxASiCGetSignerInfo: function(context, signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray(context.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxASiCGetSignerInfo',
+				'number',
+				['number', 'number', 'array', 'number',
+					'number', 'number', 'number'],
+				[context.GetContext(), signIndex, 
+					asicData, asicData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUCtxFreeCertificateInfoEx(
+			context.GetContext()|0, certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	ASiCIsAllContentCovered: function(signIndex, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var intPtr = EUPointerInt();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCIsAllContentCovered',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, asicData, asicData.length, 
+					intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toBoolean();
+	},
+	ASiCCreateEmptySign: function(asicType, signType, 
+		references, asBase64String) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCCreateEmptySign',
+				'number',
+				['number', 'number',
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[asicType, signType, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	ASiCCreateSignerBegin: function(
+		signAlgo, asicType, signType,
+		referencesNames, asicData) {
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var refNamesString = referencesNames != null ? 
+			intArrayFromStrings(referencesNames, this.fieldsEncoder) : 
+			0;
+
+		var pSignRefPtr = EUPointer();
+		var pAttrsHashPtr = EUPointerArray();
+		var pASiCDataPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCCreateSignerBegin',
+				'number',
+				['number', 'number', 'number',
+					refNamesString ? 'array' : 'number',
+					'array', 'number', 
+					'number', 
+					'number', 'number',
+					'number', 'number'],
+				[signAlgo, asicType, signType,
+					refNamesString,
+					asicData, asicData.length,
+					pSignRefPtr.ptr, 
+					pAttrsHashPtr.ptr, pAttrsHashPtr.lengthPtr,
+					pASiCDataPtr.ptr, pASiCDataPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pSignRefPtr.free();
+			pAttrsHashPtr.free();
+			pASiCDataPtr.free();
+			this.RaiseError(error);
+		}
+
+		return new EndUserASiCSigner(
+			pSignRefPtr.toString(false, this.fieldsEncoder), 
+			pAttrsHashPtr.toArray(), pASiCDataPtr.toArray());
+	},
+	ASiCCreateSignerBeginEx: function(
+		signerCert, signAlgo, asicType, signType,
+		referencesNames, asicData) {
+		if (signerCert != null)
+			this.CheckMaxDataSize(signerCert);
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var refNamesString = referencesNames != null ? 
+			intArrayFromStrings(referencesNames, this.fieldsEncoder) : 
+			0;
+
+		var pSignRefPtr = EUPointer();
+		var pAttrsHashPtr = EUPointerArray();
+		var pASiCDataPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCCreateSignerBeginEx',
+				'number',
+				[signerCert ? 'array' : 'number', 'number',
+					'number', 'number', 'number',
+					refNamesString ? 'array' : 'number',
+					'array', 'number', 
+					'number', 
+					'number', 'number',
+					'number', 'number'],
+				[signerCert ? signerCert : 0, 
+					signerCert ? signerCert.length : 0,
+					signAlgo, asicType, signType,
+					refNamesString,
+					asicData, asicData.length,
+					pSignRefPtr.ptr, 
+					pAttrsHashPtr.ptr, pAttrsHashPtr.lengthPtr,
+					pASiCDataPtr.ptr, pASiCDataPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pSignRefPtr.free();
+			pAttrsHashPtr.free();
+			pASiCDataPtr.free();
+			this.RaiseError(error);
+		}
+
+		return new EndUserASiCSigner(
+			pSignRefPtr.toString(false, this.fieldsEncoder), 
+			pAttrsHashPtr.toArray(), pASiCDataPtr.toArray());
+	},
+	ASiCCreateSignerEnd: function(
+		asicType, signType, signLevel,
+		signatureReference, signature, 
+		asicData, asBase64String) {
+		this.CheckMaxDataSize(signature);
+		this.CheckMaxDataSize(asicData);
+
+		if ((typeof signature) == 'string')
+			signature = this.Base64Decode(signature);
+		if ((typeof asicData) == 'string')
+			asicData = this.Base64Decode(asicData);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUASiCCreateSignerEnd',
+				'number',
+				['number', 'number', 'number',
+					'array', 'array', 'number', 
+					'array', 'number',
+					'number', 'number'],
+				[asicType, signType, signLevel,
+					this.fieldsEncoder.encode(signatureReference),
+					signature, signature.length,
+					asicData, asicData.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	PDFGetSignType: function(signIndex, signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFGetSignType',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, signedPDFData, signedPDFData.length, 
+					intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	PDFGetSignsCount: function(signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFGetSignsCount',
+				'number',
+				['array', 'number', 'number'],
+				[signedPDFData, signedPDFData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	PDFGetSignerInfo: function(signIndex, signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFGetSignerInfo',
+				'number',
+				['number', 'array', 'number',
+					'number', 'number', 'number'],
+				[signIndex, signedPDFData, signedPDFData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUFreeCertificateInfoEx(certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	CtxPDFGetSignerInfo: function(context, signIndex, signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray(context.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxPDFGetSignerInfo',
+				'number',
+				['number', 'number', 'array', 'number',
+					'number', 'number', 'number'],
+				[context.GetContext(), signIndex, 
+					signedPDFData, signedPDFData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUCtxFreeCertificateInfoEx(
+			context.GetContext()|0, certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	PDFGetSignTimeInfo: function(signIndex, signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var pTimeInfoPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFGetSignTimeInfo',
+				'number',
+				['number', 'array', 'number', 'number'],
+				[signIndex, signedPDFData, signedPDFData.length,
+					pTimeInfoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pTimeInfoPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var timeInfoPtr, timeInfo;
+
+		timeInfoPtr = pTimeInfoPtr.toPtr();
+		timeInfo = new EndUserTimeInfo(timeInfoPtr);
+		Module._EUFreeTimeInfo(timeInfoPtr);
+
+		return timeInfo;
+	},
+	PDFSignData: function(pdfData, signType, asBase64String) {
+		this.CheckMaxDataSize(pdfData);
+		
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFSignData',
+				'number',
+				['array', 'number', 'number', 
+					'number', 'number'],
+				[pdfData, pdfData.length, signType,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	PDFVerifyData: function(signIndex, signedPDFData) {
+		this.CheckMaxDataSize(signedPDFData);
+		
+		if ((typeof signedPDFData) == 'string')
+			signedPDFData = this.Base64Decode(signedPDFData);
+
+		var infoPtr = EUPointerSignerInfo();
+		var signTimeInfo = null;
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFVerifyData',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, signedPDFData, signedPDFData.length,
+					infoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			infoPtr.free();
+			this.RaiseError(error);
+		}
+
+		try {
+			signTimeInfo = this.PDFGetSignTimeInfo(
+				signIndex, signedPDFData);
+		} catch (e) {
+			infoPtr.free();
+			throw e;
+		}
+		
+		var info = new EndUserSignInfo(infoPtr.ptr, 
+			null, signTimeInfo);
+		infoPtr.free();
+
+		return info;
+	},
+	CtxPDFSignData: function(pkContext,
+		signAlgo, pdfData, signType, asBase64String) {
+		this.CheckMaxDataSize(pdfData);
+
+		var pPtr = EUPointerArray(
+			pkContext.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxPDFSignData',
+				'number',
+				['number', 'number', 
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[pkContext.GetContext(), signAlgo,
+					pdfData, pdfData.length, signType,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	PDFCreateSignerBegin: function(signAlgo, pdfData) {
+		this.CheckMaxDataSize(pdfData);
+		
+		var pSignRefPtr = EUPointer();
+		var pAttrsHashPtr = EUPointerArray();
+		var pPDFDataPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFCreateSignerBegin',
+				'number',
+				['number', 'array', 'number', 'number',
+					'number', 'number', 
+					'number', 'number'],
+				[signAlgo, pdfData, pdfData.length, pSignRefPtr.ptr, 
+					pAttrsHashPtr.ptr, pAttrsHashPtr.lengthPtr,
+					pPDFDataPtr.ptr, pPDFDataPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pSignRefPtr.free();
+			pAttrsHashPtr.free();
+			pPDFDataPtr.free();
+			this.RaiseError(error);
+		}
+
+		return new EndUserPDFSigner(
+			pSignRefPtr.toString(false, this.fieldsEncoder), 
+			pAttrsHashPtr.toArray(), pPDFDataPtr.toArray());
+	},
+	PDFCreateSignerEnd: function(pdfData, signType, 
+		signatureReference, signature, asBase64String) {
+		this.CheckMaxDataSize(pdfData);
+		this.CheckMaxDataSize(signature);
+
+		if ((typeof pdfData) == 'string')
+			pdfData = this.Base64Decode(pdfData);
+		if ((typeof signature) == 'string')
+			signature = this.Base64Decode(signature);
+		
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUPDFCreateSignerEnd',
+				'number',
+				['array', 'number', 'number',
+					'array', 'array', 'number',
+					'number', 'number'],
+				[pdfData, pdfData.length, signType,
+					this.fieldsEncoder.encode(signatureReference), 
+					signature, signature.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	XAdESGetType: function(xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetType',
+				'number',
+				['array', 'number', 'number'],
+				[xadesData, xadesData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	XAdESGetSignsCount: function(xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetSignsCount',
+				'number',
+				['array', 'number', 'number'],
+				[xadesData, xadesData.length, intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	XAdESGetSignLevel: function(signIndex, xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var intPtr = EUPointerDWORD();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetSignLevel',
+				'number',
+				['number', 'array', 'number', 
+					'number'],
+				[signIndex, xadesData, xadesData.length, 
+					intPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			intPtr.free();
+			this.RaiseError(error);
+		}
+
+		return intPtr.toNumber();
+	},
+	XAdESGetSignerInfo: function(signIndex, xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetSignerInfo',
+				'number',
+				['number', 'array', 'number',
+					'number', 'number', 'number'],
+				[signIndex, xadesData, xadesData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUFreeCertificateInfoEx(certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	XAdESGetSignTimeInfo: function(signIndex, xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var pTimeInfoPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetSignTimeInfo',
+				'number',
+				['number', 'array', 'number', 'number'],
+				[signIndex, xadesData, xadesData.length,
+					pTimeInfoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pTimeInfoPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var timeInfoPtr, timeInfo;
+
+		timeInfoPtr = pTimeInfoPtr.toPtr();
+		timeInfo = new EndUserTimeInfo(timeInfoPtr);
+		Module._EUFreeTimeInfo(timeInfoPtr);
+
+		return timeInfo;
+	},
+	XAdESGetSignReferences: function(signIndex, xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var pPtr = EUPointer();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetSignReferences',
+				'number',
+				['number', 'array', 'number', 'number'],
+				[signIndex, xadesData, xadesData.length,
+					pPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+
+			this.RaiseError(error);
+		}
+		
+		return pPtr.toStringArray(this.fieldsEncoder);
+	},
+	XAdESGetReference: function(xadesData, referenceName) {
+		this.CheckMaxDataSize(xadesData);
+		
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var arrPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESGetReference',
+				'number',
+				['array', 'number', 'array', 'number', 'number'],
+				[xadesData, xadesData.length, 
+					this.fieldsEncoder.encode(referenceName),
+					arrPtr.ptr, arrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			arrPtr.free();
+			this.RaiseError(error);
+		}
+
+		return arrPtr.toArray();
+	},
+	XAdESSignData: function(xadesType, signLevel, 
+		references, asBase64String) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESSignData',
+				'number',
+				['number', 'number', 
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[xadesType, signLevel, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	XAdESVerifyData: function(references, signIndex, xadesData) {
+		var refNamesString = null;
+		var refDataArray = null;
+
+		if (references != null) {
+			var refNames = [];
+			var refData = [];
+			var refDataSize = 0;
+			for (var i = 0; i < references.length; i++) {
+				refNames.push(references[i].GetName());
+				refData.push(references[i].GetData());
+				refDataSize += references[i].GetData().length;
+			}
+
+			this.CheckMaxDataSize(refDataSize);
+		
+			refNamesString = intArrayFromStrings(
+				refNames, this.fieldsEncoder);
+			refDataArray = new EUArrayFromArrayOfArray(refData);
+		}
+
+		this.CheckMaxDataSize(xadesData);
+		
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var infoPtr = EUPointerSignerInfo();
+		var signTimeInfo = null;
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESVerifyData',
+				'number',
+				[refNamesString != null ? 'array' : 'number', 
+					'number', 'number', 
+					'number', 'array', 'number', 
+					'number'],
+				[refNamesString, 
+					refDataArray != null ? refDataArray.arraysPtr : 0, 
+					refDataArray != null ? refDataArray.arraysLengthPtr : 0,
+					signIndex, xadesData, xadesData.length,
+					infoPtr.ptr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			infoPtr.free();
+			this.RaiseError(error);
+		}
+
+		try {
+			signTimeInfo = this.XAdESGetSignTimeInfo(
+				signIndex, xadesData);
+		} catch (e) {
+			infoPtr.free();
+			throw e;
+		}
+		
+		var info = new EndUserSignInfo(infoPtr.ptr, 
+			null, signTimeInfo);
+		infoPtr.free();
+
+		return info;
+	},
+	CtxXAdESSignData: function(pkContext,
+		signAlgo, xadesType, 
+		signLevel, references, asBase64String) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pPtr = EUPointerArray(
+			pkContext.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxXAdESSignData',
+				'number',
+				['number', 'number', 
+					'number', 'number',
+					'array', 'number', 'number', 
+					'number', 'number'],
+				[pkContext.GetContext(), signAlgo,
+					xadesType, signLevel, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
+	},
+	CtxXAdESGetSignerInfo: function(context, signIndex, xadesData) {
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var pCertInfoExPtr = EUPointer();
+		var certArrPtr = EUPointerArray(context.GetContext());
+		var error;
+
+		try {
+			error = Module.ccall('EUCtxXAdESGetSignerInfo',
+				'number',
+				['number', 'number', 'array', 'number',
+					'number', 'number', 'number'],
+				[context.GetContext(), signIndex, 
+					xadesData, xadesData.length,
+					pCertInfoExPtr.ptr, 
+					certArrPtr.ptr, certArrPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+
+		if (error != EU_ERROR_NONE) {
+			pCertInfoExPtr.free();
+			certArrPtr.free();
+
+			this.RaiseError(error);
+		}
+
+		var certInfoExPtr, certInfoEx;
+
+		certInfoExPtr = pCertInfoExPtr.toPtr();
+		certInfoEx = new EndUserCertificateInfoEx(
+			certInfoExPtr, this.fieldsEncoder);
+		Module._EUCtxFreeCertificateInfoEx(
+			context.GetContext()|0, certInfoExPtr);
+
+		return new EndUserCertificate(certInfoEx, certArrPtr.toArray());
+	},
+	XAdESCreateSignerBegin: function(
+		signerCert, signAlgo, xadesType, references) {
+		var refNames = [];
+		var refData = [];
+		var refDataSize = 0;
+		for (var i = 0; i < references.length; i++) {
+			refNames.push(references[i].GetName());
+			refData.push(references[i].GetData());
+			refDataSize += references[i].GetData().length;
+		}
+		this.CheckMaxDataSize(signerCert);
+		this.CheckMaxDataSize(refDataSize);
+		
+		var refNamesString = intArrayFromStrings(
+			refNames, this.fieldsEncoder);
+		var refDataArray = new EUArrayFromArrayOfArray(refData);
+
+		var pSignRefPtr = EUPointer();
+		var pAttrsHashPtr = EUPointerArray();
+		var pXAdESDataPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESCreateSignerBegin',
+				'number',
+				['array', 'number', 'number', 'number', 
+					'array', 'number', 'number', 
+					'number', 
+					'number', 'number',
+					'number', 'number'],
+				[signerCert, signerCert.length, signAlgo, xadesType, 
+					refNamesString, refDataArray.arraysPtr, 
+					refDataArray.arraysLengthPtr,
+					pSignRefPtr.ptr, 
+					pAttrsHashPtr.ptr, pAttrsHashPtr.lengthPtr,
+					pXAdESDataPtr.ptr, pXAdESDataPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pSignRefPtr.free();
+			pAttrsHashPtr.free();
+			pXAdESDataPtr.free();
+			this.RaiseError(error);
+		}
+
+		return new EndUserXAdESSigner(
+			pSignRefPtr.toString(false, this.fieldsEncoder), 
+			pAttrsHashPtr.toArray(), pXAdESDataPtr.toArray());
+	},
+	XAdESCreateSignerEnd: function(
+		signLevel, signatureReference, signature, 
+		xadesData, asBase64String) {
+		this.CheckMaxDataSize(signature);
+		this.CheckMaxDataSize(xadesData);
+
+		if ((typeof signature) == 'string')
+			signature = this.Base64Decode(signature);
+		if ((typeof xadesData) == 'string')
+			xadesData = this.Base64Decode(xadesData);
+
+		var pPtr = EUPointerArray();
+		var error;
+
+		try {
+			error = Module.ccall('EUXAdESCreateSignerEnd',
+				'number',
+				['number',
+					'array', 'array', 'number', 
+					'array', 'number',
+					'number', 'number'],
+				[signLevel,
+					this.fieldsEncoder.encode(signatureReference),
+					signature, signature.length,
+					xadesData, xadesData.length,
+					pPtr.ptr, pPtr.lengthPtr]);
+		} catch (e) {
+			error = EU_ERROR_UNKNOWN;
+		}
+		
+		if (error != EU_ERROR_NONE) {
+			pPtr.free();
+			this.RaiseError(error);
+		}
+
+		if (asBase64String)
+			return this.Base64Encode(pPtr.toArray());
+		else 
+			return pPtr.toArray();
 	}
 });
 

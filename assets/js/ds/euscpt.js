@@ -14,9 +14,7 @@ if (!Uint8Array.prototype.slice) {
 
 var EU_ONE_MB = 1024 * 1024;
 var EU_MAX_DATA_SIZE_MB = ((typeof EU_MAX_DATA_SIZE_MB) != 'undefined') ? 
-	EU_MAX_DATA_SIZE_MB : (isMobileBrowser() ? 2 : 5);
-var EU_LIBRARY_STACK_MB = 5;
-var EU_LIBRARY_MEMORY_MB = 5;
+	EU_MAX_DATA_SIZE_MB : 5;
 
 var EU_MAX_P7S_CONTAINER_SIZE = 100 * EU_ONE_MB;
 var EU_MAX_P7E_CONTAINER_SIZE = 100 * EU_ONE_MB;
@@ -27,6 +25,12 @@ var EU_DEFAULT_LANG		 	= 0;
 var EU_UA_LANG				= 1;
 var EU_RU_LANG				= 2;
 var EU_EN_LANG				= 3;
+
+//-----------------------------------------------------------------------------
+
+var EU_CP_ACP_ENCODING		= 0;
+var EU_CP_1251_ENCODING		= 1251;
+var EU_UTF8_ENCODING		= 65001;
 
 //-----------------------------------------------------------------------------
 
@@ -50,8 +54,22 @@ var EU_CERT_KEY_TYPE_ECDSA		= 0x04;
 
 //-----------------------------------------------------------------------------
 
+var EU_CERT_HASH_TYPE_UNKNOWN		= 0x00;
+var EU_CERT_HASH_TYPE_GOST34311		= 0x01;
+var EU_CERT_HASH_TYPE_SHA1			= 0x02;
+var EU_CERT_HASH_TYPE_SHA224		= 0x03;
+var EU_CERT_HASH_TYPE_SHA256		= 0x04;
+var EU_CERT_HASH_TYPE_SHA384		= 0x05;
+var EU_CERT_HASH_TYPE_SHA512		= 0x06;
+var EU_CERT_HASH_TYPE_DSTU7564_256	= 0x07;
+var EU_CERT_HASH_TYPE_DSTU7564_384	= 0x08;
+var EU_CERT_HASH_TYPE_DSTU7564_512	= 0x09;
+
+//-----------------------------------------------------------------------------
+
 var EU_KEY_USAGE_UNKNOWN			= 0x0000;
 var EU_KEY_USAGE_DIGITAL_SIGNATURE	= 0x0001;
+var EU_KEY_USAGE_NON_REPUDATION		= 0x0002;
 var EU_KEY_USAGE_KEY_AGREEMENT		= 0x0010;
 
 //-----------------------------------------------------------------------------
@@ -71,6 +89,11 @@ var EU_CTX_HASH_ALGO_GOST34311 = 1;
 var EU_CTX_HASH_ALGO_SHA160 = 2;
 var EU_CTX_HASH_ALGO_SHA224 = 3;
 var EU_CTX_HASH_ALGO_SHA256 = 4;
+var EU_CTX_HASH_ALGO_SHA384 = 5;
+var EU_CTX_HASH_ALGO_SHA512 = 6;
+var EU_CTX_HASH_ALGO_DSTU7564_256 = 7;
+var EU_CTX_HASH_ALGO_DSTU7564_384 = 8;
+var EU_CTX_HASH_ALGO_DSTU7564_512 = 9;
 
 //-----------------------------------------------------------------------------
 
@@ -78,6 +101,7 @@ var EU_CTX_SIGN_UNKNOWN = 0;
 var EU_CTX_SIGN_DSTU4145_WITH_GOST34311 = 1;
 var EU_CTX_SIGN_RSA_WITH_SHA = 2;
 var EU_CTX_SIGN_ECDSA_WITH_SHA = 3;
+var EU_CTX_SIGN_DSTU4145_WITH_DSTU7564 = 4;
 
 //-----------------------------------------------------------------------------
 
@@ -200,31 +224,48 @@ var EU_UNZR_MAX_LENGTH = 15;
 var EU_INFORMATION_MAX_LENGTH = 513;
 var EU_PASS_PHRASE_MAX_LENGTH = 129;
 
+var EU_TSL_MAX_LENGTH = 2561;
+
 var EU_KEYS_TYPE_NONE = 0;
 var EU_KEYS_TYPE_DSTU_AND_ECDH_WITH_GOST = 1;
 var EU_KEYS_TYPE_RSA_WITH_SHA = 2;
 var EU_KEYS_TYPE_ECDSA_WITH_SHA = 4;
+var EU_KEYS_TYPE_DSTU_AND_ECDH_WITH_DSTU = 8;
 
 var EU_KEYS_LENGTH_DS_UA_191 = 1;
 var EU_KEYS_LENGTH_DS_UA_257 = 2;
 var EU_KEYS_LENGTH_DS_UA_307 = 3;
+var EU_KEYS_LENGTH_DS_UA_FILE = 4;
+var EU_KEYS_LENGTH_DS_UA_CERT = 5;
 
 var EU_KEYS_LENGTH_KEP_UA_257 = 1;
 var EU_KEYS_LENGTH_KEP_UA_431 = 2;
 var EU_KEYS_LENGTH_KEP_UA_571 = 3;
+var EU_KEYS_LENGTH_KEP_UA_FILE = 4;
+var EU_KEYS_LENGTH_KEP_UA_CERT = 5;
 
 var EU_KEYS_LENGTH_DS_RSA_1024 = 1;
 var EU_KEYS_LENGTH_DS_RSA_2048 = 2;
 var EU_KEYS_LENGTH_DS_RSA_3072 = 3;
 var EU_KEYS_LENGTH_DS_RSA_4096 = 4;
+var EU_KEYS_LENGTH_DS_RSA_FILE = 5;
+var EU_KEYS_LENGTH_DS_RSA_CERT = 6;
 
 var EU_KEYS_LENGTH_DS_ECDSA_192 = 1;
 var EU_KEYS_LENGTH_DS_ECDSA_256 = 2;
 var EU_KEYS_LENGTH_DS_ECDSA_384 = 3;
 var EU_KEYS_LENGTH_DS_ECDSA_521 = 4;
+var EU_KEYS_LENGTH_DS_ECDSA_FILE = 5;
+var EU_KEYS_LENGTH_DS_ECDSA_CERT = 6;
 
+var EU_CONTENT_ENC_ALGO_DEFAULT = 0;
+var EU_CONTENT_ENC_ALGO_GOST28147_CFB = 2;
 var EU_CONTENT_ENC_ALGO_TDES_CBC = 4;
+var EU_CONTENT_ENC_ALGO_AES_128_CBC = 5;
+var EU_CONTENT_ENC_ALGO_AES_192_CBC = 6;
 var EU_CONTENT_ENC_ALGO_AES_256_CBC = 7;
+var EU_CONTENT_ENC_ALGO_DSTU7624_256_OFB = 8;
+var EU_CONTENT_ENC_ALGO_DSTU7624_256_CFB = 9;
 
 var EU_HEADER_CA_TYPE = "UA1";
 var EU_HEADER_PART_TYPE_SIGNED = 1;
@@ -249,6 +290,31 @@ var EU_KEYS_REQUEST_TYPE_UA_DS = 1;
 var EU_KEYS_REQUEST_TYPE_UA_KEP = 2;
 var EU_KEYS_REQUEST_TYPE_INTERNATIONAL = 3;
 
+var EU_ASIC_TYPE_UNKNOWN = 0;
+var EU_ASIC_TYPE_S = 1;
+var EU_ASIC_TYPE_E = 2;
+
+var EU_ASIC_SIGN_TYPE_UNKNOWN = 0;
+var EU_ASIC_SIGN_TYPE_CADES = 1;
+var EU_ASIC_SIGN_TYPE_XADES = 2;
+
+var EU_XADES_TYPE_UNKNOWN = 0;
+var EU_XADES_TYPE_DETACHED = 1;
+var EU_XADES_TYPE_ENVELOPING = 2;
+var EU_XADES_TYPE_ENVELOPED = 3;
+
+var EU_XADES_SIGN_LEVEL_UNKNOWN = 0;
+var EU_XADES_SIGN_LEVEL_B_B = 1;
+var EU_XADES_SIGN_LEVEL_B_T = 4;
+var EU_XADES_SIGN_LEVEL_B_LT = 16;
+var EU_XADES_SIGN_LEVEL_B_LTA = 32;
+
+var EU_PADES_SIGN_LEVEL_UNKNOWN = 0;
+var EU_PADES_SIGN_LEVEL_B_B = 1;
+var EU_PADES_SIGN_LEVEL_B_T = 4;
+var EU_PADES_SIGN_LEVEL_B_LT = 16;
+var EU_PADES_SIGN_LEVEL_B_LTA = 32;
+
 //=============================================================================
 
 var EU_RESOLVE_OIDS_PARAMETER = 'ResolveOIDs';
@@ -257,12 +323,16 @@ var EU_SIGN_INCLUDE_CONTENT_TIME_STAMP_PARAMETER = 'SignIncludeContentTimeStamp'
 var EU_SIGN_TYPE_PARAMETER = 'SignType';
 var EU_SIGN_INCLUDE_CA_CERTIFICATES_PARAMETER = 'SignIncludeCACertificates';
 var EU_FORCE_USE_TSP_FROM_SETTINGS_PARAMETER = 'ForceUseTSPFromSettings';
+var EU_STRING_ENCODING_PARAMETER = 'StringEncoding';
+var EU_CHECK_CERT_CHAIN_ON_SIGN_TIME_PARAMETER = 'CheckCertChainOnSignTime';
+var EU_CONNECTIONS_TIMEOUT_PARAMETER = "ConnectionsTimeout";
 
 var UA_OID_EXT_KEY_USAGE_STAMP = "1.2.804.2.1.1.1.3.9";
 
 var EU_CHECK_PRIVATE_KEY_CONTEXT_PARAMETER = "CheckPrivateKey";
 var EU_RESOLVE_OIDS_CONTEXT_PARAMETER = "ResolveOIDs";
 var EU_EXPORATABLE_CONTEXT_CONTEXT_PARAMETER = "ExportableContext";
+var EU_ENCODE_ECDSA_SIGN_VALUE_CONTEXT_PARAMETER = "EncodeECDSASignValue";
 
 //=============================================================================
 
@@ -361,12 +431,6 @@ eu_wait = function(first){
 
 //=============================================================================
 
-function isMobileBrowser() {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-//=============================================================================
-
 function StringToCString(s) {
 	var strLen = s.length;
 	var arr = new Uint8Array(strLen + 1);
@@ -404,12 +468,15 @@ function ArrayToString(arr) {
 		ret.push(String.fromCharCode(chr));
 	}
 
-	return  decodeURIComponent(escape(ret.join('')));
+	return decodeURIComponent(escape(ret.join('')));
 }
 
-function UTF8ToCP1251Array(s) {
+function UTF8ToCP1251Array(s, normalize) {
+	if (typeof normalize == 'undefined')
+		normalize = true;
+
 	var L = [];
-	if (s.normalize)
+	if (s.normalize && normalize)
 		s = s.normalize();
 
 	for (var i = 0; i < s.length; i++) {
@@ -417,6 +484,24 @@ function UTF8ToCP1251Array(s) {
 		if (!(ord in CP1251Table))
 			throw "Character " + s.charAt(i) + " isn't supported by win1251!";
 		L.push(CP1251Table[ord]);
+	}
+
+	L.push(0);
+
+	return L;
+}
+
+function UTF8ToUTF8Array(s, normalize) {
+	if (typeof normalize == 'undefined')
+		normalize = true;
+
+	var L = [];
+	if (s.normalize && normalize)
+		s = s.normalize();
+
+	var utf8 = unescape(encodeURIComponent(s));
+	for (var i = 0; i < utf8.length; i++) {
+		L.push(utf8.charCodeAt(i));
 	}
 
 	L.push(0);
@@ -451,12 +536,34 @@ function CP1251PointerToUTF8(ptr) {
 	return ret;
 }
 
+function UTF8PointerToUTF8(ptr) {
+	var t;
+	var i = 0;
+	var ret = [];
 
-function StringToUTF16LEArray(str, zero) {
+	if (ptr == 0)
+		return '';
+
+
+	while (1) {
+		t = HEAPU8[(((ptr)+(i))|0)];
+		if (t == 0) 
+			break;
+		ret.push(t);
+		i++;
+	}
+
+	return ArrayToString(ret);
+}
+
+function StringToUTF16LEArray(str, zero, normalize) {
+	if (typeof normalize == 'undefined')
+		normalize = true;
+
 	var L = [];
 	var c;
 
-	if (str.normalize)
+	if (str.normalize && normalize)
 		str = str.normalize();
 
 	for (var i = 0; i < str.length; i++) {
@@ -537,6 +644,38 @@ StringEncoder.isSupported = function(charset) {
 
 //=============================================================================
 
+var LibraryStringEncoder = function(charset) {
+	if (charset == EU_CP_ACP_ENCODING)
+		charset = EU_CP_1251_ENCODING;
+
+	if (charset != EU_CP_1251_ENCODING && 
+			charset != EU_UTF8_ENCODING) {
+		throw Error("Library charset not supported");
+	}
+
+	this.charset = charset;
+};
+
+LibraryStringEncoder.prototype.encode = function(val) {
+	if (this.charset == EU_CP_1251_ENCODING)
+		return UTF8ToCP1251Array(val);
+	else if (this.charset == EU_UTF8_ENCODING)
+		return UTF8ToUTF8Array(val, false);
+	else
+		throw Error("Library charset not supported"); 
+};
+
+LibraryStringEncoder.prototype.decodePointer = function(val) {
+	if (this.charset == EU_CP_1251_ENCODING)
+		return CP1251PointerToUTF8(val);
+	else if (this.charset == EU_UTF8_ENCODING)
+		return UTF8PointerToUTF8(val);
+	else
+		throw Error("Library charset not supported"); 
+};
+
+//=============================================================================
+
 function SetClassID(className, classVersion, classPtr) {
 	classPtr['Vendor'] = 'JSC IIT';
 	classPtr['ClassVersion'] = classVersion;
@@ -547,14 +686,16 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
-function intArrayFromStrings(strArr) {
+function intArrayFromStrings(strArr, encoder) {
 	if (strArr.length == 0)
 		return [0, 0];
 
 	var resArray = [];
 	for (var i = 0; i < strArr.length; i++) {
-		var cp1251Arr = UTF8ToCP1251Array(strArr[i]);
-		resArray = resArray.concat(cp1251Arr);
+		var tmpStrArr = encoder ? 
+			encoder.encode(strArr[i]) : 
+			UTF8ToCP1251Array(strArr[i]);
+		resArray = resArray.concat(tmpStrArr);
 	}
 
 	resArray.push(0);
@@ -603,24 +744,6 @@ function IsStructureFilled(classPtr, structPtr, variables) {
 		structPtr, "i32") == EU_TRUE) ? true : false;
 }
 
-function ClassInitializeMethods(classConstructor, variables, hasSetters) {
-	for (var key in variables) {
-		var funcName = key.capitalize();
-
-		var getName = (variables[key] != 'boolean') ? 
-			('Get' + funcName) : funcName; 
-		var getBody = new Function("return this." + key + ";");
-		classConstructor.prototype[getName] = getBody;
-
-		if (hasSetters) {
-			var setName = (variables[key] != 'boolean') ? 
-				('Set' + funcName) : funcName;
-			var setBody = new Function("value", "this." + key + " = value;");
-			classConstructor.prototype[setName] = setBody;
-		}
-	}
-}
-
 function ClassSetDefaultValues(classPtr, variables) {
 	for (var key in variables) {
 		if (variables[key] == 'string') {
@@ -637,12 +760,14 @@ function ClassSetDefaultValues(classPtr, variables) {
 	}
 }
 
-function StructureToClass(classPtr, structPtr, variables) {
+function StructureToClass(classPtr, structPtr, variables, encoder) {
 	try {
 		for (var key in variables) {
 			if (variables[key] == 'string') {
-				classPtr[key] = CP1251PointerToUTF8(
-					Module.getValue(structPtr, "i8*"));
+				var tmpPtr = Module.getValue(structPtr, "i8*");
+				classPtr[key] = encoder ? 
+					encoder.decodePointer(tmpPtr) :
+					CP1251PointerToUTF8(tmpPtr);
 				structPtr+=EU_PTR_SIZE;
 			} else if (variables[key] == 'word') {
 				classPtr[key] = Module.getValue(structPtr, "i16") | 0;
@@ -775,7 +900,17 @@ var EndUserFile = function() {
 	SetClassID('EndUserFile', '1.0.1', this);
 };
 
-ClassInitializeMethods(EndUserFile, EndUserFileFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserFile.prototype.GetFile = function() {
+	return this.file;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserFile.prototype.GetData = function() {
+	return this.data;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -825,7 +960,113 @@ var EndUserOwnerInfo = function(pInfo) {
 	}
 };
 
-ClassInitializeMethods(EndUserOwnerInfo, EndUserOwnerInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.IsFilled = function() {
+	return this.isFilled;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetIssuer = function() {
+	return this.issuer;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetIssuerCN = function() {
+	return this.issuerCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSerial = function() {
+	return this.serial;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubject = function() {
+	return this.subject;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjCN = function() {
+	return this.subjCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjOrg = function() {
+	return this.subjOrg;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjOrgUnit = function() {
+	return this.subjOrgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjTitle = function() {
+	return this.subjTitle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjState = function() {
+	return this.subjState;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjLocality = function() {
+	return this.subjLocality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjFullName = function() {
+	return this.subjFullName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjAddress = function() {
+	return this.subjAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjPhone = function() {
+	return this.subjPhone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjEMail = function() {
+	return this.subjEMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjDNS = function() {
+	return this.subjDNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjEDRPOUCode = function() {
+	return this.subjEDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserOwnerInfo.prototype.GetSubjDRFOCode = function() {
+	return this.subjDRFOCode;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -862,7 +1103,41 @@ var EndUserTimeInfo = function(pInfo) {
 	}
 };
 
-ClassInitializeMethods(EndUserTimeInfo, EndUserTimeInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.IsTimeAvail = function() {
+	return this.isTimeAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.IsTimeStamp = function() {
+	return this.isTimeStamp;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.GetTime = function() {
+	return this.time;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.IsSignTimeStampAvail = function() {
+	return this.isSignTimeStampAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTimeInfo.prototype.GetSignTimeStamp = function() {
+	return this.signTimeStamp;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -900,7 +1175,17 @@ var EndUserSignInfo = function(pInfo, data, timeInfo) {
 		this.timeInfo = timeInfo;
 };
 
-ClassInitializeMethods(EndUserSignInfo, EndUserSignInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserSignInfo.prototype.GetOwnerInfo = function() {
+	return this.ownerInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSignInfo.prototype.GetTimeInfo = function() {
+	return this.timeInfo;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -944,7 +1229,17 @@ var EndUserSenderInfo = function(pInfo, data) {
 	this.data = data;
 };
 
-ClassInitializeMethods(EndUserSenderInfo, EndUserSenderInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserSenderInfo.prototype.GetOwnerInfo = function() {
+	return this.ownerInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSenderInfo.prototype.GetTimeInfo = function() {
+	return this.timeInfo;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1041,8 +1336,275 @@ var EndUserCertificateInfo = function(pInfo) {
 	}
 };
 
-ClassInitializeMethods(EndUserCertificateInfo, 
-	EndUserCertificateInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsFilled = function() {
+	return this.isFilled;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetIssuer = function() {
+	return this.issuer;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetIssuerCN = function() {
+	return this.issuerCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSerial = function() {
+	return this.serial;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubject = function() {
+	return this.subject;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjCN = function() {
+	return this.subjCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjOrg = function() {
+	return this.subjOrg;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjOrgUnit = function() {
+	return this.subjOrgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjTitle = function() {
+	return this.subjTitle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjState = function() {
+	return this.subjState;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjLocality = function() {
+	return this.subjLocality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjFullName = function() {
+	return this.subjFullName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjAddress = function() {
+	return this.subjAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjPhone = function() {
+	return this.subjPhone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjEMail = function() {
+	return this.subjEMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjDNS = function() {
+	return this.subjDNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjEDRPOUCode = function() {
+	return this.subjEDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjDRFOCode = function() {
+	return this.subjDRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjNBUCode = function() {
+	return this.subjNBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjSPFMCode = function() {
+	return this.subjSPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjOCode = function() {
+	return this.subjOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjOUCode = function() {
+	return this.subjOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetSubjUserCode = function() {
+	return this.subjUserCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetCertBeginTime = function() {
+	return this.certBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetCertEndTime = function() {
+	return this.certEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsPrivKeyTimesAvail = function() {
+	return this.isPrivKeyTimesAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPrivKeyBeginTime = function() {
+	return this.privKeyBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPrivKeyEndTime = function() {
+	return this.privKeyEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPublicKeyBits = function() {
+	return this.publicKeyBits;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPublicKey = function() {
+	return this.publicKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPublicKeyID = function() {
+	return this.publicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsECDHPublicKeyAvail = function() {
+	return this.isECDHPublicKeyAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetECDHPublicKeyBits = function() {
+	return this.ECDHPublicKeyBits;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetECDHPublicKey = function() {
+	return this.ECDHPublicKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetECDHPublicKeyID = function() {
+	return this.ECDHPublicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetIssuerPublicKeyID = function() {
+	return this.issuerPublicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetKeyUsage = function() {
+	return this.keyUsage;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetExtKeyUsages = function() {
+	return this.extKeyUsages;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetPolicies = function() {
+	return this.policies;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetCrlDistribPoint1 = function() {
+	return this.crlDistribPoint1;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.GetCrlDistribPoint2 = function() {
+	return this.crlDistribPoint2;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsPowerCert = function() {
+	return this.isPowerCert;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsSubjTypeAvail = function() {
+	return this.isSubjTypeAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfo.prototype.IsSubjCA = function() {
+	return this.isSubjCA;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1140,24 +1702,389 @@ var EndUserCertificateInfoExFields = {
 
 	"isQSCD" : 'boolean',
 
-	"subjUserID": "string"
+	"subjUserID": "string",
+
+	"certHashType": "long"
 };
 
 //-----------------------------------------------------------------------------
 
-var EndUserCertificateInfoEx = function(pInfo) {
-	SetClassID('EndUserCertificateInfoEx', '1.0.8', this);
+var EndUserCertificateInfoEx = function(pInfo, encoder) {
+	SetClassID('EndUserCertificateInfoEx', '1.0.9', this);
 
 	if ((typeof pInfo != 'undefined') && (pInfo != null) &&
 			IsStructureFilled(this, pInfo, EndUserCertificateInfoExFields)) {
-		StructureToClass(this, pInfo, EndUserCertificateInfoExFields);
+		StructureToClass(this, pInfo, EndUserCertificateInfoExFields, encoder);
 	} else {
 		ClassSetDefaultValues(this, EndUserCertificateInfoExFields);
 	}
 };
 
-ClassInitializeMethods(EndUserCertificateInfoEx, 
-	EndUserCertificateInfoExFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsFilled = function() {
+	return this.isFilled;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetIssuer = function() {
+	return this.issuer;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetIssuerCN = function() {
+	return this.issuerCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSerial = function() {
+	return this.serial;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubject = function() {
+	return this.subject;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjCN = function() {
+	return this.subjCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjOrg = function() {
+	return this.subjOrg;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjOrgUnit = function() {
+	return this.subjOrgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjTitle = function() {
+	return this.subjTitle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjState = function() {
+	return this.subjState;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjLocality = function() {
+	return this.subjLocality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjFullName = function() {
+	return this.subjFullName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjAddress = function() {
+	return this.subjAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjPhone = function() {
+	return this.subjPhone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjEMail = function() {
+	return this.subjEMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjDNS = function() {
+	return this.subjDNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjEDRPOUCode = function() {
+	return this.subjEDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjDRFOCode = function() {
+	return this.subjDRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjNBUCode = function() {
+	return this.subjNBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjSPFMCode = function() {
+	return this.subjSPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjOCode = function() {
+	return this.subjOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjOUCode = function() {
+	return this.subjOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjUserCode = function() {
+	return this.subjUserCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetCertBeginTime = function() {
+	return this.certBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetCertEndTime = function() {
+	return this.certEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsPrivKeyTimesAvail = function() {
+	return this.isPrivKeyTimesAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPrivKeyBeginTime = function() {
+	return this.privKeyBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPrivKeyEndTime = function() {
+	return this.privKeyEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPublicKeyBits = function() {
+	return this.publicKeyBits;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPublicKey = function() {
+	return this.publicKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPublicKeyID = function() {
+	return this.publicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetIssuerPublicKeyID = function() {
+	return this.issuerPublicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetKeyUsage = function() {
+	return this.keyUsage;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetExtKeyUsages = function() {
+	return this.extKeyUsages;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPolicies = function() {
+	return this.policies;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetCrlDistribPoint1 = function() {
+	return this.crlDistribPoint1;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetCrlDistribPoint2 = function() {
+	return this.crlDistribPoint2;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsPowerCert = function() {
+	return this.isPowerCert;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsSubjTypeAvail = function() {
+	return this.isSubjTypeAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsSubjCA = function() {
+	return this.isSubjCA;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetChainLength = function() {
+	return this.chainLength;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetUPN = function() {
+	return this.UPN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetPublicKeyType = function() {
+	return this.publicKeyType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetKeyUsageType = function() {
+	return this.keyUsageType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetRSAModul = function() {
+	return this.RSAModul;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetRSAExponent = function() {
+	return this.RSAExponent;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetOCSPAccessInfo = function() {
+	return this.OCSPAccessInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetIssuerAccessInfo = function() {
+	return this.issuerAccessInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetTSPAccessInfo = function() {
+	return this.TSPAccessInfo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsLimitValueAvailable = function() {
+	return this.isLimitValueAvailable;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetLimitValue = function() {
+	return this.limitValue;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetLimitValueCurrency = function() {
+	return this.limitValueCurrency;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjType = function() {
+	return this.subjType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjSubType = function() {
+	return this.subjSubType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjUNZR = function() {
+	return this.subjUNZR;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjCountry = function() {
+	return this.subjCountry;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetFingerprint = function() {
+	return this.fingerprint;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.IsQSCD = function() {
+	return this.isQSCD;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetSubjUserID = function() {
+	return this.subjUserID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificateInfoEx.prototype.GetCertHashType = function() {
+	return this.certHashType;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1238,7 +2165,7 @@ var EndUserRequestInfoFields = {
 //-----------------------------------------------------------------------------
 
 var EndUserRequestInfo = function(pInfo) {
-	SetClassID('EndUserRequestInfoFields', '1.0.4', this);
+	SetClassID('EndUserRequestInfo', '1.0.4', this);
 
 	if ((typeof pInfo != 'undefined') && (pInfo != null) &&
 			IsStructureFilled(this, pInfo, EndUserRequestInfoFields)) {
@@ -1248,8 +2175,281 @@ var EndUserRequestInfo = function(pInfo) {
 	}
 };
 
-ClassInitializeMethods(EndUserRequestInfo, 
-	EndUserRequestInfoFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsFilled = function() {
+	return this.isFilled;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsSimple = function() {
+	return this.isSimple;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubject = function() {
+	return this.subject;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjCN = function() {
+	return this.subjCN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjOrg = function() {
+	return this.subjOrg;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjOrgUnit = function() {
+	return this.subjOrgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjTitle = function() {
+	return this.subjTitle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjState = function() {
+	return this.subjState;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjLocality = function() {
+	return this.subjLocality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjFullName = function() {
+	return this.subjFullName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjAddress = function() {
+	return this.subjAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjPhone = function() {
+	return this.subjPhone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjEMail = function() {
+	return this.subjEMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjDNS = function() {
+	return this.subjDNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjEDRPOUCode = function() {
+	return this.subjEDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjDRFOCode = function() {
+	return this.subjDRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjNBUCode = function() {
+	return this.subjNBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjSPFMCode = function() {
+	return this.subjSPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjOCode = function() {
+	return this.subjOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjOUCode = function() {
+	return this.subjOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjUserCode = function() {
+	return this.subjUserCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsCertTimesAvail = function() {
+	return this.isCertTimesAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetCertBeginTime = function() {
+	return this.certBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetCertEndTime = function() {
+	return this.certEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsPrivKeyTimesAvail = function() {
+	return this.isPrivKeyTimesAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPrivKeyBeginTime = function() {
+	return this.privKeyBeginTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPrivKeyEndTime = function() {
+	return this.privKeyEndTime;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPublicKeyType = function() {
+	return this.publicKeyType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPublicKeyBits = function() {
+	return this.publicKeyBits;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPublicKey = function() {
+	return this.publicKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetRSAModul = function() {
+	return this.RSAModul;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetRSAExponent = function() {
+	return this.RSAExponent;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetPublicKeyID = function() {
+	return this.publicKeyID;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetExtKeyUsages = function() {
+	return this.extKeyUsages;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetCrlDistribPoint1 = function() {
+	return this.crlDistribPoint1;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetCrlDistribPoint2 = function() {
+	return this.crlDistribPoint2;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsSubjTypeAvail = function() {
+	return this.isSubjTypeAvail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjType = function() {
+	return this.subjType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjSubType = function() {
+	return this.subjSubType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsSelfSigned = function() {
+	return this.isSelfSigned;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSignIssuer = function() {
+	return this.signIssuer;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSignSerial = function() {
+	return this.signSerial;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjUNZR = function() {
+	return this.subjUNZR;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.GetSubjCountry = function() {
+	return this.subjCountry;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserRequestInfo.prototype.IsQSCD = function() {
+	return this.isQSCD;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1703,14 +2903,288 @@ var EndUserInfoFields = {
 //-----------------------------------------------------------------------------
 
 var _EndUserInfo = function() {
-	SetClassID('EndUserParams', '1.0.3', this);
+	SetClassID('EndUserInfo', '1.0.3', this);
 
 	ClassSetDefaultValues(this, EndUserInfoFields);
 
 	this.version = 3;
 };
 
-ClassInitializeMethods(_EndUserInfo, EndUserInfoFields, true);
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetVersion = function(version) {
+	this.version = version;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetCommonName = function() {
+	return this.commonName;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetCommonName = function(commonName) {
+	this.commonName = commonName;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetLocality = function() {
+	return this.locality;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetLocality = function(locality) {
+	this.locality = locality;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetState = function() {
+	return this.state;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetState = function(state) {
+	this.state = state;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetOrganization = function() {
+	return this.organization;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetOrganization = function(organization) {
+	this.organization = organization;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetOrgUnit = function() {
+	return this.orgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetOrgUnit = function(orgUnit) {
+	this.orgUnit = orgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetTitle = function() {
+	return this.title;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetTitle = function(title) {
+	this.title = title;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetStreet = function() {
+	return this.street;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetStreet = function(street) {
+	this.street = street;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetPhone = function() {
+	return this.phone;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetPhone = function(phone) {
+	this.phone = phone;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetSurname = function() {
+	return this.surname;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetSurname = function(surname) {
+	this.surname = surname;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetGivenname = function() {
+	return this.givenname;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetGivenname = function(givenname) {
+	this.givenname = givenname;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetEMail = function() {
+	return this.EMail;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetEMail = function(EMail) {
+	this.EMail = EMail;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetDNS = function() {
+	return this.DNS;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetDNS = function(DNS) {
+	this.DNS = DNS;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetEDRPOUCode = function() {
+	return this.EDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetEDRPOUCode = function(EDRPOUCode) {
+	this.EDRPOUCode = EDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetDRFOCode = function() {
+	return this.DRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetDRFOCode = function(DRFOCode) {
+	this.DRFOCode = DRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetNBUCode = function() {
+	return this.NBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetNBUCode = function(NBUCode) {
+	this.NBUCode = NBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetSPFMCode = function() {
+	return this.SPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetSPFMCode = function(SPFMCode) {
+	this.SPFMCode = SPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetOCode = function() {
+	return this.OCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetOCode = function(OCode) {
+	this.OCode = OCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetOUCode = function() {
+	return this.OUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetOUCode = function(OUCode) {
+	this.OUCode = OUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetUserCode = function() {
+	return this.userCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetUserCode = function(userCode) {
+	this.userCode = userCode;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetUPN = function() {
+	return this.UPN;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetUPN = function(UPN) {
+	this.UPN = UPN;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetUNZR = function() {
+	return this.UNZR;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetUNZR = function(UNZR) {
+	this.UNZR = UNZR;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.GetCountry = function() {
+	return this.country;
+};
+
+//-----------------------------------------------------------------------------
+
+_EndUserInfo.prototype.SetCountry = function(country) {
+	this.country = country;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1820,7 +3294,257 @@ var EndUserParams = function(pParams) {
 	}
 };
 
-ClassInitializeMethods(EndUserParams, EndUserParamsFields, true);
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetSN = function() {
+	return this.SN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetSN = function(SN) {
+	this.SN = SN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetCommonName = function() {
+	return this.commonName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetCommonName = function(commonName) {
+	this.commonName = commonName;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetLocality = function() {
+	return this.locality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetLocality = function(locality) {
+	this.locality = locality;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetState = function() {
+	return this.state;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetState = function(state) {
+	this.state = state;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetOrganization = function() {
+	return this.organization;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetOrganization = function(organization) {
+	this.organization = organization;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetOrgUnit = function() {
+	return this.orgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetOrgUnit = function(orgUnit) {
+	this.orgUnit = orgUnit;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetTitle = function() {
+	return this.title;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetTitle = function(title) {
+	this.title = title;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetStreet = function() {
+	return this.street;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetStreet = function(street) {
+	this.street = street;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetPhone = function() {
+	return this.phone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetPhone = function(phone) {
+	this.phone = phone;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetSurname = function() {
+	return this.surname;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetSurname = function(surname) {
+	this.surname = surname;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetGivenname = function() {
+	return this.givenname;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetGivenname = function(givenname) {
+	this.givenname = givenname;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetEMail = function() {
+	return this.EMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetEMail = function(EMail) {
+	this.EMail = EMail;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetDNS = function() {
+	return this.DNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetDNS = function(DNS) {
+	this.DNS = DNS;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetEDRPOUCode = function() {
+	return this.EDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetEDRPOUCode = function(EDRPOUCode) {
+	this.EDRPOUCode = EDRPOUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetDRFOCode = function() {
+	return this.DRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetDRFOCode = function(DRFOCode) {
+	this.DRFOCode = DRFOCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetNBUCode = function() {
+	return this.NBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetNBUCode = function(NBUCode) {
+	this.NBUCode = NBUCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetSPFMCode = function() {
+	return this.SPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetSPFMCode = function(SPFMCode) {
+	this.SPFMCode = SPFMCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetInformation = function() {
+	return this.information;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetInformation = function(information) {
+	this.information = information;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetPassPhrase = function() {
+	return this.passPhrase;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetPassPhrase = function(passPhrase) {
+	this.passPhrase = passPhrase;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.IsPublishCertificate = function() {
+	return this.isPublishCertificate;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.IsPublishCertificate = function(isPublishCertificate) {
+	this.isPublishCertificate = isPublishCertificate;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.GetRAAdminSN = function() {
+	return this.RAAdminSN;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserParams.prototype.SetRAAdminSN = function(RAAdminSN) {
+	this.RAAdminSN = RAAdminSN;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1836,7 +3560,7 @@ EndUserParams.prototype.GetTransferableObject = function() {
 
 //=============================================================================
 
-var EndUserJKSPrivateKeyFields = {
+var EndUserPrivateKeyFields = {
 	"privateKey": "array",
 	"privateKeyName": "string",
 	"privateKeyInfo": "array",
@@ -1994,7 +3718,11 @@ var EndUserContext = function(context) {
 	this.context = context;
 };
 
-ClassInitializeMethods(EndUserContext, EndUserContextFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserContext.prototype.GetContext = function() {
+	return this.context;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2024,8 +3752,17 @@ var EndUserPrivateKeyContext = function(context, ownerInfo) {
 	this.ownerInfo = ownerInfo;
 };
 
-ClassInitializeMethods(EndUserPrivateKeyContext, 
-	EndUserPrivateKeyContextFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKeyContext.prototype.GetContext = function() {
+	return this.context;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPrivateKeyContext.prototype.GetOwnerInfo = function() {
+	return this.ownerInfo;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2104,7 +3841,17 @@ var EndUserCertificate = function(infoEx, data) {
 	this.data = data;
 };
 
-ClassInitializeMethods(EndUserCertificate, EndUserCertificateFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserCertificate.prototype.GetInfoEx = function() {
+	return this.infoEx;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCertificate.prototype.GetData = function() {
+	return this.data;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2193,7 +3940,29 @@ var EndUserSession = function(handle, data) {
 	this.data = data;
 };
 
-ClassInitializeMethods(EndUserSession, EndUserSessionFields, true);
+//-----------------------------------------------------------------------------
+
+EndUserSession.prototype.GetHandle = function() {
+	return this.handle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSession.prototype.SetHandle = function(handle) {
+	this.handle = handle;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSession.prototype.GetData = function() {
+	return this.data;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSession.prototype.SetData = function(data) {
+	this.data = data;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2268,7 +4037,29 @@ var EndUserCryptoHeader = function(caType,
 	this.cryptoData = cryptoData;
 };
 
-ClassInitializeMethods(EndUserCryptoHeader, EndUserCryptoHeaderFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserCryptoHeader.prototype.GetCAType = function() {
+	return this.CAType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCryptoHeader.prototype.GetHeaderType = function() {
+	return this.headerType;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCryptoHeader.prototype.GetHeaderSize = function() {
+	return this.headerSize;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserCryptoHeader.prototype.GetCryptoData = function() {
+	return this.cryptoData;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2355,8 +4146,41 @@ var EndUserSSSignHashResult = function(pInfo) {
 	}
 };
 
-ClassInitializeMethods(EndUserSSSignHashResult, 
-	EndUserSSSignHashResultFields, false);
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetVersion = function() {
+	return this.version;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetError = function() {
+	return this.error;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetHash = function() {
+	return this.hash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetSignature = function() {
+	return this.signature;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetStatusCode = function() {
+	return this.statusCode;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSSSignHashResult.prototype.GetStatus = function() {
+	return this.status;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -2369,5 +4193,423 @@ EndUserSSSignHashResult.prototype.SetTransferableObject = function(obj) {
 EndUserSSSignHashResult.prototype.GetTransferableObject = function() {
 	return ObjectToTransferableObject(this, {}, EndUserSSSignHashResultFields);
 };
+
+//=============================================================================
+
+var EndUserReferenceFields =  {
+	'name': 'string',
+	'data': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserReference = function(name, data) {
+	SetClassID('EndUserReference', '1.0.1', this);
+
+	this.name = name;
+	this.data = data;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.GetName = function() {
+	return this.name;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.SetName = function(name) {
+	this.name = name;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.GetData = function() {
+	return this.data;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.SetData = function(data) {
+	this.data = data;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserReferenceFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserReference.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserReferenceFields);
+};
+
+//=============================================================================
+
+var EndUserTSLSettingsFields =  {
+	'useTSL': 'boolean',
+	'autoDownloadTSL': 'boolean',
+	'tslAddress': 'string'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserTSLSettings = function(useTSL, autoDownloadTSL, tslAddress) {
+	SetClassID('EndUserTSLSettings', '1.0.1', this);
+
+	this.useTSL = useTSL;
+	this.autoDownloadTSL = autoDownloadTSL;
+	this.tslAddress = tslAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.GetUseTSL = function() {
+	return this.useTSL;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.SetUseTSL = function(useTSL) {
+	this.useTSL = useTSL;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.GetAutoDownloadTSL = function() {
+	return this.autoDownloadTSL;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.SetAutoDownloadTSL = function(autoDownloadTSL) {
+	this.autoDownloadTSL = autoDownloadTSL;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.GetTSLAddress = function() {
+	return this.tslAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.SetTSLAddress = function(tslAddress) {
+	this.tslAddress = tslAddress;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserTSLSettingsFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserTSLSettings.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserTSLSettingsFields);
+};
+
+//=============================================================================
+
+var EndUserSignerFields =  {
+	'unsignedSigner': 'array',
+	'attrsHash': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserSigner = function(unsignedSigner, attrsHash) {
+	SetClassID('EndUserSigner', '1.0.1', this);
+
+	this.unsignedSigner = unsignedSigner;
+	this.attrsHash = attrsHash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSigner.prototype.GetUnsignedSigner = function() {
+	return this.unsignedSigner;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSigner.prototype.GetAttrsHash = function() {
+	return this.attrsHash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSigner.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserSignerFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserSigner.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserSignerFields);
+};
+
+//=============================================================================
+
+var EndUserASiCSignerFields =  {
+	'signatureReference': 'string',
+	'attrsHash': 'array',
+	'asicData': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserASiCSigner = function(signatureReference, attrsHash, asicData) {
+	SetClassID('EndUserASiCSigner', '1.0.1', this);
+
+	this.signatureReference = signatureReference;
+	this.attrsHash = attrsHash;
+	this.asicData = asicData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserASiCSigner.prototype.GetSignatureReference = function() {
+	return this.signatureReference;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserASiCSigner.prototype.GetAttrsHash = function() {
+	return this.attrsHash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserASiCSigner.prototype.GetASiCData = function() {
+	return this.asicData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserASiCSigner.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserASiCSignerFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserASiCSigner.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserASiCSignerFields);
+};
+
+//=============================================================================
+
+var EndUserPDFSignerFields =  {
+	'signatureReference': 'string',
+	'attrsHash': 'array',
+	'asicData': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserPDFSigner = function(signatureReference, attrsHash, pdfData) {
+	SetClassID('EndUserPDFSigner', '1.0.1', this);
+
+	this.signatureReference = signatureReference;
+	this.attrsHash = attrsHash;
+	this.pdfData = pdfData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPDFSigner.prototype.GetSignatureReference = function() {
+	return this.signatureReference;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPDFSigner.prototype.GetAttrsHash = function() {
+	return this.attrsHash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPDFSigner.prototype.GetPDFData = function() {
+	return this.pdfData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPDFSigner.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserPDFSignerFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserPDFSigner.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserPDFSignerFields);
+};
+
+//=============================================================================
+
+var EndUserXAdESSignerFields =  {
+	'signatureReference': 'string',
+	'attrsHash': 'array',
+	'xadesData': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserXAdESSigner = function(signatureReference, attrsHash, xadesData) {
+	SetClassID('EndUserXAdESSigner', '1.0.1', this);
+
+	this.signatureReference = signatureReference;
+	this.attrsHash = attrsHash;
+	this.xadesData = xadesData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserXAdESSigner.prototype.GetSignatureReference = function() {
+	return this.signatureReference;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserXAdESSigner.prototype.GetAttrsHash = function() {
+	return this.attrsHash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserXAdESSigner.prototype.GetXAdESData = function() {
+	return this.xadesData;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserXAdESSigner.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserXAdESSignerFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserXAdESSigner.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserXAdESSignerFields);
+};
+
+//=============================================================================
+
+var EndUserMakeCertificateResultFields = {
+	"privateKey": "array",
+	"certificates": "array",
+	"cmpRequest": "array"
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserMakeCertificateResult = function(
+	privateKey, certificates, cmpRequest) {
+	SetClassID('EndUserMakeCertificateResult', '1.0.1', this);
+
+	this.privateKey = privateKey;
+	this.certificates = certificates;
+	this.cmpRequest = cmpRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.GetPrivateKey = function() {
+	return this.privateKey;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.GetCertificatesCount = function() {
+	return this.certificates.length;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.GetCertificate = function(index) {
+	if (index < 0 || index >= this.certificates.length)
+		return null;
+
+	return this.certificates[index];
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.GetCMPRequest = function() {
+	return this.cmpRequest;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserMakeCertificateResult);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserMakeCertificateResult.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserMakeCertificateResult);
+};
+
+//=============================================================================
+
+var EndUserDataHashFields =  {
+	'hashAlgo': 'number',
+	'hash': 'array'
+};
+
+//-----------------------------------------------------------------------------
+
+var EndUserDataHash = function(hashAlgo, hash) {
+	SetClassID('EndUserDataHash', '1.0.1', this);
+
+	this.hashAlgo = hashAlgo;
+	this.hash = hash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserDataHash.prototype.GetHashAlgo = function() {
+	return this.hashAlgo;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserDataHash.prototype.GetHash = function() {
+	return this.hash;
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserDataHash.prototype.SetTransferableObject = function(obj) {
+	TransferableObjectToClass(this, obj, EndUserDataHashFields);
+};
+
+//-----------------------------------------------------------------------------
+
+EndUserDataHash.prototype.GetTransferableObject = function() {
+	return ObjectToTransferableObject(this, {}, EndUserDataHashFields);
+};
+
+//=============================================================================
+
+// WARNING! Next items are depracated.
+
+/**
+ * Use EU_SIGN_TYPE_CADES_* for CAdES
+ * Use EU_XADES_SIGN_LEVEL_* for XAdES
+ */
+ var EU_ASIC_SIGN_LEVEL_BES = 1;
+ var EU_ASIC_SIGN_LEVEL_T = 4;
+
+/**
+ * Use EU_XADES_SIGN_LEVEL_B_B for EU_XADES_SIGN_LEVEL_BES
+ * Use EU_XADES_SIGN_LEVEL_B_T for EU_XADES_SIGN_LEVEL_T
+ */
+var EU_XADES_SIGN_LEVEL_BES = EU_XADES_SIGN_LEVEL_B_B;
+var EU_XADES_SIGN_LEVEL_T = EU_XADES_SIGN_LEVEL_B_T;
 
 //=============================================================================
