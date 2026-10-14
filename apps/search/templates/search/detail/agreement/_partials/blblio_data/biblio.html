@@ -104,7 +104,11 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td>
                         {% for person in hit.Decision.DecisionDetails.AuthorDetails.Author %}
-                            {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                            {% if person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm %}
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.RepresentNameFormDetails.RepresentNameForm }}
+                            {% else %}
+                                {{ person.AuthorAddressBook.FormattedNameAddress.Name.FreeFormatName.FreeFormatNameDetails.FreeFormatNameLine }} {% if person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode %}[{{ person.AuthorAddressBook.FormattedNameAddress.Address.AddressCountryCode }}]{% endif %}<br>
+                            {% endif %}
                         {% endfor %}
 
                         {% include 'search/detail/_partials/sanctions.html' with person_type='автор' %}
@@ -145,7 +149,7 @@
             {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.ContractName %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.Decision.DecisionDetails.ContractName }}</td>
+                    <td>{{ hit.Decision.DecisionDetails.RegistrationKind }} ({{ hit.Decision.DecisionDetails.ContractName }})</td>
                 </tr>
             {% endif %}
 

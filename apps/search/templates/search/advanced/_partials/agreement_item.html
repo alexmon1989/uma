@@ -50,15 +50,6 @@
                 >{{ hit.search_data.rights_date|parse_date|date:"d.m.Y" }}</a>
             </div>
 
-            {% if not hit.Document.is_limited %}
-                <div class="col-md">
-                    <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Об'єкт авторського права" %}:</h4>
-                    {% for obj in hit.Decision.DecisionDetails.CopyrightObjectKindDetails.CopyrightObjectKind %}
-                        {{ obj.CopyrightObjectKindName }}{% if not forloop.last %};{% endif %}
-                    {% endfor %}
-                </div>
-            {% endif %}
-
             {% if hit.Decision.DecisionDetails.AuthorDetails.Author or hit.Document.is_limited %}
                 <div class="col-md">
                     <h4 class="g-font-size-13 g-font-weight-600 g-mb-0">{% trans "Автор(и)" %}:</h4>
