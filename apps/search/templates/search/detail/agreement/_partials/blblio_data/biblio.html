@@ -45,7 +45,7 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>
                 </tr>
-            {% elif hit.Decision.DecisionDetails.RegistrationKind %}
+            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.RegistrationKind %}
                 <tr>
                     <th>{{ ipc_field.code_title }}</th>
                     <td>{{ hit.Decision.DecisionDetails.RegistrationKind }}</td>
@@ -146,11 +146,13 @@
                     <th>{{ ipc_field.code_title }}</th>
                     <td><span class="g-color-red">*</span></td>
                 </tr>
-            {% elif ipc_field.enable_view and hit.Decision.DecisionDetails.ContractName %}
-                <tr>
-                    <th>{{ ipc_field.code_title }}</th>
-                    <td>{{ hit.Decision.DecisionDetails.RegistrationKind }} ({{ hit.Decision.DecisionDetails.ContractName }})</td>
-                </tr>
+            {% elif ipc_field.enable_view %}
+                {% if hit.Decision.DecisionDetails.ContractName or hit.Decision.DecisionDetails.RegistrationKind %}
+                    <tr>
+                        <th>{{ ipc_field.code_title }}</th>
+                        <td>{{ hit.Decision.DecisionDetails.RegistrationKind }} {% if hit.Decision.DecisionDetails.ContractName %}({{ hit.Decision.DecisionDetails.ContractName }}){% endif %}</td>
+                    </tr>
+                {% endif %}
             {% endif %}
 
             {% get_field '81' ipc_fields as ipc_field %}
