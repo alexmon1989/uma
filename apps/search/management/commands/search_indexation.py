@@ -1,5 +1,6 @@
 import logging
 
+from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -40,6 +41,7 @@ class Command(BaseCommand):
         - ``--obj_type`` (int): Додає до індексу лише записи певного типу ОПВ.
         - ``--status`` (int): Додає до індексу лише записи з певним статусом: 1 - заявки, 2 - охоронні документи.
         - ``--ignore_indexed`` (bool): Ігнорує записи з ``elasticindexed=1``.
+        - ``--ignore_lock`` (bool): Ігнорує блокування та примусово запускає індексацію.
         """
         parser.add_argument(
             '--id',
@@ -61,6 +63,11 @@ class Command(BaseCommand):
             type=bool,
             help='Ignores elasticindexed=1'
         )
+        parser.add_argument(
+            '--ignore_lock',
+            action='store_true',
+            help='Ignores running process lock and forces indexation'
+        )
 
     def handle(self, *args, **options):
         """
@@ -71,43 +78,60 @@ class Command(BaseCommand):
 
         Логіка:
 
+        - Захоплення блокування (lock) через кеш для запобігання паралельного запуску.
         - Отримання списку додатків для індексації за допомогою сервісу ``ApplicationIndexationService``.
         - Створення процесу індексації в базі даних.
         - Індексація кожного додатка та оновлення лічильника оброблених записів.
         - Збереження часу завершення індексації та оновлення даних про процес індексації.
         - Виведення повідомлення про успішне завершення процесу індексації.
         """
-        apps = ApplicationIndexationService.get_apps_for_indexation(
-            ignore_indexed=options['ignore_indexed'],
-            app_id=options['id'],
-            status=options['status'],
-            obj_type=options['obj_type'],
-            ignore_apps=[
-                'm202006737', 'm202006738', 'm202021203', 'm202021202', 'm202021173', 'm202020602',
-                'm202020603', 'm202020601', 'm202020630', 'm202009450', 'm202009453', 'm202009452',
-                'a202204078', 'a202304888'
-                'm202128624', 'm202128621'
-            ]
-        )
+        lock_key = 'search_indexation_lock'
+        lock_timeout = 60 * 60 * 2  # 2 години
+        lock_acquired = False
 
-        self.stdout.write(self.style.SUCCESS(
-            f'The list of documents has been successfully received ({apps.count()} items).'
-        ))
+        if not options.get('ignore_lock'):
+            if not cache.add(lock_key, 'locked', timeout=lock_timeout):
+                self.stdout.write(self.style.WARNING(
+                    "Команда search_indexation вже виконується іншим процесом. Запуск скасовано."
+                ))
+                return
+            lock_acquired = True
 
-        # Создание процесса индексации в БД
-        self.indexation_process = IndexationProcess.objects.create(
-            begin_date=timezone.now(),
-            not_indexed_count=apps.count()
-        )
+        try:
+            apps = ApplicationIndexationService.get_apps_for_indexation(
+                ignore_indexed=options['ignore_indexed'],
+                app_id=options['id'],
+                status=options['status'],
+                obj_type=options['obj_type'],
+                ignore_apps=[
+                    'm202006737', 'm202006738', 'm202021203', 'm202021202', 'm202021173', 'm202020602',
+                    'm202020603', 'm202020601', 'm202020630', 'm202009450', 'm202009453', 'm202009452',
+                    'a202204078', 'a202304888',
+                    'm202128624', 'm202128621', 'm201312190'
+                ]
+            )
 
-        for app in apps:
-            ApplicationIndexationService.index_application(app)
-            self.indexation_process.processed_count += 1
+            self.stdout.write(self.style.SUCCESS(
+                f'The list of documents has been successfully received ({apps.count()} items).'
+            ))
+
+            # Создание процесса индексации в БД
+            self.indexation_process = IndexationProcess.objects.create(
+                begin_date=timezone.now(),
+                not_indexed_count=apps.count()
+            )
+
+            for app in apps:
+                ApplicationIndexationService.index_application(app)
+                self.indexation_process.processed_count += 1
+                self.indexation_process.save()
+
+            # Время окончания процесса индексации и сохранение данных процесса индексации
+            self.indexation_process.finish_date = timezone.now()
+            self.indexation_process.documents_in_index = application_get_indexed_count()
             self.indexation_process.save()
 
-        # Время окончания процесса индексации и сохранение данных процесса индексации
-        self.indexation_process.finish_date = timezone.now()
-        self.indexation_process.documents_in_index = application_get_indexed_count()
-        self.indexation_process.save()
-
-        self.stdout.write(self.style.SUCCESS('Finished'))
+            self.stdout.write(self.style.SUCCESS('Finished'))
+        finally:
+            if lock_acquired:
+                cache.delete(lock_key)
