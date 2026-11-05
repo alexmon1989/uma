@@ -339,9 +339,13 @@ class ApplicationRawDataDecisionReceiver(ApplicationRawDataFSReceiver):
         if contract_info_additional['contract_territory']:
             data['Decision']['DecisionDetails']['ContractTerritory'] = contract_info_additional['contract_territory']
 
-        # Вид і назва договору
+        # Назва договору
         if contract_info_additional['contract_name']:
             data['Decision']['DecisionDetails']['ContractName'] = contract_info_additional['contract_name']
+
+        # Вид договору
+        if contract_info_additional['contract_kind']:
+            data['Decision']['DecisionDetails']['RegistrationKind'] = contract_info_additional['contract_kind']
 
     def get_data(self) -> dict:
         data = super().get_data()
