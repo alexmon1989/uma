@@ -573,6 +573,17 @@ def fox_get_out_docs(app_number: str) -> list:
         return results
 
 
+def kasdrap_get_contract_info_additional(claim_id: int):
+    """Отримує додаткову інформацію щодо договору з технологічної БД."""
+    with connections['db_kasdrap'].cursor() as cursor:
+        cursor.execute("CALL ext_get_contract_info_by_claim(%s)", [claim_id])
+        row = cursor.fetchone()
+        if not row:
+            return {}
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+
+
 class ClaimDataSource(ABC):
     """Отримує дані файлу формули."""
 

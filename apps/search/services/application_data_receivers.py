@@ -10,7 +10,8 @@ from apps.search.services.application_raw_data_receivers import (ApplicationRawD
                                                                  ApplicationRawDataFSReceiver,
                                                                  ApplicationRawDataFSMadrid9Receiver,
                                                                  ApplicationRawDataFSWKMReceiver,
-                                                                 ApplicationRawDataFSMadrid14Receiver)
+                                                                 ApplicationRawDataFSMadrid14Receiver,
+                                                                 ApplicationRawDataDecisionReceiver)
 from apps.search.services.application_raw_data_fixers import (ApplicationRawDataFixer,
                                                               ApplicationRawDataFSInvUMLDFixer,
                                                               ApplicationRawDataFSTMFixer,
@@ -150,8 +151,8 @@ def create_service(app: IpcAppList, source: str) -> ApplicationGetFullDataServic
                 raw_data_filters,
                 raw_data_fixer
             )
-        elif app.obj_type_id in (11, 12):  # Договора авт. право
-            raw_data_receiver = ApplicationRawDataFSReceiver(app)
+        elif app.obj_type_id in (11, 12):  # Договора авт. Право
+            raw_data_receiver = ApplicationRawDataDecisionReceiver(app)
             simple_data_creator = ApplicationSimpleDataCRCreator()
             raw_data_filters = [ApplicationRawDataDecisionLimitedFilter()]
             raw_data_fixer = ApplicationRawDataFSCRFixer()

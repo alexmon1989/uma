@@ -15,7 +15,7 @@ from apps.bulletin.models import EBulletinData
 
 # Get an instance of a logger
 from apps.search.services.external import madrid_notif_get_ua_bul, fox_get_object_persons, \
-    poznachennya_claim_get_termination_date
+    poznachennya_claim_get_termination_date, kasdrap_get_contract_info_additional
 
 logger = logging.getLogger(__name__)
 
@@ -312,3 +312,40 @@ class ApplicationRawDataFSWKMReceiver(ApplicationRawDataFSReceiver):
     def _set_file_path(self) -> None:
         """Встановлює шлях до файлу з даними."""
         self._file_path = os.path.join(self._app.real_files_path, f"{self._app.id_claim}.json")
+
+
+class ApplicationRawDataDecisionReceiver(ApplicationRawDataFSReceiver):
+    """Получает сырые данные договора об авт. праве с файловой системы, получает доп. информацию, которой нет в ФС."""
+
+    def _set_contract_info(self, data: dict) -> None:
+        """Встановлює значення додаткових полів."""
+        contract_info_additional = kasdrap_get_contract_info_additional(self._app.id_parent)
+
+        # Способи використання твору, майнові права на які передаються (надаються) за договором
+        if contract_info_additional['rights_text']:
+            data['Decision']['DecisionDetails']['ContractTransfer'] = contract_info_additional['rights_text']
+
+        # Строк, на який надано права за договором (для ліцензійних договорів)
+        if contract_info_additional['contract_duration']:
+            data['Decision']['DecisionDetails']['RightsGrantedTerm'] = contract_info_additional['contract_duration']
+
+        # Номер договору і дата його підписання
+        if contract_info_additional['contract_number']:
+            data['Decision']['DecisionDetails']['ContractNumber'] = contract_info_additional['contract_number']
+        if contract_info_additional['contract_date']:
+            data['Decision']['DecisionDetails']['ContractDate'] = contract_info_additional['contract_date']
+
+        # Територія (за наявності)
+        if contract_info_additional['contract_territory']:
+            data['Decision']['DecisionDetails']['ContractTerritory'] = contract_info_additional['contract_territory']
+
+        # Вид і назва договору
+        if contract_info_additional['contract_name']:
+            data['Decision']['DecisionDetails']['ContractName'] = contract_info_additional['contract_name']
+
+    def get_data(self) -> dict:
+        data = super().get_data()
+
+        self._set_contract_info(data)
+
+        return data
