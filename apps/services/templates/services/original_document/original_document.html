@@ -9,21 +9,9 @@
     <section class="container g-pt-70 g-pb-20">
         <div class="row justify-content-between">
             <div class="col-md-12 g-mb-60">
-                <get-original-doc :recaptcha-enabled="{{ RECAPTCHA_ENABLED|yesno:"true,false" }}"></get-original-doc>
+                <get-original-doc></get-original-doc>
             </div>
         </div>
     </section>
 
-{% endblock %}
-
-{% block extra_scripts %}
-    {% if RECAPTCHA_ENABLED %}
-        <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
-    {% endif %}
-{% endblock %}
-
-{% block extra_meta %}
-    {% if RECAPTCHA_ENABLED %}
-        <meta name="site-key" content="{{ site_key }}">
-    {% endif %}
 {% endblock %}

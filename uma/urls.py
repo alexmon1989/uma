@@ -32,6 +32,8 @@ from apps.favorites.views import add_or_remove
 
 # from apps.bulletin_new.views import get_applications
 from apps.payments.views import OrderCreateAPIView, OrderStatusAPIView
+from apps.my_auth.views import proxy_handler_view
+from apps.services.views import generate_original_document
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -75,6 +77,11 @@ urlpatterns += [
         r"^media/(?P<file_path>(?:INVENTIONS|UTILITY_MOD)/.+)$",
         protected_media_view,
         name="protected_media",
+    ),
+    path(
+        "services/original-document/create-task/",
+        generate_original_document,
+        name="generate_original_document",
     ),
 ]
 

@@ -1,21 +1,31 @@
+import re
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.conf import settings
-from .tasks import get_original_document
+from django.utils.translation import gettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
 from .models import APIDescription
+from .tasks import get_original_document
 
 
+@ensure_csrf_cookie
 def original_document(request):
-    """Отображает страницу с возможнлстью загрузки оригинального документа из Е=Архива."""
-    if request.GET.get('sec_code'):
-        task = get_original_document.delay(request.GET['sec_code'])
-        return JsonResponse({'task_id': task.id})
-
+    """Отображает страницу с возможностью загрузки оригинального документа из Е-Архива."""
     return render(
         request,
         'services/original_document/original_document.html',
-        {'site_key': settings.RECAPTCHA_SITE_KEY, 'RECAPTCHA_ENABLED': settings.RECAPTCHA_ENABLED},
     )
+
+
+@require_POST
+def generate_original_document(request):
+    """Запускает фоновую задачу формирования оригинального документа из Е-Архива."""
+    sec_code = request.POST.get('sec_code', '').strip()
+    if not re.fullmatch(r'^(?:cr)?\d{10}$', sec_code, re.IGNORECASE):
+        return JsonResponse({'error': _('Довжина ідентифікатора документу невірна')}, status=400)
+
+    task = get_original_document.delay(sec_code.upper())
+    return JsonResponse({'task_id': task.id})
 
 
 def api_description(request):

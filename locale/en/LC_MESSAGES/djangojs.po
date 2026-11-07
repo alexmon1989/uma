@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #: assets/vendor/master-slider/transition-gallery/js/jquery-1.8.0.min.js:2
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-02 17:17+0300\n"
+"POT-Creation-Date: 2026-10-20 00:12+0300\n"
 "PO-Revision-Date: 2018-11-09 14:01+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,6 +18,308 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
+
+#: assets/bundles/app.js:2
+msgid "CalendarPanel"
+msgstr ""
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:5
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:8
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:5
+msgid "Для початку роботи заповніть форму пошуку"
+msgstr "Fill out the search form to get started"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:6
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:5
+msgid "Оберіть параметр пошуку"
+msgstr "Select search parameter"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:7
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:6
+msgid "Значення"
+msgstr "Value"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:8
+msgid "Так"
+msgstr "Yes"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:9
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:52
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:42
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:50
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:46
+msgid "Оберіть діапазон дат"
+msgstr "Select date range"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:67
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:10
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:7
+msgid "Додати параметр"
+msgstr "Add parameter"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:66
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:11
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:9
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:6
+msgid "Показати результати"
+msgstr "Show results"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:68
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:12
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:10
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:7
+msgid "Виконуємо пошук..."
+msgstr "Performing search..."
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:13
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:11
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:8
+msgid "Об'єкт промислової власності"
+msgstr "Object of industrial property"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:14
+msgid "Правовий статус ОПВ"
+msgstr "Legal status of IPO"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:15
+msgid "Бібліографічні елементи"
+msgstr "Bibliographic elements"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:17
+#: assets/js/vue-components/ContactForm.vue:88
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:8
+#: assets/js/vue-components/GetOriginalDoc.vue:55
+#: assets/js/vue-components/PaymentForm/mixins/translations.js:20
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:15
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
+msgid "Обов'язкове поле для заповнення"
+msgstr "Required field"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:18
+#: assets/js/vue-components/GetOriginalDoc.vue:56
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:16
+msgid "Поле містить невірне значення"
+msgstr "The field contains wrong value"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:22
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:12
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:20
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:16
+msgid "Нд"
+msgstr "Sun"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:23
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:13
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:21
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:17
+msgid "Пн"
+msgstr "Mon"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:24
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:14
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:22
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:18
+msgid "Вт"
+msgstr "Tue"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:25
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:15
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:23
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:19
+msgid "Ср"
+msgstr "Wed"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:26
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:16
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:24
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:20
+msgid "Чт"
+msgstr "Tue"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:27
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:17
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:25
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:21
+msgid "Пт"
+msgstr "Tue"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:28
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:18
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:26
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:22
+msgid "Сб"
+msgstr "Wed"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:31
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:21
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:29
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:25
+msgid "Січень"
+msgstr "January"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:32
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:22
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:30
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:26
+msgid "Лютий"
+msgstr "February"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:33
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:23
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:31
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:27
+msgid "Березень"
+msgstr "March"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:34
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:24
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:32
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:28
+msgid "Квітень"
+msgstr "April"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:35
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:25
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:33
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:29
+msgid "Травень"
+msgstr "May"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:36
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:26
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:34
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:30
+msgid "Червень"
+msgstr "June"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:37
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:27
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:35
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:31
+msgid "Липень"
+msgstr "Jule"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:38
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:28
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:36
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:32
+msgid "Серпень"
+msgstr "August"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:39
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:29
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:37
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:33
+msgid "Вересень"
+msgstr "September"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:40
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:30
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:38
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:34
+msgid "Жовтень"
+msgstr "October"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:41
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:31
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:39
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:35
+msgid "Листопад"
+msgstr "November"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:42
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:32
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:40
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:36
+msgid "Грудень"
+msgstr "December"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:45
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:35
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:43
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:39
+msgid "наступні 7 днів"
+msgstr "next 7 days"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:46
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:36
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:44
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:40
+msgid "наступні 30 днів"
+msgstr "next 30 days"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:47
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:37
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:45
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:41
+msgid "попередні 7 днів"
+msgstr "previous 7 days"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:48
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:38
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:46
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:42
+msgid "попередні 30 днів"
+msgstr "previous 30 days"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:51
+#: assets/js/vue-components/DateFilterForm/mixins/translations.js:41
+#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:49
+#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:45
+msgid "Оберіть дату"
+msgstr "Select search parameter"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:60
+msgid "ТА"
+msgstr "AND"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:64
+msgid "АБО"
+msgstr "OR"
+
+#: assets/bundles/app.js:2
+#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:68
+msgid "НЕ"
+msgstr "NOT"
 
 #: assets/js/custom.js:59 assets/js/custom.js:72 assets/js/custom.js:79
 #: assets/js/vue-components/GetOriginalDoc.vue:132
@@ -62,38 +364,6 @@ msgstr "Add to the favorites list."
 msgid "Документ було видалено зі списку вибраних документів."
 msgstr "The document was removed from the favorites list."
 
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:66
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:11
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:9
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:6
-msgid "Показати результати"
-msgstr "Show results"
-
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:67
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:10
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:7
-msgid "Додати параметр"
-msgstr "Add parameter"
-
-#: assets/js/vue-components/AdvancedSearchForm/AdvancedSearchForm.vue:68
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:12
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:10
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:7
-msgid "Виконуємо пошук..."
-msgstr "Performing search..."
-
-#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:59
-msgid "ТА"
-msgstr "AND"
-
-#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:63
-msgid "АБО"
-msgstr "OR"
-
-#: assets/js/vue-components/AdvancedSearchForm/Fields/Value/TextValue.vue:67
-msgid "НЕ"
-msgstr "NOT"
-
 #: assets/js/vue-components/AdvancedSearchForm/IpcCode.vue:165
 msgid "Заявка"
 msgstr "Claim"
@@ -102,231 +372,131 @@ msgstr "Claim"
 msgid "Охоронний документ"
 msgstr "Protective document"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:5
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:8
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:5
-msgid "Для початку роботи заповніть форму пошуку"
-msgstr "Fill out the search form to get started"
+#: assets/js/vue-components/Auth/mixins/translations.js:6
+msgid "За допомогою файлового ключа"
+msgstr "Using file key"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:6
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:5
-msgid "Оберіть параметр пошуку"
-msgstr "Select search parameter"
+#: assets/js/vue-components/Auth/mixins/translations.js:7
+msgid "За допомогою логіна/пароля"
+msgstr "Using login/password"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:7
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:6
-msgid "Значення"
-msgstr "Value"
+#: assets/js/vue-components/Auth/mixins/translations.js:10
+msgid "Оберіть ЦСК:"
+msgstr "Select CA:"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:8
-msgid "Так"
-msgstr "Yes"
+#: assets/js/vue-components/Auth/mixins/translations.js:11
+msgid "Визначити автоматично"
+msgstr "Detect automatically"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:9
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:52
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:42
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:50
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:46
-msgid "Оберіть діапазон дат"
-msgstr "Select date range"
+#: assets/js/vue-components/Auth/mixins/translations.js:12
+msgid "інший"
+msgstr "other"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:13
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:11
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:8
-msgid "Об'єкт промислової власності"
-msgstr "Object of industrial property"
+#: assets/js/vue-components/Auth/mixins/translations.js:13
+msgid "Особистий ключ"
+msgstr "Personal key"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:14
-msgid "Правовий статус ОПВ"
-msgstr "Legal status of IPO"
+#: assets/js/vue-components/Auth/mixins/translations.js:14
+msgid "Огляд"
+msgstr "Browse"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:15
-msgid "Бібліографічні елементи"
-msgstr "Bibliographic elements"
+#: assets/js/vue-components/Auth/mixins/translations.js:15
+msgid "Сертифікат(и)"
+msgstr "Certificate(s)"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:17
-#: assets/js/vue-components/ContactForm.vue:88
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:8
-#: assets/js/vue-components/GetOriginalDoc.vue:55
-#: assets/js/vue-components/PaymentForm/mixins/translations.js:20
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:15
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:12
-msgid "Обов'язкове поле для заповнення"
-msgstr "Required field"
+#: assets/js/vue-components/Auth/mixins/translations.js:16
+msgid "Оберіть файл(и) з сертифікатом(ами) (зазвичай, з розширенням cer, crt)"
+msgstr "Select file(s) with certificate(s) (usually with .cer, .crt extensions)"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:18
-#: assets/js/vue-components/GetOriginalDoc.vue:56
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:16
-msgid "Поле містить невірне значення"
-msgstr "The field contains wrong value"
+#: assets/js/vue-components/Auth/mixins/translations.js:17
+msgid "Пароль захисту ключа"
+msgstr "Key password"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:22
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:12
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:20
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:16
-msgid "Нд"
-msgstr "Sun"
+#: assets/js/vue-components/Auth/mixins/translations.js:18
+msgid "Запам'ятати"
+msgstr "Remember me"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:23
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:13
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:21
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:17
-msgid "Пн"
-msgstr "Mon"
+#: assets/js/vue-components/Auth/mixins/translations.js:19
+msgid "Вхід"
+msgstr "Enter"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:24
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:14
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:22
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:18
-msgid "Вт"
-msgstr "Tue"
+#: assets/js/vue-components/Auth/mixins/translations.js:20
+msgid "Завантаження..."
+msgstr "Loading..."
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:25
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:15
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:23
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:19
-msgid "Ср"
-msgstr "Wed"
+#: assets/js/vue-components/Auth/mixins/translations.js:43
+msgid "Оберіть файл з особистим ключем (зазвичай його назва \"Key-6.dat\" або *.pfx, *.pk8, *.zs2, *.jks) та вкажіть пароль захисту"
+msgstr "Select a personal key file (usually named \"Key-6.dat\" or *.pfx, *.pk8, *.zs2, *.jks) and specify the password"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:26
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:16
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:24
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:20
-msgid "Чт"
-msgstr "Tue"
+#: assets/js/vue-components/Auth/mixins/translations.js:24
+msgid ", а також оберіть сертифікат(и)"
+msgstr ", and select certificate(s)"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:27
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:17
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:25
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:21
-msgid "Пт"
-msgstr "Tue"
+#: assets/js/vue-components/Auth/mixins/translations.js:27
+msgid "Авторизація неможлива!"
+msgstr "Authorization is not possible!"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:28
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:18
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:26
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:22
-msgid "Сб"
-msgstr "Wed"
+#: assets/js/vue-components/Auth/mixins/translations.js:28
+msgid "Виникла помилка при авторизації"
+msgstr "An error occurred during authorization"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:31
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:21
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:29
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:25
-msgid "Січень"
-msgstr "January"
+#: assets/js/vue-components/Auth/mixins/translations.js:29
+msgid ""
+"Криптографічну бібліотеку не завантажено. Перевірте підключення euscp.js."
+msgstr ""
+"Cryptographic library is not loaded. Check euscp.js connection."
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:32
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:22
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:30
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:26
-msgid "Лютий"
-msgstr "February"
+#: assets/js/vue-components/Auth/mixins/translations.js:30
+msgid "Помилка ініціалізації криптографічної бібліотеки"
+msgstr "Cryptographic library initialization error"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:33
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:23
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:31
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:27
-msgid "Березень"
-msgstr "March"
+#: assets/js/vue-components/Auth/mixins/translations.js:31
+msgid "Зачекайте, триває ініціалізація криптографічного модуля..."
+msgstr "Please wait, initializing cryptographic module..."
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:34
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:24
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:32
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:28
-msgid "Квітень"
-msgstr "April"
+#: assets/js/vue-components/Auth/mixins/translations.js:32
+msgid "Оберіть файл з особистим ключем"
+msgstr "Select personal key file"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:35
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:25
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:33
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:29
-msgid "Травень"
-msgstr "May"
+#: assets/js/vue-components/Auth/mixins/translations.js:33
+msgid "Оберіть файл(и) з сертифікатом(ами)"
+msgstr "Select file(s) with certificate(s)"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:36
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:26
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:34
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:30
-msgid "Червень"
-msgstr "June"
+#: assets/js/vue-components/Auth/mixins/translations.js:34
+msgid "Вкажіть пароль доступу до особистого ключа"
+msgstr "Specify the password for personal key"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:37
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:27
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:35
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:31
-msgid "Липень"
-msgstr "Jule"
+#: assets/js/vue-components/Auth/mixins/translations.js:35
+msgid "У JKS контейнері не знайдено ключів"
+msgstr "No keys found in JKS container"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:38
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:28
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:36
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:32
-msgid "Серпень"
-msgstr "August"
+#: assets/js/vue-components/Auth/mixins/translations.js:38
+msgid "Логін:"
+msgstr "Username:"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:39
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:29
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:37
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:33
-msgid "Вересень"
-msgstr "September"
+#: assets/js/vue-components/Auth/mixins/translations.js:39
+msgid "Логін"
+msgstr "Username"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:40
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:30
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:38
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:34
-msgid "Жовтень"
-msgstr "October"
+#: assets/js/vue-components/Auth/mixins/translations.js:40
+msgid "Пароль:"
+msgstr "Password:"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:41
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:31
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:39
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:35
-msgid "Листопад"
-msgstr "November"
+#: assets/js/vue-components/Auth/mixins/translations.js:41
+msgid "Пароль"
+msgstr "Password"
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:42
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:32
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:40
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:36
-msgid "Грудень"
-msgstr "December"
+#: assets/js/vue-components/Auth/mixins/translations.js:44
+msgid "Будь ласка, вкажіть логін та пароль."
+msgstr "Please enter username and password."
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:45
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:35
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:43
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:39
-msgid "наступні 7 днів"
-msgstr "next 7 days"
+#: assets/js/vue-components/Auth/mixins/translations.js:45
+msgid "Невірний логін або пароль."
+msgstr "Invalid username or password."
 
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:46
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:36
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:44
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:40
-msgid "наступні 30 днів"
-msgstr "next 30 days"
-
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:47
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:37
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:45
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:41
-msgid "попередні 7 днів"
-msgstr "previous 7 days"
-
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:48
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:38
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:46
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:42
-msgid "попередні 30 днів"
-msgstr "previous 30 days"
-
-#: assets/js/vue-components/AdvancedSearchForm/mixins/translations.js:51
-#: assets/js/vue-components/DateFilterForm/mixins/translations.js:41
-#: assets/js/vue-components/SimpleSearchForm/mixins/translations.js:49
-#: assets/js/vue-components/TransactionsSearchForm/mixins/translations.js:45
-msgid "Оберіть дату"
-msgstr "Select search parameter"
+#: assets/js/vue-components/Auth/mixins/translations.js:17
+msgid "Завантаження криптографічної бібліотеки"
+msgstr "Loading cryptographic library"
 
 #: assets/js/vue-components/ContactForm.vue:81
 msgid "Форму було відправлено. Ми відповимо вам найближчим часом."
@@ -498,6 +668,74 @@ msgstr ""
 #: docs/build/html/_static/sphinx_highlight.js:112
 msgid "Hide Search Matches"
 msgstr ""
+
+#: assets/js/vue-components/Auth/mixins/translations.js:7
+msgid "За допомогою токена"
+msgstr "Using hardware token"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:27
+msgid "Захищений носій (токен):"
+msgstr "Hardware key (token):"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:28
+msgid "Оберіть носій ключа"
+msgstr "Select key media"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:29
+msgid "Носії не знайдено (підключіть токен)"
+msgstr "No media found (connect token)"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:30
+msgid "Оновити"
+msgstr "Refresh"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:31
+msgid "Пароль захисту токена (PIN-код)"
+msgstr "Token password (PIN code)"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:32
+msgid "Оберіть захищений носій (токен)"
+msgstr "Select a secure media (token)"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:33
+msgid "Вкажіть пароль захисту токена (PIN-код)"
+msgstr "Enter token password (PIN code)"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:34
+msgid "Бібліотека web-підпису не підтримується у вашому браузері або ОС."
+msgstr "The web signature library is not supported in your browser or OS."
+
+#: assets/js/vue-components/Auth/mixins/translations.js:35
+msgid "Бібліотека web-підпису потребує оновлення."
+msgstr "The web signature library needs an update."
+
+#: assets/js/vue-components/Auth/mixins/translations.js:36
+msgid "Для роботи з токенами необхідно встановити програмне забезпечення web-підпису."
+msgstr "To work with tokens, it is necessary to install web signing software."
+
+#: assets/js/vue-components/Auth/mixins/translations.js:37
+msgid "Також необхідно встановити розширення для браузера."
+msgstr "It is also necessary to install a browser extension."
+
+#: assets/js/vue-components/Auth/mixins/translations.js:38
+msgid "Завантажити модуль web-підпису"
+msgstr "Download web signing module"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:39
+msgid "Встановити розширення для браузера"
+msgstr "Install browser extension"
+
+#: assets/js/vue-components/Auth/mixins/translations.js:40
+msgid "Перевірити знову"
+msgstr "Check again"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:56
+msgid "Довжина ідентифікатора документу невірна"
+msgstr "Invalid document identifier length"
+
+#: assets/js/vue-components/GetOriginalDoc.vue:59
+msgid "Забагато запитів. Будь-ласка, зачекайте хвилину перед повторною спробою."
+msgstr "Too many requests. Please wait a minute before trying again."
 
 #~ msgid "Стан об'єкта"
 #~ msgstr "Object state"

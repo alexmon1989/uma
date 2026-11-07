@@ -2948,3 +2948,24 @@ msgstr "Phone"
 
 #~ msgid "Патент України на винахід"
 #~ msgstr "Granted Patent of Ukraine for Invention"
+
+#: apps/my_auth/views.py:17
+msgid "Вихід успішний."
+msgstr "Logged out successfully."
+
+#: apps/my_auth/views.py:47 apps/my_auth/views.py:70
+msgid "Авторизація успішна."
+msgstr "Authorization successful."
+
+#: apps/my_auth/views.py:59
+msgid "Будь ласка, вкажіть логін та пароль."
+msgstr "Please enter username and password."
+
+#: apps/my_auth/views.py:63
+msgid "Невірний логін або пароль."
+msgstr "Invalid username or password."
+
+#: apps/services/views.py:25
+msgid "Довжина ідентифікатора документу невірна"
+msgstr "Invalid document identifier length"
+

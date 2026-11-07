@@ -10,7 +10,9 @@
                         <input type="text"
                                name="sec_code"
                                v-model="value"
-                               v-validate="'required|alpha_num'"
+                               v-validate="{ required: true, regex: /^(cr)?\d{10}$/i }"
+                               data-vv-validate-on="none"
+                               @input="errors.remove('sec_code')"
                                :disabled="processing"
                                class="form-control rounded-0 form-control-md"
                                :placeholder="translations.inputPlaceholder">
@@ -29,21 +31,18 @@
             </div>
         </form>
 
-        <p class="g-mb-20 text-danger" v-if="serverErrors.length > 0">{{ translations.serverErrors }}</p>
+        <p class="g-mb-20 text-danger" v-if="serverErrors.length > 0">{{ typeof serverErrors[0] === 'string' ? serverErrors[0] : translations.serverErrors }}</p>
         <p class="g-mb-20 text-danger" v-if="notFound">{{ translations.notFound }}</p>
     </div>
 </template>
 
 <script>
     import axios from '../axios-config';
+    import qs from 'qs';
     import { saveAs } from 'file-saver';
     import * as Toastr from 'toastr';
 
     export default {
-        props: {
-            recaptchaEnabled: Boolean,
-        },
-
         data() {
             return {
                 translations: {
@@ -53,9 +52,10 @@
                     btnTextProcessing: gettext('Зачекайте...'),
                     validationErrors: {
                         required: gettext('Обов\'язкове поле для заповнення'),
-                        alpha_num: gettext('Поле містить невірне значення'),
+                        regex: gettext('Довжина ідентифікатора документу невірна'),
                     },
                     serverErrors: gettext('Помилка звернення до сервера. Спробуйте, будь-ласка, пізніше.'),
+                    rateLimitError: gettext('Забагато запитів. Будь-ласка, зачекайте хвилину перед повторною спробою.'),
                     notFound: gettext('Вибачте, за даним ідентифікатором не знайдено жодного документа.'),
                 },
                 processing: false,
@@ -71,15 +71,15 @@
         methods: {
             // Обработчик отправки формы
             handleSubmit() {
-                Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 10000});
                 this.serverErrors = [];
-                this.processing = true;
                 this.filePath = '';
                 this.notFound = false;
                 this.taskId = '';
                 this.$validator.validate().then(valid => {
                     if (valid) {
-                       this.getTaskId();
+                        Toastr.info(gettext('Будь-ласка, зачекайте, відбувається формування файлу.'), {timeOut: 10000});
+                        this.processing = true;
+                        this.getTaskId();
                     } else {
                         this.processing = false;
                     }
@@ -87,18 +87,25 @@
             },
 
             getTaskId() {
-                axios.get('/services/original-document/', {
-                    params: {
-                        sec_code: this.value,
-                    }
-                })
+                axios.post('/services/original-document/create-task/', qs.stringify({
+                    sec_code: this.value ? this.value.trim() : '',
+                }))
                     .then((response) => {
                         this.serverErrors = [];
                         this.taskId = response.data.task_id;
                     })
                     .catch(e => {
-                        this.serverErrors.push(e);
-                        this.processing = false
+                        if (e.response && e.response.status === 429) {
+                            this.serverErrors.push(this.translations.rateLimitError);
+                            Toastr.error(this.translations.rateLimitError);
+                        } else if (e.response && e.response.data && e.response.data.error) {
+                            this.serverErrors.push(e.response.data.error);
+                            Toastr.error(e.response.data.error);
+                        } else {
+                            this.serverErrors.push(this.translations.serverErrors);
+                            Toastr.error(this.translations.serverErrors);
+                        }
+                        this.processing = false;
                     });
             },
 
@@ -123,7 +130,7 @@
                             } else {
                                 self.notFound = true;
                             }
-                            self.processing = false
+                            self.processing = false;
                         }
                     };
 
@@ -133,24 +140,11 @@
                         self.processing = false;
                     };
 
-                    if (this.recaptchaEnabled) {
-                        let siteKey = document.querySelector('meta[name="site-key"]').content;
-
-                        return grecaptcha.execute(siteKey, {action: 'getoriginaldoc'}).then(function (token) {
-                            return axios.get('/search/get-task-info/', {
-                                params: {
-                                    task_id: self.taskId,
-                                    token: token,
-                                }
-                            }).then(onSuccess).catch(onError);
-                        });
-                    } else {
-                        return axios.get('/search/get-task-info/', {
-                            params: {
-                                task_id: self.taskId,
-                            }
-                        }).then(onSuccess).catch(onError);
-                    }
+                    return axios.get('/search/get-task-info/', {
+                        params: {
+                            task_id: self.taskId,
+                        }
+                    }).then(onSuccess).catch(onError);
                 } else {
                     // Количество попыток превышено
                     this.serverErrors.push('Количество обращения к серверу превышено.');
