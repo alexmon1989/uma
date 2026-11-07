@@ -733,9 +733,9 @@ msgstr "Check again"
 msgid "Довжина ідентифікатора документу невірна"
 msgstr "Invalid document identifier length"
 
-#: assets/js/vue-components/GetOriginalDoc.vue:59
-msgid "Забагато запитів. Будь-ласка, зачекайте хвилину перед повторною спробою."
-msgstr "Too many requests. Please wait a minute before trying again."
+#: assets/js/vue-components/GetOriginalDoc.vue:58
+msgid "Забагато запитів. Будь-ласка, зачекайте перед повторною спробою."
+msgstr "Too many requests. Please wait before trying again."
 
 #~ msgid "Стан об'єкта"
 #~ msgstr "Object state"
