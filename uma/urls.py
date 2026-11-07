@@ -32,7 +32,6 @@ from apps.favorites.views import add_or_remove
 
 # from apps.bulletin_new.views import get_applications
 from apps.payments.views import OrderCreateAPIView, OrderStatusAPIView
-from apps.my_auth.views import proxy_handler_view
 from apps.services.views import generate_original_document
 
 urlpatterns = [
