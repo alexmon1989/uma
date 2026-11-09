@@ -2965,6 +2965,14 @@ msgstr "Please enter username and password."
 msgid "Невірний логін або пароль."
 msgstr "Invalid username or password."
 
+#: apps/my_auth/views.py:60
+msgid "Цей спосіб авторизації вимкнено."
+msgstr "This authentication method is disabled."
+
+#: apps/my_auth/views.py:94
+msgid "Авторизація за логіном та паролем вимкнена."
+msgstr "Authentication with username and password is disabled."
+
 #: apps/services/views.py:25
 msgid "Довжина ідентифікатора документу невірна"
 msgstr "Invalid document identifier length"

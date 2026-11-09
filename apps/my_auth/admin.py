@@ -46,8 +46,11 @@ class CertificateOwnerAdmin(admin.ModelAdmin):
         'pszSerial',
         'user',
         'pszSubjFullName',
+        'key_media_type',
     )
+    list_filter = ('key_media_type',)
     readonly_fields = (
+        'key_media_type',
         'pszIssuer',
         'pszIssuerCN',
         'pszSerial',

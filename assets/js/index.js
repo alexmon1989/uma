@@ -20,6 +20,10 @@ import DateFilterForm from "./vue-components/DateFilterForm/DateFilterForm.vue";
 import Bulletin from "./vue-components/Bulletin/Bulletin.vue";
 import BulletinNew from "./vue-components/BulletinNew/Bulletin.vue";
 import PaymentForm from "./vue-components/PaymentForm/PaymentForm.vue";
+import LoginForm from "./vue-components/Auth/LoginForm.vue";
+import LoginFileKey from "./vue-components/Auth/LoginFileKey.vue";
+import LoginHardwareKey from "./vue-components/Auth/LoginHardwareKey.vue";
+import LoginPassword from "./vue-components/Auth/LoginPassword.vue";
 
 import VeeValidate from 'vee-validate';
 import * as Toastr from "toastr";
@@ -44,5 +48,9 @@ const app = new Vue({
         Bulletin,
         BulletinNew,
         PaymentForm,
+        LoginForm,
+        LoginFileKey,
+        LoginHardwareKey,
+        LoginPassword,
     }
 });
