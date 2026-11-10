@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from .services import (
@@ -25,6 +25,7 @@ def logout_view(request):
     return HttpResponseRedirect("/")
 
 
+@ensure_csrf_cookie
 def login_view(request):
     """Страница логина пользователей."""
     if request.user.is_authenticated:
