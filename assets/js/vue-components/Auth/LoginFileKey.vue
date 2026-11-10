@@ -303,7 +303,15 @@
                             if (!jksKeys || jksKeys.length === 0) {
                                 throw new Error(this.translations.jksNoKeys);
                             }
-                            const pkIndex = 0;
+                            let pkIndex = jksKeys.findIndex(k => {
+                                if (k.digitalStamp) return false;
+                                const cert = (k.certificates || [])[0];
+                                const usage = (cert && cert.infoEx && cert.infoEx.keyUsage || '').toLowerCase();
+                                return usage.includes('підпис') || usage.includes('sign');
+                            });
+                            if (pkIndex === -1) {
+                                pkIndex = Math.max(0, jksKeys.findIndex(k => !k.digitalStamp));
+                            }
                             const jksCerts = (jksKeys[pkIndex].certificates || []).map(c => c.data);
                             const certsToUse = (pkCertificates && pkCertificates.length > 0) ? pkCertificates : jksCerts;
                             return this.euSign.ReadPrivateKeyBinary(

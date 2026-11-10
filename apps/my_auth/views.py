@@ -34,7 +34,8 @@ def login_view(request):
     has_ds = bool({"file", "token"} & set(enabled_methods))
 
     if has_ds:
-        request.session["secret"] = uuid.uuid4().hex
+        if not request.session.get("secret"):
+            request.session["secret"] = uuid.uuid4().hex
     else:
         request.session.pop("secret", None)
 
