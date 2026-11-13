@@ -6,7 +6,8 @@ from django.conf import settings
 from django.db.models import F
 from django.utils.translation import gettext as _
 from ..models import ObjType, SortParameter, IndexationProcess, PaidServicesSettings
-from ..utils import (user_has_access_to_docs as user_has_access_to_docs_, get_registration_status_color,
+from ..services import UserDocAccessService
+from ..utils import (get_registration_status_color,
                      get_fixed_mark_status_code)
 from apps.bulletin.services import bulletin_get_number_by_date, bulletin_get_number_with_year_by_date
 import re
@@ -250,9 +251,9 @@ def sort_params(context):
 
 
 @register.simple_tag
-def user_has_access_to_docs(user, id_app_number):
+def user_has_access_to_docs(user, hit: dict) -> bool:
     """Возвращает признак доступности документа(ов)."""
-    return user_has_access_to_docs_(user, id_app_number)
+    return UserDocAccessService(user, hit).has_access()
 
 
 @register.filter

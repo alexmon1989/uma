@@ -21,6 +21,7 @@ from uma.utils import iterable
 import xlsxwriter
 import io
 from apps.bulletin.models import ClListOfficialBulletinsIp
+from .services.doc_access import UserDocAccessService
 
 
 def get_search_groups(search_data):
@@ -1155,88 +1156,6 @@ def create_selection_tm(data, params, file_path):
     document.save(file_path)
 
 
-def user_has_access_to_docs_decorator(f):
-    """Декоратор для проверки у пользователя наличия прав на скачивание документа(ов)."""
-    def wrapper(*args, **kw):
-        id_app_number = args[0].POST.get('id_app_number') or kw.get('id_app_number')
-        if user_has_access_to_docs(args[0].user, id_app_number):
-            return f(*args, **kw)
-        else:
-            return HttpResponse('401 Unauthorized', status=401)
-    return wrapper
-
-
-def user_has_access_to_docs(user, hit):
-    """Возвращает признак доступности документа(ов)"""
-    # Проверка на принадлженость пользователя к роли суперадмина или к ВИП-роли
-    if not user.is_anonymous:
-        if user.is_vip():
-            return True
-        elif 'НАЗК' in user.groups.all().values_list('name', flat=True):
-            return not is_app_limited(hit)
-        else:
-            allowed_persons = []
-
-            for person_type in ('applicant', 'inventor', 'owner', 'agent'):
-                try:
-                    if hit['search_data'].get(person_type):
-                        allowed_persons += [x['name'] for x in hit['search_data'][person_type]]
-                except KeyError:
-                    pass
-
-            # Адреса для листування (ТМ)
-            try:
-                allowed_persons.append(
-                    hit['TradeMark']['TrademarkDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
-                        'Name']['FreeFormatNameLine']
-                )
-            except KeyError:
-                pass
-
-            # Адреса для листування (ПЗ)
-            try:
-                allowed_persons.append(
-                    hit['Design']['DesignDetails']['CorrespondenceAddress']['CorrespondenceAddressBook'][
-                        'FormattedNameAddress']['Name']['FreeFormatName']['FreeFormatNameDetails']['FreeFormatNameLine']
-                )
-            except KeyError:
-                pass
-
-            # Адреса для листування (заявки на винаходи, корисні моделі)
-            try:
-                allowed_persons.append(hit['Claim']['I_98'])
-            except KeyError:
-                pass
-
-            # Адреса для листування (охоронні документи на винаходи, корисні моделі)
-            try:
-                allowed_persons.append(hit['Patent']['I_98'])
-            except KeyError:
-                pass
-
-            # Имена пользователя (если роль - патентный поверенный, то необходимо проверять несколько имён)
-            user_names = []
-            if hasattr(user, 'certificateowner'):
-                user_names = [user.certificateowner.pszSubjFullName.strip()]
-            elif user.is_patent_attorney():
-                user_names.append(f"{user.last_name} {user.first_name}".strip())
-                for patent_attroney in user.patentattorney_set.all():
-                    user_names.append(patent_attroney.name)
-
-            # Удаление None-объектов
-            allowed_persons = list(filter(lambda item: item is not None, allowed_persons))
-
-            # Замена латинских I, i на кириллицу, апострофов
-            user_names = [x.replace('I', 'І').replace('i', 'і').replace("`", "'").replace("’", "'") for x in user_names]
-            allowed_persons = [x.replace('I', 'І').replace('i', 'і').replace("`", "'").replace("’", "'") for x in allowed_persons]
-
-            # Проверка на вхождение
-            return any([person for person in allowed_persons for user_name in user_names if
-                        user_name.upper() in person.upper()])
-
-    return False
-
-
 def create_search_res_doc(data, file_path):
     """Формировние Excel-файла с результатами поиска."""
     workbook = xlsxwriter.Workbook(file_path)
@@ -1968,7 +1887,8 @@ def filter_app_data(app_data, user):
     # Если это заявка на полезную модель или пром образец, заявка на ТМ без установленной даты подачи
     # то необходимо убрать всю "закрытую" информацию
     # (кроме как для вип-пользователей или людей, которые имеют отношение к заявке)
-    if app_data['search_data'].get('obj_state') == 1 and not user_has_access_to_docs(user, app_data):
+
+    if app_data['search_data'].get('obj_state') == 1 and not UserDocAccessService(user, app_data).has_access():
 
         if app_data['Document']['idObjType'] == 1 and not app_data['Claim'].get('I_43.D'):  # Изобретения
             res = {
@@ -2116,7 +2036,8 @@ def is_app_limited(app_data: dict):
 
 def is_app_limited_for_user(app_data, user):
     """Является ли заявка такой (для пользователя), библиографические данные которой не должны публиковаться"""
-    return is_app_limited(app_data) and not user_has_access_to_docs(user, app_data)
+
+    return is_app_limited(app_data) and not UserDocAccessService(user, app_data).has_access()
 
 
 def get_ipc_codes_with_schedules(lang_code):

@@ -5,7 +5,6 @@ import copy
 import os
 from zipfile import ZipFile
 
-import pyodbc
 from dateutil.relativedelta import relativedelta
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -17,12 +16,28 @@ from django.conf import settings
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
-from apps.search.models import IpcAppList, DeliveryDateCead, OrderService, OrderDocument, AppLimited, AppDocuments
+from apps.search.models import (
+    IpcAppList,
+    DeliveryDateCead,
+    OrderService,
+    OrderDocument,
+    AppLimited,
+    AppDocuments,
+)
 from apps.bulletin import services as bulletin_services
-from apps.search.services.external import gloc_get_sanctioned_objects, gnof_get_tracking_numbers, \
-    SanctionedObjectsService
-from apps.search.utils import filter_bad_apps, user_has_access_to_docs
-from apps.search.dataclasses import InidCode, ApplicationDocument, ServiceExecuteResult, ServiceExecuteResultError
+from apps.search.services.external import (
+    gloc_get_sanctioned_objects,
+    gnof_get_tracking_numbers,
+    SanctionedObjectsService,
+)
+from apps.search.utils import filter_bad_apps
+from .doc_access import UserDocAccessService
+from apps.search.dataclasses import (
+    InidCode,
+    ApplicationDocument,
+    ServiceExecuteResult,
+    ServiceExecuteResultError,
+)
 from apps.my_auth.services import UserService
 from apps.classifiers.services import document_types_disabled_nacp
 
@@ -38,7 +53,7 @@ def application_get_stages_statuses(app_data: dict) -> Optional[List]:
     }
 
     try:
-        return obj_types_funcs[app_data['Document']['idObjType']](app_data)
+        return obj_types_funcs[app_data["Document"]["idObjType"]](app_data)
     except KeyError:
         return None
 
@@ -47,115 +62,153 @@ def application_get_inv_um_ld_stages_statuses(app_data: dict) -> List:
     """Возвращает список со статусами этапов рассмотрения заявки на изобретение или полезную модель."""
     # Состояние делопроизводства
     is_stopped = False
-    doc_types = [doc['DOCRECORD']['DOCTYPE'] for doc in app_data['DOCFLOW'].get('DOCUMENTS', [])
-                 if doc['DOCRECORD'].get('DOCREGNUMBER')
-                 or doc['DOCRECORD'].get('DOCBARCODE')
-                 or doc['DOCRECORD'].get('DOCSENDINGDATE')]
+    doc_types = [
+        doc["DOCRECORD"]["DOCTYPE"]
+        for doc in app_data["DOCFLOW"].get("DOCUMENTS", [])
+        if doc["DOCRECORD"].get("DOCREGNUMBER")
+        or doc["DOCRECORD"].get("DOCBARCODE")
+        or doc["DOCRECORD"].get("DOCSENDINGDATE")
+    ]
 
     # Признаки того что делопроизводство остановлено
-    for x in ['[В11]', '[В5]', '[В5а]', '[В5д]', '[В12]', '[В5б]', '[В16]', '[В10]']:
+    for x in ["[В11]", "[В5]", "[В5а]", "[В5д]", "[В12]", "[В5б]", "[В16]", "[В10]"]:
         for doc_type in doc_types:
             if x in doc_type:
                 is_stopped = True
 
     # Признаки того что делопроизводство возобновлено
     if is_stopped:
-        for x in ['[В21а]', '[В21б]', '[В21]', '[В22]']:
+        for x in ["[В21а]", "[В21б]", "[В21]", "[В22]"]:
             for doc_type in doc_types:
                 if x in doc_type:
                     is_stopped = False
 
     # Пройденные стадии
     done_stages = list()
-    for stage in app_data['DOCFLOW'].get('STAGES', []):
-        if stage['STAGERECORD']['STAGE'] == 'Встановлення дати подання національної заявки':
-            for x in ['[В1]', '[В4]', '[В9]']:
+    for stage in app_data["DOCFLOW"].get("STAGES", []):
+        if (
+            stage["STAGERECORD"]["STAGE"]
+            == "Встановлення дати подання національної заявки"
+        ):
+            for x in ["[В1]", "[В4]", "[В9]"]:
                 for doc_type in doc_types:
                     if x in doc_type:
-                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        done_stages.append(stage["STAGERECORD"]["STAGE"])
                         break
-        elif stage['STAGERECORD']['STAGE'] == 'Формальна експертиза заявок на винаходи і корисні моделі':
-            for x in ['[В6]', '[В7]', '[В8]']:
+        elif (
+            stage["STAGERECORD"]["STAGE"]
+            == "Формальна експертиза заявок на винаходи і корисні моделі"
+        ):
+            for x in ["[В6]", "[В7]", "[В8]"]:
                 for doc_type in doc_types:
                     if x in doc_type:
-                        done_stages.append(stage['STAGERECORD']['STAGE'])
+                        done_stages.append(stage["STAGERECORD"]["STAGE"])
                         break
-        elif stage['STAGERECORD'].get('ENDDATE'):
-            done_stages.append(stage['STAGERECORD']['STAGE'])
+        elif stage["STAGERECORD"].get("ENDDATE"):
+            done_stages.append(stage["STAGERECORD"]["STAGE"])
 
     # Коды сборов
     cl_codes = []
-    for stage in app_data['DOCFLOW'].get('COLLECTIONS', []):
-        if stage['CLRECORD'].get('CLCODE'):
-            cl_codes.append(stage['CLRECORD']['CLCODE'])
+    for stage in app_data["DOCFLOW"].get("COLLECTIONS", []):
+        if stage["CLRECORD"].get("CLCODE"):
+            cl_codes.append(stage["CLRECORD"]["CLCODE"])
 
     # Стадии делопроизводства по заявке
     stages = [
         {
-            'title': _('Патент зареєстровано'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or 'Підтримка чинності' in done_stages
-            else 'not-active'
+            "title": _("Патент зареєстровано"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Підтримка чинності" in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Підготовка до державної реєстрації та публікації'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or 'Підготовка заявки до реєстрації патенту' in done_stages
-            else 'not-active'
+            "title": _("Підготовка до державної реєстрації та публікації"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Підготовка заявки до реєстрації патенту" in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Очікування документа про сплату державного мита'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or '19994' in cl_codes or '19996' in cl_codes
-            else 'not-active'
+            "title": _("Очікування документа про сплату державного мита"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "19994" in cl_codes
+                or "19996" in cl_codes
+                else "not-active"
+            ),
         },
         {
-            'title': _('Кваліфікаційна експертиза'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2 or 'Кваліфікаційна експертиза' in done_stages
-            else 'not-active'
+            "title": _("Кваліфікаційна експертиза"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Кваліфікаційна експертиза" in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Очікування клопотання про проведення кваліфікаційної експертизи'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or 'Очікування клопотання та збору щодо КЕ' in done_stages
-            else 'not-active'
+            "title": _(
+                "Очікування клопотання про проведення кваліфікаційної експертизи"
+            ),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Очікування клопотання та збору щодо КЕ" in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Формальна експертиза'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or 'Формальна експертиза заявок на винаходи і корисні моделі' in done_stages
-            else 'not-active'
+            "title": _("Формальна експертиза"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Формальна експертиза заявок на винаходи і корисні моделі"
+                in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Встановлення дати подання'),
-            'status': 'done' if app_data['search_data']['obj_state'] == 2
-                                or 'Встановлення дати подання національної заявки' in done_stages
-                                or 'Встановлення дати входження в національну фазу в Україні' in done_stages
-            else 'not-active'
+            "title": _("Встановлення дати подання"),
+            "status": (
+                "done"
+                if app_data["search_data"]["obj_state"] == 2
+                or "Встановлення дати подання національної заявки" in done_stages
+                or "Встановлення дати входження в національну фазу в Україні"
+                in done_stages
+                else "not-active"
+            ),
         },
         {
-            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
-            'status': 'done'
+            "title": _(
+                "Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних"
+            ),
+            "status": "done",
         },
     ]
 
     # Неиспользуемые стадии при экспертизе заявок на полезные модели
-    if app_data['Document']['idObjType'] == 2:
-        stages[3]['status'] = 'not-used'
-        stages[4]['status'] = 'not-used'
+    if app_data["Document"]["idObjType"] == 2:
+        stages[3]["status"] = "not-used"
+        stages[4]["status"] = "not-used"
 
     # Определение текущей стадии или стадии, на которой было остановлено делопроизводство
     for i, s in enumerate(stages):
-        if s['status'] == 'done':
+        if s["status"] == "done":
             if i != 0:
                 if is_stopped:
                     if i == 7:
                         # Поскольку стадия "Реєстрація первинних документів" всегда пройдена
-                        stages[i - 1]['status'] = 'stopped'
+                        stages[i - 1]["status"] = "stopped"
                     else:
-                        stages[i]['status'] = 'stopped'
+                        stages[i]["status"] = "stopped"
                 else:
-                    stages[i - 1]['status'] = 'current'
+                    stages[i - 1]["status"] = "current"
             break
 
     return stages
@@ -163,103 +216,121 @@ def application_get_inv_um_ld_stages_statuses(app_data: dict) -> List:
 
 def application_get_tm_stages_statuses(app_data: dict) -> List:
     """Возвращает список со статусами этапов рассмотрения заявки на ТМ."""
-    if app_data['TradeMark'].get('TrademarkDetails', {}).get('stages'):  # Заявки из новой системы
-        stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
-                          app_data['TradeMark']['TrademarkDetails']['stages']))
+    if (
+        app_data["TradeMark"].get("TrademarkDetails", {}).get("stages")
+    ):  # Заявки из новой системы
+        stages = list(
+            map(
+                lambda x: {"title": x["title"], "status": x["status"].replace(";", "")},
+                app_data["TradeMark"]["TrademarkDetails"]["stages"],
+            )
+        )
 
         # Fix для свидетельств
-        if app_data['search_data']['obj_state'] == 2:
+        if app_data["search_data"]["obj_state"] == 2:
             for stage in stages:
-                stage['status'] = 'done'
+                stage["status"] = "done"
             return stages
 
         # Fix
-        prev_status = ''
+        prev_status = ""
         for stage in stages[::-1]:
-            if stage["title"] == "Встановлення дати подання" \
-                    and app_data['TradeMark'].get('TrademarkDetails', {}).get('Code_441'):
-                if stage['status'] == 'current':
-                    stages[3]['status'] = 'current'
-                stage['status'] = 'done'
+            if stage["title"] == "Встановлення дати подання" and app_data[
+                "TradeMark"
+            ].get("TrademarkDetails", {}).get("Code_441"):
+                if stage["status"] == "current":
+                    stages[3]["status"] = "current"
+                stage["status"] = "done"
                 continue
 
-            if stage['status'] == 'current' == prev_status \
-                    or (stage['status'] in ('done', 'current', 'stopped',)
-                        and prev_status in ('current', 'not-active', 'stopped')):
-                stage['status'] = 'not-active'
+            if stage["status"] == "current" == prev_status or (
+                stage["status"]
+                in (
+                    "done",
+                    "current",
+                    "stopped",
+                )
+                and prev_status in ("current", "not-active", "stopped")
+            ):
+                stage["status"] = "not-active"
 
-            prev_status = stage['status']
+            prev_status = stage["status"]
 
         return stages
 
     # "Старые" заявки
 
     mark_status_code = application_get_tm_fixed_mark_status_code(app_data)
-    is_stopped = app_data['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено' \
-                 or mark_status_code == 8000
+    is_stopped = (
+        app_data["Document"].get("RegistrationStatus")
+        == "Діловодство за заявкою припинено"
+        or mark_status_code == 8000
+    )
 
-    if app_data['search_data']['obj_state'] == 2:
-        stages_statuses = ['done' for _ in range(6)]
+    if app_data["search_data"]["obj_state"] == 2:
+        stages_statuses = ["done" for _ in range(6)]
     else:
-        stages_statuses = ['not-active' for _ in range(6)]
+        stages_statuses = ["not-active" for _ in range(6)]
 
         for i, s in enumerate(stages_statuses):
             if mark_status_code >= (i + 2) * 1000:
-                stages_statuses[i] = 'done'
+                stages_statuses[i] = "done"
             else:
                 if is_stopped:
-                    stages_statuses[i] = 'not-active'
+                    stages_statuses[i] = "not-active"
                     if i > 1:
-                        stages_statuses[i - 1] = 'stopped'
+                        stages_statuses[i - 1] = "stopped"
                     else:
-                        stages_statuses[i] = 'stopped'
+                        stages_statuses[i] = "stopped"
                 else:
-                    stages_statuses[i] = 'current'
+                    stages_statuses[i] = "current"
                 break
 
         if mark_status_code == 8000:
-            stages_statuses[5] = 'stopped'
+            stages_statuses[5] = "stopped"
 
         # Если есть форма Т-08, то "Кваліфікаційна експертиза" пройдена
-        if stages_statuses[2] == 'done' and stages_statuses[5] == 'not-active':
-            for doc in app_data['TradeMark']['DocFlow']['Documents']:
-                if 'Т-08' in doc['DocRecord'].get('DocFlow', {}).get('Documents', []):
-                    stages_statuses[4] = 'current'
-                    stages_statuses[3] = 'done'
+        if stages_statuses[2] == "done" and stages_statuses[5] == "not-active":
+            for doc in app_data["TradeMark"]["DocFlow"]["Documents"]:
+                if "Т-08" in doc["DocRecord"].get("DocFlow", {}).get("Documents", []):
+                    stages_statuses[4] = "current"
+                    stages_statuses[3] = "done"
                     break
 
         # Если есть форма Т-05, то "Формальна експертиза" пройдена (для случая если делопроизводство остановлено)
         if is_stopped:
-            for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
-                if 'Т-05' in doc['DocRecord'].get('DocType', ''):
-                    stages_statuses[2] = 'done'
-                    stages_statuses[3] = 'stopped'
+            for doc in app_data["TradeMark"].get("DocFlow", {}).get("Documents", []):
+                if "Т-05" in doc["DocRecord"].get("DocType", ""):
+                    stages_statuses[2] = "done"
+                    stages_statuses[3] = "stopped"
                     break
 
     stages = [
         {
-            'title': _('Торговельну марку зареєстровано'),
-            'status': stages_statuses[5],
+            "title": _("Торговельну марку зареєстровано"),
+            "status": stages_statuses[5],
         },
         {
-            'title': _('Підготовка до державної реєстрації та публікації'),
-            'status': stages_statuses[4],
+            "title": _("Підготовка до державної реєстрації та публікації"),
+            "status": stages_statuses[4],
         },
         {
-            'title': _('Кваліфікаційна експертиза'),
-            'status': stages_statuses[3],
+            "title": _("Кваліфікаційна експертиза"),
+            "status": stages_statuses[3],
         },
         {
-            'title': _('Формальна експертиза'),
-            'status': stages_statuses[2],
+            "title": _("Формальна експертиза"),
+            "status": stages_statuses[2],
         },
         {
-            'title': _('Встановлення дати подання'),
-            'status': stages_statuses[1],
+            "title": _("Встановлення дати подання"),
+            "status": stages_statuses[1],
         },
         {
-            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
-            'status': stages_statuses[0],
+            "title": _(
+                "Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних"
+            ),
+            "status": stages_statuses[0],
         },
     ]
 
@@ -268,79 +339,103 @@ def application_get_tm_stages_statuses(app_data: dict) -> List:
 
 def application_get_tm_fixed_mark_status_code(app_data):
     """Анализирует список документов ТМ и возвращает код статуса согласно их наличию."""
-    result = int(app_data['Document'].get('MarkCurrentStatusCodeType', 0))
-    for doc in app_data['TradeMark'].get('DocFlow', {}).get('Documents', []):
-        if ('ТM-1.1' in doc['DocRecord']['DocType'] or 'ТМ-1.1' in doc['DocRecord']['DocType']) and result < 2000:
+    result = int(app_data["Document"].get("MarkCurrentStatusCodeType", 0))
+    for doc in app_data["TradeMark"].get("DocFlow", {}).get("Documents", []):
+        if (
+            "ТM-1.1" in doc["DocRecord"]["DocType"]
+            or "ТМ-1.1" in doc["DocRecord"]["DocType"]
+        ) and result < 2000:
             result = 3000
-        if ('Т-05' in doc['DocRecord']['DocType'] or 'Т-5' in doc['DocRecord']['DocType']) and result < 3000:
+        if (
+            "Т-05" in doc["DocRecord"]["DocType"]
+            or "Т-5" in doc["DocRecord"]["DocType"]
+        ) and result < 3000:
             result = 3000
-        if 'Т-08' in doc['DocRecord']['DocType'] and result < 4000:
+        if "Т-08" in doc["DocRecord"]["DocType"] and result < 4000:
             result = 4000
     return result
 
 
 def application_get_id_stages_statuses(app_data: dict) -> List:
     """Возвращает список со статусами этапов рассмотрения заявки на пром. образец."""
-    if app_data['Design'].get('DesignDetails', {}).get('stages'):  # Заявки из новой системы
-        stages = list(map(lambda x: {'title': x['title'], 'status': x['status'].replace(';', '')},
-                          app_data['Design']['DesignDetails']['stages']))
+    if (
+        app_data["Design"].get("DesignDetails", {}).get("stages")
+    ):  # Заявки из новой системы
+        stages = list(
+            map(
+                lambda x: {"title": x["title"], "status": x["status"].replace(";", "")},
+                app_data["Design"]["DesignDetails"]["stages"],
+            )
+        )
 
         # Fix для патентов
-        if app_data['search_data']['obj_state'] == 2:
+        if app_data["search_data"]["obj_state"] == 2:
             for stage in stages:
-                stage['status'] = 'done'
+                stage["status"] = "done"
             return stages
 
         # Fix
-        prev_status = ''
+        prev_status = ""
         for stage in stages[::-1]:
-            if stage['status'] == 'current' == prev_status or (
-                    stage['status'] in ('done', 'current', 'stopped',) and prev_status in ('current', 'not-active')):
-                stage['status'] = 'not-active'
-            prev_status = stage['status']
+            if stage["status"] == "current" == prev_status or (
+                stage["status"]
+                in (
+                    "done",
+                    "current",
+                    "stopped",
+                )
+                and prev_status in ("current", "not-active")
+            ):
+                stage["status"] = "not-active"
+            prev_status = stage["status"]
 
         return stages
 
-    design_status_code = int(app_data['Document'].get('DesignCurrentStatusCodeType', 0))
-    is_stopped = app_data['Document'].get('RegistrationStatus') == 'Діловодство за заявкою припинено'
+    design_status_code = int(app_data["Document"].get("DesignCurrentStatusCodeType", 0))
+    is_stopped = (
+        app_data["Document"].get("RegistrationStatus")
+        == "Діловодство за заявкою припинено"
+    )
 
-    if app_data['search_data']['obj_state'] == 2:
-        stages_statuses = ['done' for _ in range(5)]
+    if app_data["search_data"]["obj_state"] == 2:
+        stages_statuses = ["done" for _ in range(5)]
     else:
-        stages_statuses = ['not-active' for _ in range(5)]
+        stages_statuses = ["not-active" for _ in range(5)]
         marks = [2000, 4000, 5000, 5002, 6000]
 
         for i, s in enumerate(stages_statuses):
             if design_status_code >= marks[i]:
-                stages_statuses[i] = 'done'
+                stages_statuses[i] = "done"
             else:
                 if is_stopped:
-                    stages_statuses[i] = 'not-active'
-                    stages_statuses[i - 1] = 'stopped'
+                    stages_statuses[i] = "not-active"
+                    stages_statuses[i - 1] = "stopped"
                 else:
-                    stages_statuses[i] = 'current'
+                    stages_statuses[i] = "current"
                 break
 
     stages = [
         {
-            'title': _('Промисловий зразок зареєстровано'),
-            'status': stages_statuses[4],
+            "title": _("Промисловий зразок зареєстровано"),
+            "status": stages_statuses[4],
         },
         {
-            'title': _('Підготовка до державної реєстрації та публікації'),
-            'status': stages_statuses[3],
+            "title": _("Підготовка до державної реєстрації та публікації"),
+            "status": stages_statuses[3],
         },
         {
-            'title': _('Експертиза заявки'),
-            'status': stages_statuses[2],
+            "title": _("Експертиза заявки"),
+            "status": stages_statuses[2],
         },
         {
-            'title': _('Встановлення дати подання'),
-            'status': stages_statuses[1],
+            "title": _("Встановлення дати подання"),
+            "status": stages_statuses[1],
         },
         {
-            'title': _('Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних'),
-            'status': stages_statuses[0],
+            "title": _(
+                "Реєстрація первинних документів, попередня експертиза та введення відомостей до бази даних"
+            ),
+            "status": stages_statuses[0],
         },
     ]
 
@@ -350,82 +445,92 @@ def application_get_id_stages_statuses(app_data: dict) -> List:
 def application_sort_transactions(app_data: dict) -> None:
     """Сортирует оповещения заявки."""
     # Изобретения, полезные модели, топографии
-    if app_data['Document']['idObjType'] in (1, 2, 3):
-        transactions = app_data['transactions']
+    if app_data["Document"]["idObjType"] in (1, 2, 3):
+        transactions = app_data["transactions"]
         transactions.sort(
-            key=lambda item: time.strptime(item.get('BULLETIN_DATE', '1970-01-01'), "%Y-%m-%d")
+            key=lambda item: time.strptime(
+                item.get("BULLETIN_DATE", "1970-01-01"), "%Y-%m-%d"
+            )
         )
 
     # Торговые марки
-    elif app_data['Document']['idObjType'] == 4:
+    elif app_data["Document"]["idObjType"] == 4:
         try:
-            transactions = app_data['TradeMark']['Transactions']['Transaction']
+            transactions = app_data["TradeMark"]["Transactions"]["Transaction"]
         except KeyError:
             pass
         else:
             transactions.sort(
-                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+                key=lambda item: time.strptime(
+                    item.get("@bulletinDate", "1970-01-01"), "%Y-%m-%d"
+                )
             )
 
     # Геогр. зазначення
-    elif app_data['Document']['idObjType'] == 5:
+    elif app_data["Document"]["idObjType"] == 5:
         try:
-            transactions = app_data['Geo']['Transactions']['Transaction']
+            transactions = app_data["Geo"]["Transactions"]["Transaction"]
         except KeyError:
             pass
         else:
             transactions.sort(
-                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+                key=lambda item: time.strptime(
+                    item.get("@bulletinDate", "1970-01-01"), "%Y-%m-%d"
+                )
             )
 
     # Пром. образцы
-    elif app_data['Document']['idObjType'] == 6:
+    elif app_data["Document"]["idObjType"] == 6:
         try:
-            transactions = app_data['Design']['Transactions']['Transaction']
+            transactions = app_data["Design"]["Transactions"]["Transaction"]
         except KeyError:
             pass
         else:
             transactions.sort(
-                key=lambda item: time.strptime(item.get('@bulletinDate', '1970-01-01'), "%Y-%m-%d")
+                key=lambda item: time.strptime(
+                    item.get("@bulletinDate", "1970-01-01"), "%Y-%m-%d"
+                )
             )
 
 
 def application_73_contains_country_code(code: str, biblio_data: dict) -> bool:
     """Возвращает признак наличия определённого кода страны в поле 73."""
     code = code.lower()
-    i_73_values = biblio_data.get('I_73')
+    i_73_values = biblio_data.get("I_73")
     if i_73_values:
         for item in i_73_values:
-            if item.get('I_73.C', '').lower() == code:
+            if item.get("I_73.C", "").lower() == code:
                 return True
     return False
 
 
-def application_filter_documents_im_um_ld(biblio_data: dict, documents_data: List[dict]) -> List[dict]:
+def application_filter_documents_im_um_ld(
+    biblio_data: dict, documents_data: List[dict]
+) -> List[dict]:
     """Возвращает отфильтрованные документы изобретения, полезной модели, топографии."""
     # 73 код содержит ли код страны RU
-    is_73_ru = application_73_contains_country_code('RU', biblio_data)
+    is_73_ru = application_73_contains_country_code("RU", biblio_data)
 
     res = []
     for doc in documents_data:
-        doc_reg_number = doc['DOCRECORD'].get('DOCREGNUMBER', '')
+        doc_reg_number = doc["DOCRECORD"].get("DOCREGNUMBER", "")
         # Документы без номеров, дат
-        if not doc_reg_number and not doc['DOCRECORD'].get('DOCSENDINGDATE'):
+        if not doc_reg_number and not doc["DOCRECORD"].get("DOCSENDINGDATE"):
             continue
 
         # Внутренние документы
-        if doc_reg_number.startswith('вн'):
+        if doc_reg_number.startswith("вн"):
             continue
 
         # Тип документа
-        doc_type = doc['DOCRECORD'].get('DOCTYPE', '').lower()
+        doc_type = doc["DOCRECORD"].get("DOCTYPE", "").lower()
 
         # В рез. список не включаются служебные записки и отчёты о поиске
-        if 'службова' in doc_type or 'звіт про інформаційний пошук' in doc_type:
+        if "службова" in doc_type or "звіт про інформаційний пошук" in doc_type:
             continue
 
         # Если код владельца - RU, то не включать в рез. список документов документы В8, В9
-        if ('[в8]' in doc_type or '[в9]' in doc_type) and is_73_ru:
+        if ("[в8]" in doc_type or "[в9]" in doc_type) and is_73_ru:
             continue
 
         res.append(doc)
@@ -437,17 +542,23 @@ def application_filter_documents_tm_id(documents_data: List[dict]) -> List[dict]
     """Возвращает отфильтрованные документы торг. марки, пром. образца."""
     res = []
     for doc in documents_data:
-        doc_type = doc.get('DocRecord', {}).get('DocType', '').lower()
+        doc_type = doc.get("DocRecord", {}).get("DocType", "").lower()
 
         # В рез. список не включаются служебные записки
-        if 'службова' in doc_type or 'бібліографічні дані заявки на знак для товарів і послуг' in doc_type:
+        if (
+            "службова" in doc_type
+            or "бібліографічні дані заявки на знак для товарів і послуг" in doc_type
+        ):
             continue
         # и внутренние документы
-        doc_number = doc.get('DocRecord', {}).get('DocRegNumber', '').lower()
-        if doc_number.startswith('вн'):
+        doc_number = doc.get("DocRecord", {}).get("DocRegNumber", "").lower()
+        if doc_number.startswith("вн"):
             continue
         # и документы с датой 1970-01-01 без рег. номера
-        if not doc_number and doc.get('DocRecord', {}).get('DocRegDate', '') == '1970-01-01':
+        if (
+            not doc_number
+            and doc.get("DocRecord", {}).get("DocRegDate", "") == "1970-01-01"
+        ):
             continue
 
         res.append(doc)
@@ -463,10 +574,18 @@ def application_prepare_biblio_data_tm(data: dict, app_db_data: IpcAppList) -> d
     # Если последнее изменение данных после значения settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE,
     # то необходимо отображать значение, которое вернулось с АС "Позначення",
     # а иначе брать номер бюллетеня из таблицы cl_list_official_bulletins_ip
-    bulletin_date_until = datetime.datetime.strptime(settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE, '%d.%m.%Y')
+    bulletin_date_until = datetime.datetime.strptime(
+        settings.CODE_441_BUL_NUMBER_FROM_JSON_SINCE_DATE, "%d.%m.%Y"
+    )
 
-    if 'Code_441_BulNumber' in res and 'Code_441' in res and app_db_data.lastupdate < bulletin_date_until:
-        res['Code_441_BulNumber'] = bulletin_services.bulletin_get_number_by_date(res['Code_441'])
+    if (
+        "Code_441_BulNumber" in res
+        and "Code_441" in res
+        and app_db_data.lastupdate < bulletin_date_until
+    ):
+        res["Code_441_BulNumber"] = bulletin_services.bulletin_get_number_by_date(
+            res["Code_441"]
+        )
 
     return res
 
@@ -476,21 +595,27 @@ def application_get_app_db_data(app_id: int) -> IpcAppList:
     return IpcAppList.objects.filter(pk=app_id).first()
 
 
-def application_get_app_elasticsearch_data(app_id: int, exclude_bad_apps: bool = True) -> dict:
+def application_get_app_elasticsearch_data(
+    app_id: int, exclude_bad_apps: bool = True
+) -> dict:
     """Возвращает данные заявки, хранящиеся в ElasticSearch."""
     client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     q = Q(
-        'bool',
-        must=[Q('match', _id=app_id)],
+        "bool",
+        must=[Q("match", _id=app_id)],
     )
 
     # Фильтр заявок, которые не положено отображать
     if exclude_bad_apps:
         q = filter_bad_apps(q)
 
-    s = Search(index=settings.ELASTIC_INDEX_NAME).using(client).query(q).source(
-        excludes=["*.DocBarCode", "*.DOCBARCODE"]
-    ).execute()
+    s = (
+        Search(index=settings.ELASTIC_INDEX_NAME)
+        .using(client)
+        .query(q)
+        .source(excludes=["*.DocBarCode", "*.DOCBARCODE"])
+        .execute()
+    )
 
     if not s:
         return {}
@@ -506,15 +631,15 @@ def application_get_cap_list(i_68: str) -> List[dict]:
                     {
                         "query_string": {
                             "query": "16",
-                            "default_field": "Document.idObjType"
+                            "default_field": "Document.idObjType",
                         }
                     },
                     {
                         "query_string": {
-                            "query": i_68.replace('/', '//'),
-                            "default_field": "Patent_Certificate.I_68.exact"
+                            "query": i_68.replace("/", "//"),
+                            "default_field": "Patent_Certificate.I_68.exact",
                         }
-                    }
+                    },
                 ]
             }
         }
@@ -523,8 +648,8 @@ def application_get_cap_list(i_68: str) -> List[dict]:
 
     res = []
     for hit in s.scan():
-        item = hit.to_dict()['Patent_Certificate']
-        item['id'] = hit.meta.id
+        item = hit.to_dict()["Patent_Certificate"]
+        item["id"] = hit.meta.id
         res.append(item)
 
     return res
@@ -533,13 +658,15 @@ def application_get_cap_list(i_68: str) -> List[dict]:
 def application_tm_censored_image_in_data(data: dict) -> bool:
     """Проверяет, содержит ли изображение ТМ запрещённые элементы."""
     censored_notices_types_list = (
-        'CONTAINS_OBSCENE_WORDS_AND_EXPRESSIONS',  # Містить нецензурні слова та вислови
-        'CONTAINS_PORNOGRAFIC_IMAGES',  # 'Містить порнографічні зображення',
-        'CONTAINS_PROPAGANDA_OF_NATIONAL_ENMITY',  # 'Містить пропагування національної ворожнечі',
-        'CONTAINS_PROPAGANDA_OF_RELIGIOUS_ENMITY',  # 'Містить пропагування релігійної ворожнечі',
-        'CONTAINS_THE_PROMOTION_OF_FASCISM_AND_NEOFASHISM',  # 'Містить пропагування фашизму та неофашизму'
+        "CONTAINS_OBSCENE_WORDS_AND_EXPRESSIONS",  # Містить нецензурні слова та вислови
+        "CONTAINS_PORNOGRAFIC_IMAGES",  # 'Містить порнографічні зображення',
+        "CONTAINS_PROPAGANDA_OF_NATIONAL_ENMITY",  # 'Містить пропагування національної ворожнечі',
+        "CONTAINS_PROPAGANDA_OF_RELIGIOUS_ENMITY",  # 'Містить пропагування релігійної ворожнечі',
+        "CONTAINS_THE_PROMOTION_OF_FASCISM_AND_NEOFASHISM",  # 'Містить пропагування фашизму та неофашизму'
     )
-    notice_type = data['TradeMark']['TrademarkDetails']['MarkImageDetails']['MarkImage'].get('MarkImageTypeNotice')
+    notice_type = data["TradeMark"]["TrademarkDetails"]["MarkImageDetails"][
+        "MarkImage"
+    ].get("MarkImageTypeNotice")
     return notice_type and notice_type in censored_notices_types_list
 
 
@@ -547,14 +674,20 @@ def application_tm_can_be_indexed(app_data: dict) -> bool:
     """Проверяет может ли торговая марка быть добавлена в поисковый индекс."""
     today = datetime.datetime.now()
 
-    publication = app_data.get('TradeMark', {}).get('TrademarkDetails', {}).get('PublicationDetails', [])
+    publication = (
+        app_data.get("TradeMark", {})
+        .get("TrademarkDetails", {})
+        .get("PublicationDetails", [])
+    )
     for item in publication:
-        if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
+        if datetime.datetime.strptime(item["PublicationDate"], "%Y-%m-%d") > today:
             return False
 
-    transactions = app_data.get('TradeMark', {}).get('Transactions', {}).get('Transaction', [])
+    transactions = (
+        app_data.get("TradeMark", {}).get("Transactions", {}).get("Transaction", [])
+    )
     for item in transactions:
-        if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
+        if datetime.datetime.strptime(item["@bulletinDate"], "%Y-%m-%d") > today:
             return False
 
     return True
@@ -565,9 +698,9 @@ def application_inv_can_be_indexed(app_data: dict) -> bool:
     res = True
     today = datetime.datetime.now()
 
-    i_43 = app_data.get('Claim', {}).get('I_43.D', [])
+    i_43 = app_data.get("Claim", {}).get("I_43.D", [])
     for item in i_43:
-        if datetime.datetime.strptime(item, '%Y-%m-%d') > today:
+        if datetime.datetime.strptime(item, "%Y-%m-%d") > today:
             res = False
             break
 
@@ -578,14 +711,18 @@ def application_id_can_be_indexed(app_data: dict) -> bool:
     """Проверяет может ли пром образец быть добавлен в поисковый индекс."""
     today = datetime.datetime.now()
 
-    publication = app_data.get('Design', {}).get('DesignDetails', {}).get('RecordPublicationDetails', [])
+    publication = (
+        app_data.get("Design", {})
+        .get("DesignDetails", {})
+        .get("RecordPublicationDetails", [])
+    )
     for item in publication:
-        if datetime.datetime.strptime(item['PublicationDate'], '%Y-%m-%d') > today:
+        if datetime.datetime.strptime(item["PublicationDate"], "%Y-%m-%d") > today:
             return False
 
-    transactions = app_data.get('Transactions', {}).get('Transaction', [])
+    transactions = app_data.get("Transactions", {}).get("Transaction", [])
     for item in transactions:
-        if datetime.datetime.strptime(item['@bulletinDate'], '%Y-%m-%d') > today:
+        if datetime.datetime.strptime(item["@bulletinDate"], "%Y-%m-%d") > today:
             return False
 
     return True
@@ -593,179 +730,249 @@ def application_id_can_be_indexed(app_data: dict) -> bool:
 
 def application_is_limited_publication(app_number: str, obj_type_id: int) -> bool:
     """Возвращает признак того что объект публикуется с ограниченным набором данных."""
-    return AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).exists()
+    return AppLimited.objects.filter(
+        app_number=app_number, obj_type_id=obj_type_id
+    ).exists()
 
 
-def application_filter_limited_data(app_number: str, obj_type_id: int, biblio_data: dict) -> None:
+def application_filter_limited_data(
+    app_number: str, obj_type_id: int, biblio_data: dict
+) -> None:
     """Удаляет ограниченные для отображения поля из библиографии"""
-    limited_app = AppLimited.objects.filter(app_number=app_number, obj_type_id=obj_type_id).first()
+    limited_app = AppLimited.objects.filter(
+        app_number=app_number, obj_type_id=obj_type_id
+    ).first()
 
     if obj_type_id in (1, 2, 3):
-        app = IpcAppList.objects.filter(
-            app_number=app_number,
-            obj_type_id=obj_type_id
-        ).order_by('-registration_number').first()
+        app = (
+            IpcAppList.objects.filter(app_number=app_number, obj_type_id=obj_type_id)
+            .order_by("-registration_number")
+            .first()
+        )
         documents = AppDocuments.objects.filter(app=app)
-        application_filter_limited_data_inv_um_ld(limited_app.settings_dict, biblio_data, documents)
+        application_filter_limited_data_inv_um_ld(
+            limited_app.settings_dict, biblio_data, documents
+        )
 
     elif obj_type_id in (10, 13):
         application_filter_limited_data_cr(limited_app.settings_dict, biblio_data)
 
     elif obj_type_id in (11, 12):
-        application_filter_limited_data_agreement(limited_app.settings_dict, biblio_data)
+        application_filter_limited_data_agreement(
+            limited_app.settings_dict, biblio_data
+        )
 
 
-def application_filter_limited_data_inv_um_ld(limit_settings: dict, biblio_data: dict,
-                                              documents: QuerySet[AppDocuments]) -> None:
+def application_filter_limited_data_inv_um_ld(
+    limit_settings: dict, biblio_data: dict, documents: QuerySet[AppDocuments]
+) -> None:
     """Удаляет ограниченные для отображения поля из библиографии изобретения/полезной модели/топографии,
     а также файлы документов."""
-    if 'AB' in biblio_data and not limit_settings.get('AB', False):
-        del biblio_data['AB']
+    if "AB" in biblio_data and not limit_settings.get("AB", False):
+        del biblio_data["AB"]
         for doc in documents:
             if doc.enter_num == 100 and os.path.exists(doc.real_file_path):
                 os.remove(doc.real_file_path)
-    if 'CL' in biblio_data and not limit_settings.get('CL', False):
-        del biblio_data['CL']
+    if "CL" in biblio_data and not limit_settings.get("CL", False):
+        del biblio_data["CL"]
         for doc in documents:
-            if doc.enter_num == 98 and doc.file_type == 'pdf' and os.path.exists(doc.real_file_path):
+            if (
+                doc.enter_num == 98
+                and doc.file_type == "pdf"
+                and os.path.exists(doc.real_file_path)
+            ):
                 os.remove(doc.real_file_path)
-    if 'DE' in biblio_data and not limit_settings.get('DE', False):
-        del biblio_data['DE']
+    if "DE" in biblio_data and not limit_settings.get("DE", False):
+        del biblio_data["DE"]
         for doc in documents:
             if doc.enter_num in (99, 101) and os.path.exists(doc.real_file_path):
                 os.remove(doc.real_file_path)
-    if 'I_71' in biblio_data and not limit_settings.get('I_71', False):
-        del biblio_data['I_71']
-    if 'I_72' in biblio_data and not limit_settings.get('I_72', False):
-        del biblio_data['I_72']
-    if 'I_73' in biblio_data and not limit_settings.get('I_73', False):
-        del biblio_data['I_73']
-    if 'I_98' in biblio_data and not limit_settings.get('I_98', False):
-        del biblio_data['I_98']
-    if 'I_98_Index' in biblio_data and not limit_settings.get('I_98_Index', False):
-        del biblio_data['I_98_Index']
+    if "I_71" in biblio_data and not limit_settings.get("I_71", False):
+        del biblio_data["I_71"]
+    if "I_72" in biblio_data and not limit_settings.get("I_72", False):
+        del biblio_data["I_72"]
+    if "I_73" in biblio_data and not limit_settings.get("I_73", False):
+        del biblio_data["I_73"]
+    if "I_98" in biblio_data and not limit_settings.get("I_98", False):
+        del biblio_data["I_98"]
+    if "I_98_Index" in biblio_data and not limit_settings.get("I_98_Index", False):
+        del biblio_data["I_98_Index"]
 
 
 def application_filter_limited_data_cr(limit_settings: dict, biblio_data: dict) -> None:
     """Удаляет ограниченные для отображения поля из библиографии авторского права."""
-    if 'AuthorDetails' in biblio_data and not limit_settings.get('AuthorDetails', False):
-        del biblio_data['AuthorDetails']
-    if 'Annotation' in biblio_data and not limit_settings.get('Annotation', False):
-        del biblio_data['Annotation']
-    if 'ApplicantDetails' in biblio_data and not limit_settings.get('ApplicantDetails', False):
-        del biblio_data['ApplicantDetails']
-    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
-        del biblio_data['CopyrightObjectKindDetails']
-    if 'EmployerDetails' in biblio_data and not limit_settings.get('EmployerDetails', False):
-        del biblio_data['EmployerDetails']
-    if 'HolderDetails' in biblio_data and not limit_settings.get('HolderDetails', False):
-        del biblio_data['HolderDetails']
-    if 'PromulgationData' in biblio_data and not limit_settings.get('PromulgationData', False):
-        del biblio_data['PromulgationData']
-    if 'RegistrationKind' in biblio_data and not limit_settings.get('RegistrationKind', False):
-        del biblio_data['RegistrationKind']
-    if 'RegistrationKindCode' in biblio_data and not limit_settings.get('RegistrationKindCode', False):
-        del biblio_data['RegistrationKindCode']
-    if 'RegistrationOfficeCode' in biblio_data and not limit_settings.get('RegistrationOfficeCode', False):
-        del biblio_data['RegistrationOfficeCode']
-    if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
-        del biblio_data['RepresentativeDetails']
-    if 'Name' in biblio_data and not limit_settings.get('Name', True):
-        del biblio_data['Name']
+    if "AuthorDetails" in biblio_data and not limit_settings.get(
+        "AuthorDetails", False
+    ):
+        del biblio_data["AuthorDetails"]
+    if "Annotation" in biblio_data and not limit_settings.get("Annotation", False):
+        del biblio_data["Annotation"]
+    if "ApplicantDetails" in biblio_data and not limit_settings.get(
+        "ApplicantDetails", False
+    ):
+        del biblio_data["ApplicantDetails"]
+    if "CopyrightObjectKindDetails" in biblio_data and not limit_settings.get(
+        "CopyrightObjectKindDetails", False
+    ):
+        del biblio_data["CopyrightObjectKindDetails"]
+    if "EmployerDetails" in biblio_data and not limit_settings.get(
+        "EmployerDetails", False
+    ):
+        del biblio_data["EmployerDetails"]
+    if "HolderDetails" in biblio_data and not limit_settings.get(
+        "HolderDetails", False
+    ):
+        del biblio_data["HolderDetails"]
+    if "PromulgationData" in biblio_data and not limit_settings.get(
+        "PromulgationData", False
+    ):
+        del biblio_data["PromulgationData"]
+    if "RegistrationKind" in biblio_data and not limit_settings.get(
+        "RegistrationKind", False
+    ):
+        del biblio_data["RegistrationKind"]
+    if "RegistrationKindCode" in biblio_data and not limit_settings.get(
+        "RegistrationKindCode", False
+    ):
+        del biblio_data["RegistrationKindCode"]
+    if "RegistrationOfficeCode" in biblio_data and not limit_settings.get(
+        "RegistrationOfficeCode", False
+    ):
+        del biblio_data["RegistrationOfficeCode"]
+    if "RepresentativeDetails" in biblio_data and not limit_settings.get(
+        "RepresentativeDetails", False
+    ):
+        del biblio_data["RepresentativeDetails"]
+    if "Name" in biblio_data and not limit_settings.get("Name", True):
+        del biblio_data["Name"]
 
 
-def application_filter_limited_data_agreement(limit_settings: dict, biblio_data: dict) -> None:
+def application_filter_limited_data_agreement(
+    limit_settings: dict, biblio_data: dict
+) -> None:
     """Удаляет ограниченные для отображения поля из библиографии договоров авторского права."""
     # Поля, которые по умолчанию сохраняются
-    if 'RegistrationNumber' in biblio_data and not limit_settings.get('RegistrationNumber', True):
-        del biblio_data['RegistrationNumber']
-    if 'RegistrationDate' in biblio_data and not limit_settings.get('RegistrationDate', True):
-        del biblio_data['RegistrationDate']
-    if 'PublicationDetails' in biblio_data and not limit_settings.get('PublicationDetails', True):
-        del biblio_data['PublicationDetails']
-    if 'Name' in biblio_data and not limit_settings.get('Name', True):
-        del biblio_data['Name']
-    if 'NameShort' in biblio_data and not limit_settings.get('NameShort', True):
-        del biblio_data['NameShort']
+    if "RegistrationNumber" in biblio_data and not limit_settings.get(
+        "RegistrationNumber", True
+    ):
+        del biblio_data["RegistrationNumber"]
+    if "RegistrationDate" in biblio_data and not limit_settings.get(
+        "RegistrationDate", True
+    ):
+        del biblio_data["RegistrationDate"]
+    if "PublicationDetails" in biblio_data and not limit_settings.get(
+        "PublicationDetails", True
+    ):
+        del biblio_data["PublicationDetails"]
+    if "Name" in biblio_data and not limit_settings.get("Name", True):
+        del biblio_data["Name"]
+    if "NameShort" in biblio_data and not limit_settings.get("NameShort", True):
+        del biblio_data["NameShort"]
 
     # Поля, которые по умолчанию удаляются
-    if 'Annotation' in biblio_data and not limit_settings.get('Annotation', False):
-        del biblio_data['Annotation']
-    if 'ApplicantDetails' in biblio_data and not limit_settings.get('ApplicantDetails', False):
-        del biblio_data['ApplicantDetails']
-    if 'ApplicationDate' in biblio_data and not limit_settings.get('ApplicationDate', False):
-        del biblio_data['ApplicationDate']
-    if 'ApplicationNumber' in biblio_data and not limit_settings.get('ApplicationNumber', False):
-        del biblio_data['ApplicationNumber']
-    if 'AuthorDetails' in biblio_data and not limit_settings.get('AuthorDetails', False):
-        del biblio_data['AuthorDetails']
-    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
-        del biblio_data['CopyrightObjectKindDetails']
-    if 'CopyrightObjectKindDetails' in biblio_data and not limit_settings.get('CopyrightObjectKindDetails', False):
-        del biblio_data['CopyrightObjectKindDetails']
-    if 'DocFlow' in biblio_data and not limit_settings.get('DocFlow', False):
-        del biblio_data['DocFlow']
-    if 'LicenseeDetails' in biblio_data:
-        if not limit_settings.get('LicenseeDetails', False):
-            del biblio_data['LicenseeDetails']
+    if "Annotation" in biblio_data and not limit_settings.get("Annotation", False):
+        del biblio_data["Annotation"]
+    if "ApplicantDetails" in biblio_data and not limit_settings.get(
+        "ApplicantDetails", False
+    ):
+        del biblio_data["ApplicantDetails"]
+    if "ApplicationDate" in biblio_data and not limit_settings.get(
+        "ApplicationDate", False
+    ):
+        del biblio_data["ApplicationDate"]
+    if "ApplicationNumber" in biblio_data and not limit_settings.get(
+        "ApplicationNumber", False
+    ):
+        del biblio_data["ApplicationNumber"]
+    if "AuthorDetails" in biblio_data and not limit_settings.get(
+        "AuthorDetails", False
+    ):
+        del biblio_data["AuthorDetails"]
+    if "CopyrightObjectKindDetails" in biblio_data and not limit_settings.get(
+        "CopyrightObjectKindDetails", False
+    ):
+        del biblio_data["CopyrightObjectKindDetails"]
+    if "CopyrightObjectKindDetails" in biblio_data and not limit_settings.get(
+        "CopyrightObjectKindDetails", False
+    ):
+        del biblio_data["CopyrightObjectKindDetails"]
+    if "DocFlow" in biblio_data and not limit_settings.get("DocFlow", False):
+        del biblio_data["DocFlow"]
+    if "LicenseeDetails" in biblio_data:
+        if not limit_settings.get("LicenseeDetails", False):
+            del biblio_data["LicenseeDetails"]
         else:
-            for item in biblio_data['LicenseeDetails']['Licensee']:
-                if not limit_settings['LicenseeDetails']['Address']:
-                    del item['LicenseeAddressBook']['FormattedNameAddress']['Address']
-                if not limit_settings['LicenseeDetails']['Name']:
-                    del item['LicenseeAddressBook']['FormattedNameAddress']['Name']
-    if 'LicensorDetails' in biblio_data:
-        if not limit_settings.get('LicensorDetails', False):
-            del biblio_data['LicensorDetails']
+            for item in biblio_data["LicenseeDetails"]["Licensee"]:
+                if not limit_settings["LicenseeDetails"]["Address"]:
+                    del item["LicenseeAddressBook"]["FormattedNameAddress"]["Address"]
+                if not limit_settings["LicenseeDetails"]["Name"]:
+                    del item["LicenseeAddressBook"]["FormattedNameAddress"]["Name"]
+    if "LicensorDetails" in biblio_data:
+        if not limit_settings.get("LicensorDetails", False):
+            del biblio_data["LicensorDetails"]
         else:
-            for item in biblio_data['LicensorDetails']['Licensor']:
-                if not limit_settings['LicensorDetails']['Address']:
-                    del item['LicensorAddressBook']['FormattedNameAddress']['Address']
-                if not limit_settings['LicensorDetails']['Name']:
-                    del item['LicensorAddressBook']['FormattedNameAddress']['Name']
-    if 'RegistrationKind' in biblio_data and not limit_settings.get('RegistrationKind', False):
-        del biblio_data['RegistrationKind']
-    if 'RegistrationKindCode' in biblio_data and not limit_settings.get('RegistrationKindCode', False):
-        del biblio_data['RegistrationKindCode']
-    if 'RegistrationOfficeCode' in biblio_data and not limit_settings.get('RegistrationOfficeCode', False):
-        del biblio_data['RegistrationOfficeCode']
-    if 'RepresentativeDetails' in biblio_data and not limit_settings.get('RepresentativeDetails', False):
-        del biblio_data['RepresentativeDetails']
+            for item in biblio_data["LicensorDetails"]["Licensor"]:
+                if not limit_settings["LicensorDetails"]["Address"]:
+                    del item["LicensorAddressBook"]["FormattedNameAddress"]["Address"]
+                if not limit_settings["LicensorDetails"]["Name"]:
+                    del item["LicensorAddressBook"]["FormattedNameAddress"]["Name"]
+    if "RegistrationKind" in biblio_data and not limit_settings.get(
+        "RegistrationKind", False
+    ):
+        del biblio_data["RegistrationKind"]
+    if "RegistrationKindCode" in biblio_data and not limit_settings.get(
+        "RegistrationKindCode", False
+    ):
+        del biblio_data["RegistrationKindCode"]
+    if "RegistrationOfficeCode" in biblio_data and not limit_settings.get(
+        "RegistrationOfficeCode", False
+    ):
+        del biblio_data["RegistrationOfficeCode"]
+    if "RepresentativeDetails" in biblio_data and not limit_settings.get(
+        "RepresentativeDetails", False
+    ):
+        del biblio_data["RepresentativeDetails"]
 
 
 def application_get_documents(app_id: int) -> dict:
     """Возвращает словарь с документами объекта."""
     documents = AppDocuments.objects.filter(
-        app_id=app_id,
-        enter_num__in=(98, 99, 100, 101),
-        file_type='pdf'
+        app_id=app_id, enter_num__in=(98, 99, 100, 101), file_type="pdf"
     ).values()
 
     app = IpcAppList.objects.filter(pk=app_id).first()
-    limited_app = AppLimited.objects.filter(app_number=app.app_number, obj_type_id=app.obj_type_id).first()
+    limited_app = AppLimited.objects.filter(
+        app_number=app.app_number, obj_type_id=app.obj_type_id
+    ).first()
 
     res = {}
     for document in documents:
         # Формула
-        if document['enter_num'] == 98 and (not limited_app or limited_app.settings_dict.get('CL')):
-            res['cl'] = document
+        if document["enter_num"] == 98 and (
+            not limited_app or limited_app.settings_dict.get("CL")
+        ):
+            res["cl"] = document
         # Описание
-        elif document['enter_num'] == 99 and (not limited_app or limited_app.settings_dict.get('DE')):
-            res['de'] = document
+        elif document["enter_num"] == 99 and (
+            not limited_app or limited_app.settings_dict.get("DE")
+        ):
+            res["de"] = document
         # Описание
-        elif document['enter_num'] == 101 and (not limited_app or limited_app.settings_dict.get('DE')):
-            res['de_pub'] = document
+        elif document["enter_num"] == 101 and (
+            not limited_app or limited_app.settings_dict.get("DE")
+        ):
+            res["de_pub"] = document
         else:
-            if not limited_app or limited_app.settings_dict.get('AB'):
-                if 'A_UA' in document['file_name']:
+            if not limited_app or limited_app.settings_dict.get("AB"):
+                if "A_UA" in document["file_name"]:
                     # Реферат укр.
-                    res['ab_ua'] = document
-                if 'A_RU' in document['file_name']:
+                    res["ab_ua"] = document
+                if "A_RU" in document["file_name"]:
                     # Реферат рос.
-                    res['ab_ru'] = document
-                if 'A_EN' in document['file_name']:
+                    res["ab_ru"] = document
+                if "A_EN" in document["file_name"]:
                     # Реферат англ.
-                    res['ab_en'] = document
+                    res["ab_en"] = document
     return res
 
 
@@ -793,20 +1000,27 @@ def application_get_sanctions(*numbers: tuple[str], id_obj_type: int) -> list[di
     # Санкційні дані об'єкта
     result = []
 
+    # Для авт. права враховуються номера реєстрацій
     if id_obj_type in (10, 11, 12, 13):
-        numbers = (numbers[1], )
+        numbers = (numbers[1],)
 
     for number in numbers:
         if not number:
             continue
 
-        data = [x for x in rr_sanctioned_objects[number] if x['id_obj_type'] in gloc_obj_types[id_obj_type]]
+        data = [
+            x
+            for x in rr_sanctioned_objects[number]
+            if x["id_obj_type"] in gloc_obj_types[id_obj_type]
+        ]
         result.extend(data)
 
     return result
 
 
-def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_number: str = None) -> bool:
+def application_has_sanctions(
+    id_obj_type: int, app_number: str = None, reg_number: str = None
+) -> bool:
     """Повертає ознаку того чи знаходиться об'єкт під санкціями."""
     # Відповідність ідентифікаторів типів об'єктів у СІС та ГЛОК
     gloc_obj_types = {
@@ -831,8 +1045,10 @@ def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_numb
     rr_sanctioned_objects = gloc_get_sanctioned_objects()
 
     for sanctioned_obj in rr_sanctioned_objects:
-        if sanctioned_obj['obj_number'] in (app_number, reg_number) \
-                and sanctioned_obj['id_obj_type'] in gloc_obj_types[id_obj_type]:
+        if (
+            sanctioned_obj["obj_number"] in (app_number, reg_number)
+            and sanctioned_obj["id_obj_type"] in gloc_obj_types[id_obj_type]
+        ):
             return True
 
     return False
@@ -840,7 +1056,7 @@ def application_has_sanctions(id_obj_type: int, app_number: str = None, reg_numb
 
 def application_get_indexed_count() -> int:
     """Возвращает количество проиндексированных объектов в поисковом индексе ElasticSearch."""
-    qs = Q('query_string', query='*')
+    qs = Q("query_string", query="*")
 
     # Не включать в список результатов заявки, по которым выдан патент
     qs = filter_bad_apps(qs)
@@ -854,7 +1070,9 @@ def application_get_indexed_count() -> int:
 def application_fill_notification_date():
     """Заполняет поле NotificationDate в таблице IPC_AppList."""
     app_list = IpcAppList.objects.filter(obj_type__id__in=(1, 2))
-    registration_date__max = app_list.aggregate(Max('registration_date'))['registration_date__max']
+    registration_date__max = app_list.aggregate(Max("registration_date"))[
+        "registration_date__max"
+    ]
     q = Q(
         "nested",
         path="TRANSACTIONS.TRANSACTION",
@@ -862,7 +1080,7 @@ def application_fill_notification_date():
             "query_string",
             query=registration_date__max.date(),
             default_field="TRANSACTIONS.TRANSACTION.BULLETIN_DATE",
-        )
+        ),
     )
     es = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     s = Search(using=es, index=settings.ELASTIC_INDEX_NAME).query(q).source(False)
@@ -872,45 +1090,63 @@ def application_fill_notification_date():
     ids = []
     for res in results:
         ids.append(res.meta.id)
-    IpcAppList.objects.filter(id__in=ids).update(notification_date=registration_date__max)
+    IpcAppList.objects.filter(id__in=ids).update(
+        notification_date=registration_date__max
+    )
 
 
 def application_set_documents_tracking_numbers(app_data: dict, years: int = 3) -> None:
     """Присвоює в дані документів (не старіші years років) значення трек-номерів Укрпошти."""
     years_ago = datetime.date.today() - relativedelta(years=years)
-    if app_data['Document']['idObjType'] in (1, 2, 3):
-        docs = app_data.get('DOCFLOW', {}).get('DOCUMENTS', [])
+    if app_data["Document"]["idObjType"] in (1, 2, 3):
+        docs = app_data.get("DOCFLOW", {}).get("DOCUMENTS", [])
         doc_numbers = [
-            x['DOCRECORD']['DOCREGNUMBER'] for x in docs
-            if x['DOCRECORD'].get('DOCREGNUMBER')
-               and x['DOCRECORD'].get('DOCSENDINGDATE')
-               and datetime.datetime.strptime(x['DOCRECORD']['DOCSENDINGDATE'], '%Y-%m-%d').date() > years_ago
+            x["DOCRECORD"]["DOCREGNUMBER"]
+            for x in docs
+            if x["DOCRECORD"].get("DOCREGNUMBER")
+            and x["DOCRECORD"].get("DOCSENDINGDATE")
+            and datetime.datetime.strptime(
+                x["DOCRECORD"]["DOCSENDINGDATE"], "%Y-%m-%d"
+            ).date()
+            > years_ago
         ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
             for doc in docs:
-                if doc['DOCRECORD'].get('DOCREGNUMBER'):
-                    doc['DOCRECORD']['TRACKINGNUMBER'] = tracking_numbers.get(doc['DOCRECORD']['DOCREGNUMBER'])
+                if doc["DOCRECORD"].get("DOCREGNUMBER"):
+                    doc["DOCRECORD"]["TRACKINGNUMBER"] = tracking_numbers.get(
+                        doc["DOCRECORD"]["DOCREGNUMBER"]
+                    )
 
-    elif app_data['Document']['idObjType'] in (4, 5, 6):
+    elif app_data["Document"]["idObjType"] in (4, 5, 6):
         section_names = {
-            4: 'TradeMark',
-            5: 'Geo',
-            6: 'Design',
+            4: "TradeMark",
+            5: "Geo",
+            6: "Design",
         }
-        docs = app_data[section_names[app_data['Document']['idObjType']]].get('DocFlow', {}).get('Documents', [])
+        docs = (
+            app_data[section_names[app_data["Document"]["idObjType"]]]
+            .get("DocFlow", {})
+            .get("Documents", [])
+        )
         doc_numbers = [
-            x['DocRecord']['DocRegNumber'] for x in docs
-            if x['DocRecord'].get('DocRegNumber')
-               and x['DocRecord'].get('DocDirection') == 'Outcoming'
-               and x['DocRecord'].get('DocRegDate')
-               and datetime.datetime.strptime(x['DocRecord']['DocRegDate'], '%Y-%m-%d').date() > years_ago
+            x["DocRecord"]["DocRegNumber"]
+            for x in docs
+            if x["DocRecord"].get("DocRegNumber")
+            and x["DocRecord"].get("DocDirection") == "Outcoming"
+            and x["DocRecord"].get("DocRegDate")
+            and datetime.datetime.strptime(
+                x["DocRecord"]["DocRegDate"], "%Y-%m-%d"
+            ).date()
+            > years_ago
         ]
         if doc_numbers:
             tracking_numbers = gnof_get_tracking_numbers(doc_numbers)
             for doc in docs:
-                if doc['DocRecord'].get('DocRegNumber'):
-                    doc['DocRecord']['TrackingNumber'] = tracking_numbers.get(doc['DocRecord']['DocRegNumber'])
+                if doc["DocRecord"].get("DocRegNumber"):
+                    doc["DocRecord"]["TrackingNumber"] = tracking_numbers.get(
+                        doc["DocRecord"]["DocRegNumber"]
+                    )
 
 
 def inid_code_get_list(lang: str) -> List[InidCode]:
@@ -922,585 +1158,1333 @@ def inid_code_get_list(lang: str) -> List[InidCode]:
     """
     res = []
 
-    if lang == 'ua':
+    if lang == "ua":
         # ТМ регистрации
         inid_data = [
-            InidCode(4, '540', 'Зображення знака', 2, True),
-            InidCode(4, '141', 'Дата закінчення строку дії реєстрації знака', 2, True),
-            InidCode(4, '111', 'Порядковий номер реєстрації', 2, True),
-            InidCode(4, '151', 'Дата реєстрації', 2, True),
-            InidCode(4, '181', 'Очікувана дата закінчення строку дії реєстрації', 2, True),
-            InidCode(4, '186', 'Очікувана дата продовження строку дії реєстрації', 2, True),
-            InidCode(4, '210', 'Номер заявки', 2, True),
-            InidCode(4, '220', 'Дата подання заявки', 2, True),
-            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
-                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 2, True),
-            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 2, True),
-            InidCode(4, '450', 'Дата публікації відомостей про видачу свідоцтва', 2, True),
-            InidCode(4, '531', 'Віденська класифікація', 2, True),
-            InidCode(4, '731', 'Ім\'я та адреса заявника', 2, True),
-            InidCode(4, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
-            InidCode(4, '740', 'Ім\'я та адреса представника', 2, True),
-            InidCode(4, '750', 'Адреса для листування', 2, True),
-            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 2, True),
-            InidCode(4, '511', 'Індекси Ніццької класифікації', 2, True),
-            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 2, True),
+            InidCode(4, "540", "Зображення знака", 2, True),
+            InidCode(4, "141", "Дата закінчення строку дії реєстрації знака", 2, True),
+            InidCode(4, "111", "Порядковий номер реєстрації", 2, True),
+            InidCode(4, "151", "Дата реєстрації", 2, True),
+            InidCode(
+                4, "181", "Очікувана дата закінчення строку дії реєстрації", 2, True
+            ),
+            InidCode(
+                4, "186", "Очікувана дата продовження строку дії реєстрації", 2, True
+            ),
+            InidCode(4, "210", "Номер заявки", 2, True),
+            InidCode(4, "220", "Дата подання заявки", 2, True),
+            InidCode(
+                4,
+                "300",
+                "Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, "
+                "пов'язані зі старшинством або реєстрацією знака у країні походження",
+                2,
+                True,
+            ),
+            InidCode(
+                4,
+                "441",
+                "Дата публікації відомостей про заявку та номер бюлетня",
+                2,
+                True,
+            ),
+            InidCode(
+                4, "450", "Дата публікації відомостей про видачу свідоцтва", 2, True
+            ),
+            InidCode(4, "531", "Віденська класифікація", 2, True),
+            InidCode(4, "731", "Ім'я та адреса заявника", 2, True),
+            InidCode(4, "732", "Ім'я та адреса володільця реєстрації", 2, True),
+            InidCode(4, "740", "Ім'я та адреса представника", 2, True),
+            InidCode(4, "750", "Адреса для листування", 2, True),
+            InidCode(4, "591", "Інформація щодо заявлених кольорів", 2, True),
+            InidCode(4, "511", "Індекси Ніццької класифікації", 2, True),
+            InidCode(
+                4,
+                "526",
+                "Вилучення з охорони окремих елементів торговельної марки",
+                2,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # ТМ заявки
         inid_data = [
-            InidCode(4, '540', 'Зображення знака', 1, True),
-            InidCode(4, '210', 'Номер заявки', 1, True),
-            InidCode(4, '220', 'Дата подання заявки', 1, True),
-            InidCode(4, '221', 'Дата надходження матеріалів заявки до НОІВ', 1, True),
-            InidCode(4, '300', 'Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, '
-                               'пов\'язані зі старшинством або реєстрацією знака у країні походження', 1, True),
-            InidCode(4, '441', 'Дата публікації відомостей про заявку та номер бюлетня', 1, True),
-            InidCode(4, '531', 'Віденська класифікація', 1, True),
-            InidCode(4, '731', 'Ім\'я та адреса заявника', 1, True),
-            InidCode(4, '740', 'Ім\'я та адреса представника', 1, True),
-            InidCode(4, '750', 'Адреса для листування', 1, True),
-            InidCode(4, '591', 'Інформація щодо заявлених кольорів', 1, True),
-            InidCode(4, '511', 'Індекси Ніццької класифікації', 1, True),
-            InidCode(4, '526', 'Вилучення з охорони окремих елементів торговельної марки', 1, True),
+            InidCode(4, "540", "Зображення знака", 1, True),
+            InidCode(4, "210", "Номер заявки", 1, True),
+            InidCode(4, "220", "Дата подання заявки", 1, True),
+            InidCode(4, "221", "Дата надходження матеріалів заявки до НОІВ", 1, True),
+            InidCode(
+                4,
+                "300",
+                "Дані щодо пріоритету відповідно до Паризької конвенції та інші дані, "
+                "пов'язані зі старшинством або реєстрацією знака у країні походження",
+                1,
+                True,
+            ),
+            InidCode(
+                4,
+                "441",
+                "Дата публікації відомостей про заявку та номер бюлетня",
+                1,
+                True,
+            ),
+            InidCode(4, "531", "Віденська класифікація", 1, True),
+            InidCode(4, "731", "Ім'я та адреса заявника", 1, True),
+            InidCode(4, "740", "Ім'я та адреса представника", 1, True),
+            InidCode(4, "750", "Адреса для листування", 1, True),
+            InidCode(4, "591", "Інформація щодо заявлених кольорів", 1, True),
+            InidCode(4, "511", "Індекси Ніццької класифікації", 1, True),
+            InidCode(
+                4,
+                "526",
+                "Вилучення з охорони окремих елементів торговельної марки",
+                1,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # Пром. образцы регистрации
         inid_data = [
-            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 2, True),
-            InidCode(6, '11', 'Номер реєстрації (патенту)', 2, True),
-            InidCode(6, '24', 'Дата, з якої є чинними права на промисловий зразок', 2, True),
-            InidCode(6, '21', 'Номер заявки', 2, True),
-            InidCode(6, '22', 'Дата подання заявки', 2, True),
-            InidCode(6, '23', 'Дата виставкового пріоритету', 2, True),
-            InidCode(6, '28', 'Кількість заявлених варіантів', 2, True),
-            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 2, True),
-            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 2, True),
-            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку', 2, True),
-            InidCode(6, '45', 'Дата публікації відомостей про видачу патенту та номер бюлетеня', 2, True),
-            InidCode(6, '54', 'Назва промислового зразка', 2, True),
-            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 2, True),
-            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 2, True),
-            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 2, True),
-            InidCode(6, '73', "Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави", 2, True),
-            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 2, True),
-            InidCode(6, '98', "Адреса для листування", 2, True),
+            InidCode(
+                6,
+                "51",
+                "Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)",
+                2,
+                True,
+            ),
+            InidCode(6, "11", "Номер реєстрації (патенту)", 2, True),
+            InidCode(
+                6, "24", "Дата, з якої є чинними права на промисловий зразок", 2, True
+            ),
+            InidCode(6, "21", "Номер заявки", 2, True),
+            InidCode(6, "22", "Дата подання заявки", 2, True),
+            InidCode(6, "23", "Дата виставкового пріоритету", 2, True),
+            InidCode(6, "28", "Кількість заявлених варіантів", 2, True),
+            InidCode(
+                6,
+                "31",
+                "Номер попередньої заявки відповідно до Паризької конвенції",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "32",
+                "Дата подання попередньої заявки відповідно до Паризької конвенції",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "33",
+                "Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "45",
+                "Дата публікації відомостей про видачу патенту та номер бюлетеня",
+                2,
+                True,
+            ),
+            InidCode(6, "54", "Назва промислового зразка", 2, True),
+            InidCode(
+                6,
+                "55",
+                "Зображення промислового зразка та вказівка відносно кольорів",
+                2,
+                True,
+            ),
+            InidCode(
+                6, "71", "Ім'я (імена) та адреса (адреси) заявника (заявників)", 2, True
+            ),
+            InidCode(
+                6, "72", "Ім'я (імена) автора (авторів), якщо воно відоме", 2, True
+            ),
+            InidCode(
+                6,
+                "73",
+                "Ім’я або повне найменування власника(ів) патенту, його адреса та двобуквений код держави",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "74",
+                "Ім'я (імена) та адреса (адреси) представника (представників)",
+                2,
+                True,
+            ),
+            InidCode(6, "98", "Адреса для листування", 2, True),
         ]
         res.extend(inid_data)
 
         # Пром. образцы заявки
         inid_data = [
-            InidCode(6, '51', 'Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)', 1, True),
-            InidCode(6, '21', 'Номер заявки', 1, True),
-            InidCode(6, '22', 'Дата подання заявки', 1, True),
-            InidCode(6, '23', 'Дата виставкового пріоритету', 1, True),
-            InidCode(6, '28', 'Кількість заявлених варіантів', 1, True),
-            InidCode(6, '31', 'Номер попередньої заявки відповідно до Паризької конвенції', 1, True),
-            InidCode(6, '32', 'Дата подання попередньої заявки відповідно до Паризької конвенції', 1, True),
-            InidCode(6, '33', 'Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку',
-                     1, True),
-            InidCode(6, '54', 'Назва промислового зразка', 1, True),
-            InidCode(6, '55', 'Зображення промислового зразка та вказівка відносно кольорів', 1, True),
-            InidCode(6, '71', "Ім'я (імена) та адреса (адреси) заявника (заявників)", 1, True),
-            InidCode(6, '72', "Ім'я (імена) автора (авторів), якщо воно відоме", 1, True),
-            InidCode(6, '74', "Ім'я (імена) та адреса (адреси) представника (представників)", 1, True),
-            InidCode(6, '98', "Адреса для листування", 1, True),
+            InidCode(
+                6,
+                "51",
+                "Індекс(и) Міжнародної класифікації промислових зразків (МКПЗ)",
+                1,
+                True,
+            ),
+            InidCode(6, "21", "Номер заявки", 1, True),
+            InidCode(6, "22", "Дата подання заявки", 1, True),
+            InidCode(6, "23", "Дата виставкового пріоритету", 1, True),
+            InidCode(6, "28", "Кількість заявлених варіантів", 1, True),
+            InidCode(
+                6,
+                "31",
+                "Номер попередньої заявки відповідно до Паризької конвенції",
+                1,
+                True,
+            ),
+            InidCode(
+                6,
+                "32",
+                "Дата подання попередньої заявки відповідно до Паризької конвенції",
+                1,
+                True,
+            ),
+            InidCode(
+                6,
+                "33",
+                "Двобуквений код держави-учасниці Паризької конвенції, до якої подано попередню заявку",
+                1,
+                True,
+            ),
+            InidCode(6, "54", "Назва промислового зразка", 1, True),
+            InidCode(
+                6,
+                "55",
+                "Зображення промислового зразка та вказівка відносно кольорів",
+                1,
+                True,
+            ),
+            InidCode(
+                6, "71", "Ім'я (імена) та адреса (адреси) заявника (заявників)", 1, True
+            ),
+            InidCode(
+                6, "72", "Ім'я (імена) автора (авторів), якщо воно відоме", 1, True
+            ),
+            InidCode(
+                6,
+                "74",
+                "Ім'я (імена) та адреса (адреси) представника (представників)",
+                1,
+                True,
+            ),
+            InidCode(6, "98", "Адреса для листування", 1, True),
         ]
         res.extend(inid_data)
 
         # Мадрид
         for obj_type_id in [9, 14]:
             inid_data = [
-                InidCode(obj_type_id, '111', 'Номер міжнародної реєстрації', 2, True),
-                InidCode(obj_type_id, '151', 'Дата міжнародної реєстрації', 2, True),
-                InidCode(obj_type_id, '180', 'Очікувана дата закінчення строку дії реєстрації/продовження', 2, True),
-                InidCode(obj_type_id, '441', 'Дата публікації відомостей про міжнародну реєстрацію торговельної марки, що надійшла для проведення експертизи', 2, True),
-                InidCode(obj_type_id, '450', 'Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ', 2, True),
-                InidCode(obj_type_id, '732', 'Ім\'я та адреса володільця реєстрації', 2, True),
-                InidCode(obj_type_id, '740', 'Ім\'я та адреса представника', 2, True),
-                InidCode(obj_type_id, '821', 'Базова заявка', 2, True),
-                InidCode(obj_type_id, '891', 'Дата територіального поширення міжнародної реєстрації', 2, True),
-                InidCode(obj_type_id, '540', 'Зображення торговельної марки', 2, True),
-                InidCode(obj_type_id, '511', 'Індекс (індекси) МКТП та перелік товарів і послуг', 2, True),
+                InidCode(obj_type_id, "111", "Номер міжнародної реєстрації", 2, True),
+                InidCode(obj_type_id, "151", "Дата міжнародної реєстрації", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "180",
+                    "Очікувана дата закінчення строку дії реєстрації/продовження",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "441",
+                    "Дата публікації відомостей про міжнародну реєстрацію торговельної марки, що надійшла для проведення експертизи",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "450",
+                    "Дата публікації відомостей про міжнародну реєстрацію та номер бюлетеню Міжнародного бюро ВОІВ",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "732", "Ім'я та адреса володільця реєстрації", 2, True
+                ),
+                InidCode(obj_type_id, "740", "Ім'я та адреса представника", 2, True),
+                InidCode(obj_type_id, "821", "Базова заявка", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "891",
+                    "Дата територіального поширення міжнародної реєстрації",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "540", "Зображення торговельної марки", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "511",
+                    "Індекс (індекси) МКТП та перелік товарів і послуг",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # Изобретения, полезные модели (регистрации)
         for obj_type_id in [1, 2]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'Номер патенту', 2, True),
-                InidCode(obj_type_id, '21', 'Номер заявки', 2, True),
-                InidCode(obj_type_id, '22', 'Дата подання заявки', 2, True),
-                InidCode(obj_type_id, '24', 'Дата, з якої є чинними права', 2, True),
-                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 2, True),
-                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 2, True),
-                InidCode(obj_type_id, '33', 'Двобуквений код держави', 2, True),
-                InidCode(obj_type_id, '41', 'Дата публікації відомостей про заявку на державну реєстрацію винаходу '
-                                            'та номер бюлетеня', 2, True),
-                InidCode(obj_type_id, '46', 'Дата публікації відомостей про державну реєстрацію патенту'
-                                            ' та номер бюлетеня', 2, True),
-                InidCode(obj_type_id, '51', 'Iндекс МПК', 2, True),
-                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 2, True),
-                InidCode(obj_type_id, '56', 'Аналоги винаходу', 2, True),
-                InidCode(obj_type_id, '62', 'Номер та дата більш ранньої заявки, з якої було виділено даний патентний документ', 2, True),
-                InidCode(obj_type_id, '71', 'Заявник', 2, True),
-                InidCode(obj_type_id, '72', 'Винахідник', 2, True),
-                InidCode(obj_type_id, '73', 'Власник', 2, True),
-                InidCode(obj_type_id, '74', 'Представник', 2, True),
-                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 2, True),
-                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 2, True),
-                InidCode(obj_type_id, '98', 'Адреса для листування', 2, True),
+                InidCode(obj_type_id, "11", "Номер патенту", 2, True),
+                InidCode(obj_type_id, "21", "Номер заявки", 2, True),
+                InidCode(obj_type_id, "22", "Дата подання заявки", 2, True),
+                InidCode(obj_type_id, "24", "Дата, з якої є чинними права", 2, True),
+                InidCode(obj_type_id, "31", "Номер попередньої заявки", 2, True),
+                InidCode(obj_type_id, "32", "Дата подання попередньої заявки", 2, True),
+                InidCode(obj_type_id, "33", "Двобуквений код держави", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "41",
+                    "Дата публікації відомостей про заявку на державну реєстрацію винаходу "
+                    "та номер бюлетеня",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "46",
+                    "Дата публікації відомостей про державну реєстрацію патенту"
+                    " та номер бюлетеня",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "51", "Iндекс МПК", 2, True),
+                InidCode(
+                    obj_type_id, "54", "Назва винаходу (корисної моделі)", 2, True
+                ),
+                InidCode(obj_type_id, "56", "Аналоги винаходу", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "62",
+                    "Номер та дата більш ранньої заявки, з якої було виділено даний патентний документ",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "71", "Заявник", 2, True),
+                InidCode(obj_type_id, "72", "Винахідник", 2, True),
+                InidCode(obj_type_id, "73", "Власник", 2, True),
+                InidCode(obj_type_id, "74", "Представник", 2, True),
+                InidCode(
+                    obj_type_id, "85", "Дата входження до національної фази", 2, True
+                ),
+                InidCode(
+                    obj_type_id, "86", "Номер та дата подання заявки РСТ", 2, True
+                ),
+                InidCode(obj_type_id, "98", "Адреса для листування", 2, True),
             ]
             res.extend(inid_data)
 
         # Изобретения, полезные модели (заявки)
         for obj_type_id in [1, 2]:
             inid_data = [
-                InidCode(obj_type_id, '21', 'Номер заявки', 1, True),
-                InidCode(obj_type_id, '22', 'Дата подання заявки', 1, True),
-                InidCode(obj_type_id, '31', 'Номер попередньої заявки', 1, True),
-                InidCode(obj_type_id, '32', 'Дата подання попередньої заявки', 1, True),
-                InidCode(obj_type_id, '33', 'Двобуквений код держави', 1, True),
-                InidCode(obj_type_id, '41', 'Дата публікації відомостей про заявку на державну реєстрацію винаходу '
-                                            'та номер бюлетеня', 1, True),
-                InidCode(obj_type_id, '51', 'Iндекс МПК', 1, True),
-                InidCode(obj_type_id, '54', 'Назва винаходу (корисної моделі)', 1, True),
-                InidCode(obj_type_id, '56', 'Аналоги винаходу', 1, True),
-                InidCode(obj_type_id, '71', 'Заявник', 1, True),
-                InidCode(obj_type_id, '72', 'Винахідник', 1, True),
-                InidCode(obj_type_id, '74', 'Представник', 1, True),
-                InidCode(obj_type_id, '85', 'Дата входження до національної фази', 1, True),
-                InidCode(obj_type_id, '86', 'Номер та дата подання заявки РСТ', 1, True),
-                InidCode(obj_type_id, '98', 'Адреса для листування', 1, True),
+                InidCode(obj_type_id, "21", "Номер заявки", 1, True),
+                InidCode(obj_type_id, "22", "Дата подання заявки", 1, True),
+                InidCode(obj_type_id, "31", "Номер попередньої заявки", 1, True),
+                InidCode(obj_type_id, "32", "Дата подання попередньої заявки", 1, True),
+                InidCode(obj_type_id, "33", "Двобуквений код держави", 1, True),
+                InidCode(
+                    obj_type_id,
+                    "41",
+                    "Дата публікації відомостей про заявку на державну реєстрацію винаходу "
+                    "та номер бюлетеня",
+                    1,
+                    True,
+                ),
+                InidCode(obj_type_id, "51", "Iндекс МПК", 1, True),
+                InidCode(
+                    obj_type_id, "54", "Назва винаходу (корисної моделі)", 1, True
+                ),
+                InidCode(obj_type_id, "56", "Аналоги винаходу", 1, True),
+                InidCode(obj_type_id, "71", "Заявник", 1, True),
+                InidCode(obj_type_id, "72", "Винахідник", 1, True),
+                InidCode(obj_type_id, "74", "Представник", 1, True),
+                InidCode(
+                    obj_type_id, "85", "Дата входження до національної фази", 1, True
+                ),
+                InidCode(
+                    obj_type_id, "86", "Номер та дата подання заявки РСТ", 1, True
+                ),
+                InidCode(obj_type_id, "98", "Адреса для листування", 1, True),
             ]
             res.extend(inid_data)
 
         # Топографии (регистрации)
         inid_data = [
-            InidCode(3, '11', 'Номер свідоцтва', 2, True),
-            InidCode(3, '21', 'Номер заявки', 2, True),
-            InidCode(3, '22', 'Дата подання заявки', 2, True),
-            InidCode(3, '24', 'Дата, з якої є чинними права', 2, True),
-            InidCode(3, '31', 'Номер попередньої заявки', 2, True),
-            InidCode(3, '32', 'Дата подання попередньої заявки', 2, True),
-            InidCode(3, '33', 'Двобуквений код держави', 2, True),
-            InidCode(3, '41', 'Дата публікації заявки', 2, True),
-            InidCode(3, '46', 'Дата публікації відомостей про видачу патенту, номер бюлетня', 2,
-                     True),
-            InidCode(3, '54', 'Назва інтегральної мікросхеми', 2, True),
-            InidCode(3, '71', 'Заявник', 2, True),
-            InidCode(3, '72', 'Винахідник', 2, True),
-            InidCode(3, '73', 'Власник', 2, True),
-            InidCode(3, '74', 'Представник', 2, True),
-            InidCode(3, '98', 'Адреса для листування', 2, True),
+            InidCode(3, "11", "Номер свідоцтва", 2, True),
+            InidCode(3, "21", "Номер заявки", 2, True),
+            InidCode(3, "22", "Дата подання заявки", 2, True),
+            InidCode(3, "24", "Дата, з якої є чинними права", 2, True),
+            InidCode(3, "31", "Номер попередньої заявки", 2, True),
+            InidCode(3, "32", "Дата подання попередньої заявки", 2, True),
+            InidCode(3, "33", "Двобуквений код держави", 2, True),
+            InidCode(3, "41", "Дата публікації заявки", 2, True),
+            InidCode(
+                3,
+                "46",
+                "Дата публікації відомостей про видачу патенту, номер бюлетня",
+                2,
+                True,
+            ),
+            InidCode(3, "54", "Назва інтегральної мікросхеми", 2, True),
+            InidCode(3, "71", "Заявник", 2, True),
+            InidCode(3, "72", "Винахідник", 2, True),
+            InidCode(3, "73", "Власник", 2, True),
+            InidCode(3, "74", "Представник", 2, True),
+            InidCode(3, "98", "Адреса для листування", 2, True),
         ]
         res.extend(inid_data)
 
         # Географічні зазначення (заявки)
         inid_data = [
-            InidCode(5, '190', 'Держава реєстрації КЗПТ', 1, True),
-            InidCode(5, '210', 'Номер заявки', 1, True),
-            InidCode(5, '220', 'Дата подання заявки', 1, True),
-            InidCode(5,
-                     '441',
-                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
-                     1,
-                     True),
-            InidCode(5, '539.I', 'Географічне зазначення', 1, True),
-            InidCode(5, '540', 'Назва товару', 1, True),
-            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
-            InidCode(5, '529.A', 'Опис меж географічного місця', 1, True),
-            InidCode(5, '539.D', 'Опис товару', 1, True),
-            InidCode(5, '4573',
-                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
-                     1, True),
-            InidCode(5, '731', 'Відомості про заявника', 1, True),
-            InidCode(5, '9441', 'Специфікація товару', 1, True),
+            InidCode(5, "190", "Держава реєстрації КЗПТ", 1, True),
+            InidCode(5, "210", "Номер заявки", 1, True),
+            InidCode(5, "220", "Дата подання заявки", 1, True),
+            InidCode(
+                5,
+                "441",
+                "Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня",
+                1,
+                True,
+            ),
+            InidCode(5, "539.I", "Географічне зазначення", 1, True),
+            InidCode(5, "540", "Назва товару", 1, True),
+            InidCode(5, "4551", "Кваліфікація географічного зазначення", 1, True),
+            InidCode(5, "529.A", "Опис меж географічного місця", 1, True),
+            InidCode(5, "539.D", "Опис товару", 1, True),
+            InidCode(
+                5,
+                "4573",
+                "Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням",
+                1,
+                True,
+            ),
+            InidCode(5, "731", "Відомості про заявника", 1, True),
+            InidCode(5, "9441", "Специфікація товару", 1, True),
         ]
         res.extend(inid_data)
 
         # Географічні зазначення (регистрации)
         inid_data = [
-            InidCode(5, '111', 'Номер реєстрації', 2, True),
-            InidCode(5, '151', 'Дата реєстрації', 2, True),
-            InidCode(5, '190', 'Держава реєстрації КЗПТ', 2, True),
-            InidCode(5, '210', 'Номер заявки', 2, True),
-            InidCode(5, '220', 'Дата подання заявки', 2, True),
-            InidCode(5,
-                     '441',
-                     'Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня',
-                     2,
-                     True),
-            InidCode(5, '539.I', 'Географічне зазначення', 2, True),
-            InidCode(5, '540', 'Назва товару', 2, True),
-            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 2, True),
-            InidCode(5, '529.A', 'Опис меж географічного місця', 2, True),
-            InidCode(5, '539.D', 'Опис товару', 2, True),
-            InidCode(5, '4573',
-                     'Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням',
-                     2, True),
-            InidCode(5, '731', 'Відомості про заявника', 2, True),
-            InidCode(5, '9441', 'Специфікація товару', 2, True),
+            InidCode(5, "111", "Номер реєстрації", 2, True),
+            InidCode(5, "151", "Дата реєстрації", 2, True),
+            InidCode(5, "190", "Держава реєстрації КЗПТ", 2, True),
+            InidCode(5, "210", "Номер заявки", 2, True),
+            InidCode(5, "220", "Дата подання заявки", 2, True),
+            InidCode(
+                5,
+                "441",
+                "Дата публікації відомостей про заявку (заявлене географічне зазначення) та номер бюлетеня",
+                2,
+                True,
+            ),
+            InidCode(5, "539.I", "Географічне зазначення", 2, True),
+            InidCode(5, "540", "Назва товару", 2, True),
+            InidCode(5, "4551", "Кваліфікація географічного зазначення", 2, True),
+            InidCode(5, "529.A", "Опис меж географічного місця", 2, True),
+            InidCode(5, "539.D", "Опис товару", 2, True),
+            InidCode(
+                5,
+                "4573",
+                "Опис взаємозв’язку товару з географічним середовищем чи географічним місцем походженням",
+                2,
+                True,
+            ),
+            InidCode(5, "731", "Відомості про заявника", 2, True),
+            InidCode(5, "9441", "Специфікація товару", 2, True),
         ]
         res.extend(inid_data)
 
         # Авт. право (регистрации)
         for obj_type_id in [10, 13]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'Номер свідоцтва про реєстрацію авторського права на твір', 2, True),
-                InidCode(obj_type_id, '15', 'Дата реєстрації авторського права', 2, True),
-                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
-                InidCode(obj_type_id, '45.D', 'Дата публікації', 2, True),
-                InidCode(obj_type_id, '45.N', 'Номер бюлетеня', 2, True),
-                InidCode(obj_type_id, '54', 'Вид та повна назва твору (творів)', 2, True),
-                InidCode(obj_type_id, '54.S', 'Скорочена назва твору (творів)', 2, True),
-                InidCode(obj_type_id, '57', 'Анотація', 2, True),
-                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів), чи позначення «Анонімно»', 2, True),
-                InidCode(obj_type_id, '58', 'Вихідні дані для оприлюднених творів', 2, True),
-                InidCode(obj_type_id, '77', 'Повне ім\'я або повне офіційне найменування роботодавця', 2, True),
+                InidCode(
+                    obj_type_id,
+                    "11",
+                    "Номер свідоцтва про реєстрацію авторського права на твір",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "15", "Дата реєстрації авторського права", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "29",
+                    "Об'єкт авторського права, до якого належить твір",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "45.D", "Дата публікації", 2, True),
+                InidCode(obj_type_id, "45.N", "Номер бюлетеня", 2, True),
+                InidCode(
+                    obj_type_id, "54", "Вид та повна назва твору (творів)", 2, True
+                ),
+                InidCode(
+                    obj_type_id, "54.S", "Скорочена назва твору (творів)", 2, True
+                ),
+                InidCode(obj_type_id, "57", "Анотація", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "72",
+                    "Повне ім'я та/або псевдонім автора (авторів), чи позначення «Анонімно»",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "58", "Вихідні дані для оприлюднених творів", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "77",
+                    "Повне ім'я або повне офіційне найменування роботодавця",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # Договора авт. право (регистрации)
         for obj_type_id in [11, 12]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'Номер реєстрації договору', 2, True),
-                InidCode(obj_type_id, '15', 'Дата реєстрації договору', 2, True),
-                InidCode(obj_type_id, '27', 'Вид договору', 2, True),
-                InidCode(obj_type_id, '29', 'Об\'єкт авторського права, до якого належить твір', 2, True),
-                InidCode(obj_type_id, '54', 'Вид та повна назва твору (творів)', 2, True),
-                InidCode(obj_type_id, '54.S', 'Скорочена назва твору (творів)', 2, True),
-                InidCode(obj_type_id, '72', 'Повне ім\'я та/або псевдонім автора (авторів) твору', 2, True),
-                InidCode(obj_type_id, '75', 'Повне ім\'я фізичної(их) або повне офіційне найменування юридичної(их) '
-                                            'особи (осіб), сторін договору', 2, True),
+                InidCode(obj_type_id, "11", "Номер реєстрації договору", 2, True),
+                InidCode(obj_type_id, "15", "Дата реєстрації договору", 2, True),
+                InidCode(obj_type_id, "27", "Вид договору", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "29",
+                    "Об'єкт авторського права, до якого належить твір",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "54", "Вид та повна назва твору (творів)", 2, True
+                ),
+                InidCode(
+                    obj_type_id, "54.S", "Скорочена назва твору (творів)", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "72",
+                    "Повне ім'я та/або псевдонім автора (авторів) твору",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "75",
+                    "Повне ім'я фізичної(их) або повне офіційне найменування юридичної(их) "
+                    "особи (осіб), сторін договору",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # СДО
         inid_data = [
-            InidCode(16, '11', 'Номер сертифіката додаткової охорони (номер базового патенту/порядковий номер СДО '
-                               'за цим патентом)', 2, True),
-            InidCode(16, '16', 'Дата державної реєстрації додаткової охорони', 2, True),
-            InidCode(16, '98', 'Дата подання клопотання про видачу сертифіката додаткової охорони', 2, True),
-            InidCode(16, '68', 'Номер державної реєстрації, що є номером базового патенту', 2, True),
-            InidCode(16, '54', 'Назва винаходу', 2, True),
-            InidCode(16, '95', 'Назва продукту (СДО) (співпадає з назвою, зазначеною у дозвільному документі)', 2, True),
-            InidCode(16, '92', 'Номер та дата першого національного дозволу на розміщення продукту на ринку', 2, True),
-            InidCode(16, '94', 'Строк дії сертифіката додаткової охорони', 2, True),
-            InidCode(16, '73', 'Ім\'я або повне найменування й адреса володільця (володільців) сертифіката додаткової '
-                               'охорони та двобуквений код держави', 2, True),
+            InidCode(
+                16,
+                "11",
+                "Номер сертифіката додаткової охорони (номер базового патенту/порядковий номер СДО "
+                "за цим патентом)",
+                2,
+                True,
+            ),
+            InidCode(16, "16", "Дата державної реєстрації додаткової охорони", 2, True),
+            InidCode(
+                16,
+                "98",
+                "Дата подання клопотання про видачу сертифіката додаткової охорони",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "68",
+                "Номер державної реєстрації, що є номером базового патенту",
+                2,
+                True,
+            ),
+            InidCode(16, "54", "Назва винаходу", 2, True),
+            InidCode(
+                16,
+                "95",
+                "Назва продукту (СДО) (співпадає з назвою, зазначеною у дозвільному документі)",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "92",
+                "Номер та дата першого національного дозволу на розміщення продукту на ринку",
+                2,
+                True,
+            ),
+            InidCode(16, "94", "Строк дії сертифіката додаткової охорони", 2, True),
+            InidCode(
+                16,
+                "73",
+                "Ім'я або повне найменування й адреса володільця (володільців) сертифіката додаткової "
+                "охорони та двобуквений код держави",
+                2,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # Добре відомі ТМ
         inid_data = [
-            InidCode(17, 'image', 'Зображення знака', None, True),
-            InidCode(17, 'keywords', 'Ключові слова', None, True),
-            InidCode(17, 'decision_date', 'Дата набрання чинності рішенням, яким визнано, '
-                                          'що знак став добре відомим в Україні', None, True),
-            InidCode(17, 'rights_date', 'Дата, на яку знак став добре відомим в Україні', None, True),
-            InidCode(17, 'holder', 'Ім\'я або повне найменування власника', None, True),
-            InidCode(17, 'nice', 'Перелік товарів і/або послуг, за класами МКТП '
-                                 'для яких знак визнано добре відомим в Україні', None, True),
-            InidCode(17, 'vienna', 'Індекси Віденської класифікації', None, True),
+            InidCode(17, "image", "Зображення знака", None, True),
+            InidCode(17, "keywords", "Ключові слова", None, True),
+            InidCode(
+                17,
+                "decision_date",
+                "Дата набрання чинності рішенням, яким визнано, "
+                "що знак став добре відомим в Україні",
+                None,
+                True,
+            ),
+            InidCode(
+                17,
+                "rights_date",
+                "Дата, на яку знак став добре відомим в Україні",
+                None,
+                True,
+            ),
+            InidCode(17, "holder", "Ім'я або повне найменування власника", None, True),
+            InidCode(
+                17,
+                "nice",
+                "Перелік товарів і/або послуг, за класами МКТП "
+                "для яких знак визнано добре відомим в Україні",
+                None,
+                True,
+            ),
+            InidCode(17, "vienna", "Індекси Віденської класифікації", None, True),
         ]
         res.extend(inid_data)
 
-    elif lang == 'en':
+    elif lang == "en":
         # ТМ регистрации
         inid_data = [
-            InidCode(4, '540', 'Reproduction of the mark', 2, True),
-            InidCode(4, '141', 'Date of the termination of the registration of the mark', 2, True),
-            InidCode(4, '111', 'Serial number of the registration', 2, True),
-            InidCode(4, '151', 'Date of the registration', 2, True),
-            InidCode(4, '181', 'Expected expiration date of the registration', 2, True),
-            InidCode(4, '186', 'Expected prolongation date of the registration', 2, True),
-            InidCode(4, '210', 'Serial number of the application', 2, True),
-            InidCode(4, '220', 'Date of filing of the application', 2, True),
-            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
-                               'or registration of the mark in the origin country', 2, True),
-            InidCode(4, '441', 'Application publication date and bulletin number', 2, True),
-            InidCode(4, '450', 'Date of publication of information on the issuance of the certificate', 2, True),
-            InidCode(4, '531', 'Vienna Classification', 2, True),
-            InidCode(4, '731', 'Name and address of the applicant', 2, True),
-            InidCode(4, '732', 'Name and address of the holder of the registration', 2, True),
-            InidCode(4, '740', 'Name and address of the representative', 1, True),
-            InidCode(4, '750', 'Address for correspondence', 1, True),
-            InidCode(4, '591', 'Information concerning colors claimed', 2, True),
-            InidCode(4, '511', 'Nice Classification indexes', 2, True),
-            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 2, True),
+            InidCode(4, "540", "Reproduction of the mark", 2, True),
+            InidCode(
+                4,
+                "141",
+                "Date of the termination of the registration of the mark",
+                2,
+                True,
+            ),
+            InidCode(4, "111", "Serial number of the registration", 2, True),
+            InidCode(4, "151", "Date of the registration", 2, True),
+            InidCode(4, "181", "Expected expiration date of the registration", 2, True),
+            InidCode(
+                4, "186", "Expected prolongation date of the registration", 2, True
+            ),
+            InidCode(4, "210", "Serial number of the application", 2, True),
+            InidCode(4, "220", "Date of filing of the application", 2, True),
+            InidCode(
+                4,
+                "300",
+                "Priority data according to the Paris Convention and other data related to seniority "
+                "or registration of the mark in the origin country",
+                2,
+                True,
+            ),
+            InidCode(
+                4, "441", "Application publication date and bulletin number", 2, True
+            ),
+            InidCode(
+                4,
+                "450",
+                "Date of publication of information on the issuance of the certificate",
+                2,
+                True,
+            ),
+            InidCode(4, "531", "Vienna Classification", 2, True),
+            InidCode(4, "731", "Name and address of the applicant", 2, True),
+            InidCode(
+                4, "732", "Name and address of the holder of the registration", 2, True
+            ),
+            InidCode(4, "740", "Name and address of the representative", 1, True),
+            InidCode(4, "750", "Address for correspondence", 1, True),
+            InidCode(4, "591", "Information concerning colors claimed", 2, True),
+            InidCode(4, "511", "Nice Classification indexes", 2, True),
+            InidCode(
+                4,
+                "526",
+                "Withdrawal from protection of certain elements of the trademark",
+                2,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # ТМ заявки
         inid_data = [
-            InidCode(4, '540', 'Reproduction of the mark', 1, True),
-            InidCode(4, '210', 'Serial number of the application', 1, True),
-            InidCode(4, '220', 'Date of filing of the application', 1, True),
-            InidCode(4, '221', 'Date of receipt of application materials to NIPIO', 1, True),
-            InidCode(4, '300', 'Priority data according to the Paris Convention and other data related to seniority '
-                               'or registration of the mark in the origin country', 1, True),
-            InidCode(4, '441', 'Application publication date and bulletin number', 1, True),
-            InidCode(4, '531', 'Vienna Classification', 1, True),
-            InidCode(4, '731', 'Name and address of the applicant', 1, True),
-            InidCode(4, '740', 'Name and address of the representative', 1, True),
-            InidCode(4, '750', 'Address for correspondence', 1, True),
-            InidCode(4, '591', 'Information concerning colors claimed', 1, True),
-            InidCode(4, '511', 'Nice Classification indexes', 1, True),
-            InidCode(4, '526', 'Withdrawal from protection of certain elements of the trademark', 1, True),
+            InidCode(4, "540", "Reproduction of the mark", 1, True),
+            InidCode(4, "210", "Serial number of the application", 1, True),
+            InidCode(4, "220", "Date of filing of the application", 1, True),
+            InidCode(
+                4, "221", "Date of receipt of application materials to NIPIO", 1, True
+            ),
+            InidCode(
+                4,
+                "300",
+                "Priority data according to the Paris Convention and other data related to seniority "
+                "or registration of the mark in the origin country",
+                1,
+                True,
+            ),
+            InidCode(
+                4, "441", "Application publication date and bulletin number", 1, True
+            ),
+            InidCode(4, "531", "Vienna Classification", 1, True),
+            InidCode(4, "731", "Name and address of the applicant", 1, True),
+            InidCode(4, "740", "Name and address of the representative", 1, True),
+            InidCode(4, "750", "Address for correspondence", 1, True),
+            InidCode(4, "591", "Information concerning colors claimed", 1, True),
+            InidCode(4, "511", "Nice Classification indexes", 1, True),
+            InidCode(
+                4,
+                "526",
+                "Withdrawal from protection of certain elements of the trademark",
+                1,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # Пром. образцы регистрации
         inid_data = [
-            InidCode(6, '51', 'International Classification for Industrial Designs', 2, True),
-            InidCode(6, '11', 'Serial number of the registration', 2, True),
-            InidCode(6, '24', 'Date from which the industrial design right has effect', 2, True),
-            InidCode(6, '21', 'Serial number of the application', 2, True),
-            InidCode(6, '22', 'Date of filing of the application', 2, True),
-            InidCode(6, '23', 'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)', 2, True),
-            InidCode(6, '28', 'Number of industrial designs included in the application', 2, True),
-            InidCode(6, '31', 'Serial number assigned to the priority application', 2, True),
-            InidCode(6, '32', 'Date of filing of the priority application', 2, True),
-            InidCode(6, '33', 'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
-                     2, True),
-            InidCode(6, '45', 'Date of publication of information on patent issuance and bulletin number', 2, True),
-            InidCode(6, '54', 'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design', 2, True),
-            InidCode(6, '55', 'Images', 2, True),
-            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 2, True),
-            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 2, True),
-            InidCode(6, '73', "Name(s) and address(es) of the owner(s)", 2, True),
-            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 2, True),
-            InidCode(6, '98', "Correspondense address", 2, True),
+            InidCode(
+                6, "51", "International Classification for Industrial Designs", 2, True
+            ),
+            InidCode(6, "11", "Serial number of the registration", 2, True),
+            InidCode(
+                6,
+                "24",
+                "Date from which the industrial design right has effect",
+                2,
+                True,
+            ),
+            InidCode(6, "21", "Serial number of the application", 2, True),
+            InidCode(6, "22", "Date of filing of the application", 2, True),
+            InidCode(
+                6,
+                "23",
+                "Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "28",
+                "Number of industrial designs included in the application",
+                2,
+                True,
+            ),
+            InidCode(
+                6, "31", "Serial number assigned to the priority application", 2, True
+            ),
+            InidCode(6, "32", "Date of filing of the priority application", 2, True),
+            InidCode(
+                6,
+                "33",
+                "Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "45",
+                "Date of publication of information on patent issuance and bulletin number",
+                2,
+                True,
+            ),
+            InidCode(
+                6,
+                "54",
+                "Designation of article(s) or product(s) covered by the industrial design or title of the industrial design",
+                2,
+                True,
+            ),
+            InidCode(6, "55", "Images", 2, True),
+            InidCode(6, "71", "Name(s) and address(es) of the applicant(s)", 2, True),
+            InidCode(6, "72", "Name(s) of the creator(s) if known to be such", 2, True),
+            InidCode(6, "73", "Name(s) and address(es) of the owner(s)", 2, True),
+            InidCode(
+                6, "74", "Name(s) and address(es) of the representative(s)", 2, True
+            ),
+            InidCode(6, "98", "Correspondense address", 2, True),
         ]
         res.extend(inid_data)
 
         # Пром. образцы заявки
         inid_data = [
-            InidCode(6, '51', 'International Classification for Industrial Designs', 1, True),
-            InidCode(6, '21', 'Serial number of the application', 1, True),
-            InidCode(6, '22', 'Date of filing of the application', 1, True),
-            InidCode(6, '23',
-                     'Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)',
-                     1, True),
-            InidCode(6, '28', 'Number of industrial designs included in the application', 1, True),
-            InidCode(6, '31', 'Serial number assigned to the priority application', 1, True),
-            InidCode(6, '32', 'Date of filing of the priority application', 1, True),
-            InidCode(6, '33',
-                     'Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made',
-                     1, True),
-            InidCode(6, '54',
-                     'Designation of article(s) or product(s) covered by the industrial design or title of the industrial design',
-                     1, True),
-            InidCode(6, '55', 'Images', 1, True),
-            InidCode(6, '71', "Name(s) and address(es) of the applicant(s)", 1, True),
-            InidCode(6, '72', "Name(s) of the creator(s) if known to be such", 1, True),
-            InidCode(6, '74', "Name(s) and address(es) of the representative(s)", 1, True),
-            InidCode(6, '98', "Correspondense address", 1, True),
+            InidCode(
+                6, "51", "International Classification for Industrial Designs", 1, True
+            ),
+            InidCode(6, "21", "Serial number of the application", 1, True),
+            InidCode(6, "22", "Date of filing of the application", 1, True),
+            InidCode(
+                6,
+                "23",
+                "Name and place of exhibition, and date on which the industrial design was first exhibited there (exhibition priority data)",
+                1,
+                True,
+            ),
+            InidCode(
+                6,
+                "28",
+                "Number of industrial designs included in the application",
+                1,
+                True,
+            ),
+            InidCode(
+                6, "31", "Serial number assigned to the priority application", 1, True
+            ),
+            InidCode(6, "32", "Date of filing of the priority application", 1, True),
+            InidCode(
+                6,
+                "33",
+                "Two-letter code, according to WIPO Standard ST.3, identifying the authority with which the priority application was made",
+                1,
+                True,
+            ),
+            InidCode(
+                6,
+                "54",
+                "Designation of article(s) or product(s) covered by the industrial design or title of the industrial design",
+                1,
+                True,
+            ),
+            InidCode(6, "55", "Images", 1, True),
+            InidCode(6, "71", "Name(s) and address(es) of the applicant(s)", 1, True),
+            InidCode(6, "72", "Name(s) of the creator(s) if known to be such", 1, True),
+            InidCode(
+                6, "74", "Name(s) and address(es) of the representative(s)", 1, True
+            ),
+            InidCode(6, "98", "Correspondense address", 1, True),
         ]
         res.extend(inid_data)
 
         # Мадрид
         for obj_type_id in [9, 14]:
             inid_data = [
-                InidCode(obj_type_id, '111', 'International registration number', 2, True),
-                InidCode(obj_type_id, '151', 'Date of international registration', 2, True),
-                InidCode(obj_type_id, '180', 'Expected expiration date of the registration', 2, True),
-                InidCode(obj_type_id, '441', 'Application publication date and bulletin number', 2, True),
-                InidCode(obj_type_id, '450', 'Date of publication of information on international registration and number of the WIPO International Bureau bulletin', 2, True),
-                InidCode(obj_type_id, '732', 'Name and address of the holder of the registration', 2, True),
-                InidCode(obj_type_id, '740', 'Name and address of the representative', 2, True),
-                InidCode(obj_type_id, '821', 'Base application', 2, True),
-                InidCode(obj_type_id, '891', 'Date of territorial distribution of international registration', 2, True),
-                InidCode(obj_type_id, '540', 'Brand image', 2, True),
-                InidCode(obj_type_id, '511', 'ICCI index (s) and list of goods and services', 2, True),
+                InidCode(
+                    obj_type_id, "111", "International registration number", 2, True
+                ),
+                InidCode(
+                    obj_type_id, "151", "Date of international registration", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "180",
+                    "Expected expiration date of the registration",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "441",
+                    "Application publication date and bulletin number",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "450",
+                    "Date of publication of information on international registration and number of the WIPO International Bureau bulletin",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "732",
+                    "Name and address of the holder of the registration",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "740",
+                    "Name and address of the representative",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "821", "Base application", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "891",
+                    "Date of territorial distribution of international registration",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "540", "Brand image", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "511",
+                    "ICCI index (s) and list of goods and services",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # Изобретения, полезные модели (регистрации)
         for obj_type_id in [1, 2]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'Number of the patent, SPC or patent document', 2, True),
-                InidCode(obj_type_id, '21', 'Number assigned to the application', 2, True),
-                InidCode(obj_type_id, '22', 'Date of filing of the application', 2, True),
-                InidCode(obj_type_id, '24', 'Date from which industrial property rights may have effec', 2, True),
-                InidCode(obj_type_id, '31', 'Number assigned to priority application', 2, True),
-                InidCode(obj_type_id, '32', 'Date of filing of priority application', 2, True),
-                InidCode(obj_type_id, '33', 'Twoleter of country code', 2, True),
-                InidCode(obj_type_id, '41', 'Date of publication of application', 2, True),
-                InidCode(obj_type_id, '46', 'Bulletin number and date of publication about patents grant', 2,
-                         True),
-                InidCode(obj_type_id, '51', 'Internmational patent classification', 2, True),
-                InidCode(obj_type_id, '54', 'Title of the invention', 2, True),
-                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 2, True),
-                InidCode(obj_type_id, '62',
-                         'Number and date of the earlier application from which the present patent document has been divided up', 2,
-                         True),
-                InidCode(obj_type_id, '71', 'Applicant', 2, True),
-                InidCode(obj_type_id, '72', 'Inventor', 2, True),
-                InidCode(obj_type_id, '73', 'Name of grantee, holder, assignee or owner', 2, True),
-                InidCode(obj_type_id, '74', 'Name of attorney or agent', 2, True),
-                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 2, True),
-                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 2, True),
-                InidCode(obj_type_id, '98', 'Mailing address', 2, True),
+                InidCode(
+                    obj_type_id,
+                    "11",
+                    "Number of the patent, SPC or patent document",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "21", "Number assigned to the application", 2, True
+                ),
+                InidCode(
+                    obj_type_id, "22", "Date of filing of the application", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "24",
+                    "Date from which industrial property rights may have effec",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "31",
+                    "Number assigned to priority application",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "32", "Date of filing of priority application", 2, True
+                ),
+                InidCode(obj_type_id, "33", "Twoleter of country code", 2, True),
+                InidCode(
+                    obj_type_id, "41", "Date of publication of application", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "46",
+                    "Bulletin number and date of publication about patents grant",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "51", "Internmational patent classification", 2, True
+                ),
+                InidCode(obj_type_id, "54", "Title of the invention", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "56",
+                    "Prior art documents, if separate from descriptive text",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "62",
+                    "Number and date of the earlier application from which the present patent document has been divided up",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "71", "Applicant", 2, True),
+                InidCode(obj_type_id, "72", "Inventor", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "73",
+                    "Name of grantee, holder, assignee or owner",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "74", "Name of attorney or agent", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "85",
+                    "Date of publication about patents grant",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "86",
+                    "Number and date of filing of PCT Application",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "98", "Mailing address", 2, True),
             ]
             res.extend(inid_data)
 
         # Изобретения, полезные модели (заявки)
         for obj_type_id in [1, 2]:
             inid_data = [
-                InidCode(obj_type_id, '21', 'Number assigned to the application', 1, True),
-                InidCode(obj_type_id, '22', 'Date of filing of the application', 1, True),
-                InidCode(obj_type_id, '31', 'Number assigned to priority application', 1, True),
-                InidCode(obj_type_id, '32', 'Date of filing of priority application', 1, True),
-                InidCode(obj_type_id, '33', 'Twoleter of country code', 1, True),
-                InidCode(obj_type_id, '41', 'Date of publication of application', 1, True),
-                InidCode(obj_type_id, '51', 'Internmational patent classification', 1, True),
-                InidCode(obj_type_id, '54', 'Title of the invention', 1, True),
-                InidCode(obj_type_id, '56', 'Prior art documents, if separate from descriptive text', 1, True),
-                InidCode(obj_type_id, '71', 'Applicant', 1, True),
-                InidCode(obj_type_id, '72', 'Inventor', 1, True),
-                InidCode(obj_type_id, '74', 'Name of attorney or agent', 1, True),
-                InidCode(obj_type_id, '85', 'Date of publication about patents grant', 1, True),
-                InidCode(obj_type_id, '86', 'Number and date of filing of PCT Application', 1, True),
-                InidCode(obj_type_id, '98', 'Mailing address', 1, True),
+                InidCode(
+                    obj_type_id, "21", "Number assigned to the application", 1, True
+                ),
+                InidCode(
+                    obj_type_id, "22", "Date of filing of the application", 1, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "31",
+                    "Number assigned to priority application",
+                    1,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "32", "Date of filing of priority application", 1, True
+                ),
+                InidCode(obj_type_id, "33", "Twoleter of country code", 1, True),
+                InidCode(
+                    obj_type_id, "41", "Date of publication of application", 1, True
+                ),
+                InidCode(
+                    obj_type_id, "51", "Internmational patent classification", 1, True
+                ),
+                InidCode(obj_type_id, "54", "Title of the invention", 1, True),
+                InidCode(
+                    obj_type_id,
+                    "56",
+                    "Prior art documents, if separate from descriptive text",
+                    1,
+                    True,
+                ),
+                InidCode(obj_type_id, "71", "Applicant", 1, True),
+                InidCode(obj_type_id, "72", "Inventor", 1, True),
+                InidCode(obj_type_id, "74", "Name of attorney or agent", 1, True),
+                InidCode(
+                    obj_type_id,
+                    "85",
+                    "Date of publication about patents grant",
+                    1,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "86",
+                    "Number and date of filing of PCT Application",
+                    1,
+                    True,
+                ),
+                InidCode(obj_type_id, "98", "Mailing address", 1, True),
             ]
             res.extend(inid_data)
 
         # Топографии (регистрации)
         inid_data = [
-            InidCode(3, '11', 'Number of the patent, SPC or patent document', 2, True),
-            InidCode(3, '21', 'Number assigned to the application', 2, True),
-            InidCode(3, '22', 'Date of filing of the application', 2, True),
-            InidCode(3, '24', 'Date from which industrial property rights may have effect', 2, True),
-            InidCode(3, '31', 'Number assigned to priority application', 2, True),
-            InidCode(3, '32', 'Date of filing of priority application', 2, True),
-            InidCode(3, '33', 'Twoleter of country code', 2, True),
-            InidCode(3, '41', 'Date of publication of application', 2, True),
-            InidCode(3, '46', 'Bulletin number and date of publication about patents grant', 2,
-                     True),
-            InidCode(3, '54', 'Title of Integral micro ciquit', 2, True),
-            InidCode(3, '71', 'Applicant', 2, True),
-            InidCode(3, '72', 'Inventor', 2, True),
-            InidCode(3, '73', 'Name of grantee, holder, assignee or owner', 2, True),
-            InidCode(3, '74', 'Name of attorney or agent', 2, True),
-            InidCode(3, '98', 'Mailing address', 2, True),
+            InidCode(3, "11", "Number of the patent, SPC or patent document", 2, True),
+            InidCode(3, "21", "Number assigned to the application", 2, True),
+            InidCode(3, "22", "Date of filing of the application", 2, True),
+            InidCode(
+                3,
+                "24",
+                "Date from which industrial property rights may have effect",
+                2,
+                True,
+            ),
+            InidCode(3, "31", "Number assigned to priority application", 2, True),
+            InidCode(3, "32", "Date of filing of priority application", 2, True),
+            InidCode(3, "33", "Twoleter of country code", 2, True),
+            InidCode(3, "41", "Date of publication of application", 2, True),
+            InidCode(
+                3,
+                "46",
+                "Bulletin number and date of publication about patents grant",
+                2,
+                True,
+            ),
+            InidCode(3, "54", "Title of Integral micro ciquit", 2, True),
+            InidCode(3, "71", "Applicant", 2, True),
+            InidCode(3, "72", "Inventor", 2, True),
+            InidCode(3, "73", "Name of grantee, holder, assignee or owner", 2, True),
+            InidCode(3, "74", "Name of attorney or agent", 2, True),
+            InidCode(3, "98", "Mailing address", 2, True),
         ]
         res.extend(inid_data)
 
         # Географічні зазначення (заявки)
         inid_data = [
-            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 1, True),
-            InidCode(5, '210', 'Application number', 1, True),
-            InidCode(5, '220', 'Date of filing of the application', 1, True),
-            InidCode(5,
-                     '441',
-                     'Application publication date, bulletin number',
-                     1,
-                     True),
-            InidCode(5, '539.I', 'Geographical indication', 1, True),
-            InidCode(5, '540', 'Name of the product', 1, True),
-            InidCode(5, '4551', 'Кваліфікація географічного зазначення', 1, True),
-            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 1, True),
-            InidCode(5, '539.D', 'Description of the product for which the geographical indication is applied for registration', 1, True),
-            InidCode(5, '4573',
-                     'Description of the product\'s relationship with the geographic environment or geographic place of origin',
-                     1, True),
-            InidCode(5, '731', 'Information about applicant', 1, True),
-            InidCode(5, '9441', 'Specification', 1, True),
+            InidCode(
+                5,
+                "190",
+                "State of registration of the qualified indication of origin of the product",
+                1,
+                True,
+            ),
+            InidCode(5, "210", "Application number", 1, True),
+            InidCode(5, "220", "Date of filing of the application", 1, True),
+            InidCode(
+                5, "441", "Application publication date, bulletin number", 1, True
+            ),
+            InidCode(5, "539.I", "Geographical indication", 1, True),
+            InidCode(5, "540", "Name of the product", 1, True),
+            InidCode(5, "4551", "Кваліфікація географічного зазначення", 1, True),
+            InidCode(
+                5,
+                "529.A",
+                "Description of the boundaries of a geographical place",
+                1,
+                True,
+            ),
+            InidCode(
+                5,
+                "539.D",
+                "Description of the product for which the geographical indication is applied for registration",
+                1,
+                True,
+            ),
+            InidCode(
+                5,
+                "4573",
+                "Description of the product's relationship with the geographic environment or geographic place of origin",
+                1,
+                True,
+            ),
+            InidCode(5, "731", "Information about applicant", 1, True),
+            InidCode(5, "9441", "Specification", 1, True),
         ]
         res.extend(inid_data)
 
         # Географічні зазначення (регистрации)
         inid_data = [
-            InidCode(5, '111', 'Registration number', 2, True),
-            InidCode(5, '151', 'Date of the registration', 2, True),
-            InidCode(5, '190', 'State of registration of the qualified indication of origin of the product', 2, True),
-            InidCode(5, '210', 'Application number', 2, True),
-            InidCode(5, '220', 'Date of filing of the application', 2, True),
-            InidCode(5,
-                     '441',
-                     'Application publication date, bulletin number',
-                     1,
-                     True),
-            InidCode(5, '539.I', 'Geographical indication', 2, True),
-            InidCode(5, '540', 'Name of the product', 2, True),
-            InidCode(5, '4551', 'Qualification of geographical indication', 2, True),
-            InidCode(5, '529.A', 'Description of the boundaries of a geographical place', 2, True),
-            InidCode(5, '539.D', 'Description of the product', 2, True),
-            InidCode(5, '4573',
-                     'Description of the product\'s relationship with the geographic environment '
-                     'or geographic place of origin',
-                     2, True),
-            InidCode(5, '731', 'Information about applicant', 2, True),
-            InidCode(5, '9441', 'Specification', 2, True),
+            InidCode(5, "111", "Registration number", 2, True),
+            InidCode(5, "151", "Date of the registration", 2, True),
+            InidCode(
+                5,
+                "190",
+                "State of registration of the qualified indication of origin of the product",
+                2,
+                True,
+            ),
+            InidCode(5, "210", "Application number", 2, True),
+            InidCode(5, "220", "Date of filing of the application", 2, True),
+            InidCode(
+                5, "441", "Application publication date, bulletin number", 1, True
+            ),
+            InidCode(5, "539.I", "Geographical indication", 2, True),
+            InidCode(5, "540", "Name of the product", 2, True),
+            InidCode(5, "4551", "Qualification of geographical indication", 2, True),
+            InidCode(
+                5,
+                "529.A",
+                "Description of the boundaries of a geographical place",
+                2,
+                True,
+            ),
+            InidCode(5, "539.D", "Description of the product", 2, True),
+            InidCode(
+                5,
+                "4573",
+                "Description of the product's relationship with the geographic environment "
+                "or geographic place of origin",
+                2,
+                True,
+            ),
+            InidCode(5, "731", "Information about applicant", 2, True),
+            InidCode(5, "9441", "Specification", 2, True),
         ]
         res.extend(inid_data)
 
         # Авт. право (регистрации)
         for obj_type_id in [10, 13]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'The number of the copyright registration certificate for the office work',
-                         2, True),
-                InidCode(obj_type_id, '15', 'Copyright registration date', 2, True),
-                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
-                InidCode(obj_type_id, '45.D', 'Date of publication', 2, True),
-                InidCode(obj_type_id, '45.N', 'Bulletin number', 2, True),
-                InidCode(obj_type_id, '54', 'Type and full title of the work (works)', 2, True),
-                InidCode(obj_type_id, '54.S', 'Abbreviated title of the work (works)', 2, True),
-                InidCode(obj_type_id, '57', 'Annotation', 2, True),
-                InidCode(obj_type_id, '72', 'Name(s) of the creator(s) if known to be such', 2, True),
-                InidCode(obj_type_id, '58', 'Initial data for published works', 2, True),
-                InidCode(obj_type_id, '77', 'Name(s) and address(es) of the Employer(s)', 2, True),
+                InidCode(
+                    obj_type_id,
+                    "11",
+                    "The number of the copyright registration certificate for the office work",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "15", "Copyright registration date", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "29",
+                    "The object of copyright to which the work related",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "45.D", "Date of publication", 2, True),
+                InidCode(obj_type_id, "45.N", "Bulletin number", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "54",
+                    "Type and full title of the work (works)",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "54.S",
+                    "Abbreviated title of the work (works)",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "57", "Annotation", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "72",
+                    "Name(s) of the creator(s) if known to be such",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id, "58", "Initial data for published works", 2, True
+                ),
+                InidCode(
+                    obj_type_id,
+                    "77",
+                    "Name(s) and address(es) of the Employer(s)",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # Договора авт. право (регистрации)
         for obj_type_id in [11, 12]:
             inid_data = [
-                InidCode(obj_type_id, '11', 'Agreement registration number', 2, True),
-                InidCode(obj_type_id, '15', 'Agreement registration date', 2, True),
-                InidCode(obj_type_id, '27', 'Kind of agreement', 2, True),
-                InidCode(obj_type_id, '29', 'The object of copyright to which the work related', 2, True),
-                InidCode(obj_type_id, '54', 'Type and full title of the work (works)', 2, True),
-                InidCode(obj_type_id, '54.S', 'Abbreviated title of the work (works)', 2, True),
-                InidCode(obj_type_id, '72', 'Name(s) of the creator(s)', 2, True),
-                InidCode(obj_type_id, '75', 'Name of the natural person(s) or full official name of the legal '
-                                            'entity(ies), parties to the agreement', 2, True),
+                InidCode(obj_type_id, "11", "Agreement registration number", 2, True),
+                InidCode(obj_type_id, "15", "Agreement registration date", 2, True),
+                InidCode(obj_type_id, "27", "Kind of agreement", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "29",
+                    "The object of copyright to which the work related",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "54",
+                    "Type and full title of the work (works)",
+                    2,
+                    True,
+                ),
+                InidCode(
+                    obj_type_id,
+                    "54.S",
+                    "Abbreviated title of the work (works)",
+                    2,
+                    True,
+                ),
+                InidCode(obj_type_id, "72", "Name(s) of the creator(s)", 2, True),
+                InidCode(
+                    obj_type_id,
+                    "75",
+                    "Name of the natural person(s) or full official name of the legal "
+                    "entity(ies), parties to the agreement",
+                    2,
+                    True,
+                ),
             ]
             res.extend(inid_data)
 
         # СДО
         inid_data = [
-            InidCode(16, '11', 'Number of the certificate of additional protection (number of the basic patent/serial '
-                               'number of the CAP under this patent)', 2, True),
-            InidCode(16, '16', 'Date of state registration of additional protection', 2, True),
-            InidCode(16, '98', 'Date of submission of the request for the issuance of a certificate '
-                               'of additional protection', 2, True),
-            InidCode(16, '68', 'State registration number, which is the number of the basic patent', 2, True),
-            InidCode(16, '54', 'Name of the invention', 2, True),
-            InidCode(16, '95', 'Name of the product (CAP) (matches the name specified '
-                               'in the authorization document)', 2, True),
-            InidCode(16, '92', 'Number and date of the first national authorization to place the product '
-                               'on the market', 2, True),
-            InidCode(16, '94', 'Term of validity of certificate of additional protection', 2, True),
-            InidCode(16, '73', 'Name or full name and address of the CAP owner(s) and two-letter country code', 2, True),
+            InidCode(
+                16,
+                "11",
+                "Number of the certificate of additional protection (number of the basic patent/serial "
+                "number of the CAP under this patent)",
+                2,
+                True,
+            ),
+            InidCode(
+                16, "16", "Date of state registration of additional protection", 2, True
+            ),
+            InidCode(
+                16,
+                "98",
+                "Date of submission of the request for the issuance of a certificate "
+                "of additional protection",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "68",
+                "State registration number, which is the number of the basic patent",
+                2,
+                True,
+            ),
+            InidCode(16, "54", "Name of the invention", 2, True),
+            InidCode(
+                16,
+                "95",
+                "Name of the product (CAP) (matches the name specified "
+                "in the authorization document)",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "92",
+                "Number and date of the first national authorization to place the product "
+                "on the market",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "94",
+                "Term of validity of certificate of additional protection",
+                2,
+                True,
+            ),
+            InidCode(
+                16,
+                "73",
+                "Name or full name and address of the CAP owner(s) and two-letter country code",
+                2,
+                True,
+            ),
         ]
         res.extend(inid_data)
 
         # Добре відомі ТМ
         inid_data = [
-            InidCode(17, 'image', 'Reproduction of the Mark', None, True),
-            InidCode(17, 'keywords', 'Key Words', None, True),
-            InidCode(17, 'decision_date', 'Effective Date of the Decision on the Declaration of the Mark '
-                                          'to be Well-Known in Ukraine', None, True),
-            InidCode(17, 'rights_date', 'Date on which the Mark was Declared to be Well-Known in Ukraine', None, True),
-            InidCode(17, 'holder', 'Name of the holder', None, True),
-            InidCode(17, 'nice', 'List of Goods and/or Services for which the Mark was Declared '
-                                 'to be Well-Known in Ukraine', None, True),
-            InidCode(17, 'vienna', 'Vienna Clasification', None, True),
+            InidCode(17, "image", "Reproduction of the Mark", None, True),
+            InidCode(17, "keywords", "Key Words", None, True),
+            InidCode(
+                17,
+                "decision_date",
+                "Effective Date of the Decision on the Declaration of the Mark "
+                "to be Well-Known in Ukraine",
+                None,
+                True,
+            ),
+            InidCode(
+                17,
+                "rights_date",
+                "Date on which the Mark was Declared to be Well-Known in Ukraine",
+                None,
+                True,
+            ),
+            InidCode(17, "holder", "Name of the holder", None, True),
+            InidCode(
+                17,
+                "nice",
+                "List of Goods and/or Services for which the Mark was Declared "
+                "to be Well-Known in Ukraine",
+                None,
+                True,
+            ),
+            InidCode(17, "vienna", "Vienna Clasification", None, True),
         ]
         res.extend(inid_data)
     return res
@@ -1515,14 +2499,18 @@ class DocumentReceiveDateService:
 
     def _get_receive_date_tm_id(self) -> datetime.datetime | None:
         """Получает (из ЦЕАД) дату получения документа заявителем."""
-        item = DeliveryDateCead.objects.using('e_archive').filter(id_doc_cead=self.doc.id_doc_cead).first()
+        item = (
+            DeliveryDateCead.objects.using("e_archive")
+            .filter(id_doc_cead=self.doc.id_doc_cead)
+            .first()
+        )
         if item:
             return item.receive_date
         return None
 
     def _get_receive_date_inv_um(self) -> datetime.datetime | None:
         """Получает (из ЦЕАД) дату получения документа заявителем."""
-        with connections['ellav'].cursor() as cursor:
+        with connections["ellav"].cursor() as cursor:
             query = f"""
                 SELECT *
                 FROM OPENQUERY([FOX,51433], '
@@ -1546,7 +2534,7 @@ class DocumentReceiveDateService:
             cursor.execute(query)
             row = cursor.fetchone()
             if row and row[0]:
-                return datetime.datetime.strptime(row[0], '%Y-%m-%d')
+                return datetime.datetime.strptime(row[0], "%Y-%m-%d")
             return None
 
     def get_receive_date(self) -> datetime.datetime | None:
@@ -1559,29 +2547,49 @@ class DocumentReceiveDateService:
 
 class DownloadDocumentsService:
     """Сервис, который скачивает документы из EArchive для пользователя."""
+
     cead_ids: List[int]  # список идентификаторов документов ЦЕАД для скачивания
     application_id: int  # идентификатор заявки (поле idAPPNumber из таблицы IPC_APPList базы данных UMA)
     application_data: dict
     user_id: int  # идентификатор пользователя
     user_ip_address: str  # ip адрес пользователя
     documents: List[ApplicationDocument] = []  # Список всех документов заявки
-    documents_wo_receive_date: List[ApplicationDocument] = []  # Список документов без даты получения
+    documents_wo_receive_date: List[ApplicationDocument] = (
+        []
+    )  # Список документов без даты получения
     es_client = Elasticsearch(settings.ELASTIC_HOST, timeout=settings.ELASTIC_TIMEOUT)
     order: OrderService
 
     # Типы документов для проверки есть ли у них дата доставки
     _doc_types_to_check = [
-        'Т-8', 'Т-19', 'П-8', 'П-19', 'Т8', 'Т19', 'П8', 'П19',
-        'В8', 'В9', 'В50', 'В-8', 'В-9', 'В-50'
+        "Т-8",
+        "Т-19",
+        "П-8",
+        "П-19",
+        "Т8",
+        "Т19",
+        "П8",
+        "П19",
+        "В8",
+        "В9",
+        "В50",
+        "В-8",
+        "В-9",
+        "В-50",
     ]
 
     def _set_application(self) -> None:
         """Получает данные заявки из ElasticSearch."""
         q = Q(
-            'bool',
-            must=[Q('match', _id=self.application_id)],
+            "bool",
+            must=[Q("match", _id=self.application_id)],
         )
-        s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es_client).query(q).execute()
+        s = (
+            Search(index=settings.ELASTIC_INDEX_NAME)
+            .using(self.es_client)
+            .query(q)
+            .execute()
+        )
         if not s:
             self.application_data = {}
         else:
@@ -1590,66 +2598,71 @@ class DownloadDocumentsService:
     def _set_application_documents(self) -> None:
         """Устанавливает список всех документов заявки."""
         documents = []
-        if self.application_data['Document']['idObjType'] in (1, 2, 3):
-            for doc in self.application_data['DOCFLOW']['DOCUMENTS']:
-                if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+        if self.application_data["Document"]["idObjType"] in (1, 2, 3):
+            for doc in self.application_data["DOCFLOW"]["DOCUMENTS"]:
+                if doc["DOCRECORD"].get("DOCIDDOCCEAD"):
                     documents.append(
                         ApplicationDocument(
-                            title=doc['DOCRECORD'].get('DOCTYPE'),
-                            reg_number=doc['DOCRECORD'].get('DOCREGNUMBER'),
-                            id_doc_cead=doc['DOCRECORD'].get('DOCIDDOCCEAD'),
+                            title=doc["DOCRECORD"].get("DOCTYPE"),
+                            reg_number=doc["DOCRECORD"].get("DOCREGNUMBER"),
+                            id_doc_cead=doc["DOCRECORD"].get("DOCIDDOCCEAD"),
                         )
                     )
 
             # Если это охранный документ, то нужно ещё добавить в список документы заявки
-            if self.application_data['search_data']['obj_state'] == 2:
+            if self.application_data["search_data"]["obj_state"] == 2:
                 q = Q(
-                    'query_string',
+                    "query_string",
                     query=f"search_data.obj_state:1 AND search_data.app_number:{self.application_data['search_data']['app_number']}",
                 )
-                s = Search(index=settings.ELASTIC_INDEX_NAME).using(self.es_client).query(q).execute()
+                s = (
+                    Search(index=settings.ELASTIC_INDEX_NAME)
+                    .using(self.es_client)
+                    .query(q)
+                    .execute()
+                )
                 if s:
                     app_hit = s[0].to_dict()
-                    for doc in app_hit.get('DOCFLOW', {}).get('DOCUMENTS', []):
-                        if doc['DOCRECORD'].get('DOCIDDOCCEAD'):
+                    for doc in app_hit.get("DOCFLOW", {}).get("DOCUMENTS", []):
+                        if doc["DOCRECORD"].get("DOCIDDOCCEAD"):
                             documents.append(
                                 ApplicationDocument(
-                                    title=doc['DOCRECORD'].get('DOCTYPE'),
-                                    reg_number=doc['DOCRECORD'].get('DOCREGNUMBER'),
-                                    id_doc_cead=doc['DOCRECORD'].get('DOCIDDOCCEAD'),
+                                    title=doc["DOCRECORD"].get("DOCTYPE"),
+                                    reg_number=doc["DOCRECORD"].get("DOCREGNUMBER"),
+                                    id_doc_cead=doc["DOCRECORD"].get("DOCIDDOCCEAD"),
                                 )
                             )
 
-        elif self.application_data['Document']['idObjType'] == 4:
-            for doc in self.application_data['TradeMark']['DocFlow']['Documents']:
-                if doc['DocRecord'].get('DocIdDocCEAD'):
+        elif self.application_data["Document"]["idObjType"] == 4:
+            for doc in self.application_data["TradeMark"]["DocFlow"]["Documents"]:
+                if doc["DocRecord"].get("DocIdDocCEAD"):
                     documents.append(
                         ApplicationDocument(
-                            title=doc['DocRecord'].get('DocType'),
-                            reg_number=doc['DocRecord'].get('DocRegNumber'),
-                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                            title=doc["DocRecord"].get("DocType"),
+                            reg_number=doc["DocRecord"].get("DocRegNumber"),
+                            id_doc_cead=doc["DocRecord"].get("DocIdDocCEAD"),
                         )
                     )
 
-        elif self.application_data['Document']['idObjType'] == 5:
-            for doc in self.application_data['Geo']['DocFlow']['Documents']:
-                if doc['DocRecord'].get('DocIdDocCEAD'):
+        elif self.application_data["Document"]["idObjType"] == 5:
+            for doc in self.application_data["Geo"]["DocFlow"]["Documents"]:
+                if doc["DocRecord"].get("DocIdDocCEAD"):
                     documents.append(
                         ApplicationDocument(
-                            title=doc['DocRecord'].get('DocType'),
-                            reg_number=doc['DocRecord'].get('DocRegNumber'),
-                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                            title=doc["DocRecord"].get("DocType"),
+                            reg_number=doc["DocRecord"].get("DocRegNumber"),
+                            id_doc_cead=doc["DocRecord"].get("DocIdDocCEAD"),
                         )
                     )
 
-        elif self.application_data['Document']['idObjType'] == 6:
-            for doc in self.application_data['Design']['DocFlow']['Documents']:
-                if doc['DocRecord'].get('DocIdDocCEAD'):
+        elif self.application_data["Document"]["idObjType"] == 6:
+            for doc in self.application_data["Design"]["DocFlow"]["Documents"]:
+                if doc["DocRecord"].get("DocIdDocCEAD"):
                     documents.append(
                         ApplicationDocument(
-                            title=doc['DocRecord'].get('DocType'),
-                            reg_number=doc['DocRecord'].get('DocRegNumber'),
-                            id_doc_cead=doc['DocRecord'].get('DocIdDocCEAD'),
+                            title=doc["DocRecord"].get("DocType"),
+                            reg_number=doc["DocRecord"].get("DocRegNumber"),
+                            id_doc_cead=doc["DocRecord"].get("DocIdDocCEAD"),
                         )
                     )
 
@@ -1666,47 +2679,59 @@ class DownloadDocumentsService:
     def _get_error_downloading(self) -> tuple[str, str] | None:
         """Проверяет все ли запрошенные документы могут быть скачаны. Возвращает кортеж с данными ошибки или None."""
         user_groups = UserService.get_user_groups(self.user_id)
-        if 'НАЗК' in user_groups:
+        if "НАЗК" in user_groups:
             doc_titles = []
             for id_doc_cead in self.cead_ids:
                 for doc in self.documents:
                     if int(doc.id_doc_cead) == int(id_doc_cead):
                         doc_titles.append(doc.title.replace("\r\n", ""))
-            disabled_docs = document_types_disabled_nacp(doc_titles, self.application_data['Document']['idObjType'])
+            disabled_docs = document_types_disabled_nacp(
+                doc_titles, self.application_data["Document"]["idObjType"]
+            )
             if disabled_docs:
                 if len(self.cead_ids) == 1:
-                    message = _('Завантаження неможливе, '
-                                'оскільки документ не дозволений для завантаження представникам НАЗК.')
+                    message = _(
+                        "Завантаження неможливе, "
+                        "оскільки документ не дозволений для завантаження представникам НАЗК."
+                    )
                 else:
-                    message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
-                                'що не дозволений(і) для завантаження представникам НАЗК:')
+                    message = _(
+                        "Завантаження неможливе, оскільки у списку для завантаження є документ(и), "
+                        "що не дозволений(і) для завантаження представникам НАЗК:"
+                    )
                     for doc in disabled_docs:
                         message = f"{message}<br>- {doc}"
-                return 'nacp_disabled', message
+                return "nacp_disabled", message
         else:
-            if self.application_data['search_data']['obj_state'] == 1:
+            if self.application_data["search_data"]["obj_state"] == 1:
                 self._set_docs_wo_receive_date()
                 if len(self.documents_wo_receive_date) > 0:
                     if len(self.cead_ids) == 1:
-                        message = _('Завантаження неможливе, оскільки документ не був отриманий адресатом.')
+                        message = _(
+                            "Завантаження неможливе, оскільки документ не був отриманий адресатом."
+                        )
                     else:
-                        message = _('Завантаження неможливе, оскільки у списку для завантаження є документ(и), '
-                                    'що не був(ли) отримані адресатом:')
+                        message = _(
+                            "Завантаження неможливе, оскільки у списку для завантаження є документ(и), "
+                            "що не був(ли) отримані адресатом:"
+                        )
                         for doc in self.documents_wo_receive_date:
                             message = f"{message}<br>- {doc.title} ({doc.reg_number})"
-                    return 'no_receive_date', message
+                    return "no_receive_date", message
 
     def _set_docs_wo_receive_date(self) -> None:
         """Проверяет, все ли документы для скачивания имеют дату получения.
-        Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19', 'В-8', 'В-9', 'В-50'"""
+        Проверяются документы типов 'Т-8', 'Т-19', 'П-8', 'П-19', 'В-8', 'В-9', 'В-50'
+        """
         self.documents_wo_receive_date = []
         for id_doc_cead in self.cead_ids:
             for doc in self.documents:
-                if int(doc.id_doc_cead) == int(id_doc_cead) \
-                        and any([x in doc.title for x in self._doc_types_to_check]):
+                if int(doc.id_doc_cead) == int(id_doc_cead) and any(
+                    [x in doc.title for x in self._doc_types_to_check]
+                ):
                     service = DocumentReceiveDateService(
-                        obj_type_id=self.application_data['Document']['idObjType'],
-                        doc=doc
+                        obj_type_id=self.application_data["Document"]["idObjType"],
+                        doc=doc,
                     )
                     receive_date = service.get_receive_date()
                     if not receive_date:
@@ -1717,7 +2742,7 @@ class DownloadDocumentsService:
         self.order = OrderService(
             user_id=self.user_id,
             ip_user=self.user_ip_address,
-            app_id=self.application_id
+            app_id=self.application_id,
         )
         self.order.save()
         for cead_id in self.cead_ids:
@@ -1744,29 +2769,36 @@ class DownloadDocumentsService:
             settings.ORDERS_ROOT,
             str(self.order.user_id),
             str(self.order.id),
-            file_zip_name
+            file_zip_name,
         )
-        with ZipFile(file_path_zip, 'w') as zip_:
+        with ZipFile(file_path_zip, "w") as zip_:
             for document in self.order.orderdocument_set.all():
                 zip_.write(
                     os.path.join(
                         settings.DOCUMENTS_MOUNT_FOLDER,
-                        'OrderService',
+                        "OrderService",
                         str(self.order.user_id),
                         str(self.order.id),
-                        document.file_name),
-                    f"{document.file_name}"
+                        document.file_name,
+                    ),
+                    f"{document.file_name}",
                 )
         return os.path.join(
             settings.MEDIA_URL,
-            'OrderService',
+            "OrderService",
             str(self.order.user_id),
             str(self.order.id),
-            file_zip_name
+            file_zip_name,
         )
 
-    def execute(self, cead_ids: List[int], application_id: int, user_id: int,
-                user_ip_address: str, lang_code: str) -> ServiceExecuteResult:
+    def execute(
+        self,
+        cead_ids: List[int],
+        application_id: int,
+        user_id: int,
+        user_ip_address: str,
+        lang_code: str,
+    ) -> ServiceExecuteResult:
         translation.activate(lang_code)
         self.cead_ids = cead_ids
         self.application_id = application_id
@@ -1778,12 +2810,9 @@ class DownloadDocumentsService:
 
         # Проверка есть ли доступ у пользователя к этой заявке
         user = UserService.get_user_or_anonymous(user_id)
-        if not user_has_access_to_docs(user, self.application_data):
+        if not UserDocAccessService(user, self.application_data).has_access():
             return ServiceExecuteResult(
-                status='error',
-                error=ServiceExecuteResultError(
-                    error_type='no_access'
-                )
+                status="error", error=ServiceExecuteResultError(error_type="no_access")
             )
 
         # Получение списка всех документов заявки
@@ -1792,21 +2821,18 @@ class DownloadDocumentsService:
         # Проверка все ли документы, запрошенные пользователем, входят в список документов заявки
         if not self._check_correct_cead_ids():
             return ServiceExecuteResult(
-                status='error',
-                error=ServiceExecuteResultError(
-                    error_type='wrong_id_doc_cead_list'
-                )
+                status="error",
+                error=ServiceExecuteResultError(error_type="wrong_id_doc_cead_list"),
             )
 
         # Проверка все ли документы, запрошенные пользователем, доступны для загрузки
         error_downloading = self._get_error_downloading()
         if error_downloading:
             return ServiceExecuteResult(
-                status='error',
+                status="error",
                 error=ServiceExecuteResultError(
-                    error_type=error_downloading[0],
-                    message=error_downloading[1]
-                )
+                    error_type=error_downloading[0], message=error_downloading[1]
+                ),
             )
 
         # Создание заказа
@@ -1814,19 +2840,11 @@ class DownloadDocumentsService:
         order_result = self._wait_order_completed()
         if not order_result:
             return ServiceExecuteResult(
-                status='error',
-                error=ServiceExecuteResultError(
-                    error_type='order_fail'
-                )
+                status="error", error=ServiceExecuteResultError(error_type="order_fail")
             )
 
         # Формирование архива с документами
         zip_path = self._create_zip()
 
         # Возврат успешного результата
-        return ServiceExecuteResult(
-            status='success',
-            data={
-                'file_path': zip_path
-            }
-        )
+        return ServiceExecuteResult(status="success", data={"file_path": zip_path})
