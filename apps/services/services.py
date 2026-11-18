@@ -3,6 +3,7 @@ import uuid
 from zipfile import ZipFile
 from django.conf import settings
 from django.db import connections
+from .models import OriginalDocumentDownloadLog
 
 
 class OriginalDocumentService:
@@ -44,3 +45,20 @@ class OriginalDocumentService:
                 filename
             )
 
+
+def original_document_download_log_create(
+    *,
+    sec_code: str,
+    user_id: int | None = None,
+    ip_address: str | None = None,
+    user_agent: str = '',
+    file_path: str = '',
+) -> OriginalDocumentDownloadLog:
+    """Створює запис у журналі успішних отримань оригіналів документів."""
+    return OriginalDocumentDownloadLog.objects.create(
+        sec_code=sec_code,
+        user_id=user_id,
+        ip_address=ip_address,
+        user_agent=user_agent or '',
+        file_path=file_path,
+    )

@@ -34,3 +34,13 @@ def get_user_or_anonymous(user_id):
         user = AnonymousUser()
 
     return user
+
+
+def get_client_ip(request):
+    """Возвращает IP-адрес пользователя."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

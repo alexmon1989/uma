@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from uma.utils import get_client_ip
 from .models import APIDescription
 from .tasks import get_original_document
 
@@ -24,7 +25,16 @@ def generate_original_document(request):
     if not re.fullmatch(r'^(?:cr)?\d{10}$', sec_code, re.IGNORECASE):
         return JsonResponse({'error': _('Довжина ідентифікатора документу невірна')}, status=400)
 
-    task = get_original_document.delay(sec_code.upper())
+    user_id = request.user.pk if request.user.is_authenticated else None
+    ip = get_client_ip(request)
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+    task = get_original_document.delay(
+        sec_code.upper(),
+        user_id=user_id,
+        ip=ip,
+        user_agent=user_agent,
+    )
     return JsonResponse({'task_id': task.id})
 
 

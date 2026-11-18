@@ -25,7 +25,8 @@ from .models import (
     AppVisit,
 )
 from .forms import AdvancedSearchForm, SimpleSearchForm
-from .utils import get_client_ip, paginate_results, get_ipc_codes_with_schedules
+from uma.utils import get_client_ip
+from .utils import paginate_results, get_ipc_codes_with_schedules
 from urllib.parse import parse_qs, urlparse, quote
 from celery.result import AsyncResult
 import json
