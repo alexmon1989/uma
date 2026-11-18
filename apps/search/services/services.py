@@ -31,7 +31,7 @@ from apps.search.services.external import (
     SanctionedObjectsService,
 )
 from apps.search.utils import filter_bad_apps
-from .doc_access import UserDocAccessService
+from .doc_access import UserDocAccessService, MediaFileAccessService
 from apps.search.dataclasses import (
     InidCode,
     ApplicationDocument,

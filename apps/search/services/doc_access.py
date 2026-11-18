@@ -1,7 +1,12 @@
+import os
+import re
 import unicodedata
+from abc import ABC, abstractmethod
 from typing import Any
 
 from django.contrib.auth.models import AnonymousUser, User
+
+from apps.search.models import AppLimited
 
 
 class UserDocAccessService:
@@ -68,43 +73,45 @@ class UserDocAccessService:
     )
 
     # Таблиця нормалізації символів
-    _NAME_TRANSLATION_TABLE = str.maketrans({
-        # Латиниця -> Кирилиця
-        "I": "І",
-        "O": "О",
-        "A": "А",
-        "C": "С",
-        "E": "Е",
-        "H": "Н",
-        "K": "К",
-        "M": "М",
-        "P": "Р",
-        "T": "Т",
-        "X": "Х",
-        "B": "В",
-        # Дефіси, тире та розділові знаки -> пробіл
-        "-": " ",
-        "–": " ",
-        "—": " ",
-        "‑": " ",
-        ".": " ",
-        ",": " ",
-        # Апострофи, лапки та невидимі спецсимволи -> видаляємо
-        "'": None,
-        "`": None,
-        "’": None,
-        "ʼ": None,
-        "‘": None,
-        '"': None,
-        "«": None,
-        "»": None,
-        "„": None,
-        "“": None,
-        "”": None,
-        "\xad": None,  # м'який перенос (soft hyphen)
-        "\u200b": None,  # пробіл нульової ширини
-        "\ufeff": None,  # BOM
-    })
+    _NAME_TRANSLATION_TABLE = str.maketrans(
+        {
+            # Латиниця -> Кирилиця
+            "I": "І",
+            "O": "О",
+            "A": "А",
+            "C": "С",
+            "E": "Е",
+            "H": "Н",
+            "K": "К",
+            "M": "М",
+            "P": "Р",
+            "T": "Т",
+            "X": "Х",
+            "B": "В",
+            # Дефіси, тире та розділові знаки -> пробіл
+            "-": " ",
+            "–": " ",
+            "—": " ",
+            "‑": " ",
+            ".": " ",
+            ",": " ",
+            # Апострофи, лапки та невидимі спецсимволи -> видаляємо
+            "'": None,
+            "`": None,
+            "’": None,
+            "ʼ": None,
+            "‘": None,
+            '"': None,
+            "«": None,
+            "»": None,
+            "„": None,
+            "“": None,
+            "”": None,
+            "\xad": None,  # м'який перенос (soft hyphen)
+            "\u200b": None,  # пробіл нульової ширини
+            "\ufeff": None,  # BOM
+        }
+    )
 
     def __init__(self, user: User | AnonymousUser, hit: dict[str, Any]) -> None:
         self.user = user
@@ -155,7 +162,10 @@ class UserDocAccessService:
         )
 
     def _get_user_edrpou(self) -> str | None:
-        if hasattr(self.user, "certificateowner") and self.user.certificateowner.pszSubjEDRPOUCode:
+        if (
+            hasattr(self.user, "certificateowner")
+            and self.user.certificateowner.pszSubjEDRPOUCode
+        ):
             return self.user.certificateowner.pszSubjEDRPOUCode.strip() or None
         return None
 
@@ -175,9 +185,7 @@ class UserDocAccessService:
 
         doc_persons = self._get_doc_persons()
         return any(
-            user_name in person
-            for person in doc_persons
-            for user_name in user_names
+            user_name in person for person in doc_persons for user_name in user_names
         )
 
     def _get_user_names(self) -> list[str]:
@@ -192,9 +200,7 @@ class UserDocAccessService:
                 raw_names.append(patent_attorney.name)
 
         return [
-            self._normalize_name(name)
-            for name in raw_names
-            if name and name.strip()
+            self._normalize_name(name) for name in raw_names if name and name.strip()
         ]
 
     def _get_doc_persons(self) -> list[str]:
@@ -231,3 +237,112 @@ class UserDocAccessService:
             for v in current
             if not isinstance(v, (dict, list)) and str(v).strip()
         ]
+
+
+class MediaAccessChecker(ABC):
+    """Базовий клас перевірки доступу до медіафайлів заявки згідно з налаштуваннями AppLimited."""
+
+    @abstractmethod
+    def has_access(self, filename: str, settings_dict: dict[str, Any]) -> bool:
+        """Повертає True, якщо доступ до файлу дозволено."""
+        pass
+
+
+class InvUMLDMediaAccessChecker(MediaAccessChecker):
+    """Перевірка доступу до файлів винаходів, корисних моделей та компонувань НМП."""
+
+    ENTER_NUM_PATTERN = re.compile(r"^(\d+)_")
+    PUBLISHED_DESCRIPTION_PREFIX = "published_description"
+
+    # 98 - формула (CL), 99 - опис (DE), 100 - реферат (AB), 101 - опубл. опис (DE)
+    ENTER_NUM_TO_SETTING: dict[int, str] = {
+        98: "CL",
+        99: "DE",
+        100: "AB",
+        101: "DE",
+    }
+
+    def has_access(self, filename: str, settings_dict: dict[str, Any]) -> bool:
+        setting_key = self._get_setting_key(filename)
+        if setting_key is None:
+            return True
+        return bool(settings_dict.get(setting_key, False))
+
+    def _get_setting_key(self, filename: str) -> str | None:
+        if filename.startswith(self.PUBLISHED_DESCRIPTION_PREFIX):
+            return "DE"
+        match = self.ENTER_NUM_PATTERN.match(filename)
+        if match:
+            enter_num = int(match.group(1))
+            return self.ENTER_NUM_TO_SETTING.get(enter_num)
+        return None
+
+
+class TMMediaAccessChecker(MediaAccessChecker):
+    """Перевірка доступу до медіафайлів торговельних марок (зображення знака)."""
+
+    SETTING_KEY = "MarkImageFilename"
+
+    def has_access(self, filename: str, settings_dict: dict[str, Any]) -> bool:
+        return bool(settings_dict.get(self.SETTING_KEY, False))
+
+
+class IDMediaAccessChecker(MediaAccessChecker):
+    """Перевірка доступу до медіафайлів промислових зразків (зображення зразка)."""
+
+    SETTING_KEY = "DesignSpecimenDetails"
+
+    def has_access(self, filename: str, settings_dict: dict[str, Any]) -> bool:
+        return bool(settings_dict.get(self.SETTING_KEY, False))
+
+
+class MediaFileAccessService:
+    """Сервіс перевірки прав публічного доступу до захищених медіафайлів об'єктів за шляхом файлу."""
+
+    FOLDER_TO_OBJ_TYPE: dict[str, int] = {
+        "INVENTIONS": 1,
+        "UTILITY_MOD": 2,
+        "LAYOUT_DES": 3,
+        "TRADE_MARKS": 4,
+        "INDUSTRIAL_DES": 6,
+    }
+
+    CHECKERS: dict[int, type[MediaAccessChecker]] = {
+        1: InvUMLDMediaAccessChecker,
+        2: InvUMLDMediaAccessChecker,
+        3: InvUMLDMediaAccessChecker,
+        4: TMMediaAccessChecker,
+        6: IDMediaAccessChecker,
+    }
+
+    PATH_PATTERN = re.compile(
+        r"^(?:/)?(?P<folder>INVENTIONS|UTILITY_MOD|LAYOUT_DES|TRADE_MARKS|INDUSTRIAL_DES)/\d+/(?P<app_number>[^/]+)/",
+        re.IGNORECASE,
+    )
+
+    def __init__(self, file_path: str) -> None:
+        self.file_path = file_path
+
+    def has_access(self) -> bool:
+        """Повертає True, якщо файл дозволено віддавати користувачу."""
+        match = self.PATH_PATTERN.search(self.file_path)
+        if not match:
+            return True
+
+        folder = match.group("folder").upper()
+        app_number = match.group("app_number")
+        obj_type_id = self.FOLDER_TO_OBJ_TYPE.get(folder)
+
+        checker_cls = self.CHECKERS.get(obj_type_id)
+        if not checker_cls:
+            return True
+
+        app_limited = AppLimited.objects.filter(
+            app_number=app_number,
+            obj_type_id=obj_type_id,
+        ).first()
+        if not app_limited or app_limited.cancelled:
+            return True
+
+        filename = os.path.basename(self.file_path)
+        return checker_cls().has_access(filename, app_limited.settings_dict)

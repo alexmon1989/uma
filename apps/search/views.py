@@ -1,4 +1,5 @@
 from apps.search.services.external import SanctionedObjectsService
+from apps.search.services.doc_access import MediaFileAccessService
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -22,7 +23,6 @@ from .models import (
     SimpleSearchPage,
     AdvancedSearchPage,
     AppVisit,
-    AppLimited,
 )
 from .forms import AdvancedSearchForm, SimpleSearchForm
 from .utils import get_client_ip, paginate_results, get_ipc_codes_with_schedules
@@ -30,8 +30,6 @@ from urllib.parse import parse_qs, urlparse, quote
 from celery.result import AsyncResult
 import json
 import mimetypes
-import os
-import re
 import six
 import apps.search.tasks as tasks
 from apps.search.decorators import check_recaptcha
@@ -597,33 +595,10 @@ def toggle_search_form(request):
     return JsonResponse({"visible": request.session.get("show_search_form")})
 
 
-def protected_media_view(request, file_path: str) -> HttpResponse:
-    # Отримуємо номер заявки зі шляху (наприклад: 'INVENTIONS/2021/a202102173/...')
-    match = re.search(
-        r"(?:INVENTIONS|UTILITY_MOD)/\d+/([^/]+)", file_path, re.IGNORECASE
-    )
-    app_number = match.group(1) if match else None
-
-    # Дані обмежень
-    app_limited = AppLimited.objects.filter(app_number=app_number).first()
-
-    # Визначення чи є обмеження на конкретний документ
-    if app_limited and not app_limited.cancelled:
-        filename = os.path.basename(file_path)
-        enter_num_match = re.match(r"^(\d+)_", filename)
-        enter_num = int(enter_num_match.group(1)) if enter_num_match else None
-
-        # 100 - реферат, 99 - опис, 98 - формула, 101 - опубл. опис (також published_description.pdf)
-        if enter_num == 100 and not app_limited.settings_dict.get("AB"):
-            return HttpResponseForbidden("Access denied")
-        if (
-            enter_num in (99, 101)
-            or filename == "published_description.pdf"
-            or filename.startswith("published_description")
-        ) and not app_limited.settings_dict.get("DE"):
-            return HttpResponseForbidden("Access denied")
-        if enter_num == 98 and not app_limited.settings_dict.get("CL"):
-            return HttpResponseForbidden("Access denied")
+def serve_protected_media(request, file_path: str) -> HttpResponse:
+    """Віддає захищені медіафайли об'єктів через Nginx X-Accel-Redirect з перевіркою обмежень публікації."""
+    if not MediaFileAccessService(file_path).has_access():
+        return HttpResponseForbidden("Access denied")
 
     # Переадресація через Nginx X-Accel-Redirect
     encoded_path = quote(file_path, safe="/")

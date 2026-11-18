@@ -122,7 +122,7 @@ def get_image_url(file_path, image_name):
     splitted_path = file_path.replace("\\", "/").split('/')
     splitted_path_len = len(splitted_path)
 
-    return f"{settings.MEDIA_URL}/" \
+    return f"{settings.MEDIA_URL}" \
            f"{splitted_path[splitted_path_len - 4]}" \
            f"/{splitted_path[splitted_path_len - 3]}/" \
            f"{splitted_path[splitted_path_len - 2]}/{image_name}"
@@ -133,7 +133,7 @@ def get_image_url_madrid_tm(file_path, image_name):
     splitted_path = file_path.replace("\\", "/").split('/')
     splitted_path_len = len(splitted_path)
 
-    return f"{settings.MEDIA_URL}/" \
+    return f"{settings.MEDIA_URL}" \
            f"{splitted_path[splitted_path_len - 5].upper()}/" \
            f"{splitted_path[splitted_path_len - 4]}/" \
            f"{splitted_path[splitted_path_len - 3]}/" \

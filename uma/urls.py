@@ -26,7 +26,7 @@ from apps.search.views import (
     get_task_info,
     get_validation_info,
     toggle_search_form,
-    protected_media_view,
+    serve_protected_media,
 )
 from apps.favorites.views import add_or_remove
 
@@ -74,8 +74,8 @@ urlpatterns += [
         name="payments-order-status",
     ),
     re_path(
-        r"^media/(?P<file_path>(?:INVENTIONS|UTILITY_MOD)/.+)$",
-        protected_media_view,
+        r"^media/+(?P<file_path>(?:INVENTIONS|UTILITY_MOD|LAYOUT_DES|TRADE_MARKS|INDUSTRIAL_DES)/.+)$",
+        serve_protected_media,
         name="protected_media",
     ),
     path(

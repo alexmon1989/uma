@@ -146,8 +146,9 @@
                        href="javascript:;"
                        data-src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}">
                         <img class="img-fluid img-thumbnail"
-                             src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
-                             alt="">
+                            loading="lazy"
+                            src="{{ hit.Document.filesPath|get_image_url:hit.TradeMark.TrademarkDetails.MarkImageDetails.MarkImage.MarkImageFilename }}"
+                            alt="">
 
                         <span class="u-block-hover__additional--fade g-color-white g-z-index-2">
                             <i class="hs-icon hs-icon-magnifier g-absolute-centered g-font-size-25"></i>
